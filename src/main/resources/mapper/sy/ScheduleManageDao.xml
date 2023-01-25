@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.sy.dao.ScheduleManageDao">
+    <select id="getList" parameterType="scheduleManageVO" resultType="scheduleManageVO">
+        SELECT
+            IDENT
+            , YEAR
+            , MONTH
+            , DAY
+            , CALD_DESC
+            , WORK_YN
+            , CALD_DT
+        FROM SY_CALD
+        WHERE 1=1
+        <if test= "year != null and year != '' ">
+            AND YEAR = #{year}
+        </if>
+        <if test= "month != null and month != '' ">
+            AND MONTH = #{month}
+        </if>
+        <if test= "day != null and day != '' ">
+            AND DAY = #{day}
+        </if>
+        <if test= "workYn != null and workYn != '' ">
+            AND WORK_YN = #{workYn}
+        </if>
+    </select>
+
+</mapper>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.sy.dao.NoticeDao">
+    <select id="findAll" parameterType="NoticeVO" resultType="NoticeVO">
+        SELECT
+            NTB_IDX,
+            NTB_DIV,
+            NTB_TIT,
+            NTB_CTT,
+            POP_YN,
+            POP_TRMK_STR,
+            POP_TRMK_END,
+            (POP_TRMK_STR || ' ~ ' || POP_TRMK_END) AS S_POPUP_PERIOD,
+            TO_CHAR(UDT_DS, 'YYYY-MM-DD') AS UDT_DS,
+            UDT_UID,
+            DEL_YN
+        FROM EI_NTB_NTC
+        WHERE NTB_DIV = 'S0240001'
+        AND (
+                (
+                    POP_TRMK_STR BETWEEN #{popupPeriod[0]} AND #{popupPeriod[1]}
+                    OR POP_TRMK_STR IS NULL
+                )
+            OR
+                (
+                    POP_TRMK_END BETWEEN #{popupPeriod[0]} AND #{popupPeriod[1]}
+                    OR POP_TRMK_END IS NULL
+                )
+        )
+        <if test="popYn != null and popYn != ''">
+            AND POP_YN = #{popYn}
+        </if>
+        <if test="ntbTit != null and ntbTit != ''">
+            AND UPPER(NTB_TIT) LIKE UPPER('%'||#{ntbTit}||'%')
+        </if>
+        <if test="udtUid != null and udtUid != ''">
+            AND UPPER(UDT_UID) LIKE UPPER('%'||#{udtUid}||'%')
+        </if>
+        ORDER BY
+        NTB_IDX DESC, POP_TRMK_END DESC
+    </select>
+</mapper>

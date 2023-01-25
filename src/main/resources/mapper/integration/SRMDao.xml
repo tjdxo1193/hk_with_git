@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.integration.dao.SRMDao">
+
+    <select id="findFinalOrderByDegree" resultType="SRMFinalOrderVO">
+        SELECT IDX,
+               DEGREE,
+               PHS_ORDER_NO,
+               LOT_NO,
+               CRT_DS,
+               IF_INFO_IDX,
+               IF_ID,
+               STATUS,
+               ORDER_ITM
+        FROM IF_REV_SRM_FINAL_ORDER
+        WHERE DEGREE = #{value}
+    </select>
+
+    <select id="nextDegreeInFinalOrder" resultType="int">
+        SELECT NVL(MAX(DEGREE), 0) + 1
+        FROM IF_REV_SRM_FINAL_ORDER
+    </select>
+
+    <select id="nextIdxInFinalOrder" resultType="int">
+        SELECT NVL(MAX(IDX), 0) + 1
+        FROM IF_REV_SRM_FINAL_ORDER
+    </select>
+
+    <insert id="createFinalOrder" parameterType="SRMFinalOrderVO">
+        INSERT INTO IF_REV_SRM_FINAL_ORDER (IDX, DEGREE, IF_ID, PHS_ORDER_NO, LOT_NO, STATUS, ORDER_ITM, CRT_DS,
+                                            IF_INFO_IDX)
+        VALUES (#{idx},
+                #{degree},
+                #{ifId},
+                #{phsOrderNo},
+                #{lotNo},
+                #{status},
+                #{orderItm},
+                SYSDATE,
+                #{ifInfoIdx})
+    </insert>
+
+
+    <insert id="createTestStatus" parameterType="lims.api.integration.vo.SRMSendVO$TestStatus">
+        INSERT INTO IF_TRS_TEST_STATUS
+        (IDX, DEGREE, TARGET_SYSTEM, PHS_ORDER_NO, LOT_NO, BATCH_NO, STATUS, HOLD_REASON, CRT_DS, TRS_STATUS)
+        VALUES (#{idx},
+                #{degree},
+                #{targetSystem},
+                #{phsOrderNo},
+                #{lotNo},
+                #{batchNo},
+                #{status},
+                #{holdReason},
+                SYSDATE,
+                #{trsStatus})
+    </insert>
+
+
+    <insert id="createTestResult" parameterType="lims.api.integration.vo.SRMSendVO$TestResult">
+        INSERT INTO IF_TRS_TEST_RESULT
+        (IDX, DEGREE, TARGET_SYSTEM, PHS_ORDER_NO, LOT_NO, BATCH_NO, SYT_JDG, SPEC_GRV, HARDNESS, RMK, NON_CFM_REASON,
+         CRT_DS, TRS_STATUS)
+        VALUES (#{idx},
+                #{degree},
+                #{targetSystem},
+                #{phsOrderNo},
+                #{lotNo},
+                #{batchNo},
+                #{sytJdg},
+                #{specGrv},
+                #{hardness},
+                #{rmk},
+                #{nonCfmReason},
+                SYSDATE,
+                #{trsStatus})
+    </insert>
+
+
+    <select id="findReoccurPreventionReportByDegree" resultType="SRMReoccurPreventReportVO">
+        SELECT IDX,
+               DEGREE,
+               IF_ID,
+               PHS_ORDER_NO,
+               LOT_NO,
+               BATCH_NO,
+               FILE_ID,
+               FILE_NAME,
+               FILE_DATA,
+               CRT_DS,
+               IF_INFO_IDX
+        FROM IF_REV_SRM_REOCCUR_PREVENTION
+        WHERE DEGREE = #{value}
+    </select>
+
+    <select id="nextDegreeInReoccurPreventionReport" resultType="int">
+        SELECT NVL(MAX(DEGREE), 0) + 1
+        FROM IF_REV_SRM_REOCCUR_PREVENTION
+    </select>
+
+    <select id="nextIdxInReoccurPreventionReport" resultType="int">
+        SELECT NVL(MAX(IDX), 0) + 1
+        FROM IF_REV_SRM_REOCCUR_PREVENTION
+    </select>
+
+    <insert id="createReoccurPreventionReport" parameterType="SRMReoccurPreventReportVO">
+        INSERT INTO IF_REV_SRM_REOCCUR_PREVENTION
+        (IDX, DEGREE, IF_ID, PHS_ORDER_NO, LOT_NO, BATCH_NO, FILE_ID, CRT_DS, IF_INFO_IDX, FILE_NAME, FILE_DATA)
+        VALUES (#{idx},
+                #{degree},
+                #{ifId},
+                #{phsOrderNo},
+                #{lotNo},
+                #{batchNo},
+                #{fileId},
+                SYSDATE,
+                #{ifInfoIdx},
+                #{fileName},
+                #{fileData})
+    </insert>
+
+
+    <select id="findConsignSupplierReportByDegree" resultType="SRMSupplierReportVO">
+        SELECT IDX,
+               DEGREE,
+               IF_ID,
+               PHS_ORDER_NO,
+               LOT_NO,
+               BATCH_NO,
+               REPORT_DIV,
+               FILE_ID,
+               CRT_DS,
+               IF_INFO_IDX,
+               FILE_DATA,
+               FILE_NAME
+        FROM IF_REV_SRM_REPORT_CONSIGN_SUP
+        WHERE DEGREE = #{value}
+    </select>
+
+    <select id="nextDegreeInConsignSupplierReport" resultType="int">
+        SELECT NVL(MAX(DEGREE), 0) + 1
+        FROM IF_REV_SRM_REPORT_CONSIGN_SUP
+    </select>
+
+    <select id="nextIdxInConsignSupplierReport" resultType="int">
+        SELECT NVL(MAX(IDX), 0) + 1
+        FROM IF_REV_SRM_REPORT_CONSIGN_SUP
+    </select>
+
+    <insert id="createConsignSupplierReport" parameterType="SRMSupplierReportVO">
+        INSERT INTO IF_REV_SRM_REPORT_CONSIGN_SUP
+        (IDX, DEGREE, IF_ID, PHS_ORDER_NO, LOT_NO, BATCH_NO, REPORT_DIV, FILE_ID, CRT_DS, IF_INFO_IDX, FILE_NAME,
+         FILE_DATA)
+        VALUES (#{idx},
+                #{degree},
+                #{ifId},
+                #{phsOrderNo},
+                #{lotNo},
+                #{batchNo},
+                #{reportDiv},
+                #{fileId},
+                SYSDATE,
+                #{ifInfoIdx},
+                #{fileName},
+                #{fileData})
+    </insert>
+
+
+    <select id="nextDegreeInNonCfmReport" resultType="int">
+        SELECT NVL(MAX(DEGREE), 0) + 1
+        FROM IF_TRS_SRM_REPORT_NON_CFM
+    </select>
+
+    <select id="nextIdxInNonCfmReport" resultType="int">
+        SELECT NVL(MAX(IDX), 0) + 1
+        FROM IF_TRS_SRM_REPORT_NON_CFM
+    </select>
+
+    <insert id="createNonCfmReport" parameterType="lims.api.integration.vo.SRMSendVO$NonCfmReport">
+        INSERT INTO IF_TRS_SRM_REPORT_NON_CFM
+        (IDX, DEGREE, BATCH_NO, ISP_REQ_NO, ANS_NO, PHS_ORDER_NO, LOT_NO, NON_CFM_REASON, EM_ID, REPORT_DIV, FILE_NAME,
+         FILE_DATA, CRT_DS, TRS_STATUS)
+        VALUES (#{idx},
+                #{degree},
+                #{batchNo},
+                #{ispReqNo},
+                #{ansNo},
+                #{phsOrderNo},
+                #{lotNo},
+                #{nonCfmReason},
+                #{emId},
+                #{reportDiv},
+                #{fileName},
+                #{fileData},
+                SYSDATE,
+                #{trsStatus})
+    </insert>
+
+    <update id="updateTrsStatusOfNonCfmReport"
+            parameterType="lims.api.integration.vo.SRMSendVO$NonCfmReport">
+        UPDATE IF_TRS_SRM_REPORT_NON_CFM
+        SET
+        TRS_STATUS = #{trsStatus}
+        <if test="ifInfoIdx != null and ifInfoIdx != ''">
+            ,IF_INFO_IDX = #{ifInfoIdx}
+        </if>
+        <if test="errorlogId != null and errorlogId != ''">
+            ,ERRORLOG_ID = #{errorlogId}
+        </if>
+        WHERE
+        IDX = #{idx}
+    </update>
+
+</mapper>

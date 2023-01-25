@@ -1,0 +1,28 @@
+server:
+  port: 8085
+  jetty:
+    connection-idle-timeout:
+
+spring:
+  devtools:
+    livereload:
+      enabled: true
+  datasource:
+    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+    url: jdbc:log4jdbc:oracle:thin:@203.229.218.220:22221/ORCL
+    username: HK_LIMS_APP
+    password: HK_LIMS_APP
+
+report-designer:
+  service-name: KOLMAR_LIMS
+  repository-path: http://203.229.218.192:23002/ReportingServer/mrd/KOLMAR_LIMS
+  user: admin
+  password: iit3274!@
+  reporting-server:
+    url: http://203.229.218.192:23002/ReportingServer/service
+  data-server:
+    url: http://203.229.218.192:23002/DataServer/rdagent.jsp
+
+auth:
+  token:
+    secret: R0iNN6wSxunNsnYS4fYiHKYz745AyTmwI2riqhEsCwk=

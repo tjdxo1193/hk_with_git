@@ -1,0 +1,484 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.integration.dao.SAPPostProcessDao">
+
+    <select id="existsPItem" resultType="boolean"
+            parameterType="lims.api.integration.vo.SAPPostProcessVO$Material$PItemKey">
+        SELECT CASE WHEN count(1) = 3 THEN 1 ELSE 0 END
+        FROM QM_PITM
+        WHERE PLNT_CD = #{plntCd}
+          AND PITM_CD = #{pitmCd}
+    </select>
+
+    <select id="currentVersionOfPItem" resultType="Integer"
+            parameterType="lims.api.integration.vo.SAPPostProcessVO$Material$PItemKey">
+        SELECT PITM_VER
+        FROM QM_PITM
+        WHERE PLNT_CD = #{plntCd}
+          AND PITM_CD = #{pitmCd}
+          AND PITM_VER = (
+            SELECT MAX(PITM_VER)
+            FROM QM_PITM
+            WHERE PLNT_CD = #{plntCd}
+              AND PITM_CD = #{pitmCd}
+        )
+    </select>
+
+    <select id="nextVersionOfPItem" parameterType="lims.api.integration.vo.SAPPostProcessVO$Material$PItemKey"
+            resultType="int">
+        SELECT NVL(MAX(PITM_VER), 0) + 1
+        FROM QM_PITM
+        WHERE PLNT_CD = #{plntCd}
+          AND PITM_CD = #{pitmCd}
+    </select>
+
+    <select id="currentVersionOfSpec" resultType="Integer"
+            parameterType="lims.api.integration.vo.SAPPostProcessVO$Material$PItemKey">
+        SELECT PITM_VER
+        FROM QM_PITM_SPEC
+        WHERE PLNT_CD = #{plntCd}
+          AND PITM_CD = #{pitmCd}
+          AND PITM_SPEC_IDX = (
+            SELECT MAX(PITM_SPEC_IDX)
+            FROM QM_PITM_SPEC
+            WHERE PLNT_CD = #{plntCd}
+              AND PITM_CD = #{pitmCd}
+        )
+    </select>
+
+    <select id="currentFinalVersionStatusCodeOfPItem" resultType="String"
+            parameterType="lims.api.integration.vo.SAPPostProcessVO$Material$PItemKey">
+        SELECT SPEC_PROC_CD
+        FROM QM_PITM
+        WHERE PLNT_CD = #{plntCd}
+          AND PITM_CD = #{pitmCd}
+          AND PITM_VER = #{version}
+    </select>
+
+    <select id="currentFinalVersionStatusCodeOfSpec" resultType="String"
+            parameterType="lims.api.integration.vo.SAPPostProcessVO$Material$PItemKey">
+        SELECT SPEC_PROC_CD
+        FROM QM_PITM_SPEC
+        WHERE PLNT_CD = #{plntCd}
+          AND PITM_CD = #{pitmCd}
+          AND PITM_VER = #{version}
+    </select>
+
+    <select id="nextPItemSpecIdxOfSpec" resultType="Integer"
+            parameterType="lims.api.integration.vo.SAPPostProcessVO$Material$PItemKey">
+        SELECT NVL(MAX(PITM_SPEC_IDX), 0) + 1
+        FROM QM_PITM_SPEC
+        WHERE PLNT_CD = #{plntCd}
+    </select>
+
+    <select id="findLatestApprovedPackageTest"
+            resultType="Integer"
+            parameterType="lims.api.integration.vo.SAPPostProcessVO$Material$PItemSpec">
+        SELECT AITM_SPEC_IDX
+        FROM QM_PKGA
+        WHERE AITM_SPEC_IDX =
+              (SELECT MAX(AITM_SPEC_IDX)
+               FROM QM_PKGA
+               WHERE SAP_PRDHA IS NOT NULL
+                 AND SAP_PRDHA = #{sapPrdha}
+                 AND SPEC_PROC_CD = #{specProcCd})
+    </select>
+
+    <insert id="createPItem" parameterType="lims.api.integration.vo.SAPPostProcessVO$Material$PItem">
+        INSERT INTO QM_PITM
+        (PLNT_CD,
+         PITM_CD,
+         PITM_VER,
+         SPEC_PROC_CD,
+         RVS_CTT,
+         DEL_YN,
+         USE_VER_YN,
+         CRT_IP,
+         CRT_DS,
+         CRT_UID,
+         UDT_IP,
+         UDT_DS,
+         UDT_UID)
+        VALUES (#{plntCd},
+                #{pitmCd},
+                #{pitmVer},
+                #{specProcCd},
+                #{rvsCtt},
+                #{delYn},
+                #{useVerYn},
+                #{crtIp},
+                SYSDATE,
+                #{crtUid},
+                #{udtIp},
+                SYSDATE,
+                #{udtUid})
+    </insert>
+
+    <update id="updatePItem" parameterType="lims.api.integration.vo.SAPPostProcessVO$Material$PItem">
+        UPDATE QM_PITM
+        SET SPEC_PROC_CD = #{specProcCd},
+            USE_VER_YN   = #{useVerYn},
+            UDT_IP       = #{udtIp},
+            UDT_DS       = SYSDATE,
+            UDT_UID      = #{udtUid}
+        WHERE PLNT_CD = #{plntCd}
+          AND PITM_CD = #{pitmCd}
+          AND PITM_VER = #{version}
+    </update>
+
+
+    <insert id="createPItemInfo"
+            parameterType="lims.api.integration.vo.SAPPostProcessVO$Material$PItemInfo">
+        INSERT INTO QM_PITM_INFO
+        (PLNT_CD,
+         PITM_CD,
+         PITM_VER,
+         PITM_TYP,
+         PITM_NM,
+         PITM_EN,
+         SAP_PRDHA,
+         ANS_DUR_DAY)
+        VALUES (#{plntCd},
+                #{pitmCd},
+                #{pitmVer},
+                #{pitmTyp},
+                (SELECT MAKTX FROM MS_SAP_MTR_MAKT WHERE MATNR = #{pitmCd} AND SPRAS = #{materialLangKO}),
+                (SELECT MAKTX FROM MS_SAP_MTR_MAKT WHERE MATNR = #{pitmCd} AND SPRAS = #{materialLangEN}),
+                (SELECT PRDHA FROM MS_SAP_MTR_MARA WHERE MATNR = #{pitmCd}),
+                (SELECT WEBAZ FROM MS_SAP_MTR_MARC WHERE MATNR = #{pitmCd} AND WERKS = #{plntCd}))
+    </insert>
+
+    <update id="updatePItemInfo"
+            parameterType="lims.api.integration.vo.SAPPostProcessVO$Material$PItemInfo">
+        UPDATE QM_PITM_INFO
+        SET PITM_TYP    = #{pitmTyp},
+            PITM_NM     = (SELECT MAKTX FROM MS_SAP_MTR_MAKT WHERE MATNR = #{pitmCd} AND SPRAS = #{materialLangKO}),
+            PITM_EN     = (SELECT MAKTX FROM MS_SAP_MTR_MAKT WHERE MATNR = #{pitmCd} AND SPRAS = #{materialLangEN}),
+            SAP_PRDHA   = (SELECT PRDHA FROM MS_SAP_MTR_MARA WHERE MATNR = #{pitmCd}),
+            ANS_DUR_DAY = (SELECT WEBAZ FROM MS_SAP_MTR_MARC WHERE MATNR = #{pitmCd} AND WERKS = #{plntCd})
+        WHERE PLNT_CD = #{plntCd}
+          AND PITM_CD = #{pitmCd}
+          AND PITM_VER = #{version}
+    </update>
+
+
+    <insert id="createPItemInfoSap"
+            parameterType="lims.api.integration.vo.SAPPostProcessVO$Material$PItemInfoSap">
+        INSERT INTO QM_PITM_INFO_SAP
+        (PLNT_CD, PITM_CD, PITM_VER, MTR_TYP, MTR_MRP, LAB_NO, BRD_ABBR, BRD_LNE, NOM_MTR, ETR_CTN_QTY, RMTR_SPEC, NBR,
+         FTN_YN,
+         PCS01, PCS02, PCS03, USE_TRM, OTC_PRD, DMS_EPT_YN, PEAR_DIV, MKR_VOL, MKR_VOL_UNIT,
+         ETN_ANS_REQ,
+         CTRPT_NO, PER_NO, CHAG_VOL, CHAG_VOL_UNIT, DIO_YN, PRB_IN_YN, PRB_FE_YN, PNX_FE_YN)
+        VALUES (#{plntCd},
+                #{pitmCd},
+                #{pitmVer},
+                (SELECT MTART FROM MS_SAP_MTR_MARA WHERE MATNR = #{pitmCd}),
+                (SELECT DISPO FROM MS_SAP_MTR_MARC WHERE MATNR = #{pitmCd} AND WERKS = #{plntCd}),
+                (SELECT ZLABNO FROM MS_SAP_MTR_MARA WHERE MATNR = #{pitmCd}),
+                #{brdAbbr},
+                null,
+                (SELECT BISMT FROM MS_SAP_MTR_MARA WHERE MATNR = #{pitmCd}),
+                #{etrCtnQty},
+                #{rmtrSpec},
+                #{nbr},
+                #{ftnYn},
+                #{pcs01},
+                #{pcs02},
+                #{pcs03},
+                   -- // {useTrm} 사용 기간.
+                null,
+                #{otcPrd},
+                #{dmsEptYn},
+                #{pearDiv},
+                #{mkrVol},
+                #{mkrVolUnit},
+                #{etnAnsReq},
+                #{ctrptNo},
+                   -- // {perNo} 허가 번호.
+                null,
+                   -- // {chagVol} 실충전 용량.
+                null,
+                   -- // {chagVolUnit} 실충전 용량 단위.
+                null,
+                #{dioYn},
+                #{prbInYn},
+                #{prbFeYn},
+                #{pnxFeYn})
+    </insert>
+
+    <update id="updatePItemInfoSap"
+            parameterType="lims.api.integration.vo.SAPPostProcessVO$Material$PItemInfoSap">
+        UPDATE QM_PITM_INFO_SAP
+        SET MTR_TYP       = (SELECT MTART FROM MS_SAP_MTR_MARA WHERE MATNR = #{pitmCd}),
+            MTR_MRP       = (SELECT DISPO FROM MS_SAP_MTR_MARC WHERE MATNR = #{pitmCd} AND WERKS = #{plntCd}),
+            LAB_NO        = (SELECT ZLABNO FROM MS_SAP_MTR_MARA WHERE MATNR = #{pitmCd}),
+            BRD_ABBR      = #{brdAbbr},
+            BRD_LNE       = null,
+            NOM_MTR       = (SELECT BISMT FROM MS_SAP_MTR_MARA WHERE MATNR = #{pitmCd}),
+            ETR_CTN_QTY   = null,
+            RMTR_SPEC     = #{rmtrSpec},
+            NBR           = #{nbr},
+            FTN_YN        = null,
+            PCS01         = #{pcs01},
+            PCS02         = #{pcs02},
+            PCS03         = #{pcs03},
+            PCS04         = null,
+            USE_TRM       = null,
+            OTC_PRD       = #{otcPrd},
+            DMS_EPT_YN    = null,
+            PEAR_DIV      = #{pearDiv},
+            MKR_VOL       = #{mkrVol},
+            MKR_VOL_UNIT  = #{mkrVolUnit},
+            BUS_CRG       = null,
+            ETN_ANS_REQ   = #{etnAnsReq},
+            CTRPT_NO      = #{ctrptNo},
+            PER_NO        = null,
+            CHAG_VOL      = null,
+            CHAG_VOL_UNIT = null,
+            DIO_YN        = #{dioYn},
+            PRB_IN_YN     = #{prbInYn},
+            PRB_FE_YN     = #{prbFeYn},
+            PNX_FE_YN     = #{pnxFeYn}
+        WHERE PLNT_CD = #{plntCd}
+          AND PITM_CD = #{pitmCd}
+          AND PITM_VER = #{version}
+    </update>
+
+    <update id="updateStatusOfPItemSpec"
+            parameterType="lims.api.integration.vo.SAPPostProcessVO$Material$PItemSpec">
+        UPDATE QM_PITM_SPEC
+        SET SPEC_PROC_CD = #{specProcCd},
+            USE_VER_YN   = #{useVerYn}
+        WHERE PLNT_CD = #{plntCd}
+          AND PITM_CD = #{pitmCd}
+          AND PITM_VER = #{currentVersion}
+    </update>
+
+    <insert id="createNewPItemSpec"
+            parameterType="lims.api.integration.vo.SAPPostProcessVO$Material$PItemSpec">
+        INSERT INTO QM_PITM_SPEC
+        (PLNT_CD, PITM_SPEC_IDX, PITM_CD, PITM_VER, AITM_SPEC_IDX, SPEC_PROC_CD, USE_VER_YN)
+        VALUES (#{plntCd},
+                #{pitmSpecIdx},
+                #{pitmCd},
+                #{nextVersion},
+                #{aitmSpecIdx},
+                #{specProcCd},
+                #{useVerYn})
+    </insert>
+
+    <insert id="createNextPItemSpec"
+            parameterType="lims.api.integration.vo.SAPPostProcessVO$Material$PItemSpec">
+        INSERT INTO QM_PITM_SPEC
+        (PLNT_CD, PITM_SPEC_IDX, PITM_CD, PITM_VER, AITM_SPEC_IDX, SPEC_PROC_CD, DEL_YN, USE_VER_YN, RVS_NO, DOC_NO,
+         RVS_DT, ENFO_DT, RVS_REA_CD, RVS_CTT, RVS_DIV_PS, PITM_ANS_SPEC_APR_IDX, CRT_IP,
+         CRT_DS, CRT_UID, UDT_IP, UDT_DS, UDT_UID)
+        SELECT PLNT_CD,
+               #{pitmSpecIdx},
+               PITM_CD,
+               #{nextVersion},
+               DECODE(#{aitmSpecIdxIsNull}, 'Y', null, NVL(#{aitmSpecIdx}, AITM_SPEC_IDX)),
+               #{specProcCd},
+               #{delYn},
+               #{useVerYn},
+               RVS_NO,
+               DOC_NO,
+               RVS_DT,
+               ENFO_DT,
+               RVS_REA_CD,
+               RVS_CTT,
+               RVS_DIV_PS,
+               PITM_ANS_SPEC_APR_IDX,
+               #{crtIp},
+               SYSDATE,
+               #{crtUid},
+               #{udtIp},
+               SYSDATE,
+               #{udtUid}
+        FROM QM_PITM_SPEC
+        WHERE PLNT_CD = #{plntCd}
+          AND PITM_CD = #{pitmCd}
+          AND PITM_VER = #{currentVersion}
+    </insert>
+
+
+    <select id="findReqIdxByIspReqNo" resultType="int">
+        SELECT REQ_IDX
+        FROM QT_PITM_ANS_REQ
+        WHERE ISP_REQ_NO = #{value}
+    </select>
+
+    <select id="findNotCanceledTestReqProcessAllByReqIdx"
+            resultType="lims.api.integration.vo.SAPPostProcessVO$TestRequest$PItemReqProcess">
+        SELECT PLNT_CD,
+               ANS_IDX
+        FROM QT_PITM_ANS_PROC
+        WHERE REQ_IDX IN (${value})
+          AND REQ_CANL_YN = 'N'
+    </select>
+
+    <select id="nextIdxInPItemReq" resultType="int">
+        SELECT NVL(MAX(REQ_IDX), 0) + 1
+        FROM QT_PITM_ANS_REQ
+    </select>
+
+    <insert id="createPItemRequest" parameterType="lims.api.integration.vo.SAPPostProcessVO$TestRequest$PItemReq">
+        INSERT INTO QT_PITM_ANS_REQ
+        (PLNT_CD, REQ_IDX, ISP_REQ_NO, ISP_REQ_DT, MTR_CD, MTR_NM, BATCH_NO, ETR_QTY, INP_UNIT, SAVE_PLA, ETR_DT,
+         PHS_ORDER_TYP, PHS_ORDER_NO, PHS_ORDER_ITM, ITM_CTG, PHS_UNIT_PRE, AMT_UNIT, CURR_CD, AMT_LOCCURR,
+         PHS_ORDER_QTY, PHS_ORDER_UNIT, SPL_CD, SPL_NM, PHS_CRG_NM, DLV_YN, VDR_CTRT_DT, VDR_RSV_TM, VDR_RPT_RCP_CRST,
+         LOT_NO, REP_BOM_NO, SPL_LOT_NO, MAK_DT, STRG_LMT, USE_LMT, PDT_ORDER_TYP, PDT_ORDER_NO, ITN_PRS_COMP_CD,
+         ITN_PRS_COMP_NM, MAK_EQP, WRK_NM, MTR_DOC_NO, MTR_DOC_YR, MTR_DOC_ITM, CSM_BP_CD, CSM_NM, ADD_COL1, ADD_COL2,
+         ADD_COL3, ADD_COL4, ADD_COL5, UDT_DS, REV_DS)
+        VALUES (#{plntCd},
+                #{reqIdx},
+                #{ispReqNo},
+                TO_CHAR(SYSDATE, 'YYYY-MM-DD'),
+                #{mtrCd},
+                #{mtrNm},
+                #{batchNo},
+                #{etrQty},
+                #{inpUnit},
+                #{savePla},
+                #{etrDt},
+                #{phsOrderTyp},
+                #{phsOrderNo},
+                #{phsOrderItm},
+                #{itmCtg},
+                #{phsUnitPre},
+                #{amtUnit},
+                #{currCd},
+                #{amtLoccurr},
+                #{phsOrderQty},
+                #{phsOrderUnit},
+                #{splCd},
+                #{splNm},
+                #{phsCrgNm},
+                #{dlvYn},
+                #{vdrCtrtDt},
+                #{vdrRsvTm},
+                #{vdrRptRcpCrst},
+                #{lotNo},
+                #{repBomNo},
+                #{splLotNo},
+                #{makDt},
+                #{strgLmt},
+                #{useLmt},
+                #{pdtOrderTyp},
+                #{pdtOrderNo},
+                #{itnPrsCompCd},
+                #{itnPrsCompNm},
+                #{makEqp},
+                #{wrkNm},
+                #{mtrDocNo},
+                #{mtrDocYr},
+                #{mtrDocItm},
+                #{csmBpCd},
+                #{csmNm},
+                #{addCol1},
+                #{addCol2},
+                #{addCol3},
+                #{addCol4},
+                #{addCol5},
+                SYSDATE,
+                TO_DATE(#{revDs}, 'YYYY-MM-DD HH24:mi:ss'))
+    </insert>
+
+    <update id="cancelTestRequestProcessToCancel"
+            parameterType="lims.api.integration.vo.SAPPostProcessVO$TestRequest$PItemReqProcess">
+        UPDATE QT_PITM_ANS_PROC
+        SET HLD_YN  = #{hldYn},
+            HLD_UID = #{hldUid},
+            HLD_REA = #{hldRea},
+            HLD_DS  = SYSDATE
+        WHERE PLNT_CD = #{plntCd}
+          AND ANS_IDX = #{ansIdx}
+    </update>
+
+    <select id="nextSeqInPItemRequestNonCfm" resultType="int"
+            parameterType="lims.api.integration.vo.SAPPostProcessVO$TestRequest$PItemReqNonCfm">
+        SELECT NVL(MAX(NON_CFM_SEQ), 0) + 1
+        FROM QT_PITM_ANS_REQ_NON_CFM
+        WHERE PLNT_CD = #{plntCd}
+          AND REQ_IDX = #{reqIdx}
+    </select>
+
+    <insert id="createPItemRequestNonCfm"
+            parameterType="lims.api.integration.vo.SAPPostProcessVO$TestRequest$PItemReqNonCfm">
+        INSERT INTO QT_PITM_ANS_REQ_NON_CFM
+        (PLNT_CD, REQ_IDX, NON_CFM_SEQ, ISP_REQ_NO, ISP_REQ_NO_BLK, ZEXFIELD1, ZEXFIELD2, ZEXFIELD3, ZEXFIELD4,
+         ZEXFIELD5, CRT_DS, IF_INFO_IDX)
+        VALUES (#{plntCd},
+                #{reqIdx},
+                #{nonCfmSeq},
+                #{ispReqNo},
+                #{ispReqNoBlk},
+                #{zexfield1},
+                #{zexfield2},
+                #{zexfield3},
+                #{zexfield4},
+                #{zexfield5},
+                SYSDATE,
+                #{ifInfoIdx})
+    </insert>
+
+    <!-- TODO 삭제 예정 -->
+    <select id="findAllForReqTest" resultType="lims.api.integration.vo.SAPTestRequestVO$RequestHeader">
+        SELECT IDX,
+               DEGREE,
+               ZQCREQNO,
+               GUID,
+               WERKS,
+               MATNR,
+               MAKTX,
+               CHARG,
+               ERFMG,
+               ERFME,
+               LGORT,
+               BUDAT,
+               BSART,
+               EBELN,
+               EBELP,
+               PSTYP,
+               NETPR,
+               PEINH,
+               WAERS,
+               DMBTR,
+               MENGE,
+               MEINS,
+               LIFNR,
+               NAME1,
+               AFNAM,
+               ZPARCEL,
+               LFDAT,
+               ZDELIVERYTIME,
+               ZCOA,
+               ZLOT_NO,
+               ZALT_BOM_NO,
+               ZVND_LOT_NO,
+               HSDAT,
+               ZSTORING_END_DATE,
+               ZSHELF_LIFE_END_DATE,
+               AUART,
+               AUFNR,
+               ZSUBCONNO,
+               ZSUBCONNAME,
+               ZEQUNR,
+               ZWORKER,
+               MBLNR,
+               MJAHR,
+               ZEILE,
+               ZCUSTOMER,
+               ZCUSTOMERNAME,
+               ZEXFIELD1,
+               ZEXFIELD2,
+               ZEXFIELD3,
+               ZEXFIELD4,
+               ZEXFIELD5,
+               IF_INFO_IDX,
+               TO_CHAR(CRT_DS, 'YYYY-MM-DD') AS CRT_DS
+        FROM IF_REV_SAP_TEST_REQUEST_HEADER
+    </select>
+
+</mapper>

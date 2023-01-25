@@ -1,0 +1,18 @@
+{
+  "editor.tabSize": 2,
+  "search.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/crownix*": true,
+    "**/jquery*": true,
+    "**/bootstrap*": true,
+    "**/AUIGrid*.css": true,
+    "**/AUIGrid*.js": true,
+    "**/node_modules*": true,
+    "**/FileSaver*": true,
+    "**/gc.spread*": true,
+    "**/select2*": true,
+    "**/popper.js": true,
+    "**/font-awesome*": true,
+  }
+}

@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.integration.dao.ELNDao">
+
+    <select id="findReportCtByDegree" resultType="lims.api.integration.vo.ELNCtReportVO$Matnr">
+        SELECT CT_ID,
+               CT_SEQ,
+               MATNR AS LAB_NO_MATNR
+        FROM IF_REV_ELN_REPORT_CT_MATNR
+        WHERE DEGREE = #{value}
+    </select>
+
+    <select id="findReportCtFileByDegree" resultType="lims.api.integration.vo.ELNCtReportVO$File">
+        SELECT CT_ID,
+               CT_SEQ,
+               FILE_NAME,
+               DATA AS FILE_DATA
+        FROM IF_REV_ELN_REPORT_CT_FILE
+        WHERE DEGREE = #{value}
+    </select>
+
+
+    <select id="nextDegreeInReportCt" resultType="int">
+        SELECT MAX(DEGREE)
+        FROM (
+                 SELECT NVL(MAX(DEGREE), 0) + 1 AS DEGREE
+                 FROM IF_REV_ELN_REPORT_CT_FILE
+                 UNION ALL
+                 SELECT NVL(MAX(DEGREE), 0) + 1 AS DEGREE
+                 FROM IF_REV_ELN_REPORT_CT_MATNR
+             )
+    </select>
+
+    <select id="nextIdxInReportCtFile" resultType="int">
+        SELECT NVL(MAX(IDX), 0) + 1
+        FROM IF_REV_ELN_REPORT_CT_FILE
+    </select>
+
+    <insert id="createReportCtFile" parameterType="lims.api.integration.vo.ELNCtReportVO$File">
+        INSERT INTO IF_REV_ELN_REPORT_CT_FILE
+            (IDX, DEGREE, CT_ID, CT_SEQ, FILE_NAME, DATA, CRT_DS, IF_INFO_IDX)
+        VALUES (#{idx},
+                #{degree},
+                #{ctId},
+                #{ctSeq},
+                #{fileName},
+                #{fileData},
+                SYSDATE,
+                #{ifInfoIdx})
+    </insert>
+
+
+    <select id="nextIdxInReportCtMatnr" resultType="int">
+        SELECT NVL(MAX(IDX), 0) + 1
+        FROM IF_REV_ELN_REPORT_CT_MATNR
+    </select>
+
+    <insert id="createReportCtMatnr" parameterType="lims.api.integration.vo.ELNCtReportVO$Matnr">
+        INSERT INTO IF_REV_ELN_REPORT_CT_MATNR
+            (IDX, DEGREE, CT_ID, CT_SEQ, MATNR, CRT_DS, IF_INFO_IDX)
+        VALUES (#{idx},
+                #{degree},
+                #{ctId},
+                #{ctSeq},
+                #{labNoMatnr},
+                SYSDATE,
+                #{ifInfoIdx})
+    </insert>
+
+
+    <select id="nextIdxInTestMethodByItem" resultType="int">
+        SELECT NVL(MAX(IDX), 0) + 1
+        FROM IF_TRS_ELN_TEST_METHOD_BY_ITEM
+    </select>
+
+    <select id="nextDegreeInTestMethodByItem" resultType="int">
+        SELECT NVL(MAX(DEGREE), 0) + 1
+        FROM IF_TRS_ELN_TEST_METHOD_BY_ITEM
+    </select>
+
+    <insert id="createTestMethodByItem" parameterType="lims.api.integration.vo.ELNSendVO$TestMethodByItem">
+        INSERT INTO IF_TRS_ELN_TEST_METHOD_BY_ITEM
+        (IDX, DEGREE, AMITM_CD, AITM_CD, AITM_KN, AITM_EN, AITM_ABBR, VRIA_NO, VRIA_KN, VRIA_EN, USE_YN, RMK, UDT_DATE,
+         UDT_TIME, CMD_TYPE, CRT_DS, TRS_STATUS, IF_INFO_IDX)
+        VALUES (#{idx},
+                #{degree},
+                #{amitmCd},
+                #{aitmCd},
+                #{aitmKn},
+                #{aitmEn},
+                #{aitmAbbr},
+                #{vriaNo},
+                #{vriaKn},
+                #{vriaEn},
+                #{useYn},
+                #{rmk},
+                #{udtDate},
+                #{udtTime},
+                #{cmdType},
+                SYSDATE,
+                #{trsStatus},
+                #{ifInfoIdx})
+    </insert>
+
+    <update id="updateTrsStatusOfTestMethodByItem" parameterType="lims.api.integration.vo.ELNSendVO$TestMethodByItem">
+        UPDATE IF_TRS_ELN_TEST_METHOD_BY_ITEM
+        SET
+        TRS_STATUS = #{trsStatus}
+        <if test="ifInfoIdx != null and ifInfoIdx != ''">
+            ,IF_INFO_IDX = #{ifInfoIdx}
+        </if>
+        <if test="errorlogId != null and errorlogId != ''">
+            ,ERRORLOG_ID = #{errorlogId}
+        </if>
+        WHERE
+        IDX = #{idx}
+    </update>
+
+
+    <select id="findTestMethodByItemIds" parameterType="String"
+            resultType="lims.api.integration.vo.ELNSendVO$TestMethodByItem">
+        SELECT B.AMITM_CD,
+               A.AITM_CD,
+               A.AITM_KN,
+               A.AITM_EN,
+               A.AITM_ABBR,
+               B.VRIA_NO,
+               B.VRIA_KN,
+               B.VRIA_EN,
+               B.USE_YN,
+               B.RMK,
+               TO_CHAR(SYSDATE, 'YYYYMMDD') AS UDT_DATE,
+               TO_CHAR(SYSDATE, 'hhmiss')   AS UDT_TIME
+        FROM MS_AITM A
+                 LEFT JOIN MS_AMITM B ON A.AITM_CD = B.AITM_CD
+        WHERE B.AMITM_CD IN (${value})
+    </select>
+
+
+    <select id="findLastVersionStandardSpecAll" resultType="ELNStandardSpecVO">
+        SELECT IDX,
+               DEGREE,
+               GUID,
+               LAB_NO_ERP_CODE,
+               LAB_NO,
+               PRD_DIV,
+               AMITM_CD,
+               STD_TEXT,
+               STD_CTG,
+               DISPLAY_QTY,
+               PMS_STD_MIN,
+               PMS_STD_MAX,
+               COM_STD_MIN,
+               COM_STD_MAX,
+               UNIT,
+               RMK,
+               CRT_DS,
+               IF_INFO_IDX
+        FROM IF_REV_ELN_STANDARD_SPEC
+        WHERE DEGREE = #{value}
+    </select>
+
+    <select id="nextIdxInStandardSpec" resultType="int">
+        SELECT NVL(MAX(IDX), 0) + 1
+        FROM IF_REV_ELN_STANDARD_SPEC
+    </select>
+
+    <select id="nextDegreeInStandardSpec" resultType="int">
+        SELECT NVL(MAX(DEGREE), 0) + 1
+        FROM IF_REV_ELN_STANDARD_SPEC
+    </select>
+
+    <insert id="createStandardSpec" parameterType="ELNStandardSpecVO">
+        INSERT INTO IF_REV_ELN_STANDARD_SPEC
+        (IDX, DEGREE, GUID, LAB_NO_ERP_CODE, LAB_NO, PRD_DIV, AMITM_CD, STD_TEXT, STD_CTG, DISPLAY_QTY,
+         PMS_STD_MIN, PMS_STD_MAX, COM_STD_MIN, COM_STD_MAX, UNIT, RMK, CRT_DS, IF_INFO_IDX)
+        VALUES (#{idx},
+                #{degree},
+                #{guid},
+                #{labNoErpCode},
+                #{labNo},
+                #{prdDiv},
+                #{amitmCd},
+                #{stdText},
+                #{stdCtg},
+                #{displayQty},
+                #{pmsStdMin},
+                #{pmsStdMax},
+                #{comStdMin},
+                #{comStdMax},
+                #{unit},
+                #{rmk},
+                SYSDATE,
+                #{ifInfoIdx})
+    </insert>
+
+</mapper>

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.lb.dao.LabEventReviewDao">
+
+    <!-- 실험실이벤트검토 조회 -->
+    <select id="findAll" parameterType="LabEventReviewVO" resultType="LabEventReviewVO">
+        SELECT QLE.PLNT_CD
+             , QLE.LAB_EVT_IDX
+             , QLE.ANS_NO
+             , QLE.ANS_IDX
+             , QLE.RST_SEQ
+             , QLE.PITM_TYP
+             , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = QLE.PITM_TYP) AS PITM_TYP_NM
+             , QLE.PITM_CD
+             , QLE.PITM_NM
+             , QLE.ORDER_NO
+             , QLE.LOT_NO
+             , QLE.BATCH_NO
+             , QLE.AMITM_CD
+             , QLE.AMITM_NM
+             , QLE.OCR_DT
+             , QLE.ANS_UID
+             , (SELECT USER_NM FROM SY_USER SU WHERE SU.USER_ID = QLE.ANS_UID AND SU.PLNT_CD = QLE.PLNT_CD) AS ANS_UID_NM
+             , QLE.CRTV_MSR
+             , QLE.TST_LOG_RPUB_YN
+             , QLE.REVW_CMMT
+             , QLE.REVW_UID
+             , QLE.REVW_DS
+             , QLE.REVW_IP
+             , QLE.LAB_EVT_APR_IDX
+             , QLE.RJT_UID
+             , QLE.RJT_DS
+             , QLE.RJT_REA
+        FROM QE_LAB_EVT QLE
+            LEFT JOIN SY_APR_INFO SAI ON QLE.PLNT_CD = SAI.PLNT_CD AND SAI.APR_IDX = QLE.LAB_EVT_APR_IDX
+        WHERE 1 = 1
+            AND QLE.PLNT_CD = #{plntCd}
+            AND QLE.LAB_EVT_APR_IDX IS NULL
+            AND QLE.RJT_UID IS NULL
+            AND QLE.RJT_DS IS NULL
+            AND QLE.RJT_REA IS NULL
+            <if test="pitmTyp != null and pitmTyp != ''">
+                AND QLE.PITM_TYP = #{pitmTyp}
+            </if>
+            <if test="pitmCd != null and pitmCd != ''">
+                AND UPPER(QLE.PITM_CD) LIKE UPPER('%' || #{pitmCd} || '%')
+            </if>
+            <if test="pitmNm != null and pitmNm != ''">
+                AND UPPER(QLE.PITM_NM) LIKE UPPER('%' || #{pitmNm} || '%')
+            </if>
+            <if test="ansNo != null and ansNo != ''">
+                AND ANS_NO = #{ansNo}
+            </if>
+    </select>
+
+    <!-- 실험실이벤트검토 검토 승인 -->
+    <update id="approveRequest" parameterType="LabEventReviewVO">
+        UPDATE QE_LAB_EVT SET
+            REVW_UID = #{loginUserUid},
+            REVW_DS = SYSDATE,
+            REVW_IP = #{loginUserIp},
+            REVW_CMMT = #{revwCmmt},
+            LAB_EVT_APR_IDX = #{labEvtAprIdx}
+        WHERE 1 = 1
+            AND PLNT_CD = #{plntCd}
+            AND LAB_EVT_IDX = #{labEvtIdx}
+    </update>
+
+    <!-- 실험실이벤트검토 검토 반려 -->
+    <update id="reject" parameterType="LabEventReviewVO">
+        UPDATE QE_LAB_EVT SET
+            RJT_UID = #{loginUserUid},
+            RJT_DS = SYSDATE,
+            RJT_REA = #{rjtRea}
+        WHERE 1 = 1
+            AND PLNT_CD = #{plntCd}
+            AND LAB_EVT_IDX = #{labEvtIdx}
+    </update>
+</mapper>

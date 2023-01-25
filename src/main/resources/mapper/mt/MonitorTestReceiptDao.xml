@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.mt.dao.MonitorTestReceiptDao">
+
+    <select id="getMonitorTestReceiptList" parameterType="MonitorTestReceiptVO" resultType="MonitorTestReceiptVO">
+        SELECT MMAP.MITM_REQ_IDX
+            , MMAP.MITM_SPEC_IDX
+            , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = MMAP.ANS_PROC_CD) AS ANS_PROC_NM
+            , MMAP.REQ_NO
+            , MMAP.REQ_DT
+            , MMAP.ANS_EDT
+            , MMAP.REQ_DS
+            , (SELECT DPT_NM FROM SY_DPT SD WHERE SD.DPT_CD = MMAP.REQ_DPT_CD AND SD.PLNT_CD = MMAP.PLNT_CD) AS REQ_DPT_NM
+            , MMAP.RCP_DT
+            , MMAP.RCP_DS
+            , MM.MITM_CD
+            , (SELECT HIR_TREE_CD FROM SY_CD_TREE SCT WHERE SCT.TREE_CD = MM.MITM_WRK_PLC_DIV) AS UPPER_MITM_WRK_PLC_DIV
+            , (SELECT TREE_NM FROM SY_CD_TREE WHERE TREE_CD = (SELECT HIR_TREE_CD FROM SY_CD_TREE SCT WHERE SCT.TREE_CD = MM.MITM_WRK_PLC_DIV)) AS UPPER_MITM_WRK_PLC_DIV_NM
+            , MM.MITM_WRK_PLC_DIV
+            , (SELECT TREE_NM FROM SY_CD_TREE SCT WHERE SCT.TREE_CD = MM.MITM_WRK_PLC_DIV) AS MITM_WRK_PLC_DIV_NM
+            , (SELECT HIR_TREE_CD FROM SY_CD_TREE WHERE TREE_CD = MM.MITM_PITM_DIV) AS UPPER_MITM_PITM_DIV_DIV
+            , (SELECT TREE_NM FROM SY_CD_TREE WHERE TREE_CD = (SELECT HIR_TREE_CD FROM SY_CD_TREE SCT WHERE SCT.TREE_CD = MM.MITM_PITM_DIV)) AS UPPER_MITM_PITM_DIV_NM
+            , MM.MITM_PITM_DIV
+            , (SELECT TREE_NM FROM SY_CD_TREE SCT WHERE SCT.TREE_CD = MM.MITM_PITM_DIV) AS MITM_PITM_DIV_NM
+            , MM.POINT
+            , MM.ROOMNO
+            , MM.GRADE
+            , (SELECT DPT_NM FROM SY_DPT SD WHERE SD.DPT_CD = MM.CRG_DPT_CD AND SD.PLNT_CD = MMAP.PLNT_CD) AS CRG_DPT_NM
+            , MM.ANS_CYL_CD
+            , (SELECT ANS_CYL_RULE_NM FROM SY_ANS_CYL SAC WHERE SAC.ANS_CYL_CD = MM.ANS_CYL_CD) AS ANS_CYL_RULE_NM
+            , MMS.AITM_SPEC_IDX
+        FROM MT_MITM_ANS_PROC MMAP
+        LEFT JOIN MM_MITM_SPEC MMS ON MMAP.MITM_SPEC_IDX = MMS.MITM_SPEC_IDX AND MMAP.PLNT_CD = MMS.PLNT_CD
+        LEFT JOIN MM_MITM MM ON MMS.PLNT_CD = MM.PLNT_CD AND MMS.MITM_CD = MM.MITM_CD
+        WHERE 1=1
+        AND ANS_PROC_CD = #{ansProcCd}
+        AND MMAP.HLD_YN != 'Y'
+        AND MMAP.PLNT_CD = #{plntCd}
+        <if test="point != null and point != ''">
+            AND TRIM(UPPER(MM.POINT)) LIKE ('%' || TRIM(UPPER(#{point})) || '%')
+        </if>
+        <if test="roomno != null and roomno != ''">
+            AND TRIM(UPPER(MM.ROOMNO)) LIKE ('%' || TRIM(UPPER(#{roomno})) || '%')
+        </if>
+        <if test="ansCylCd != null and ansCylCd != ''">
+            AND MM.ANS_CYL_CD = #{ansCylCd}
+        </if>
+        <if test="crgDptCd != null and crgDptCd != ''">
+            AND MM.CRG_DPT_CD = #{crgDptCd}
+        </if>
+        <if test="mitmWrkPlcDiv != null and mitmWrkPlcDiv != ''">
+            AND MM.MITM_WRK_PLC_DIV = #{mitmWrkPlcDiv}
+        </if>
+        <if test="upperMitmWrkPlcDiv != null and upperMitmWrkPlcDiv != ''">
+            AND (SELECT HIR_TREE_CD FROM SY_CD_TREE SCT WHERE SCT.TREE_CD = MM.MITM_WRK_PLC_DIV) = #{upperMitmWrkPlcDiv}
+        </if>
+        <if test="upperMitmPitmDiv != null and upperMitmPitmDiv != ''">
+            AND (SELECT HIR_TREE_CD FROM SY_CD_TREE WHERE TREE_CD = MM.MITM_PITM_DIV) = #{upperMitmPitmDiv}
+        </if>
+        <if test="formReqDt != null and formReqDt != ''">
+            AND MMAP.REQ_DT BETWEEN #{formReqDt[0]} AND #{formReqDt[1]}
+        </if>
+    </select>
+
+    <select id="getMonitorTestMitm" parameterType="MonitorTestReceiptVO" resultType="MonitorTestReceiptVO">
+        SELECT MMSA.PLNT_CD
+            , MMSA.AITM_SPEC_IDX
+            , MMSA.AITM_SEQ
+            , MMSA.ISP_DUR_TM
+            , MMSA.EQM_USE_TM
+            , MMSA.AMITM_CD
+            , (SELECT VRIA_KN FROM MS_AMITM MA WHERE MA.AMITM_CD = MMSA.AMITM_CD) AS VRIA_KN
+            , (SELECT VRIA_NO FROM MS_AMITM MA WHERE MA.AMITM_CD = MMSA.AMITM_CD) AS VRIA_NO
+            , (SELECT AITM_KN FROM MS_AITM WHERE AITM_CD = (SELECT AITM_CD FROM MS_AMITM MA WHERE MA.AMITM_CD = MMSA.AMITM_CD)) AS AITM_KN
+            , MMSA.PERSPEC_TXT
+            , MMSA.OWC_SPEC_TXT
+            , MMSA.SPEC_TXT_EN
+            , MMSA.PER_SLV_LOW
+            , MMSA.PER_SLV_UPP
+            , MMSA.PER_SLV_DESC
+            , MMSA.OWC_SLV_LOW
+            , MMSA.OWC_SLV_UPP
+            , MMSA.OWC_SLV_DESC
+            , MMSA.RST_DPNT
+            , MMSA.RPT_PRT_SLV_VAL
+            , MMSA.RPT_PRT_ITM_NM
+            , DECODE(MMSA.RPT_PRT_YN, 'Y', '출력함', '출력안함') AS RPT_PRT_YN
+            , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = MMSA.SPEC_TYP) AS SPEC_TYP_NM
+            , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = MMSA.JDG_TYP) AS JDG_TYP_NM
+            , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = MMSA.SLV_JDG_CFM AND SCD.PLNT_CD = MMSA.PLNT_CD) AS SLV_JDG_CFM_NM
+            , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = MMSA.SLV_JDG_NON_CFM AND SCD.PLNT_CD = MMSA.PLNT_CD) AS SLV_JDG_NON_CFM_NM
+            , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = MMSA.RST_UNIT_CD AND SCD.PLNT_CD = MMSA.PLNT_CD) AS RST_UNIT_NM
+        FROM MM_MITM_SPEC_AITM MMSA
+        WHERE MMSA.PLNT_CD = #{plntCd}
+        AND AITM_SPEC_IDX = #{aitmSpecIdx}
+        ORDER BY MMSA.AITM_ORD
+    </select>
+
+    <update id="receipt" parameterType="MonitorTestReceiptVO">
+        <selectKey resultType="string" keyProperty="ansNo" order="BEFORE">
+            SELECT 'MR' || TO_CHAR(SYSDATE, 'YYMM') || LPAD(NVL(MAX(SUBSTR(ANS_NO, -4))+1,1),4,0) FROM MT_MITM_ANS_PROC WHERE PLNT_CD = #{plntCd}
+        </selectKey>
+        UPDATE MT_MITM_ANS_PROC SET
+            ANS_PROC_CD = #{ansProcCd}
+            , ANS_NO = #{ansNo}
+            , RCP_DT = TO_CHAR(SYSDATE, 'YYYY-MM-DD')
+            , RCP_DS = SYSDATE
+            , RCP_DPT_CD = #{rcpDptCd}
+            , RCP_UID = #{rcpUid}
+            , ASS_APR_REQ_IDX = #{assAprReqIdx}
+        WHERE MITM_REQ_IDX = #{mitmReqIdx}
+        AND PLNT_CD = #{plntCd}
+    </update>
+
+    <insert id="insertRst" parameterType="MonitorTestInstructionVO">
+        INSERT INTO MT_MITM_ANS_RST (
+            PLNT_CD
+            , MITM_REQ_IDX
+            , RST_SEQ
+            , RST_PROC_CD
+            , ANS_DPT_CD
+            , AMITM_CD
+            , AITM_ORD
+            , PERSPEC_TXT
+            , OWC_SPEC_TXT
+            , SPEC_TXT_EN
+            , SPEC_TYP
+            , JDG_TYP
+            , PER_SLV_LOW
+            , PER_SLV_UPP
+            , PER_SLV_DESC
+            , OWC_SLV_LOW
+            , OWC_SLV_UPP
+            , OWC_SLV_DESC
+            , SLV_JDG_CFM
+            , SLV_JDG_NON_CFM
+            , RST_UNIT_CD
+            , RST_DPNT
+            , RPT_PRT_SLV_VAL
+            , RPT_PRT_ITM_NM
+            , RPT_PRT_YN
+            , ISP_DPT_CD
+            , SMP_CLLT_QTY
+            , SMP_CLLT_UNIT
+            , ISP_DUR_TM
+            , EQM_USE_TM
+        )
+        SELECT
+            #{plntCd}
+            , #{mitmReqIdx}
+            , AITM_SEQ
+            , 'S0140100'
+            , ANS_DPT_CD
+            , AMITM_CD
+            , AITM_ORD
+            , PERSPEC_TXT
+            , OWC_SPEC_TXT
+            , SPEC_TXT_EN
+            , SPEC_TYP
+            , JDG_TYP
+            , PER_SLV_LOW
+            , PER_SLV_UPP
+            , PER_SLV_DESC
+            , OWC_SLV_LOW
+            , OWC_SLV_UPP
+            , OWC_SLV_DESC
+            , SLV_JDG_CFM
+            , SLV_JDG_NON_CFM
+            , RST_UNIT_CD
+            , RST_DPNT
+            , RPT_PRT_SLV_VAL
+            , RPT_PRT_ITM_NM
+            , RPT_PRT_YN
+            , ISP_DPT_CD
+            , SMP_CLLT_QTY
+            , SMP_CLLT_UNIT
+            , ISP_DUR_TM
+            , EQM_USE_TM
+        FROM MM_MITM_SPEC_AITM
+        WHERE PLNT_CD = #{plntCd}
+        AND AITM_SPEC_IDX = #{aitmSpecIdx}
+    </insert>
+</mapper>

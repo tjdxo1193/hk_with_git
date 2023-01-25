@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.sm.dao.ProcessSpecimenManageDao">
+
+    <select id="getProcessSpecimenList" parameterType="ProcessSpecimenManageVO" resultType="ProcessSpecimenManageVO">
+        SELECT SPS.PLNT_CD
+            , SPS.PS_SPCM_IDX
+            , SPS.PITM_VER
+            , SPS.PITM_CD
+            , SPS.PDT_NO
+            , SPS.ENM_DT
+            , SPS.EXPIR_DT
+            , SPS.APR_UID
+            , (SELECT USER_NM FROM SY_USER SU WHERE SU.USER_ID = SPS.APR_UID) APR_UNM
+            , SPS.MUFT
+            , SPS.RMK
+            , SPS.USE_YN
+            , QPI.PITM_NM
+            , QPI.PITM_EN
+            , QPI.PITM_TYP
+            , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = QPI.PITM_TYP) AS PITM_TYP_NM
+        FROM SD_PS_SPCM SPS
+        LEFT JOIN QM_PITM_INFO QPI ON SPS.PITM_CD = QPI.PITM_CD AND SPS.PITM_VER = QPI.PITM_VER AND SPS.PLNT_CD = QPI.PLNT_CD
+        WHERE SPS.PLNT_CD = #{plntCd}
+        <if test="pitmNm != null and pitmNm != ''">
+            AND TRIM(UPPER(QPI.PITM_NM)) LIKE ('%' || TRIM(UPPER(#{pitmNm})) || '%')
+        </if>
+        <if test="pitmCd != null and pitmCd != ''">
+            AND TRIM(UPPER(SPS.PITM_CD)) LIKE ('%' || TRIM(UPPER(#{pitmCd})) || '%')
+        </if>
+        <if test="useYn != null and useYn != ''">
+            AND SPS.USE_YN = #{useYn}
+        </if>
+        <if test="formEnmDt != null and formEnmDt != ''">
+            AND SPS.ENM_DT BETWEEN #{formEnmDt[0]} AND #{formEnmDt[1]}
+        </if>
+        <if test="formExpirDt != null and formExpirDt != ''">
+            AND SPS.EXPIR_DT BETWEEN #{formExpirDt[0]} AND #{formExpirDt[1]}
+        </if>
+    </select>
+
+    <insert id="insertProcessSpecimen" parameterType="ProcessSpecimenManageVO">
+        <selectKey resultType="integer" keyProperty="psSpcmIdx" order="BEFORE">
+            SELECT NVL(MAX(PS_SPCM_IDX)+1,1) FROM SD_PS_SPCM WHERE PLNT_CD = #{plntCd}
+        </selectKey>
+        INSERT INTO SD_PS_SPCM(
+            PLNT_CD
+            , PS_SPCM_IDX
+            , PITM_VER
+            , PITM_CD
+            , PDT_NO
+            , ENM_DT
+            , EXPIR_DT
+            , APR_UID
+            , MUFT
+            , RMK
+        ) VALUES (
+            #{plntCd}
+            , #{psSpcmIdx}
+            , #{pitmVer}
+            , #{pitmCd}
+            , '1'
+            , #{enmDt}
+            , TO_DATE(#{expirDt}, 'YYYY-MM-DD HH24:MI:SS')
+            , #{aprUid}
+            , #{muft}
+            , #{rmk}
+        )
+    </insert>
+
+    <update id="updateProcessSpecimen" parameterType="ProcessSpecimenManageVO">
+        UPDATE SD_PS_SPCM SET
+            PDT_NO = (SELECT NVL(MAX(PDT_NO)+1,1) FROM SD_PS_SPCM WHERE PLNT_CD = #{plntCd} AND PS_SPCM_IDX = #{psSpcmIdx})
+            , ENM_DT = #{enmDt}
+            , EXPIR_DT = TO_DATE(#{expirDt}, 'YYYY-MM-DD HH24:MI:SS')
+            , MUFT = #{muft}
+            , RMK = #{rmk}
+            , USE_YN = #{useYn}
+        WHERE PLNT_CD = #{plntCd}
+        AND PS_SPCM_IDX = #{psSpcmIdx}
+    </update>
+</mapper>

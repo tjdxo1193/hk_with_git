@@ -1,0 +1,84 @@
+apiPrefix: /api
+
+spring:
+  profiles:
+    active: local
+  devtools:
+    livereload:
+      enabled: false
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  session:
+    store-type: none
+  messages:
+    encoding: UTF-8
+  output:
+    ansi:
+      enabled: detect
+  datasource:
+    hikari:
+      maximum-pool-size: 20
+      connection-timeout: 10000
+      max-lifetime: 0
+      leak-detection-threshold: 20000
+
+server:
+  servlet:
+    session:
+      persistent: true
+      timeout: 0
+    context-path: /
+    encoding:
+      charset: UTF-8
+      force: true
+  shutdown: graceful
+  forward-headers-strategy: native
+  error:
+    include-message: always
+    include-stacktrace: never
+    include-binding-errors: never
+    include-exception: false
+    whitelabel:
+      enabled: false
+  tomcat:
+    additional-tld-skip-patterns: "*.jar"
+
+auth:
+  token:
+    issuer: lims
+    refresh-token:
+      expire:
+        hours: 2
+    access-token:
+      expire:
+        minutes: 30
+
+mybatis:
+  mapper-locations: mapper/**/*.xml
+  type-aliases-package: lims.api.**.vo
+  configuration:
+    map-underscore-to-camel-case: true
+    jdbc-type-for-null: varchar
+
+logging:
+  charset:
+    console: UTF-8
+    file: UTF-8
+  level:
+    com.zaxxer.hikari.HikariConfig: debug
+    com.zaxxer.hikari: trace
+    root: info
+    lims.api: debug
+    jdbc.resultsettable: debug
+    jdbc.sqltiming: info
+    jdbc: off
+    jdbc.audit: off
+    jdbc.sqlonly: off
+    jdbc.resultset: off
+    jdbc.connection: info
+  logback:
+    rollingpolicy:
+      clean-history-on-start: false
+      max-file-size: 10MB

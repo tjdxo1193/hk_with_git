@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.tp.dao.SampleUsageApprDao">
+    <select id="find" parameterType="SampleUsageApprVO" resultType="SampleUsageApprVO">
+        SELECT QSU.PLNT_CD,
+               QSU.SMP_MNG_IDX,
+               QSU.USE_SEQ,
+               QSU.SMP_USE_PROC,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = SMP_USE_PROC)                        AS SMP_USE_NM,
+               QSU.USE_SMP_VOL,
+               QSU.USE_PPS,
+               QSU.USE_UID,
+               (SELECT USER_NM FROM SY_USER WHERE PLNT_CD = #{plntCd} AND USER_ID = QSU.USE_UID) AS USE_NM,
+               QSU.USE_DT,
+               QSU.STRG_PLA,
+               QSU.SMP_USE_APR_IDX,
+               QSM.PITM_NM,
+               QSM.PITM_CD,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.PITM_TYP)                        AS PITM_TYP_NM,
+               QPAP.ANS_NO,
+               QSM.LOT_NO,
+               QSM.BATCH_NO
+        FROM QS_SMP_USE QSU
+                 LEFT JOIN SY_APR_INFO SAI ON QSU.PLNT_CD = SAI.PLNT_CD AND QSU.SMP_USE_APR_IDX = SAI.APR_IDX
+                 LEFT JOIN QS_SMP_MNG QSM ON QSU.PLNT_CD = QSM.PLNT_CD AND QSU.SMP_MNG_IDX = QSM.SMP_MNG_IDX
+                 LEFT JOIN QT_PITM_ANS_INFO QPAI ON QSM.PLNT_CD = QPAI.PLNT_CD AND QSM.ANS_IDX = QPAI.ANS_IDX
+                 LEFT JOIN QT_PITM_ANS_PROC QPAP on QPAI.PLNT_CD = QPAP.PLNT_CD AND QPAI.ANS_IDX = QPAP.ANS_IDX
+        WHERE QSU.PLNT_CD = #{plntCd}
+          AND QSU.DEL_YN = 'N'
+          AND SMP_USE_PROC = #{smpUseProc}
+          AND SAI.APR_UID = #{aprUid}
+        ORDER BY QSU.SMP_MNG_IDX DESC
+    </select>
+
+    <update id="approve" parameterType="SampleUsageApprVO">
+        UPDATE QS_SMP_USE
+        SET SMP_USE_PROC = #{smpUseProc}
+        WHERE PLNT_CD = #{plntCd}
+          AND SMP_MNG_IDX = #{smpMngIdx}
+          AND USE_SEQ = #{useSeq}
+    </update>
+
+    <update id="reject" parameterType="SampleUsageApprVO">
+        UPDATE QS_SMP_USE
+        SET SMP_USE_PROC = #{smpUseProc},
+            RJT_UID      = #{rjtUid},
+            RJT_DS       = SYSDATE,
+            RJT_REA      = #{rjtRea}
+        WHERE PLNT_CD = #{plntCd}
+          AND SMP_MNG_IDX = #{smpMngIdx}
+          AND USE_SEQ = #{useSeq}
+    </update>
+</mapper>

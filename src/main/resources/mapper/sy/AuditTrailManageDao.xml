@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.sy.dao.AuditTrailManageDao">
+
+    <resultMap id="menu" type="AuditMenu">
+        <result column="p_CODE" property="code" javaType="String"/>
+        <result column="p_NAME" property="name" javaType="String"/>
+
+        <collection property="children" ofType="AuditMenu">
+            <result column="c_CODE" property="code" javaType="String"/>
+            <result column="c_NAME" property="name" javaType="String"/>
+        </collection>
+    </resultMap>
+
+    <select id="findMenuAll" parameterType="AuditManageMenuVO" resultMap="menu">
+        SELECT DISTINCT A.MENU_CD AS p_CODE,
+        A.MENU_NM AS p_NAME,
+        B.MENU_CD AS c_CODE,
+        B.MENU_NM AS C_NAME
+        FROM SY_MENU A
+        JOIN SY_MENU B ON A.MENU_CD = B.HIR_MENU_CD
+        WHERE A.MENU_CD != 'M1000'
+        <if test="menuCd != null and menuCd != ''">
+            AND UPPER(B.MENU_CD) LIKE '%'||UPPER(#{menuCd})||'%'
+        </if>
+        <if test="upperMenuNm != null and upperMenuNm != ''">
+            AND UPPER(A.MENU_NM) LIKE '%'||UPPER(#{upperMenuNm})||'%'
+        </if>
+        <if test="menuNm != null and menuNm != ''">
+            AND UPPER(B.MENU_NM) LIKE '%'||UPPER(#{menuNm})||'%'
+        </if>
+        ORDER BY A.MENU_CD, B.MENU_CD
+    </select>
+
+    <select id="findTableAll" parameterType="AuditManageTableVO" resultType="AuditManageTable">
+        SELECT
+        T.TABLE_NAME AS TABLE_NM,
+        T.COMMENTS AS TABLE_COMMENT
+        FROM ALL_TAB_COMMENTS T
+        WHERE T.OWNER = #{owner}
+        <if test="tableNm != null and tableNm != ''">
+            AND UPPER(T.TABLE_NAME) LIKE '%'||UPPER(#{tableNm})||'%'
+        </if>
+        <if test="tableComment != null and tableComment != ''">
+            AND UPPER(T.COMMENTS) LIKE '%'||UPPER(#{tableComment})||'%'
+        </if>
+        ORDER BY T.TABLE_NAME
+    </select>
+
+    <select id="findColumnsByTableName" parameterType="AuditManageTableVO" resultType="AuditManageColumn">
+        SELECT TABLE_NAME  AS TABLE_NM,
+               COLUMN_NAME AS COLUMN_NM,
+               COMMENTS    AS COLUMN_COMMENT
+        FROM ALL_COL_COMMENTS
+        WHERE OWNER = #{owner}
+          AND TABLE_NAME = #{tableNm}
+        ORDER BY COMMENTS
+    </select>
+
+    <select id="findAuditMasterByMenuCode" resultType="AuditMaster">
+        SELECT AM.MENU_CD,
+               AM.SRLNO,
+               SM.MENU_NM,
+               AM.TAB_NM,
+               AM.COL_NM,
+               AM.COL_COMT,
+               AM.COL_HED_NM,
+               AM.JOIN_TAB_NM,
+               AM.JOIN_COL_NM,
+               AM.JOIN_DISPLAY_COL_NM
+        FROM SY_AUDIT_MST AM
+        LEFT JOIN SY_MENU SM ON AM.MENU_CD = SM.MENU_CD
+        WHERE AM.MENU_CD = #{value}
+    </select>
+
+    <select id="nextAuditMasterKey" parameterType="String" resultType="Integer">
+        SELECT NVL(MAX(SRLNO), 0) + 1
+        FROM SY_AUDIT_MST
+        WHERE MENU_CD = #{value}
+    </select>
+
+    <insert id="createAuditMaster" parameterType="AuditMaster">
+        INSERT INTO SY_AUDIT_MST
+        (MENU_CD, SRLNO, TAB_NM, COL_NM, COL_COMT, COL_HED_NM, JOIN_TAB_NM, JOIN_COL_NM, JOIN_DISPLAY_COL_NM)
+        VALUES (#{menuCd}, #{seqno}, #{tableNm}, #{columnNm}, #{columnComment}, #{columnHeaderNm}, #{joinTableNm}, #{joinColumnNm}, #{joinDisplayColumnNm})
+    </insert>
+
+    <delete id="deleteAuditMasterByMenuCode" parameterType="String">
+        DELETE SY_AUDIT_MST
+        WHERE MENU_CD = #{value}
+    </delete>
+
+</mapper>

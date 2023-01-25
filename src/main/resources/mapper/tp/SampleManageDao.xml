@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.tp.dao.SampleManageDao">
+    <select id="find" parameterType="SampleManageVO" resultType="SampleManageVO">
+        SELECT QSM.PLNT_CD,
+        QSM.SMP_MNG_IDX,
+        QSM.SMP_DPS_PROC,
+        (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.SMP_DPS_PROC) AS SMP_DPS_NM,
+        QSM.PITM_TYP,
+        (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.PITM_TYP) AS PITM_TYP_NM,
+        QSM.PITM_CD,
+        QSM.PITM_NM,
+        QSM.ANS_TYP,
+        (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.ANS_TYP) AS ANS_TYP_NM,
+        QSM.ANS_IDX,
+        QSM.SMP_DIV_CD,
+        (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.SMP_DIV_CD) AS SMP_DIV_NM,
+        QSM.MNG_SMP_VOL,
+        QSM.SMP_STRG_MTD,
+        (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.SMP_STRG_MTD) AS SMP_STRG_MTD_NM,
+        QSM.SMP_VOL_UNIT,
+        (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.SMP_VOL_UNIT) AS SMP_VOL_UNIT_NM,
+        QSM.LOT_NO,
+        QSM.BATCH_NO,
+        QSM.INP_UNIT,
+        QSM.MAK_DT,
+        QSM.STRG_LMT,
+        QSM.USE_LMT,
+        QSM.IRG_YN,
+        QSM.SMP_RMK,
+        QSM.DPS_EXP_DT,
+        QSM.DPS_FIX_DT,
+        QSM.SMP_ETR_DT,
+        QPAI.ANS_IDX,
+        QPAP.REQ_IDX,
+        QPAP.ANS_PROC_CD,
+        (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QPAP.ANS_PROC_CD) AS ANS_PROC_NM,
+        QPAP.ANS_NO,
+        QPAP.RCP_DT
+        FROM QS_SMP_MNG QSM
+        LEFT JOIN QT_PITM_ANS_INFO QPAI ON QSM.PLNT_CD = QPAI.PLNT_CD AND QSM.ANS_IDX = QPAI.ANS_IDX
+        LEFT JOIN QT_PITM_ANS_PROC QPAP on QPAI.PLNT_CD = QPAP.PLNT_CD AND QPAI.ANS_IDX = QPAP.ANS_IDX
+        WHERE QSM.PLNT_CD = #{plntCd}
+        AND QSM.DEL_YN = 'N'
+        AND QSM.DPS_YN = 'N'
+        <if test="smpDivCd != ''">
+            AND QSM.SMP_DIV_CD = #{smpDivCd}
+        </if>
+        <if test="smpDpsProc != ''">
+            AND QSM.SMP_DPS_PROC = #{smpDpsProc}
+        </if>
+        <if test="ansTyp != ''">
+            AND QSM.ANS_TYP = #{ansTyp}
+        </if>
+        <if test="pitmTyp != ''">
+            AND QSM.PITM_TYP = #{pitmTyp}
+        </if>
+        <if test="lotNo != ''">
+            AND QSM.LOT_NO LIKE '%' || UPPER(#{lotNo}) '%'
+        </if>
+        <if test="batchNo != ''">
+            AND QSM.BATCH_NO LIKE '%' || UPPER(#{batchNo}) '%'
+        </if>
+        <if test="ansNo != ''">
+            AND QPAP.ANS_NO LIKE '%' || UPPER(#{lotNo}) '%'
+        </if>
+        ORDER BY QSM.SMP_ETR_DT DESC
+    </select>
+
+    <insert id="create" parameterType="SampleManageVO">
+        <selectKey resultType="Integer" keyProperty="smpMngIdx" order="BEFORE">
+            SELECT MAX(SMP_MNG_IDX) + 1
+            FROM QS_SMP_MNG
+            WHERE PLNT_CD = #{plntCd}
+        </selectKey>
+        INSERT INTO QS_SMP_MNG(PLNT_CD, SMP_MNG_IDX, SMP_DPS_PROC, ANS_IDX, DEL_YN, DPS_YN, PITM_TYP, PITM_CD, PITM_NM,
+        ANS_TYP, SMP_DIV_CD, MNG_SMP_VOL, SMP_STRG_MTD, SMP_VOL_UNIT, LOT_NO, BATCH_NO, INP_UNIT, MAK_DT, STRG_LMT,
+        IRG_YN, SMP_RMK, DPS_EXP_DT, SMP_ETR_DT)
+        VALUES (#{plntCd}, #{smpMngIdx}, #{smpDpsProc}, #{ansIdx},'N', 'N', #{pitmTyp}, #{pitmCd}, #{pitmNm}, #{ansTyp},
+        #{smpDivCd}, #{mngSmpVol}, #{smpStrgMtd}, #{smpVolUnit}, #{lotNo}, #{batchNo}, #{inpUnit}, #{makDt},
+        #{strgLmt}, #{irgYn}, #{smpRmk}, #{dpsExpDt}, #{smpEtrDt})
+    </insert>
+
+    <update id="update" parameterType="SampleManageVO">
+        UPDATE QS_SMP_MNG
+        SET DPS_EXP_DT = #{dpsExpDt},
+            SMP_RMK    = #{smpRmk}
+        WHERE PLNT_CD = #{plntCd}
+          AND SMP_MNG_IDX = #{smpMngIdx}
+    </update>
+
+    <update id="delete">
+        UPDATE QS_SMP_MNG
+        SET DEL_YN = 'Y'
+        WHERE PLNT_CD = #{plntCd}
+          AND SMP_MNG_IDX = #{smpMngIdx}
+    </update>
+
+    <select id="findTest" parameterType="SampleManageVO" resultType="SampleManageVO">
+        SELECT QPAI.PLNT_CD,
+               QPAI.ANS_IDX,
+               QPAP.ANS_NO,
+               QPAR.MTR_CD                            AS PITM_CD,
+               QPAR.MTR_NM                            AS PITM_NM,
+               QPAI.CRG_DPT_CD,
+               (SELECT DPT_NM
+                FROM SY_DPT SD
+                WHERE SD.PLNT_CD = #{plntCd}
+                  AND SD.DPT_CD = QPAI.CRG_DPT_CD)    AS CRG_DPT_NM,
+               QPAR.LOT_NO,
+               QPAR.BATCH_NO,
+               QPAP.ANS_TYP,
+               (SELECT DTL_NM
+                FROM SY_CD_DTL SCD
+                WHERE SCD.PLNT_CD = #{plntCd}
+                  AND SCD.DTL_CD = QPAP.ANS_TYP)      AS ANS_TYP_NM,
+               QPAP.REQ_IDX,
+               QPAP.RCP_DT,
+               QPAP.ANS_PROC_CD,
+               (SELECT DTL_NM
+                FROM SY_CD_DTL SCD2
+                WHERE SCD2.PLNT_CD = #{plntCd}
+                  AND SCD2.DTL_CD = QPAP.ANS_PROC_CD) AS ANS_PROC_NM,
+               QSM.SMP_MNG_IDX,
+               QSM.PITM_TYP
+        FROM QT_PITM_ANS_INFO QPAI
+                 LEFT JOIN QT_PITM_ANS_PROC QPAP ON QPAI.PLNT_CD = QPAP.PLNT_CD AND QPAI.ANS_IDX = QPAP.ANS_IDX
+                 LEFT JOIN QT_PITM_ANS_REQ QPAR on QPAI.PLNT_CD = QPAR.PLNT_CD AND QPAP.REQ_IDX = QPAR.REQ_IDX
+                 LEFT JOIN QS_SMP_MNG QSM on QPAI.PLNT_CD = QSM.PLNT_CD and QPAI.ANS_IDX = QSM.ANS_IDX
+        WHERE QPAI.PLNT_CD = #{plntCd}
+          AND QPAP.ANS_PROC_CD IN
+              ('S0130400', 'S0130500', 'S0130600', 'S0130610', 'S0130700', 'S0130710', 'S0130800', 'S0130900',
+               'S0131000')
+        ORDER BY QPAP.RCP_DT DESC
+    </select>
+</mapper>

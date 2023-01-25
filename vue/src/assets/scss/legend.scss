@@ -1,0 +1,164 @@
+@charset "UTF-8";
+
+.legend-wrap {
+
+  // 기본값
+  & .empty {
+    background-color: rgb(150, 150, 150);
+  }
+
+  // 임시저장
+  & .tempSave {
+    background-color: rgb(255, 250, 205) !important;
+  }
+
+  // 보류
+  & .hold {
+    background-color: rgb(64, 224, 208);
+  }
+
+  // 반려
+  & .return {
+    background-color: rgb(222, 184, 135) !important;
+  }
+
+  // 반려시험
+  & .returnTest {
+    background-color: rgb(222, 184, 135);
+  }
+
+  // 부적합
+  & .nonconformity {
+    background-color: rgb(255, 0, 0);
+  }
+
+  // 조건부적합
+  & .nonconformityContidion {
+    background-color: rgb(240, 128, 128);
+  }
+
+  // 승인요청
+  & .approveRequest {
+    background-color: rgb(220, 20, 60);
+  }
+
+  // 시험중단
+  & .testStop {
+    background-color: rgb(72, 209, 204);
+  }
+
+  // 시험종료
+  & .textExit {
+    background-color: rgb(216, 191, 216);
+  }
+
+  // 승인대기중
+  & .approveWating {
+    background-color: rgb(135, 206, 250);
+  }
+
+  // 표준완료일 초과
+  & .exceedCompleteDate {
+    background-color: rgb(222, 184, 135);
+  }
+
+  // OOS 재시험
+  & .oosReTest {
+    background-color: rgb(91, 221, 215);
+  }
+
+  // 이상
+  & .weird {
+    background-color: rgb(32, 179, 170);
+  }
+
+  // 폐기
+  & .disposal {
+    background-color: rgb(255, 165, 0) !important;
+  }
+
+  // 재고없음
+  & .outOfStock {
+    background-color: rgb(245, 245, 245);
+  }
+
+  // 안전재고량이하
+  & .lessThanStock {
+    background-color: rgb(255, 255, 0) !important;
+  }
+
+  // 유효기한1달
+  & .expirationPeriod {
+    background-color: rgb(144, 238, 144) !important;
+  }
+
+  // 마지막재고
+  & .lastStock {
+    background-color: rgb(154, 205, 50) !important;
+  }
+
+  // Qualification 예정일 도래
+  & .qualifyArriveDueDate {
+    background-color: rgb(255, 165, 0);
+  }
+
+  // Qualification 예정일 초과
+  & .qualifyExceedDueDate {
+    background-color: rgb(255, 127, 80);
+  }
+
+  // Calibration 예정일초과
+  & .calibrationExceedDueDate {
+    background-color: rgb(220, 20, 60);
+  }
+
+  // 안정성시험
+  & .stabilityTest {
+    background-color: rgb(255, 215, 0);
+  }
+
+  // 규격미설정
+  & .standardNoSet {
+    background-color: rgb(176, 196, 222);
+  }
+
+  // 품목미등록
+  & .notRegisterItem {
+    background-color: rgb(252, 183, 235);
+  }
+
+  // 검토완료
+  & .reviewCompletion {
+    background-color: rgb(230, 230, 250);
+  }
+
+  // 규격서미설정
+  & .specificationsNoset {
+    background-color: #B0C4DE;
+  }
+
+  // 시험일지미등록
+  & .testLogNotRegistered {
+    background-color: #FF0000;
+  }
+
+  //시험시작전
+  & .beforeTest {
+    background-color: rgb(255, 255, 255);
+  }
+
+  //시험진행
+  & .testProgress {
+    background-color: rgb(255, 215, 0);
+  }
+
+  //완료예정일임박
+  & .closeToCompletionDate {
+    background-color: rgb(220, 191, 236);
+  }
+
+  //긴급
+  & .testEmergency {
+    background-color: rgb(252, 183, 235);
+  }
+}

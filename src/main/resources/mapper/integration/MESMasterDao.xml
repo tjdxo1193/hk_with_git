@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.integration.dao.MESMasterDao">
+
+    <select id="findFinalOrder" resultType="MESFinalOrderVO">
+        SELECT PDT_ORDER_NO,
+               ORDER_ITM,
+               LOT_NO,
+               CRT_DS,
+               IF_INFO_IDX
+        FROM MS_MES_FINL_ORDER
+    </select>
+
+    <insert id="createFinalOrder" parameterType="MESFinalOrderVO">
+        INSERT INTO MS_MES_FINL_ORDER
+            (PDT_ORDER_NO, ORDER_ITM, LOT_NO, FINL_STT, CRT_DS, IF_INFO_IDX)
+        VALUES (#{pdtOrderNo},
+                #{orderItm},
+                #{lotNo},
+                #{status},
+                SYSDATE,
+                #{ifInfoIdx})
+    </insert>
+
+
+    <select id="findPackageSpec" resultType="MESPackageSpecReportVO">
+        SELECT PITM_CD AS MATNR,
+               VER     AS VERSION,
+               FILE_NAME,
+               FILE_DATA,
+               CRT_DS,
+               IF_INFO_IDX
+        FROM MS_MES_PKG_SPEC
+    </select>
+
+    <insert id="createPackageSpec" parameterType="MESPackageSpecReportVO">
+        INSERT INTO MS_MES_PKG_SPEC
+            (PITM_CD, VER, FILE_NAME, FILE_DATA, CRT_DS, IF_INFO_IDX)
+        VALUES (#{matnr},
+                #{version},
+                #{fileName},
+                #{fileData},
+                SYSDATE,
+                #{ifInfoIdx})
+    </insert>
+
+    <update id="updatePackageSpec" parameterType="MESPackageSpecReportVO">
+        UPDATE MS_MES_PKG_SPEC
+        SET FILE_NAME = #{fileName},
+            FILE_DATA = #{fileData}
+        WHERE PITM_CD = #{matnr}
+          AND VER = #{version}
+    </update>
+
+</mapper>

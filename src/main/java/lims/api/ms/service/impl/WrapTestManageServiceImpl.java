@@ -1,0 +1,204 @@
+package lims.api.ms.service.impl;
+
+import lims.api.common.exception.NoUpdatedDataException;
+import lims.api.common.service.ApproveService;
+import lims.api.common.vo.ApproveVO;
+import lims.api.ms.dao.WrapTestManageDao;
+import lims.api.ms.enums.SpecProgress;
+import lims.api.ms.service.WrapTestManageService;
+import lims.api.ms.vo.WrapTestManageVO;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import javax.transaction.Transactional;
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class WrapTestManageServiceImpl implements WrapTestManageService {
+	
+	private final WrapTestManageDao wrapTestManageDao;
+	private final ApproveService approveService;
+
+	@Override
+	public List<WrapTestManageVO> getList(WrapTestManageVO param) {
+		return wrapTestManageDao.getList(param);
+	}
+
+	@Override
+	public WrapTestManageVO getOne(WrapTestManageVO param) {
+		return wrapTestManageDao.getOne(param);
+	}
+	
+	@Override
+	public List<WrapTestManageVO> getSapList(WrapTestManageVO param) {
+		return wrapTestManageDao.getSapList(param);
+	}
+	
+	@Override
+	public List<WrapTestManageVO> getVersion(WrapTestManageVO param) {
+		return wrapTestManageDao.getVersion(param);
+	}
+	
+	@Override
+	public List<WrapTestManageVO> getTestItem(WrapTestManageVO param) {
+		return wrapTestManageDao.getTestItem(param);
+	}
+	
+	@Override
+	public List<WrapTestManageVO> getSpec(WrapTestManageVO param) {
+		return wrapTestManageDao.getSpec(param);
+	}
+	
+	@Override
+	@Transactional
+	public Integer putQmPkGa(WrapTestManageVO baseData, List<WrapTestManageVO> testItemList, List<WrapTestManageVO> deleteTestItemList) {
+		int result = 0;
+		
+		String plntCd = baseData.getPlntCd();
+		Integer aitmSpecIdx = baseData.getAitmSpecIdx();
+		
+		// QM_PITM_AITM_SPEC(품목 시험항목 규격) 테이블(부모)에 데이터가 없다.
+		if(plntCd == null || aitmSpecIdx == null) {
+			String pkgaDiv = baseData.getPkgaDiv();
+			String sapPrdha = baseData.getSapPrdha();
+			
+			// _SPEC
+			WrapTestManageVO qmPitmAitmSpec = new WrapTestManageVO();
+			qmPitmAitmSpec.setPlntCd(plntCd);
+			qmPitmAitmSpec.setAitmSpecVer(1);
+			
+			this.insertVersion(qmPitmAitmSpec);
+			int searchedAitmSpecIdx = qmPitmAitmSpec.getSearchedAitmSpecIdx();
+			
+			// _AITM
+			testItemList.forEach(vo -> {
+				vo.setAitmSpecIdx(searchedAitmSpecIdx);
+				vo.setSpecProcCd(SpecProgress.TEMPORARY_STORAGE.getCode());
+			});
+			
+			// _PKGA
+			baseData = testItemList.get(0);
+			baseData.setAitmSpecIdx(searchedAitmSpecIdx);
+			baseData.setPkgaDiv(pkgaDiv);
+			baseData.setSapPrdha(sapPrdha);
+			baseData.setPkgaVer(1);
+			baseData.setSpecProcCd(SpecProgress.TEMPORARY_STORAGE.getCode());
+			
+		// 기존에 저장된 버전이 있는 경우
+		} else {
+			// 저장된 버전이 있고, 승인된 경우
+			if(baseData.getSpecProcCd().equals(SpecProgress.APPROVED.getCode())) {
+				// _PKGA
+				WrapTestManageVO beforeBaseData = baseData;
+				beforeBaseData.setUseVerYn("N");
+				this.updateWrapTestUseYn(beforeBaseData);
+				
+				// _SPEC
+				int newAitmSpecVer = baseData.getPkgaVer() + 1;
+				baseData.setAitmSpecVer(newAitmSpecVer);
+				baseData.setPkgaVer(newAitmSpecVer);
+				baseData.setSpecProcCd(SpecProgress.TEMPORARY_STORAGE.getCode());
+				this.insertVersion(baseData);
+				
+				// _AITM
+				int searchedAitmSpecIdx = baseData.getSearchedAitmSpecIdx();
+				testItemList.forEach(item -> item.setAitmSpecIdx(searchedAitmSpecIdx));
+				
+				baseData.setAitmSpecIdx(searchedAitmSpecIdx);
+				
+			// 데이터는 있지만 아직 임시저장 상태일 경우
+			} else if(baseData.getSpecProcCd().equals(SpecProgress.TEMPORARY_STORAGE.getCode())) {
+				WrapTestManageVO beforeBaseData = baseData;
+				this.updateWrapTest(beforeBaseData);
+			// 데이터가 있고, 승인되지도 않고, 임시저장도 아닌 경우
+			} else {
+				baseData.setSpecProcCd(SpecProgress.TEMPORARY_STORAGE.getCode());
+			}
+		}
+		
+		this.putWrapTest(baseData);
+		
+		for(WrapTestManageVO vo : testItemList) {
+			this.putTestItem(vo);
+			result++;
+		}
+		
+		for(WrapTestManageVO vo : deleteTestItemList) {
+			this.deleteTestItem(vo);
+			result++;
+		}
+		
+		return result;
+	}
+	
+	@Override
+	public Integer insertVersion(WrapTestManageVO param) {
+		return wrapTestManageDao.insertVersion(param);
+	}
+	
+	@Override
+	public Integer putTestItem(WrapTestManageVO param) {
+		return wrapTestManageDao.putTestItem(param);
+	}
+	
+	@Override
+	public Integer deleteTestItem(WrapTestManageVO param) {
+		return wrapTestManageDao.deleteTestItem(param);
+	}
+	
+	
+	@Override
+	public Integer putWrapTest(WrapTestManageVO param) {
+		return wrapTestManageDao.putWrapTest(param);
+	}
+	
+	@Override
+	public Integer updateWrapTest(WrapTestManageVO param) {
+		return wrapTestManageDao.updateWrapTest(param);
+	}
+	
+	@Override
+	public Integer updateWrapTestUseYn(WrapTestManageVO param) {
+		return wrapTestManageDao.updateWrapTestUseYn(param);
+	}
+	
+	@Override
+	public void approval(WrapTestManageVO param) {
+		param.setSpecProcCd(SpecProgress.APPROVED.getCode());
+		ApproveVO approveInfo = setApproveVO(param);
+
+		if (param.getPkgaSpecAprIdx() != null) {
+			approveInfo.setAprIdx(param.getPkgaSpecAprIdx());
+			approveService.approve(param.getPkgaSpecAprIdx());
+		} else {
+			approveService.create(approveInfo);
+			param.setPkgaSpecAprIdx(approveInfo.getAprIdx());
+		}
+
+		param.setUseVerYn("Y");
+		param.setDelYn("N");
+		int result = wrapTestManageDao.approval(param);
+	
+		List<WrapTestManageVO> beforeVersionList = wrapTestManageDao.getBeforeVersionList(param);
+
+		for(WrapTestManageVO beforeVersion : beforeVersionList) {
+			wrapTestManageDao.updateApprovalSideEffect(beforeVersion);
+		}
+
+		if (result == 0) {
+			throw new NoUpdatedDataException();
+		}
+	}
+
+	private ApproveVO setApproveVO(WrapTestManageVO param) {
+		ApproveVO approveInfo = new ApproveVO();
+		approveInfo.setPlntCd(param.getPlntCd());
+		approveInfo.setAprIp(param.getAprIp());
+		approveInfo.setAprReqDiv(param.getSpecProcCd());
+		approveInfo.setAprUid(param.getLoginUserUid());
+		approveInfo.setAprRea(param.getAprRea());
+		return approveInfo;
+	}
+	
+}

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.kp.dao.AddSampleApprDao">
+    <select id="find" parameterType="AddSampleApprVO" resultType="AddSampleApprVO">
+        SELECT QASM.PLNT_CD,
+        QASM.ADD_SMP_IDX,
+        QASM.ANS_IDX,
+        QASM.SMP_MNG_IDX,
+        QASM.ADD_SMP_PROC,
+        QASM.PITM_TYP,
+        (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = PITM_TYP) AS PITM_TYP_NM,
+        QASM.PITM_CD,
+        QASM.PITM_NM,
+        QASM.ANS_TYP,
+        (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QASM.PITM_TYP) AS ANS_TYP_NM,
+        QASM.LOT_NO,
+        QASM.BATCH_NO,
+        QASM.INP_UNIT,
+        QASM.REQ_SMP_VOL,
+        QASM.SMP_REQ_REA,
+        (SELECT DTL_NM
+        FROM SY_CD_DTL
+        WHERE PLNT_CD = #{plntCd}
+        AND DTL_CD = QASM.SMP_REQ_REA) AS SMP_REQ_REA_NM,
+        QASM.SMP_REQ_REA_DTL,
+        QASM.LABEL_CD,
+        QASM.ADD_SMP_APR_REQ_IDX,
+        QASM.RJT_UID,
+        QASM.RJT_DS,
+        QASM.RJT_REA,
+        SAI.APR_IDX,
+        SAI.APR_REQ_DIV,
+        SAI.APR_REQ_UID,
+        (SELECT USER_NM FROM SY_USER WHERE PLNT_CD = #{plntCd} AND USER_ID = SAI.APR_REQ_UID) AS APR_REQ_NM,
+        SAI.APR_REQ_DS,
+        SAI.APR_REQ_IP,
+        SAI.APR_REQ_REA,
+        SAI.APR_UID,
+        SAI.APR_DS,
+        SAI.APR_IP,
+        SAI.APR_REA,
+        SAI.APR_YN,
+        QPAP.ANS_NO
+        FROM QS_ADD_SMP_MNG QASM
+        LEFT JOIN SY_APR_INFO SAI on QASM.PLNT_CD = SAI.PLNT_CD AND QASM.ADD_SMP_APR_REQ_IDX = SAI.APR_IDX
+        LEFT JOIN QT_PITM_ANS_PROC QPAP ON QASM.PLNT_CD = QPAP.PLNT_CD AND QASM.ANS_IDX = QPAP.ANS_IDX
+        WHERE QASM.DEL_YN = 'N'
+        AND QASM.ADD_SMP_PROC = #{addSmpProc}
+        AND SAI.APR_UID = #{aprUid}
+        <if test="pitmNm != ''">
+            AND QASM.PITM_NM LIKE '%' || UPPER(#{pitmNm}) || '%'
+        </if>
+        <if test="pitmCd != ''">
+            AND QASM.PITM_CD LIKE '%' || UPPER(#{pitmCd}) || '%'
+        </if>
+        <if test="lotNo != ''">
+            AND QASM.LOT_NO LIKE '%' || UPPER(#{lotNo}) || '%'
+        </if>
+        <if test="batchNo != ''">
+            AND QASM.BATCH_NO LIKE '%' || UPPER(#{batchNo}) || '%'
+        </if>
+        <if test="smpReqDtList.size() > 0">
+            AND TO_DATE(QASM.SMP_REQ_DT) BETWEEN TO_DATE(#{smpReqDtList[0]}) AND TO_DATE(#{smpReqDtList[1]})
+        </if>
+        ORDER BY QASM.UDT_DS DESC
+    </select>
+
+    <update id="approve" parameterType="AddSampleApprVO">
+        UPDATE QS_ADD_SMP_MNG
+        SET ADD_SMP_PROC = #{addSmpProc}
+        WHERE PLNT_CD = #{plntCd}
+          AND ADD_SMP_IDX = #{addSmpIdx}
+    </update>
+
+    <update id="reject" parameterType="AddSampleApprVO">
+        UPDATE QS_ADD_SMP_MNG
+        SET ADD_SMP_PROC = #{addSmpProc},
+            RJT_UID      = #{rjtUid},
+            RJT_DS       = SYSDATE,
+            RJT_REA      = #{rjtRea}
+        WHERE PLNT_CD = #{plntCd}
+          AND ADD_SMP_IDX = #{addSmpIdx}
+    </update>
+
+    <insert id="createSample" parameterType="AddSampleApprVO">
+        <selectKey resultType="Integer" keyProperty="smpMngIdx" order="BEFORE">
+            SELECT MAX(SMP_MNG_IDX) + 1
+            FROM QS_SMP_MNG
+            WHERE PLNT_CD = #{plntCd}
+        </selectKey>
+        INSERT INTO QS_SMP_MNG (PLNT_CD, SMP_MNG_IDX, SMP_DPS_PROC, PITM_TYP, PITM_CD, PITM_NM, ANS_TYP, ANS_IDX,
+        SMP_DIV_CD, MNG_SMP_VOL, LOT_NO, BATCH_NO, INP_UNIT, DEL_YN, DPS_YN, SMP_ETR_DT) VALUES (#{plntCd},
+        #{smpMngIdx}, #{smpDpsProc}, #{pitmTyp}, #{pitmCd}, #{pitmNm}, #{ansTyp}, #{ansIdx}, #{smpDivCd}, #{reqSmpVol},
+        #{lotNo}, #{batchNo}, #{inpUnit}, 'N', 'N', TO_CHAR(SYSDATE, 'YYYY-MM-DD'))
+    </insert>
+</mapper>

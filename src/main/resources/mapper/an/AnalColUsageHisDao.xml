@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.an.dao.AnalColUsageHisDao">
+
+    <select id="findAll" parameterType="AnalColMaterialVO" resultType="AnalColMaterialVO">
+        SELECT
+            A.PLNT_CD,
+            A.RITM_ETR_IDX,
+            (SELECT TREE_CD FROM SY_CD_TREE WHERE TREE_CD = F.HIR_TREE_CD) AS UPPER_RITM_TREE_CD,
+            (SELECT
+            LTRIM(SYS_CONNECT_BY_PATH(TREE_NM, '.'), '.')
+            FROM SY_CD_TREE
+            WHERE TREE_CD = F.HIR_TREE_CD
+            START WITH HIR_TREE_CD = 'R0000000'
+            CONNECT BY PRIOR TREE_CD = HIR_TREE_CD) AS UPPER_RITM_TREE_NM,
+            A.RITM_ROOT_CD,
+            (SELECT TREE_NM FROM SY_CD_TREE WHERE TREE_CD = A.RITM_ROOT_CD) AS RITM_ROOT_NM,
+            A.RITM_CD,
+            A.RITM_KN,
+            A.RITM_EN,
+            A.RITM_ABBR,
+            A.RITM_CRG_UID,
+            (SELECT USER_NM FROM SY_USER WHERE USER_ID = A.RITM_CRG_UID) AS RITM_CRG_NM,
+            A.MNG_NO,
+            A.ETR_PROC_CD,
+            (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = A.ETR_PROC_CD) AS ETR_PROC_NM,
+            A.STRG_TERMS,
+            (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = A.STRG_TERMS) AS STRG_TERMS_NM,
+            A.STRG_PLA,
+            (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = A.STRG_PLA) AS STRG_PLA_NM,
+            A.STRG_PLA_DTL,
+            A.RITM_UNIT_CD,
+            (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = A.RITM_UNIT_CD) AS RITM_UNIT_NM,
+            A.SFY_STOK,
+            A.ETR_QTY,
+            A.ETR_EACH_QTY,
+            A.ETR_TOT_QTY,
+            A.VDR_CD,
+            A.MAK_DT,
+            A.ETR_DT,
+            A.ETR_RMK,
+            A.EXPIR_DT_CHK,
+            A.OPN_BEF_EXPIR_DT,
+            A.OPN_AFT_EXPIR_TRM,
+            A.CURR_LOT_YN,
+            A.ETR_REQ_APR_IDX,
+            A.RJT_UID,
+            A.RJT_DS,
+            A.RJT_REA,
+            A.DEL_UID,
+            A.DEL_DS,
+            A.DEL_REA,
+            A.DEL_YN,
+            A.CRT_IP,
+            A.CRT_DS,
+            A.CRT_UID,
+            A.UDT_IP,
+            A.UDT_DS,
+            A.UDT_UID,
+            A.SPEC,
+            A.CAS_NO,
+            A.FOMU,
+            A.SHADE_YN,
+            A.MTR_DEDUT_YN,
+            A.POIS_YN,
+            A.DANG_YN,
+            A.FILE_IDX,
+            B.ANC_CAT_NO,
+            B.ANC_SRL_NO,
+            B.ANC_ETR_NO,
+            B.ANC_FPAK,
+            B.ANC_LEN,
+            B.ANC_LEN_UNIT_CD,
+            (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = B.ANC_LEN_UNIT_CD) AS ANC_LEN_UNIT_NM,
+            B.ANC_INS_DIMT,
+            B.ANC_PATCSIZE,
+            B.ANC_USP_CD,
+            B.ANC_COL_NO,
+            B.ANC_PITM_DIV_CD,
+            (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = B.ANC_PITM_DIV_CD) AS ANC_PITM_DIV_NM,
+            B.ANC_PITM_NM,
+            B.ANC_AITM_NM,
+            B.ANC_INIT_ANS,
+            B.ANC_RES,
+            B.ANC_TAI,
+            B.ANC_THE,
+            B.ANC_DEV_NO,
+            C.RITM_MNG_IDX,
+            C.RITM_ETR_NO,
+            C.RITM_LABEL_NO,
+            C.MNG_PROC_CD,
+            (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = C.MNG_PROC_CD) AS MNG_PROC_NM,
+            C.OPN_DT,
+            C.EXPIR_DT,
+            C.OPN_RMK,
+            C.DPS_REA,
+            D.USE_SEQ,
+            D.PITM_NM,
+            D.ANS_NO,
+            D.MAK_NO,
+            D.AITM_NM,
+            D.USE_UID,
+            (SELECT USER_NM FROM SY_USER WHERE USER_ID = D.USE_UID) AS USE_NM,
+            TO_CHAR(TO_DATE(D.USE_DT), 'YYYY-MM-DD') AS USE_DT,
+            D.USE_RMK,
+            E.VDR_NM,
+            (SELECT COUNT(USE_SEQ) FROM RT_RITM_USE WHERE RITM_MNG_IDX = C.RITM_MNG_IDX) AS ANAL_CNT
+        FROM RT_RITM_ETR A
+        JOIN RT_RITM_ETR_INFO_ANC B ON A.RITM_ETR_IDX = B.RITM_ETR_IDX
+        JOIN RT_RITM_MNG C ON B.RITM_ETR_IDX = C.RITM_ETR_IDX
+        JOIN RT_RITM_USE D ON C.RITM_MNG_IDX = D.RITM_MNG_IDX
+        JOIN SY_CD_TREE F ON A.RITM_ROOT_CD = F.TREE_CD
+        LEFT OUTER JOIN RM_RITM_VDR E ON A.VDR_CD = E.VDR_CD
+        WHERE A.PLNT_CD = #{plntCd} AND A.ETR_PROC_CD = #{etrProcCd} AND D.DEL_YN = 'N'
+        AND C.MNG_PROC_CD IN
+        <foreach item="item" index="index" collection="processCodeList" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        <if test="upperRitmTreeCd != null and upperRitmTreeCd != ''">
+            AND F.HIR_TREE_CD = #{upperRitmTreeCd}
+        </if>
+        <if test="ritmTreeCd != null and ritmTreeCd != ''">
+            AND A.RITM_ROOT_CD = #{ritmTreeCd}
+        </if>
+        <if test="ritmKn != null and ritmKn != ''">
+            AND A.RITM_KN LIKE '%' || UPPER(#{ritmKn}) || '%'
+        </if>
+        <if test="searchEtrDt != null and searchEtrDt != ''">
+            AND A.ETR_DT BETWEEN #{searchEtrDt[0]} AND #{searchEtrDt[1]}
+        </if>
+        <if test="ancFpak != null and ancFpak != ''">
+            AND B.ANC_FPAK LIKE '%' || UPPER(#{ancFpak}) || '%'
+        </if>
+        <if test="ancLen != null and ancLen != ''">
+            AND B.ANC_LEN LIKE '%' || UPPER(#{ancLen}) || '%'
+        </if>
+        <if test="ancInsDimt != null and ancInsDimt != ''">
+            AND B.ANC_INS_DIMT LIKE '%' || UPPER(#{ancInsDimt}) || '%'
+        </if>
+        <if test="vdrNm != null and vdrNm != ''">
+            AND E.VDR_NM LIKE '%' || UPPER(#{vdrNm}) || '%'
+        </if>
+        <if test="searchUseDt != null and searchUseDt != ''">
+            AND D.USE_DT BETWEEN #{searchUseDt[0]} AND #{searchUseDt[1]}
+        </if>
+        ORDER BY A.RITM_ETR_IDX, C.RITM_MNG_IDX, D.USE_SEQ
+    </select>
+
+    <select id="findOpenItem" parameterType="AnalColMaterialVO" resultType="AnalColMaterialVO">
+        SELECT
+            A.PLNT_CD,
+            A.RITM_ETR_IDX,
+            (SELECT TREE_CD FROM SY_CD_TREE WHERE TREE_CD = E.HIR_TREE_CD) AS UPPER_RITM_TREE_CD,
+            (SELECT TREE_NM FROM SY_CD_TREE WHERE TREE_CD = E.HIR_TREE_CD) AS UPPER_RITM_TREE_NM,
+            A.RITM_ROOT_CD,
+            (SELECT TREE_NM FROM SY_CD_TREE WHERE TREE_CD = A.RITM_ROOT_CD) AS RITM_ROOT_NM,
+            A.RITM_CD,
+            A.RITM_KN,
+            A.RITM_EN,
+            A.RITM_ABBR,
+            A.RITM_CRG_UID,
+            A.MNG_NO,
+            A.ETR_PROC_CD,
+            (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = A.ETR_PROC_CD) AS ETR_PROC_NM,
+            A.STRG_TERMS,
+            (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = A.STRG_TERMS) AS STRG_TERMS_NM,
+            A.STRG_PLA,
+            (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = A.STRG_PLA) AS STRG_PLA_NM,
+            A.STRG_PLA_DTL,
+            A.RITM_UNIT_CD,
+            (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = A.RITM_UNIT_CD) AS RITM_UNIT_NM,
+            A.SFY_STOK,
+            A.ETR_QTY,
+            A.ETR_EACH_QTY,
+            A.ETR_TOT_QTY,
+            A.VDR_CD,
+            (SELECT VDR_NM FROM RM_RITM_VDR WHERE VDR_CD = A.VDR_CD) AS VDR_NM,
+            (SELECT VDR_CRG_NM FROM RM_RITM_VDR WHERE VDR_CD = A.VDR_CD) AS VDR_CRG_NM,
+            (SELECT VDR_CRG_TEL FROM RM_RITM_VDR WHERE VDR_CD = A.VDR_CD) AS VDR_CRG_TEL,
+            A.MAK_DT,
+            A.MAK_NO,
+            A.ETR_DT,
+            A.ETR_RMK,
+            A.EXPIR_DT_CHK,
+            A.OPN_BEF_EXPIR_DT,
+            A.OPN_AFT_EXPIR_TRM,
+            A.CURR_LOT_YN,
+            A.ETR_REQ_APR_IDX,
+            A.RJT_UID,
+            A.RJT_DS,
+            A.RJT_REA,
+            A.SPEC,
+            A.CAS_NO,
+            A.FOMU,
+            A.SHADE_YN,
+            A.MTR_DEDUT_YN,
+            A.POIS_YN,
+            A.DANG_YN,
+            A.FILE_IDX,
+            B.ANC_COL_NO,
+            B.ANC_PITM_NM,
+            B.ANC_AITM_NM,
+            C.RITM_MNG_IDX,
+            C.RITM_LABEL_NO,
+            C.MNG_PROC_CD,
+            C.RITM_ETR_NO,
+            (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = C.MNG_PROC_CD) AS MNG_PROC_NM,
+            C.OPN_DS,
+            C.OPN_DT,
+            C.EXPIR_DT,
+            C.OPN_RMK,
+            C.DPS_REA,
+            D.APR_REQ_UID,
+            D.APR_UID,
+            (A.ETR_EACH_QTY - NVL((SELECT SUM(USE_QTY) FROM RT_RITM_USE WHERE RITM_MNG_IDX = C.RITM_MNG_IDX),0)) AS LEFT_OVER_STOK
+        FROM RT_RITM_ETR A
+        JOIN RT_RITM_ETR_INFO_ANC B ON A.RITM_ETR_IDX = B.RITM_ETR_IDX
+        JOIN RT_RITM_MNG C ON A.RITM_ETR_IDX = C.RITM_ETR_IDX
+        JOIN SY_CD_TREE E ON A.RITM_ROOT_CD = E.TREE_CD
+        LEFT OUTER JOIN SY_APR_INFO D ON C.DPS_REQ_APR_IDX = D.APR_IDX
+        WHERE A.ETR_PROC_CD = #{etrProcCd} AND C.MNG_PROC_CD = #{mngProcCd}
+            AND A.RITM_ROOT_CD IN (
+                SELECT
+                TREE_CD
+                FROM SY_CD_TREE
+                WHERE PLNT_CD = #{plntCd} AND USE_YN = 'Y'
+                START WITH TREE_CD = #{treeCd}
+                CONNECT BY PRIOR TREE_CD = HIR_TREE_CD
+            )
+        <if test="upperRitmTreeCd != null and upperRitmTreeCd != ''">
+            AND E.HIR_TREE_CD = #{upperRitmTreeCd}
+        </if>
+        <if test="ritmTreeCd != null and ritmTreeCd != ''">
+            AND A.RITM_ROOT_CD = #{ritmTreeCd}
+        </if>
+        <if test="ritmKn != null and ritmKn != ''">
+            AND A.RITM_KN LIKE '%' || UPPER(#{ritmKn}) || '%'
+        </if>
+        <if test="mngNo != null and mngNo != ''">
+            AND A.MNG_NO LIKE '%' || UPPER(#{mngNo}) || '%'
+        </if>
+        ORDER BY A.RITM_ETR_IDX, C.RITM_MNG_IDX
+    </select>
+
+    <insert id="create" parameterType="AnalColMaterialVO">
+        <selectKey resultType="int" keyProperty="useSeq" order="BEFORE">
+            SELECT NVL(MAX(USE_SEQ),0)+1 FROM RT_RITM_USE
+        </selectKey>
+
+        INSERT INTO RT_RITM_USE(
+            PLNT_CD,
+            RITM_MNG_IDX,
+            USE_SEQ,
+            PITM_NM,
+            ANS_NO,
+            MAK_NO,
+            AITM_NM,
+            USE_UID,
+            USE_DT,
+            USE_RMK
+        )VALUES (
+            #{plntCd},
+            #{ritmMngIdx},
+            #{useSeq},
+            #{pitmNm},
+            #{ansNo},
+            #{makNo},
+            #{ancAitmNm},
+            #{useUid},
+            SYSDATE,
+            #{useRmk}
+        )
+    </insert>
+
+    <update id="update" parameterType="AnalColMaterialVO">
+        UPDATE RT_RITM_USE SET
+            PITM_NM = #{pitmNm},
+            ANS_NO = #{ansNo},
+            MAK_NO = #{makNo},
+            AITM_NM = #{ancAitmNm},
+            USE_RMK = #{useRmk}
+        WHERE USE_SEQ = #{useSeq} AND PLNT_CD = #{plntCd}
+    </update>
+
+    <update id="delete" parameterType="AnalColMaterialVO">
+        UPDATE RT_RITM_USE SET
+            DEL_YN = 'Y'
+        WHERE USE_SEQ = #{useSeq} AND PLNT_CD = #{plntCd}
+    </update>
+
+</mapper>

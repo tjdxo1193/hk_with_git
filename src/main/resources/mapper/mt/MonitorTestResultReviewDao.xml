@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.mt.dao.MonitorTestResultReviewDao">
+
+    <select id="getMonitorTestResultReviewList" parameterType="MonitorTestResultReviewVO" resultType="MonitorTestResultReviewVO">
+        SELECT MMAP.MITM_REQ_IDX
+            , MMAP.MITM_SPEC_IDX
+            , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = MMAP.ANS_PROC_CD) AS ANS_PROC_NM
+            , MMAP.REQ_NO
+            , MMAP.REQ_DT
+            , MMAP.ANS_EDT
+            , MMAP.ANS_NO
+            , MMAP.REQ_DS
+            , (SELECT DPT_NM FROM SY_DPT SD WHERE SD.DPT_CD = MMAP.REQ_DPT_CD AND SD.PLNT_CD = MMAP.PLNT_CD) AS REQ_DPT_NM
+            , MMAP.RCP_DT
+            , MMAP.RCP_DS
+            , MMAP.ASS_NO
+            , MMAP.ASS_DT
+            , MMAP.RJT_DS
+            , MMAP.RJT_REA
+            , (SELECT USER_NM FROM SY_USER SU WHERE SU.USER_ID = MMAP.RJT_UID AND SU.PLNT_CD = MMAP.PLNT_CD) AS RJT_UNM
+            , MM.MITM_CD
+            , (SELECT HIR_TREE_CD FROM SY_CD_TREE SCT WHERE SCT.TREE_CD = MM.MITM_WRK_PLC_DIV) AS UPPER_MITM_WRK_PLC_DIV
+            , (SELECT TREE_NM FROM SY_CD_TREE WHERE TREE_CD = (SELECT HIR_TREE_CD FROM SY_CD_TREE SCT WHERE SCT.TREE_CD = MM.MITM_WRK_PLC_DIV)) AS UPPER_MITM_WRK_PLC_DIV_NM
+            , MM.MITM_WRK_PLC_DIV
+            , (SELECT TREE_NM FROM SY_CD_TREE SCT WHERE SCT.TREE_CD = MM.MITM_WRK_PLC_DIV) AS MITM_WRK_PLC_DIV_NM
+            , (SELECT HIR_TREE_CD FROM SY_CD_TREE WHERE TREE_CD = MM.MITM_PITM_DIV) AS UPPER_MITM_PITM_DIV_DIV
+            , (SELECT TREE_NM FROM SY_CD_TREE WHERE TREE_CD = (SELECT HIR_TREE_CD FROM SY_CD_TREE SCT WHERE SCT.TREE_CD = MM.MITM_PITM_DIV)) AS UPPER_MITM_PITM_DIV_NM
+            , MM.MITM_PITM_DIV
+            , (SELECT TREE_NM FROM SY_CD_TREE SCT WHERE SCT.TREE_CD = MM.MITM_PITM_DIV) AS MITM_PITM_DIV_NM
+            , MM.POINT
+            , MM.ROOMNO
+            , MM.GRADE
+        FROM MT_MITM_ANS_PROC MMAP
+        LEFT JOIN MM_MITM_SPEC MMS ON MMAP.MITM_SPEC_IDX = MMS.MITM_SPEC_IDX AND MMAP.PLNT_CD = MMS.PLNT_CD
+        LEFT JOIN MM_MITM MM ON MMS.PLNT_CD = MM.PLNT_CD AND MMS.MITM_CD = MM.MITM_CD
+        WHERE 1=1
+        AND MMAP.ANS_PROC_CD IN (#{testProcessList[0]}, #{testProcessList[1]})
+        AND MMAP.PLNT_CD = #{plntCd}
+        AND MMAP.HLD_YN != 'Y'
+        AND MMAP.REVW_UID = #{revwUid}
+        <if test="crgDptCd != null and crgDptCd != ''">
+            AND MM.CRG_DPT_CD = #{crgDptCd}
+        </if>
+        <if test="mitmPitmDiv != null and mitmPitmDiv != ''">
+            AND MM.MITM_PITM_DIV = #{mitmPitmDiv}
+        </if>
+        <if test="upperMitmPitmDiv != null and upperMitmPitmDiv != ''">
+            AND (SELECT HIR_TREE_CD FROM SY_CD_TREE WHERE TREE_CD = MM.MITM_PITM_DIV) = #{upperMitmPitmDiv}
+        </if>
+        <if test="formReqDt != null and formReqDt != ''">
+            AND MMAP.REQ_DT BETWEEN #{formReqDt[0]} AND #{formReqDt[1]}
+        </if>
+        <if test="formAssDt != null and formAssDt != ''">
+            AND MMAP.ASS_DT BETWEEN #{formAssDt[0]} AND #{formAssDt[1]}
+        </if>
+    </select>
+
+    <select id="getMonitorTestRst" parameterType="MonitorTestResultReviewVO" resultType="MonitorTestResultReviewVO">
+        SELECT MMAR.PLNT_CD
+            , MMAR.MITM_REQ_IDX
+            , MMAR.RST_SEQ
+            , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = MMAR.RST_PROC_CD) AS RST_PROC_NM
+            , MMAR.ISP_DUR_TM
+            , MMAR.EQM_USE_TM
+            , MMAR.ANS_EQM_CD
+            , MMAR.AMITM_CD
+            , (SELECT VRIA_KN FROM MS_AMITM MA WHERE MA.AMITM_CD = MMAR.AMITM_CD) AS VRIA_KN
+            , (SELECT VRIA_NO FROM MS_AMITM MA WHERE MA.AMITM_CD = MMAR.AMITM_CD) AS VRIA_NO
+            , (SELECT AITM_KN FROM MS_AITM WHERE AITM_CD = (SELECT AITM_CD FROM MS_AMITM MA WHERE MA.AMITM_CD = MMAR.AMITM_CD)) AS AITM_KN
+            , MMAR.SMP_CLLT_QTY
+            , MMAR.SMP_CLLT_UNIT
+            , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = MMAR.SMP_CLLT_UNIT) AS SMP_CLLT_UNIT_NM
+            , MMAR.SMP_CLLT_DT
+            , MMAR.CLLT_TM_STR
+            , MMAR.CLLT_TM_END
+            , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = MMAR.RST_JDG) AS RST_JDG_NM
+            , MMAR.RST_RMK
+            , MMAR.ANS_EQM_CD
+            , MMAR.PERSPEC_TXT
+            , MMAR.OWC_SPEC_TXT
+            , MMAR.SPEC_TXT_EN
+            , MMAR.PER_SLV_LOW
+            , MMAR.PER_SLV_UPP
+            , MMAR.PER_SLV_DESC
+            , MMAR.OWC_SLV_LOW
+            , MMAR.OWC_SLV_UPP
+            , MMAR.OWC_SLV_DESC
+            , MMAR.RST_DPNT
+            , MMAR.RPT_PRT_SLV_VAL
+            , MMAR.RPT_PRT_ITM_NM
+            , MMAR.RST_VAL
+            , MMAR.MARK_VAL
+            , (SELECT DPT_NM FROM SY_DPT SD WHERE SD.DPT_CD = MMAR.ANS_DPT_CD AND SD.PLNT_CD = MMAR.PLNT_CD) AS ANS_DPT_NM
+            , DECODE(MMAR.RPT_PRT_YN, 'Y', '출력함', '출력안함') AS RPT_PRT_YN
+            , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = MMAR.SPEC_TYP) AS SPEC_TYP_NM
+            , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = MMAR.JDG_TYP) AS JDG_TYP_NM
+            , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = MMAR.SLV_JDG_CFM AND SCD.PLNT_CD = MMAR.PLNT_CD) AS SLV_JDG_CFM_NM
+            , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = MMAR.SLV_JDG_NON_CFM AND SCD.PLNT_CD = MMAR.PLNT_CD) AS SLV_JDG_NON_CFM_NM
+            , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = MMAR.RST_UNIT_CD AND SCD.PLNT_CD = MMAR.PLNT_CD) AS RST_UNIT_NM
+        FROM MT_MITM_ANS_RST MMAR
+        WHERE PLNT_CD = #{plntCd}
+        AND MMAR.MITM_REQ_IDX = #{mitmReqIdx}
+        AND MMAR.DEL_YN = 'N'
+        ORDER BY MMAR.AITM_ORD
+    </select>
+
+    <update id="apprRequest" parameterType="MonitorTestResultReviewVO">
+        UPDATE MT_MITM_ANS_PROC SET
+            ANS_PROC_CD = #{ansProcCd}
+            , REVW_DT = TO_CHAR(SYSDATE, 'YYYY-MM-DD')
+            , REVW_DS = SYSDATE
+            , RST_APR_REQ_IDX = #{rstAprReqIdx}
+        WHERE PLNT_CD = #{plntCd}
+        AND MITM_REQ_IDX = #{mitmReqIdx}
+    </update>
+
+    <update id="reject" parameterType="MonitorTestResultReviewVO">
+        UPDATE MT_MITM_ANS_PROC SET
+            ANS_PROC_CD = #{ansProcCd}
+            , RJT_UID = #{userId}
+            , RJT_DS = SYSDATE
+            , RJT_REA = #{rea}
+        WHERE PLNT_CD = #{plntCd}
+        AND MITM_REQ_IDX = #{mitmReqIdx}
+    </update>
+
+    <update id="hold" parameterType="MonitorTestResultReviewVO">
+        UPDATE MT_MITM_ANS_PROC SET
+            HLD_YN = 'Y'
+            , HLD_DS = SYSDATE
+            , HLD_UID = #{userId}
+            , HLD_REA = #{rea}
+        WHERE PLNT_CD = #{plntCd}
+        AND MITM_REQ_IDX = #{mitmReqIdx}
+    </update>
+</mapper>

@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.ms.dao.MonitorSpecManageDao">
+    <select id="getMItemSpecList" resultType="monitorSpecManageVO" parameterType="monitorSpecManageVO">
+        SELECT
+            MM.PLNT_CD
+             , MM.MITM_CD
+             , MM.MITM_WRK_PLC_DIV
+             , SCTWRK.TREE_NM AS MITM_WRK_PLC_DIV_NM
+             , MM.MITM_PITM_DIV
+             , SCTPITM.TREE_NM AS MITM_PITM_DIV_NM
+             , MM.POINT
+             , MM.ROOMNO
+             , MM.GRADE
+             , SDGRD.DTL_NM AS GRADE_NM
+             , MM.ANS_CYL_CD
+             , SAC.ANS_CYL_MARK_NM AS ANS_CYL_NM
+             , MM.CRG_DPT_CD
+             , SDPT.DPT_NM AS CRG_DPT_NM
+             , MM.ANS_STR_DT
+             , MM.PER_SPEC
+             , MM.REVW_DUR_TM
+             , MM.APR_DUR_TM
+             , MMS.MITM_SPEC_IDX
+             , MMS.AITM_SPEC_IDX
+             , MMS.SPEC_PROC_CD
+             , SDPROC.DTL_NM AS SPEC_PROC_NM
+             , MMS.USE_VER_YN
+        FROM MM_MITM MM
+        LEFT JOIN MM_MITM_SPEC MMS ON MM.PLNT_CD = MMS.PLNT_CD AND MMS.MITM_CD = MM.MITM_CD AND MMS.USE_VER_YN = 'Y' AND MMS.DEL_YN = 'N'
+        LEFT JOIN SY_CD_DTL SDGRD ON MM.PLNT_CD = SDGRD.PLNT_CD AND MM.GRADE = SDGRD.DTL_CD
+        LEFT JOIN SY_CD_DTL SDPROC ON MMS.PLNT_CD = SDPROC.PLNT_CD AND MMS.SPEC_PROC_CD = SDPROC.DTL_CD
+        LEFT JOIN SY_DPT SDPT ON SDPT.PLNT_CD = MM.PLNT_CD AND SDPT.DPT_CD = MM.CRG_DPT_CD
+        LEFT JOIN SY_ANS_CYL SAC ON SAC.PLNT_CD = MM.PLNT_CD AND MM.ANS_CYL_CD = SAC.ANS_CYL_CD
+        LEFT JOIN SY_CD_TREE SCTWRK ON SCTWRK.PLNT_CD = MM.PLNT_CD AND SCTWRK.TREE_CD = MM.MITM_WRK_PLC_DIV
+        LEFT JOIN SY_CD_TREE SCTPITM ON SCTPITM.PLNT_CD = MM.PLNT_CD AND SCTPITM.TREE_CD = MM.MITM_PITM_DIV
+        WHERE MM.PLNT_CD = #{plntCd}
+        AND MM.DEL_YN = 'N'
+        AND MM.USE_YN = 'Y'
+        <if test=" specProcCd != null and specProcCd != '' ">
+            AND MMS.SPEC_PROC_CD = #{specProcCd}
+        </if>
+        <if test=" mitmCd != null and mitmCd != '' ">
+            AND MM.MITM_CD LIKE '%' || (#{mitmCd}) || '%'
+        </if>
+        <if test=" crgDptCd != null and crgDptCd != '' ">
+            AND MM.CRG_DPT_CD = #{crgDptCd}
+        </if>
+        <if test="mitmPitmDivNm != null and mitmPitmDivNm != '' ">
+            AND SCTPITM.TREE_NM LIKE '%' || (#{mitmPitmDivNm}) || '%'
+        </if>
+    </select>
+
+    <select id="getVersionList" parameterType="monitorSpecManageVO" resultType="monitorSpecManageVO">
+        SELECT
+            MMS.PLNT_CD
+            ,MMS.MITM_SPEC_IDX
+            ,MMS.MITM_CD
+            ,MMS.AITM_SPEC_IDX
+            ,SDPROC.DTL_NM AS SPEC_PROC_NM
+            ,MMS.SPEC_PROC_CD
+            ,MMS.DEL_YN
+            ,MMS.USE_VER_YN
+            ,MMS.RVS_NO
+            ,MMS.DOC_NO
+            ,MMS.RVS_DT
+            ,MMS.ENFO_DT
+            ,MMS.RVS_REA_CD
+            ,MMS.RVS_CTT
+            ,MMS.RVS_DIV_PS
+            ,MMS.REVW_UID
+            ,SU1.USER_NM AS REVW_UNM
+            ,MMS.REVW_DS
+            ,MMS.REVW_IP
+            ,MMS.MITM_SPEC_APR_IDX
+            ,MMS.RJT_UID
+            ,SU2.USER_NM AS RJT_UNM
+            ,MMS.RJT_DS
+            ,MMS.RJT_REA
+            ,MMAS.AITM_SPEC_VER
+        FROM MM_MITM_SPEC MMS
+        LEFT JOIN MM_MITM_AITM_SPEC MMAS ON MMS.PLNT_CD = MMAS.PLNT_CD AND MMS.AITM_SPEC_IDX = MMAS.AITM_SPEC_IDX
+        LEFT JOIN SY_CD_DTL SDPROC ON MMS.PLNT_CD = SDPROC.PLNT_CD AND MMS.SPEC_PROC_CD = SDPROC.DTL_CD
+        LEFT JOIN SY_USER SU1 ON MMS.REVW_UID = SU1.USER_ID
+        LEFT JOIN SY_USER SU2 ON MMS.RJT_UID = SU2.USER_ID
+        WHERE MMS.PLNT_CD = #{plntCd}
+        AND MITM_CD = #{mitmCd}
+        AND MMS.DEL_YN = 'N'
+    </select>
+
+    <select id="getMItemSpecAItemList" parameterType="monitorSpecManageVO" resultType="monitorSpecManageVO">
+        SELECT
+            MMSA.PLNT_CD
+             , MMSA.AITM_SPEC_IDX
+             , MMSA.AITM_SEQ
+             , M.AITM_KN
+             , MA.VRIA_NO
+             , MA.VRIA_KN
+             , MMSA.ANS_DPT_CD
+             , MMSA.AMITM_CD
+             , MMSA.AITM_ORD
+             , MMSA.PERSPEC_TXT
+             , MMSA.OWC_SPEC_TXT
+             , MMSA.SPEC_TXT_EN
+             , MMSA.SPEC_TYP
+             , MMSA.JDG_TYP
+             , MMSA.PER_SLV_LOW
+             , MMSA.PER_SLV_UPP
+             , MMSA.PER_SLV_DESC
+             , MMSA.OWC_SLV_LOW
+             , MMSA.OWC_SLV_UPP
+             , MMSA.OWC_SLV_DESC
+             , MMSA.SLV_JDG_CFM
+             , MMSA.SLV_JDG_NON_CFM
+             , MMSA.RST_UNIT_CD
+             , MMSA.RST_DPNT
+             , MMSA.RPT_PRT_SLV_VAL
+             , MMSA.RPT_PRT_ITM_NM
+             , MMSA.RPT_PRT_YN
+             , MMSA.ISP_DPT_CD
+             , MMSA.SMP_CLLT_QTY
+             , MMSA.SMP_CLLT_UNIT
+             , MMSA.ISP_DUR_TM
+             , MMSA.EQM_USE_TM
+         FROM MM_MITM_SPEC_AITM MMSA
+         LEFT JOIN MS_AMITM MA ON MMSA.AMITM_CD = MA.AMITM_CD
+         LEFT JOIN MS_AITM M ON SUBSTR(MMSA.AMITM_CD, 0, 6) = M.AITM_CD
+        WHERE MMSA.PLNT_CD = #{plntCd}
+          AND MMSA.AITM_SPEC_IDX = #{aitmSpecIdx}
+    </select>
+
+    <insert id="createVersion" parameterType="monitorSpecManageVO">
+        INSERT INTO MM_MITM_AITM_SPEC
+            (
+                PLNT_CD
+                , AITM_SPEC_IDX
+                ,AITM_SPEC_VER
+            )
+        VALUES
+            (
+                #{plntCd}
+                ,#{aitmSpecIdx}
+                ,#{aitmSpecVer}
+           )
+    </insert>
+
+    <insert id="createMItemSpec" parameterType="monitorSpecManageVO">
+        INSERT INTO MM_MITM_SPEC
+            (
+                PLNT_CD
+                , MITM_SPEC_IDX
+                , MITM_CD
+                , AITM_SPEC_IDX
+                , SPEC_PROC_CD
+                , DEL_YN
+                , USE_VER_YN
+                , RVS_NO
+                , DOC_NO
+                , RVS_DT
+                , ENFO_DT
+                , RVS_REA_CD
+                , RVS_CTT
+                , RVS_DIV_PS
+            )
+        VALUES
+            (
+                #{plntCd}
+                ,#{mitmSpecIdx}
+                ,#{mitmCd}
+                ,#{aitmSpecIdx}
+                ,#{specProcCd}
+                ,'N'
+                ,'N'
+                , #{rvsNo}
+                , #{docNo}
+                , #{rvsDt}
+                , #{enfoDt}
+                , #{rvsReaCd}
+                , #{rvsCtt}
+                , #{rvsDivPs}
+            )
+    </insert>
+
+    <update id="updateRequestReview" parameterType="monitorSpecManageVO">
+        UPDATE MM_MITM_SPEC SET
+            SPEC_PROC_CD = #{specProcCd}
+           ,REVW_UID = #{revwUid}
+        WHERE PLNT_CD = #{plntCd}
+        AND MITM_SPEC_IDX = #{mitmSpecIdx}
+    </update>
+
+    <update id="deleteMItemSpec" parameterType="monitorSpecManageVO">
+        UPDATE MM_MITM_SPEC SET
+            DEL_YN = 'Y'
+        WHERE PLNT_CD = #{plntCd}
+        AND MITM_SPEC_IDX = #{mitmSpecIdx}
+    </update>
+
+    <insert id="createMItemSpecAItem" parameterType="monitorSpecManageVO">
+        <selectKey resultType="int" keyProperty="aitmSeq" order="BEFORE">
+            SELECT NVL(MAX(AITM_SEQ)+1,1) FROM MM_MITM_SPEC_AITM WHERE PLNT_CD = #{plntCd} AND AITM_SPEC_IDX = #{aitmSpecIdx}
+        </selectKey>
+        INSERT INTO MM_MITM_SPEC_AITM
+        (
+             PLNT_CD
+            , AITM_SPEC_IDX
+            , AITM_SEQ
+            , ANS_DPT_CD
+            , AMITM_CD
+            , AITM_ORD
+            , PERSPEC_TXT
+            , OWC_SPEC_TXT
+            , SPEC_TXT_EN
+            , SPEC_TYP
+            , JDG_TYP
+            , PER_SLV_LOW
+            , PER_SLV_UPP
+            , PER_SLV_DESC
+            , OWC_SLV_LOW
+            , OWC_SLV_UPP
+            , OWC_SLV_DESC
+            , SLV_JDG_CFM
+            , SLV_JDG_NON_CFM
+            , RST_UNIT_CD
+            , RST_DPNT
+            , RPT_PRT_SLV_VAL
+            , RPT_PRT_ITM_NM
+            , RPT_PRT_YN
+            , ISP_DPT_CD
+            , SMP_CLLT_QTY
+            , SMP_CLLT_UNIT
+            , ISP_DUR_TM
+            , EQM_USE_TM
+        )
+        VALUES
+        (
+        #{plntCd}
+        , #{aitmSpecIdx}
+        , #{aitmSeq}
+        , #{ansDptCd}
+        , #{amitmCd}
+        , #{aitmOrd}
+        , #{perspecTxt}
+        , #{owcSpecTxt}
+        , #{specTxtEn}
+        , #{specTyp}
+        , #{jdgTyp}
+        , #{perSlvLow}
+        , #{perSlvUpp}
+        , #{perSlvDesc}
+        , #{owcSlvLow}
+        , #{owcSlvUpp}
+        , #{owcSlvDesc}
+        , #{slvJdgCfm}
+        , #{slvJdgNonCfm}
+        , #{rstUnitCd}
+        , #{rstDpnt}
+        , #{rptPrtSlvVal}
+        , #{rptPrtItmNm}
+        , #{rptPrtYn}
+        , #{ispDptCd}
+        , #{smpClltQty}
+        , #{smpClltUnit}
+        , #{ispDurTm}
+        , #{eqmUseTm}
+        )
+    </insert>
+
+    <delete id="deleteMItemSpecAItem">
+        DELETE FROM MM_MITM_SPEC_AITM
+        WHERE PLNT_CD = #{plntCd}
+        AND AITM_SPEC_IDX = #{aitmSpecIdx}
+    </delete>
+
+    <select id="getItemMethodList" parameterType="monitorSpecManageVO" resultType="monitorSpecManageVO">
+        SELECT
+            M.AITM_CD
+             , M.AITM_KN
+             , M.AITM_EN
+             , M.AITM_ABBR
+             , MA.AMITM_CD
+             , MA.AITM_CD
+             , MA.VRIA_NO
+             , MA.VRIA_KN
+             , MA.VRIA_EN
+             , MA.RMK
+             , MA.USE_YN
+        FROM MS_AMITM MA
+        LEFT JOIN MS_AITM M ON MA.AITM_CD = M.AITM_CD
+        WHERE 1=1
+        <if test= "vriaKn != null and vriaKn != '' ">
+            AND MA.VRIA_KN LIKE '%' || #{vriaKn} || '%'
+        </if>
+        <if test= "aitmKn != null and aitmKn != '' ">
+            AND M.AITM_KN LIKE '%' || #{aitmKn} || '%'
+        </if>
+        ORDER BY MA.AITM_CD
+    </select>
+
+    <select id="getMitmSpecIdxAndAitmSpecIdx" resultType="monitorSpecManageVO" parameterType="string">
+        SELECT
+          (SELECT NVL(MAX(MITM_SPEC_IDX)+1,1) FROM MM_MITM_SPEC WHERE PLNT_CD = #{plntCd}) AS MITM_SPEC_IDX
+         ,(SELECT NVL(MAX(AITM_SPEC_IDX)+1,1) FROM MM_MITM_AITM_SPEC WHERE PLNT_CD = #{plntCd}) AS AITM_SPEC_IDX
+        FROM DUAL
+    </select>
+
+    <update id="updateUseVerN" parameterType="monitorSpecApprVO">
+        UPDATE MM_MITM_SPEC SET
+            USE_VER_YN = 'N'
+        WHERE PLNT_CD = #{plntCd}
+          AND MITM_CD = #{mitmCd}
+          AND USE_VER_YN = 'Y'
+    </update>
+
+    <select id="getDepartmentList" parameterType="specManageVO" resultType="comboVO">
+        SELECT
+            DPT_CD AS VALUE
+             , DPT_NM AS LABEL
+        FROM SY_DPT
+        WHERE HIR_DPT_CD = #{crgDptCd}
+    </select>
+
+</mapper>

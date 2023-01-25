@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.ms.dao.ItemApprRequestDao">
+    <select id="find" parameterType="ItemApprRequestVO" resultType="ItemApprRequestVO">
+        SELECT PLNT_CD,
+        PLNT_NM,
+        (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = SPEC_PROC_CD AND PLNT_CD = #{plntCd}) AS SPEC_PROC_NM,
+        SPEC_PROC_CD,
+        USE_VER_YN,
+        RVS_NO,
+        DOC_NO,
+        RVS_DT,
+        ENFO_DT,
+        RVS_REA_CD,
+        RVS_CTT,
+        RVS_DIV_PS,
+        REVW_UID,
+        REVW_DS,
+        REVW_IP,
+        PITM_MST_APR_IDX,
+        RJT_UID,
+        RJT_DS,
+        RJT_REA,
+        PITM_TYP,
+        (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = PITM_TYP AND PLNT_CD = #{plntCd}) AS PITM_TYP_NM,
+        PITM_NM,
+        PITM_EN,
+        SAP_PRDHA,
+        ANS_DUR_DAY,
+        CRG_DPT_CD,
+        (SELECT DPT_NM FROM SY_DPT WHERE DPT_CD = CRG_DPT_CD AND PLNT_CD = #{plntCd}) AS CRG_DPT_NM,
+        SPCM_NO,
+        MIC_YN,
+        (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = CLLT_MTD AND PLNT_CD = #{plntCd}) AS CLLT_MTD_NM,
+        CLLT_MTD,
+        (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = CLLT_MCN AND PLNT_CD = #{plntCd}) AS CLLT_MCN_NM,
+        CLLT_MCN,
+        (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = CLLT_PLA AND PLNT_CD = #{plntCd}) AS CLLT_PLA,
+        CLLT_PLA,
+        SMP_STRG_MTD,
+        SMP_VOL_UNIT,
+        SMP_VOL_ANS,
+        SMP_VOL_ETC,
+        SMP_VOL_STRG,
+        PITM_CD,
+        PITM_VER,
+        MTR_TYP,
+        MTR_MRP,
+        LAB_NO,
+        BRD_ABBR,
+        NOM_MTR,
+        ETR_CTN_QTY,
+        RMTR_SPEC,
+        NBR,
+        FTN_YN,
+        PCS01,
+        PCS02,
+        PCS03,
+        PCS04,
+        USE_TRM,
+        OTC_PRD,
+        DMS_EPT_YN,
+        PEAR_DIV,
+        MKR_VOL,
+        MKR_VOL_UNIT,
+        ETN_ANS_REQ,
+        CTRPT_NO,
+        PER_NO,
+        CHAG_VOL,
+        CHAG_VOL_UNIT,
+        DIO_YN,
+        PRB_IN_YN,
+        PRB_FE_YN,
+        PNX_FE_YN,
+        PKG_MTR_SPEC,
+        RMTR_CFMUL
+        FROM QM_PITM QP
+        FULL JOIN QM_PITM_INFO QPI USING (PLNT_CD, PITM_CD, PITM_VER)
+        FULL JOIN QM_PITM_INFO_SAP QPIS USING (PLNT_CD, PITM_CD, PITM_VER)
+        INNER JOIN SY_PLNT SP USING (PLNT_CD)
+        <where>
+            QP.DEL_YN = 'N'
+            AND QP.SPEC_PROC_CD IN ('S0080210', 'S0080200')
+            AND QP.REVW_UID = #{revwUid}
+            <if test="pitmTyp != ''">
+                AND QP.PITM_TYP = #{pitmTyp}
+            </if>
+            <if test="plntCd != ''">
+                AND PLNT_CD = #{plntCd}
+            </if>
+            <if test="pitmCd != ''">
+                AND QP.PITM_CD LIKE '%' || UPPER(#{pitmCd}) || '%'
+            </if>
+            <if test="pitmNm != ''">
+                AND QP.PITM_NM LIKE '%' || UPPER(#{pitmNm}) || '%'
+            </if>
+        </where>
+        ORDER BY QP.CRT_DS DESC
+    </select>
+
+    <update id="updateRequestApprove" parameterType="ItemApprRequestVO">
+        UPDATE QM_PITM
+        SET SPEC_PROC_CD = #{specProcCd},
+            PITM_MST_APR_IDX = #{pitmMstAprIdx},
+            REVW_UID = #{revwUid},
+            REVW_DS = SYSDATE,
+            REVW_IP = #{revwIp},
+            ENFO_DT = #{enfoDt},
+            RVS_CTT = #{rvsCtt},
+            RVS_NO = #{rvsNo},
+            RVS_DT = #{rvsDt},
+            RVS_REA_CD = #{rvsReaCd},
+            RVS_DIV_PS = #{rvsDivPs},
+            DOC_NO = #{docNo},
+            UDT_DS = SYSDATE
+        WHERE PLNT_CD = #{plntCd} AND PITM_CD = #{pitmCd} AND PITM_VER = #{pitmVer}
+    </update>
+
+    <update id="updateReturnReview" parameterType="ItemApprRequestVO">
+        UPDATE QM_PITM
+        SET SPEC_PROC_CD = #{specProcCd},
+            RJT_UID = #{revwUid},
+            RJT_DS = SYSDATE,
+            RJT_REA = #{rjtRea},
+            UDT_DS = SYSDATE
+        WHERE PLNT_CD = #{plntCd} AND PITM_CD = #{pitmCd} AND PITM_VER = #{pitmVer}
+    </update>
+</mapper>

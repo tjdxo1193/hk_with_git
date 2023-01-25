@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.tp.dao.SampleDisApprDao">
+    <select id="find" parameterType="SampleDisApprVO" resultType="SampleDisApprVO">
+        SELECT QSM.PLNT_CD,
+               QSM.SMP_MNG_IDX,
+               QSM.SMP_DPS_PROC,
+               QSM.PITM_TYP,
+               QSM.PITM_CD,
+               QSM.PITM_NM,
+               QSM.ANS_TYP,
+               QSM.ANS_IDX,
+               QSM.SMP_DIV_CD,
+               QSM.MNG_SMP_VOL,
+               QSM.SMP_STRG_MTD,
+               QSM.SMP_VOL_UNIT,
+               QSM.LOT_NO,
+               QSM.BATCH_NO,
+               QSM.INP_UNIT,
+               QSM.MAK_DT,
+               QSM.STRG_LMT,
+               QSM.USE_LMT,
+               QSM.IRG_YN,
+               QSM.SMP_RMK,
+               QSM.DPS_EXP_DT,
+               QSM.DPS_FIX_DT,
+               QSM.SMP_DPS_APR_IDX,
+               QSM.SMP_ETR_DT
+        FROM QS_SMP_MNG QSM
+                 LEFT JOIN SY_APR_INFO SAI ON QSM.PLNT_CD = SAI.PLNT_CD AND QSM.SMP_DPS_APR_IDX = SAI.APR_IDX
+        WHERE QSM.PLNT_CD = #{plntCd}
+          AND QSM.DEL_YN = 'N'
+          AND QSM.SMP_DPS_PROC IN ('S0270400', 'S0270600')
+          AND SAI.APR_UID = #{aprUid}
+    </select>
+
+    <update id="approve" parameterType="SampleDisApprVO">
+        UPDATE QS_SMP_MNG
+        SET DPS_YN     = 'N',
+            DPS_FIX_DT = TO_CHAR(SYSDATE, 'YYYY-MM-DD')
+        WHERE PLNT_CD = #{plntCd}
+          AND SMP_MNG_IDX = #{smpMngIdx}
+    </update>
+
+    <update id="reject" parameterType="SampleDisApprVO">
+        UPDATE QS_SMP_MNG
+        SET RJT_UID = #{rjtUid},
+            RJT_REA = #{rjtRea},
+            RJT_DS  = SYSDATE
+        WHERE PLNT_CD = #{plntCd}
+          AND SMP_MNG_IDX = #{smpMngIdx}
+    </update>
+</mapper>

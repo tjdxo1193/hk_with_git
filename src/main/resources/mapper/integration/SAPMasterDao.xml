@@ -1,0 +1,595 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.integration.dao.SAPMasterDao">
+
+    <select id="findMaterialMara" resultType="lims.api.integration.vo.SAPMaterialVO$Mara">
+        SELECT MATNR,
+               MTART,
+               MEINS,
+               MATKL,
+               BISMT,
+               PRDHA,
+               SPART,
+               MSTAE,
+               WRKST,
+               ZEINR,
+               TAKLV,
+               BSTME,
+               XCHPF,
+               EKWSL,
+               MHDHB,
+               ZLABNO,
+               ZPROD_ABBR,
+               CRT_DS,
+               UDT_DS
+        FROM MS_SAP_MTR_MARA
+    </select>
+
+    <insert id="createMaterialMara" parameterType="lims.api.integration.vo.SAPMaterialVO$Mara">
+        INSERT INTO MS_SAP_MTR_MARA (MATNR, MTART, MEINS, MATKL, BISMT, PRDHA, SPART, MSTAE, WRKST, ZEINR, TAKLV, BSTME,
+                                     XCHPF, EKWSL, MHDHB, ZLABNO, ZPROD_ABBR, CRT_DS, UDT_DS)
+        VALUES (#{matnr},
+                #{mtart},
+                #{meins},
+                #{matkl},
+                #{bismt},
+                #{prdha},
+                #{spart},
+                #{mstae},
+                #{wrkst},
+                #{zeinr},
+                #{taklv},
+                #{bstme},
+                #{xchpf},
+                #{ekwsl},
+                #{mhdhb},
+                #{zlabno},
+                #{zprodAbbr},
+                SYSDATE,
+                SYSDATE)
+    </insert>
+
+    <update id="updateMaterialMara" parameterType="lims.api.integration.vo.SAPMaterialVO$Mara">
+        UPDATE MS_SAP_MTR_MARA
+        SET MTART      = #{mtart},
+            MEINS      = #{meins},
+            MATKL      = #{matkl},
+            BISMT      = #{bismt},
+            PRDHA      = #{prdha},
+            SPART      = #{spart},
+            MSTAE      = #{mstae},
+            WRKST      = #{wrkst},
+            ZEINR      = #{zeinr},
+            TAKLV      = #{taklv},
+            BSTME      = #{bstme},
+            XCHPF      = #{xchpf},
+            EKWSL      = #{ekwsl},
+            MHDHB      = #{mhdhb},
+            ZLABNO     = #{zlabno},
+            ZPROD_ABBR = #{zprodAbbr},
+            UDT_DS     = SYSDATE
+        WHERE MATNR = #{matnr}
+    </update>
+
+
+    <select id="findMaterialMarc" resultType="lims.api.integration.vo.SAPMaterialVO$Marc">
+        SELECT WERKS,
+               MATNR,
+               LADGR,
+               MMSTA,
+               EKGRP,
+               INSMK,
+               DISMM,
+               FXHOR,
+               DISPO,
+               DISLS,
+               BSTRF,
+               BSTMI,
+               BESKZ,
+               SOBSL,
+               LGPRO,
+               LGFSB,
+               PLIFZ,
+               WEBAZ,
+               ELSLO,
+               STRGR,
+               MTVFP,
+               FEVOR,
+               KZECH,
+               AWSLS,
+               PRCTR,
+               LOSGR,
+               SOBSK,
+               FVIDK,
+               ZFIRST_GI_DATE,
+               CRT_DS,
+               UDT_DS
+        FROM MS_SAP_MTR_MARC
+    </select>
+
+    <select id="findMaterialMarcByMatnr" resultType="lims.api.integration.vo.SAPMaterialVO$Marc">
+        SELECT WERKS,
+               MATNR,
+               LADGR,
+               MMSTA,
+               EKGRP,
+               INSMK,
+               DISMM,
+               FXHOR,
+               DISPO,
+               DISLS,
+               BSTRF,
+               BSTMI,
+               BESKZ,
+               SOBSL,
+               LGPRO,
+               LGFSB,
+               PLIFZ,
+               WEBAZ,
+               ELSLO,
+               STRGR,
+               MTVFP,
+               FEVOR,
+               KZECH,
+               AWSLS,
+               PRCTR,
+               LOSGR,
+               SOBSK,
+               FVIDK,
+               ZFIRST_GI_DATE,
+               CRT_DS,
+               UDT_DS
+        FROM MS_SAP_MTR_MARC
+        WHERE MATNR = #{value}
+    </select>
+
+    <insert id="createMaterialMarc" parameterType="lims.api.integration.vo.SAPMaterialVO$Marc">
+        INSERT INTO MS_SAP_MTR_MARC
+        (WERKS, MATNR, LADGR, MMSTA, EKGRP, INSMK, DISMM, FXHOR, DISPO, DISLS, BSTRF, BSTMI, BESKZ, SOBSL, LGPRO, LGFSB,
+         PLIFZ, WEBAZ, ELSLO, STRGR, MTVFP, FEVOR, KZECH, AWSLS, PRCTR, LOSGR, SOBSK, FVIDK, ZFIRST_GI_DATE, CRT_DS,
+         UDT_DS)
+        VALUES (#{werks},
+                #{matnr},
+                #{ladgr},
+                #{mmsta},
+                #{ekgrp},
+                #{insmk},
+                #{dismm},
+                #{fxhor},
+                #{dispo},
+                #{disls},
+                #{bstrf},
+                #{bstmi},
+                #{beskz},
+                #{sobsl},
+                #{lgpro},
+                #{lgfsb},
+                #{plifz},
+                #{webaz},
+                #{elslo},
+                #{strgr},
+                #{mtvfp},
+                #{fevor},
+                #{kzech},
+                #{awsls},
+                #{prctr},
+                #{losgr},
+                #{sobsk},
+                #{fvidk},
+                #{zfirstGiDate},
+                SYSDATE,
+                SYSDATE)
+    </insert>
+
+    <update id="updateMaterialMarc" parameterType="lims.api.integration.vo.SAPMaterialVO$Marc">
+        UPDATE MS_SAP_MTR_MARC
+        SET LADGR          = #{ladgr},
+            MMSTA          = #{mmsta},
+            EKGRP          = #{ekgrp},
+            INSMK          = #{insmk},
+            DISMM          = #{dismm},
+            FXHOR          = #{fxhor},
+            DISPO          = #{dispo},
+            DISLS          = #{disls},
+            BSTRF          = #{bstrf},
+            BSTMI          = #{bstmi},
+            BESKZ          = #{beskz},
+            SOBSL          = #{sobsl},
+            LGPRO          = #{lgpro},
+            LGFSB          = #{lgfsb},
+            PLIFZ          = #{plifz},
+            WEBAZ          = #{webaz},
+            ELSLO          = #{elslo},
+            STRGR          = #{strgr},
+            MTVFP          = #{mtvfp},
+            FEVOR          = #{fevor},
+            KZECH          = #{kzech},
+            AWSLS          = #{awsls},
+            PRCTR          = #{prctr},
+            LOSGR          = #{losgr},
+            SOBSK          = #{sobsk},
+            FVIDK          = #{fvidk},
+            ZFIRST_GI_DATE = #{zfirstGiDate},
+            UDT_DS         = SYSDATE
+        WHERE WERKS = #{werks}
+          AND MATNR = #{matnr}
+    </update>
+
+
+    <select id="findMaterialMvke" resultType="lims.api.integration.vo.SAPMaterialVO$Mvke">
+        SELECT MATNR,
+               VKORG,
+               VTWEG,
+               DWERK,
+               AUMNG,
+               KTGRM,
+               CRT_DS,
+               UDT_DS
+        FROM MS_SAP_MTR_MVKE
+    </select>
+
+    <insert id="createMaterialMvke" parameterType="lims.api.integration.vo.SAPMaterialVO$Mvke">
+        INSERT INTO MS_SAP_MTR_MVKE
+            (MATNR, VKORG, VTWEG, DWERK, AUMNG, KTGRM, CRT_DS, UDT_DS)
+        VALUES (#{matnr},
+                #{vkorg},
+                #{vtweg},
+                #{dwerk},
+                #{aumng},
+                #{ktgrm},
+                SYSDATE,
+                SYSDATE)
+    </insert>
+
+    <update id="updateMaterialMvke" parameterType="lims.api.integration.vo.SAPMaterialVO$Mvke">
+        UPDATE MS_SAP_MTR_MVKE
+        SET DWERK  = #{dwerk},
+            AUMNG  = #{aumng},
+            KTGRM  = #{ktgrm},
+            UDT_DS = SYSDATE
+        WHERE MATNR = #{matnr}
+          AND VKORG = #{vkorg}
+          AND VTWEG = #{vtweg}
+    </update>
+
+
+    <select id="findMaterialZmdv" resultType="lims.api.integration.vo.SAPMaterialVO$Zmdv">
+        SELECT MATNR,
+               CLASS_TYPE,
+               CLAZZ,
+               CHAR_CODE,
+               CHAR_DATA_TYP,
+               CHAR_VAL_CHAR,
+               CHAR_VAL_NUM,
+               CRT_DS,
+               UDT_DS
+        FROM MS_SAP_MTR_ZMDV
+    </select>
+
+    <select id="findMaterialZmdvByMaterialCode" resultType="lims.api.integration.vo.SAPMaterialVO$Zmdv">
+        SELECT MATNR,
+               CLASS_TYPE,
+               CLAZZ,
+               CHAR_CODE,
+               CHAR_DATA_TYP,
+               CHAR_VAL_CHAR,
+               CHAR_VAL_NUM,
+               CRT_DS,
+               UDT_DS
+        FROM MS_SAP_MTR_ZMDV
+        WHERE MATNR = #{value}
+    </select>
+
+    <insert id="createMaterialZmdv" parameterType="lims.api.integration.vo.SAPMaterialVO$Zmdv">
+        INSERT INTO MS_SAP_MTR_ZMDV
+        (MATNR, CLASS_TYPE, CLAZZ, CHAR_CODE, CHAR_DATA_TYP, CHAR_VAL_CHAR, CHAR_VAL_NUM, CRT_DS, UDT_DS)
+        VALUES (#{matnr},
+                #{classType},
+                #{clazz},
+                #{charCode},
+                #{charDataTyp},
+                #{charValChar},
+                #{charValNum},
+                SYSDATE,
+                SYSDATE)
+    </insert>
+
+    <update id="updateMaterialZmdv" parameterType="lims.api.integration.vo.SAPMaterialVO$Zmdv">
+        UPDATE MS_SAP_MTR_ZMDV
+        SET CHAR_VAL_CHAR = #{charValChar},
+            CHAR_VAL_NUM  = #{charValNum},
+            UDT_DS        = SYSDATE
+        WHERE MATNR = #{matnr}
+          AND CLASS_TYPE = #{classType}
+          AND CLAZZ = #{clazz}
+          AND CHAR_CODE = #{charCode}
+          AND CHAR_DATA_TYP = #{charDataTyp}
+    </update>
+
+
+    <select id="findMaterialMakt" resultType="lims.api.integration.vo.SAPMaterialVO$Makt">
+        SELECT MATNR, SPRAS, MAKTX, CRT_DS, UDT_DS
+        FROM MS_SAP_MTR_MAKT
+    </select>
+
+    <insert id="createMaterialMakt" parameterType="lims.api.integration.vo.SAPMaterialVO$Makt">
+        INSERT INTO MS_SAP_MTR_MAKT
+            (MATNR, SPRAS, MAKTX, CRT_DS, UDT_DS)
+        VALUES (#{matnr},
+                #{spras},
+                #{maktx},
+                SYSDATE,
+                SYSDATE)
+    </insert>
+
+    <update id="updateMaterialMakt" parameterType="lims.api.integration.vo.SAPMaterialVO$Makt">
+        UPDATE MS_SAP_MTR_MAKT
+        SET MAKTX  = #{maktx},
+            UDT_DS = SYSDATE
+        WHERE MATNR = #{matnr}
+          AND SPRAS = #{spras}
+    </update>
+
+
+    <insert id="createBOM" parameterType="SAPBomVO">
+        INSERT INTO MS_SAP_BOM
+        (POSNR, STLAL, WERKS, MATNR, MAKTX, MTART, NAME1, DISPO, DSNAM, STKTX, BMENG, BMEIN, VALID_FROM, VALID_TO,
+         STLNR, ZTEXT, LKENZ, STLST, POSTP, PTEXT, IDNRK, IDNRK_MAKT, POTX1, MENGE, MEINS, FMNGE, BEIKZ, CRT_DS, UDT_DS)
+        VALUES (#{posnr},
+                #{stlal},
+                #{werks},
+                #{matnr},
+                #{maktx},
+                #{mtart},
+                #{name1},
+                #{dispo},
+                #{dsnam},
+                #{stktx},
+                #{bmeng},
+                #{bmein},
+                #{validFrom},
+                #{validTo},
+                #{stlnr},
+                #{ztext},
+                #{lkenz},
+                #{stlst},
+                #{postp},
+                #{ptext},
+                #{idnrk},
+                #{idnrkMakt},
+                #{potx1},
+                #{menge},
+                #{meins},
+                #{fmnge},
+                #{beikz},
+                SYSDATE,
+                SYSDATE)
+    </insert>
+
+    <delete id="deleteBOM">
+        DELETE
+        FROM MS_SAP_BOM
+    </delete>
+
+
+    <select id="findCharacteristicCabn" resultType="lims.api.integration.vo.SAPCharacteristicVO$Cabn">
+        SELECT CHAR_CODE,
+               CHAR_VAL_CHAR,
+               CHAR_VAL_NUM,
+               CHAR_CODE_DESC,
+               CHAR_DATA_TYPE,
+               CHAR_VAL_DESC,
+               CRT_DS,
+               IF_INFO_IDX
+        FROM MS_SAP_CHAT_CABN
+    </select>
+
+    <insert id="createCharacteristicCabn" parameterType="lims.api.integration.vo.SAPCharacteristicVO$Cabn">
+        INSERT INTO MS_SAP_CHAT_CABN
+        (CHAR_CODE, CHAR_VAL_CHAR, CHAR_VAL_NUM, CHAR_CODE_DESC, CHAR_DATA_TYPE, CHAR_VAL_DESC, CRT_DS, IF_INFO_IDX)
+        VALUES (#{charCode},
+                #{charValChar},
+                #{charValNum},
+                #{charCodeDesc},
+                #{charDataType},
+                #{charValDesc},
+                SYSDATE,
+                #{ifInfoIdx})
+    </insert>
+
+    <update id="updateCharacteristicCabn" parameterType="lims.api.integration.vo.SAPCharacteristicVO$Cabn">
+        UPDATE MS_SAP_CHAT_CABN
+        SET CHAR_CODE_DESC = #{charCodeDesc},
+            CHAR_DATA_TYPE = #{charDataType},
+            CHAR_VAL_DESC  = #{charValDesc},
+            IF_INFO_IDX    = #{ifInfoIdx}
+        WHERE CHAR_CODE = #{charCode}
+          AND CHAR_VAL_CHAR = #{charValChar}
+          AND CHAR_VAL_NUM = #{charValNum}
+    </update>
+
+
+    <select id="findCharacteristicKsml" resultType="lims.api.integration.vo.SAPCharacteristicVO$Ksml">
+        SELECT CLASS_TYPE,
+               CLAZZ,
+               CHAR_CODE,
+               CLASS_NAME,
+               CRT_DS,
+               IF_INFO_IDX
+        FROM MS_SAP_CHAT_KSML
+    </select>
+
+    <insert id="createCharacteristicKsml" parameterType="lims.api.integration.vo.SAPCharacteristicVO$Ksml">
+        INSERT INTO MS_SAP_CHAT_KSML
+            (CLASS_TYPE, CLAZZ, CHAR_CODE, CLASS_NAME, CRT_DS, IF_INFO_IDX)
+        VALUES (#{classType},
+                #{clazz},
+                #{charCode},
+                #{className},
+                SYSDATE,
+                #{ifInfoIdx})
+    </insert>
+
+    <update id="updateCharacteristicKsml" parameterType="lims.api.integration.vo.SAPCharacteristicVO$Ksml">
+        UPDATE MS_SAP_CHAT_KSML
+        SET CLASS_NAME  = #{className},
+            IF_INFO_IDX = #{ifInfoIdx}
+        WHERE CLASS_TYPE = #{classType}
+          AND CLAZZ = #{clazz}
+          AND CHAR_CODE = #{charCode}
+    </update>
+
+
+    <select id="findInputPerformHeader"
+            resultType="lims.api.integration.vo.SAPInputPerformanceByBatchVO$InputPerformanceHeader">
+        SELECT PLNT_CD       AS WERKS,
+               MTR_CD        AS MATNR,
+               BATCH_NO      AS CHARG,
+               LOT_NO,
+               MTR_NM        AS MAKTX,
+               MRP_MNG       AS DISPO,
+               PHS_ORDER_NO  AS EBELN,
+               PHS_ORDER_ITM AS EBELP,
+               PDT_ORDER_NO  AS AUFNR,
+               BWART,
+               ERFMG,
+               ERFME,
+               LGORT,
+               BUDAT,
+               ZEXFIELD1,
+               ZEXFIELD2,
+               ZEXFIELD3,
+               ZEXFIELD4,
+               ZEXFIELD5
+        FROM MS_SAP_INP_PFA
+    </select>
+
+    <insert id="createInputPerformHeader"
+            parameterType="lims.api.integration.vo.SAPInputPerformanceByBatchVO$InputPerformanceHeader">
+        INSERT INTO MS_SAP_INP_PFA
+        (PLNT_CD, MTR_CD, BATCH_NO, LOT_NO, MTR_NM, MRP_MNG, PHS_ORDER_NO, PHS_ORDER_ITM, PDT_ORDER_NO, BWART, ERFMG,
+         ERFME, LGORT, BUDAT, ZEXFIELD1, ZEXFIELD2, ZEXFIELD3, ZEXFIELD4, ZEXFIELD5)
+        VALUES (#{werks},
+                #{matnr},
+                #{charg},
+                #{lotNo},
+                #{maktx},
+                #{dispo},
+                #{ebeln},
+                #{ebelp},
+                #{aufnr},
+                #{bwart},
+                #{erfmg},
+                #{erfme},
+                #{lgort},
+                #{budat},
+                #{zexfield1},
+                #{zexfield2},
+                #{zexfield3},
+                #{zexfield4},
+                #{zexfield5})
+    </insert>
+
+    <update id="updateInputPerformHeader"
+            parameterType="lims.api.integration.vo.SAPInputPerformanceByBatchVO$InputPerformanceHeader">
+        UPDATE MS_SAP_INP_PFA
+        SET LOT_NO        = #{lotNo},
+            MTR_NM        = #{maktx},
+            MRP_MNG       = #{dispo},
+            PHS_ORDER_NO  = #{ebeln},
+            PHS_ORDER_ITM = #{ebelp},
+            PDT_ORDER_NO  = #{aufnr},
+            BWART         = #{bwart},
+            ERFMG         = #{erfmg},
+            ERFME         = #{erfme},
+            LGORT         = #{lgort},
+            BUDAT         = #{budat},
+            ZEXFIELD1     = #{zexfield1},
+            ZEXFIELD2     = #{zexfield2},
+            ZEXFIELD3     = #{zexfield3},
+            ZEXFIELD4     = #{zexfield4},
+            ZEXFIELD5     = #{zexfield5}
+        WHERE PLNT_CD = #{werks}
+          AND MTR_CD = #{matnr}
+          AND BATCH_NO = #{charg}
+    </update>
+
+
+    <select id="findInputPerformDetail"
+            resultType="lims.api.integration.vo.SAPInputPerformanceByBatchVO$InputPerformanceDetail">
+        SELECT PLNT_CD       AS WERKS,
+               MTR_CD        AS MATNR,
+               BATCH_NO      AS CHARG,
+               INP_MTR_CD    AS MATNR_INPUT,
+               INP_BATCH_NO  AS CHARG_INPUT,
+               LOT_NO,
+               MTR_NM        AS MAKTX,
+               MRP_MNG       AS DISPO,
+               PHS_ORDER_NO  AS EBELN,
+               PHS_ORDER_ITM AS EBELP,
+               PDT_ORDER_NO  AS AUFNR,
+               BWART,
+               ERFMG,
+               ERFME,
+               LGORT,
+               ZEXFIELD1,
+               ZEXFIELD2,
+               ZEXFIELD3,
+               ZEXFIELD4,
+               ZEXFIELD5
+        FROM MS_SAP_INP_PFA_DTL
+    </select>
+
+    <insert id="createInputPerformDetail"
+            parameterType="lims.api.integration.vo.SAPInputPerformanceByBatchVO$InputPerformanceDetail">
+        INSERT INTO MS_SAP_INP_PFA_DTL
+        (PLNT_CD, MTR_CD, BATCH_NO, INP_MTR_CD, INP_BATCH_NO, LOT_NO, MTR_NM, MRP_MNG, PHS_ORDER_NO, PHS_ORDER_ITM,
+         PDT_ORDER_NO, BWART, ERFMG, ERFME, LGORT, ZEXFIELD1, ZEXFIELD2, ZEXFIELD3, ZEXFIELD4, ZEXFIELD5)
+        VALUES (#{werks},
+                #{matnr},
+                #{charg},
+                #{matnrInput},
+                #{chargInput},
+                #{lotNo},
+                #{maktx},
+                #{dispo},
+                #{ebeln},
+                #{ebelp},
+                #{aufnr},
+                #{bwart},
+                #{erfmg},
+                #{erfme},
+                #{lgort},
+                #{zexfield1},
+                #{zexfield2},
+                #{zexfield3},
+                #{zexfield4},
+                #{zexfield5})
+    </insert>
+
+    <update id="updateInputPerformDetail"
+            parameterType="lims.api.integration.vo.SAPInputPerformanceByBatchVO$InputPerformanceDetail">
+        UPDATE MS_SAP_INP_PFA_DTL
+        SET LOT_NO        = #{lotNo},
+            MTR_NM        = #{maktx},
+            MRP_MNG       = #{dispo},
+            PHS_ORDER_NO  = #{ebeln},
+            PHS_ORDER_ITM = #{ebelp},
+            PDT_ORDER_NO  = #{aufnr},
+            BWART         = #{bwart},
+            ERFMG         = #{erfmg},
+            ERFME         = #{erfme},
+            LGORT         = #{lgort},
+            ZEXFIELD1     = #{zexfield1},
+            ZEXFIELD2     = #{zexfield2},
+            ZEXFIELD3     = #{zexfield3},
+            ZEXFIELD4     = #{zexfield4},
+            ZEXFIELD5     = #{zexfield5}
+        WHERE PLNT_CD = #{werks}
+          AND MTR_CD = #{matnr}
+          AND BATCH_NO = #{charg}
+          AND INP_MTR_CD = #{matnrInput}
+          AND INP_BATCH_NO = #{chargInput}
+    </update>
+
+</mapper>

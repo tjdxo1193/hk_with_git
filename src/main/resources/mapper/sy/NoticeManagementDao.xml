@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.sy.dao.NoticeManagementDao">
+    <select id="findAll" parameterType="NoticeManagementVO" resultType="NoticeManagementVO">
+        SELECT
+            NTB_IDX,
+            NTB_DIV,
+            NTB_TIT,
+            NTB_CTT,
+            POP_YN,
+            POP_TRMK_STR,
+            POP_TRMK_END,
+            (POP_TRMK_STR || ' ~ ' || POP_TRMK_END) AS S_POPUP_PERIOD,
+            TO_CHAR(UDT_DS, 'YYYY-MM-DD') AS UDT_DS,
+            UDT_UID,
+            DEL_YN
+        FROM EI_NTB_NTC
+        WHERE NTB_DIV = 'S0240001'
+        AND (
+                (
+                    POP_TRMK_STR BETWEEN #{popupPeriod[0]} AND #{popupPeriod[1]}
+                    OR POP_TRMK_STR IS NULL
+                )
+            OR
+                (
+                    POP_TRMK_END BETWEEN #{popupPeriod[0]} AND #{popupPeriod[1]}
+                    OR POP_TRMK_END IS NULL
+                )
+        )
+        <if test="popYn != null and popYn != ''">
+            AND POP_YN = #{popYn}
+        </if>
+        <if test="ntbTit != null and ntbTit != ''">
+            AND UPPER(NTB_TIT) LIKE UPPER('%'||#{ntbTit}||'%')
+        </if>
+        <if test="udtUid != null and udtUid != ''">
+            AND UPPER(UDT_UID) LIKE UPPER('%'||#{udtUid}||'%')
+        </if>
+        ORDER BY
+        NTB_IDX DESC, POP_TRMK_END DESC
+    </select>
+
+
+    <update id="update" parameterType="noticeManagementVO">
+        UPDATE EI_NTB_NTC SET
+              NTB_TIT = #{ntbTit},
+              NTB_CTT = #{ntbCtt},
+              POP_YN = #{popYn},
+        <if test="popupPeriod.size() == 2">
+              POP_TRMK_STR = #{popupPeriod[0]},
+              POP_TRMK_END = #{popupPeriod[1]},
+        </if>
+              UDT_DS = TO_CHAR(SYSDATE, 'YYYY-MM-DD'),
+              UDT_UID = #{udtUid}
+        WHERE NTB_DIV = 'S0240001'
+        AND NTB_IDX = #{ntbIdx}
+    </update>
+
+    <update id="updateOfPopYn" parameterType="noticeManagementVO">
+        UPDATE EI_NTB_NTC SET
+            POP_YN = 'N'
+        WHERE 1=1
+        <if test="ntbIdx != null and ntbIdx != ''">
+            AND NTB_IDX NOT IN (#{ntbIdx})
+        </if>
+        AND NTB_DIV = 'S0240001'
+    </update>
+
+    <insert id="create" parameterType="noticeManagementVO">
+        INSERT INTO EI_NTB_NTC
+        (
+            NTB_IDX,
+            NTB_DIV,
+            NTB_TIT,
+            NTB_CTT,
+            POP_YN,
+            POP_TRMK_STR,
+            POP_TRMK_END,
+            UDT_DS,
+            UDT_UID,
+            DEL_YN
+        )
+        VALUES
+        (
+            (SELECT NVL(MAX(NTB_IDX) + 1, 1) FROM EI_NTB_NTC),
+            'S0240001',
+            #{ntbTit},
+            #{ntbCtt},
+            #{popYn},
+            #{popupPeriod[0]},
+            #{popupPeriod[1]},
+            TO_CHAR(SYSDATE, 'YYYY-MM-DD'),
+            #{udtUid},
+            'N'
+        )
+    </insert>
+</mapper>

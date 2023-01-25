@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.in.dao.InstHisManageDao">
+
+    <select id="findAll" parameterType="InstHisManageVO" resultType="InstHisManageVO">
+        SELECT A.PLNT_CD,
+               A.EQM_CD,
+               A.EQM_NM,
+               A.EQM_DIV,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = A.PLNT_CD AND DTL_CD = A.EQM_DIV) AS EQM_DIV_NM,
+               A.SRL_NO,
+               A.MAK_COMP,
+               A.SPL_COMP,
+               A.MOD_NM,
+               A.SAP_AST_NO,
+               B.HIS_SEQ,
+               B.EQM_HIS_DIV,
+               (SELECT DTL_NM
+                FROM SY_CD_DTL
+                WHERE PLNT_CD = B.PLNT_CD
+                  AND DTL_CD = B.EQM_HIS_DIV)                                                  AS EQM_HIS_DIV_NM,
+               B.EQM_HIS_PROC_CD,
+               (SELECT DTL_NM
+                FROM SY_CD_DTL
+                WHERE PLNT_CD = A.PLNT_CD
+                  AND DTL_CD = B.EQM_HIS_PROC_CD)                                              AS EQM_HIS_PROC_NM,
+               B.EQM_HIS_APR_IDX,
+               B.RJT_UID,
+               (SELECT USER_NM FROM SY_USER WHERE PLNT_CD = B.PLNT_CD AND USER_ID = B.RJT_UID) AS RJT_NM,
+               TO_CHAR(B.RJT_DS, 'YYYY-MM-DD')                                                 AS RJT_DS,
+               B.RJT_REA,
+               B.DEL_YN,
+               B.RGT_UID,
+               (SELECT USER_NM FROM SY_USER WHERE PLNT_CD = B.PLNT_CD AND USER_ID = B.RGT_UID) AS RGT_NM,
+               B.RGT_DT,
+               B.ANS_DT,
+               B.RMK,
+               NVL(B.HIS_FILE_IDX, 0)                                                          AS HIS_FILE_IDX
+        FROM EM_EQM_INFO A
+                 JOIN EM_EQM_HIS B ON A.PLNT_CD = B.PLNT_CD AND A.EQM_CD = B.EQM_CD
+        WHERE 1 = 1
+    </select>
+
+    <insert id="save" parameterType="InstHisManageVO">
+        <selectKey keyProperty="hisSeq" resultType="Integer" order="BEFORE">
+            SELECT NVL(MAX(HIS_SEQ),0)+1 FROM EM_EQM_HIS WHERE PLNT_CD = #{plntCd} AND EQM_CD = #{eqmCd}
+        </selectKey>
+
+        INSERT INTO EM_EQM_HIS(
+        PLNT_CD,
+        EQM_CD,
+        HIS_SEQ,
+        EQM_HIS_DIV,
+        EQM_HIS_PROC_CD,
+        RGT_UID,
+        RGT_DT,
+        ANS_DT,
+        RMK,
+        HIS_FILE_IDX
+        ) VALUES (
+        #{plntCd},
+        #{eqmCd},
+        #{hisSeq},
+        #{eqmHisDiv},
+        #{eqmHisProcCd},
+        #{rgtUid},
+        SYSDATE,
+        #{ansDt},
+        #{rmk},
+        #{hisFileIdx}
+        )
+    </insert>
+
+    <update id="update" parameterType="InstHisManageVO">
+        UPDATE EM_EQM_HIS
+        SET ANS_DT       = #{ansDt},
+            RMK          = #{rmk},
+            HIS_FILE_IDX = #{hisFileIdx}
+        WHERE PLNT_CD = #{plntCd}
+          AND EQM_CD = #{eqmCd}
+          AND HIS_SEQ = #{hisSeq}
+    </update>
+
+    <update id="delete" parameterType="InstHisManageVO">
+        UPDATE EM_EQM_HIS
+        SET DEL_YN = 'Y'
+        WHERE PLNT_CD = #{plntCd}
+          AND EQM_CD = #{eqmCd}
+          AND HIS_SEQ = #{hisSeq}
+    </update>
+
+    <update id="requestApprove" parameterType="InstHisManageVO">
+        UPDATE EM_EQM_HIS
+        SET EQM_HIS_PROC_CD = #{eqmHisProcCd},
+            EQM_HIS_APR_IDX = #{eqmHisAprIdx},
+            ANS_DT          = #{ansDt},
+            RMK             = #{rmk}
+        WHERE PLNT_CD = #{plntCd}
+          AND EQM_CD = #{eqmCd}
+          AND HIS_SEQ = #{hisSeq}
+    </update>
+
+</mapper>

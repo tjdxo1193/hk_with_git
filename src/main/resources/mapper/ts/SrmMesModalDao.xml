@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.sm.dao.SrmMesModalDao">
+
+    <select id="getSrmFinalOrderList" parameterType="SrmMesModalVO" resultType="SrmMesModalVO">
+        SELECT PHS_ORDER_NO
+            , ORDER_ITM
+            , LOT_NO
+            , FINL_STT
+            , CRT_DS
+            , IF_INFO_IDX
+        FROM MS_SRM_FINL_ORDER
+    </select>
+
+    <select id="getMesFinalOrderList" parameterType="SrmMesModalVO" resultType="SrmMesModalVO">
+        SELECT PDT_ORDER_NO
+            , ORDER_ITM
+            , LOT_NO
+            , FINL_STT
+            , CRT_DS
+            , IF_INFO_IDX
+        FROM MS_MES_FINL_ORDER
+    </select>
+
+    <select id="getRelapsePrevList" parameterType="SrmMesModalVO" resultType="SrmMesModalVO">
+        SELECT BATCH_NO
+            , SEQ
+            , PHS_ORDER_NO
+            , MAK_NO
+            , FILE_NAME
+            , FILE_ID
+            , FILE_DATA
+            , CRT_DS
+            , IF_INFO_IDX
+        FROM MS_SRM_REO_PREV
+    </select>
+
+    <select id="getSrmReportList" parameterType="SrmMesModalVO" resultType="SrmMesModalVO">
+        SELECT BATCH_NO
+            , SEQ
+            , RPT_DIV
+            , PHS_ORDER_NO
+            , MAK_NO
+            , FILE_NAME
+            , FILE_ID
+            , FILE_DATA
+            , CRT_DS
+            , IF_INFO_IDX
+        FROM MS_SRM_RPT
+    </select>
+
+    <select id="getPackingSpecList" parameterType="SrmMesModalVO" resultType="SrmMesModalVO">
+        SELECT PITM_CD
+            , VER
+            , FILE_NAME
+            , FILE_DATA
+            , CRT_DS
+            , IF_INFO_IDX
+        FROM MS_MES_PKG_SPEC
+    </select>
+
+</mapper>

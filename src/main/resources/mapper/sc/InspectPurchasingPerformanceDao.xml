@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.sc.dao.InspectPurchasingPerformanceDao">
+    <select id="find" parameterType="InspectPurchasingPerformanceVO" resultType="InspectPurchasingPerformanceVO">
+        SELECT TO_CHAR(TO_DATE(QPAR.ETR_DT), 'YYYY') AS FISCAL_YR,
+        TO_CHAR(TO_DATE(QPAR.ETR_DT), 'MM')   AS MONTH,
+        QPAR.MTR_CD,
+        QPAR.MTR_NM,
+        QPAR.PHS_ORDER_NO,
+        SUM(QPAR.ETR_QTY)                     AS ETR_QTY,
+        COUNT(*)                              AS ANS_CNT,
+        MAX(QPAI.IF_YN)                       AS IF_YN,
+        MAX(QPAI.IF_DS)                       AS IF_DS
+        FROM QT_PITM_ANS_PROC QPAP
+        LEFT JOIN QT_PITM_ANS_REQ QPAR ON QPAP.PLNT_CD = QPAR.PLNT_CD AND QPAR.REQ_IDX = QPAP.REQ_IDX
+        LEFT JOIN QT_PITM_ANS_INFO QPAI ON QPAP.PLNT_CD = QPAI.PLNT_CD AND QPAP.ANS_IDX = QPAI.ANS_IDX
+        WHERE QPAR.PLNT_CD = #{plntCd}
+        <if test="month != ''">
+            AND TO_CHAR(TO_DATE(QPAR.ETR_DT), 'MM') = #{month}
+        </if>
+        <if test="mtrCd != ''">
+            AND UPPER(QPAR.MTR_CD) LIKE '%' || UPPER(#{mtrCd}) || '%'
+        </if>
+        <if test="mtrNm != ''">
+            AND UPPER(QPAR.MTR_NM) LIKE '%' || UPPER(#{mtrNm}) || '%'
+        </if>
+        <if test="phsOrderNo != ''">
+            AND UPPER(QPAR.PHS_ORDER_NO) LIKE '%' || UPPER(#{phsOrderNo}) || '%'
+        </if>
+        GROUP BY TO_CHAR(TO_DATE(QPAR.ETR_DT), 'YYYY'),
+        TO_CHAR(TO_DATE(QPAR.ETR_DT), 'MM'),
+        QPAR.MTR_CD,
+        QPAR.MTR_NM,
+        QPAR.PHS_ORDER_NO
+        ORDER BY FISCAL_YR DESC, MONTH DESC
+    </select>
+
+    <select id="findRequest" parameterType="InspectPurchasingPerformanceVO" resultType="InspectPurchasingPerformanceVO">
+        SELECT QPAR.ETR_DT,
+               QPAP.REQ_DT,
+               QPAR.ISP_REQ_NO,
+               QPAP.RCP_DT,
+               QPAP.ANS_NO,
+               QPIS.FTN_YN
+        FROM QT_PITM_ANS_REQ QPAR
+                LEFT JOIN QT_PITM_ANS_PROC QPAP on QPAR.PLNT_CD = QPAP.PLNT_CD AND QPAR.REQ_IDX = QPAP.REQ_IDX
+                LEFT JOIN QM_PITM_INFO_SAP QPIS on QPAP.PLNT_CD = QPIS.PLNT_CD AND QPAR.MTR_CD = QPIS.PITM_CD
+        WHERE QPAR.PLNT_CD = #{plntCd}
+          AND QPAR.MTR_CD = #{mtrCd}
+          AND TO_CHAR(TO_DATE(QPAR.ETR_DT), 'YYYY-MM') = #{date}
+          AND QPAR.PHS_ORDER_NO = #{phsOrderNo}
+        ORDER BY QPAR.ETR_DT DESC
+    </select>
+</mapper>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.sy.dao.DocumentDao">
+
+    <select id="findAll" parameterType="DocumentVO" resultType="DocumentVO">
+        SELECT
+            NTB_IDX,
+            NTB_DIV,
+            NTB_TIT,
+            NTB_CTT,
+            POP_YN,
+            POP_TRMK_END,
+            FILE_IDX,
+            TO_CHAR(UDT_DS, 'YYYY-MM-DD') AS UDT_DS,
+            UDT_UID,
+            DEL_YN
+        FROM
+            EI_NTB_NTC
+        WHERE
+            DEL_YN = 'N'
+            <if test="ntbTit != null and ntbTit != ''">
+                AND UPPER(NTB_TIT) LIKE UPPER(('%'||#{ntbTit}||'%'))
+            </if>
+            <if test="udtUid != null and ntbTit != ''">
+                AND UPPER(UDT_UID) LIKE UPPER(('%'||#{udtUid}||'%'))
+            </if>
+            <if test="delYn != null and delYn != ''">
+                AND DEL_YN = #{delYn}
+            </if>
+        ORDER BY
+            NTB_IDX DESC
+    </select>
+
+    <select id="nextIdx" resultType="Integer">
+        SELECT NVL(MAX(NTB_IDX), 0) + 1 FROM EI_NTB_NTC
+    </select>
+
+    <insert id="create">
+        INSERT INTO EI_NTB_NTC
+        ( NTB_IDX, NTB_TIT, NTB_CTT, FILE_IDX, DEL_YN )
+        VALUES
+        ( #{ntbIdx}, #{ntbTit}, #{ntbCtt}, #{fileIdx}, #{delYn} )
+    </insert>
+
+    <update id="update" parameterType="DocumentVO">
+        UPDATE EI_NTB_NTC
+        SET
+            NTB_TIT = #{ntbTit},
+            NTB_CTT = #{ntbCtt},
+        WHERE
+            NTB_IDX = #{ntbIdx}
+    </update>
+
+</mapper>

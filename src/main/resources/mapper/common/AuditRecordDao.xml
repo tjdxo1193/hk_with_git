@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.common.dao.AuditRecordDao">
+
+    <select id="nextIdx" parameterType="String" resultType="Integer">
+        SELECT NVL(MAX(AUDIT_IDX), 0) + 1 FROM SY_AUDIT WHERE PLNT_CD = #{value}
+    </select>
+
+    <insert id="record" parameterType="AuditRecordVO">
+        INSERT INTO SY_AUDIT
+        ( PLNT_CD, AUDIT_IDX, MENU_CD, HTTP_MTD, EVT_URL, ELE_SGNT_YN, REA, CRT_IP, CRT_DS, CRT_UID )
+        VALUES
+        ( #{plntCd}, #{auditIdx}, #{menuCd}, #{httpMtd}, #{evtUrl}, #{eleSgntYn}, #{rea}, #{crtIp}, SYSDATE, #{crtUid} )
+    </insert>
+
+    <select id="nextDetailSeq" parameterType="AuditRecordVO" resultType="Integer">
+        SELECT NVL(MAX(AUDIT_SRLNO), 0) + 1  FROM SY_AUDIT_DTL WHERE PLNT_CD = #{plntCd} AND AUDIT_IDX = #{auditIdx}
+    </select>
+
+    <insert id="recordDetail" parameterType="AuditRecordDetailVO">
+        INSERT INTO SY_AUDIT_DTL
+        ( PLNT_CD, AUDIT_IDX, AUDIT_SRLNO, EVT_NM, CHG_BEF, CHG_AFT, CRT_DS, CUD_DIV )
+        VALUES
+        ( #{plntCd}, #{auditIdx}, #{auditSrlno}, #{eventNm}, #{chgBef}, #{chgAft}, SYSDATE, #{cudDiv} )
+    </insert>
+
+</mapper>

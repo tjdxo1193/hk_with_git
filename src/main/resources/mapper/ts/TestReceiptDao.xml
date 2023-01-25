@@ -1,0 +1,392 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.ts.dao.TestReceiptDao">
+
+    <select id="getTestReceiptList" parameterType="TestReceiptVO" resultType="TestReceiptVO">
+        SELECT QPAR.PLNT_CD
+            , QPAR.REQ_IDX
+            , QPAR.ISP_REQ_NO
+            , QPAR.ISP_REQ_DT
+            , QPAR.MTR_CD
+            , QPAR.MTR_NM
+            , QPAR.BATCH_NO
+            , QPAR.ETR_QTY
+            , QPAR.INP_UNIT
+            , QPAR.SAVE_PLA
+            , QPAR.ETR_DT
+            , QPAR.PHS_ORDER_TYP
+            , QPAR.PHS_ORDER_NO
+            , QPAR.PHS_ORDER_ITM
+            , QPAR.ITM_CTG
+            , QPAR.PHS_UNIT_PRE
+            , QPAR.AMT_UNIT
+            , QPAR.CURR_CD
+            , QPAR.AMT_LOCCURR
+            , QPAR.PHS_ORDER_QTY
+            , QPAR.PHS_ORDER_UNIT
+            , QPAR.SPL_CD
+            , QPAR.SPL_NM
+            , QPAR.PHS_CRG_NM
+            , QPAR.DLV_YN
+            , QPAR.VDR_CTRT_DT
+            , QPAR.VDR_RSV_TM
+            , QPAR.VDR_RPT_RCP_CRST
+            , QPAR.LOT_NO
+            , QPAR.REP_BOM_NO
+            , QPAR.SPL_LOT_NO
+            , QPAR.MAK_DT
+            , QPAR.STRG_LMT
+            , QPAR.USE_LMT
+            , QPAR.PDT_ORDER_TYP
+            , QPAR.PDT_ORDER_NO
+            , QPAR.ITN_PRS_COMP_CD
+            , QPAR.ITN_PRS_COMP_NM
+            , QPAR.MAK_EQP
+            , QPAR.WRK_NM
+            , QPAR.MTR_DOC_NO
+            , QPAR.MTR_DOC_YR
+            , QPAR.MTR_DOC_ITM
+            , QPAR.CSM_BP_CD
+            , QPAR.CSM_NM
+            , QPAR.UDT_DS
+            , QPAR.REV_DS
+            , QPAR.ADD_COL1
+            , DECODE(QPAR.ADD_COL1, 'A', '시험(구매)', DECODE(QPAR.ADD_COL1, 'B', '시험(생산)', '시험(수동)')) AS ADD_COL1_NM
+            , QPAR.ADD_COL2
+            , QPAR.ADD_COL3
+            , QP.PITM_CD
+            , QPI.PITM_NM
+            , QPI.PITM_EN
+            , QPI.PITM_TYP
+            , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = QPI.PITM_TYP) AS PITM_TYP_NM
+            , QPI.PKG_MTR_SPEC
+            , QP.USE_VER_YN
+            , QP.PITM_VER
+            , QPIS.LAB_NO
+            , QPIS.BRD_ABBR
+            , QPIS.ETR_CTN_QTY
+            , QPIS.RMTR_SPEC
+            , QPIS.FTN_YN
+            , QPIS.PCS01
+            , QPIS.PCS02
+            , QPIS.PCS03
+            , QPIS.PCS04
+            , QPIS.USE_TRM
+            , QPIS.OTC_PRD
+            , QPIS.DMS_EPT_YN
+            , QPIS.PEAR_DIV
+            , QPIS.MKR_VOL
+            , QPIS.MKR_VOL_UNIT
+            , QPIS.ETN_ANS_REQ
+            , QPIS.CTRPT_NO
+            , QPIS.PER_NO
+            , QPIS.CHAG_VOL
+            , QPIS.CHAG_VOL_UNIT
+            , DECODE(QPIS.DIO_YN, 'Y', '대상', '대상아님') AS DIO_YN
+            , DECODE(QPIS.PRB_IN_YN, 'Y', '포함됨', '포함안됨') AS PRB_IN_YN
+            , DECODE(QPIS.PRB_FE_YN, 'Y', '대상', '대상아님') AS PRB_FE_YN
+            , DECODE(QPIS.PNX_FE_YN, 'Y', '대상', '대상아님') AS PNX_FE_YN
+            , QPIS.RMTR_CFMUL
+            , QPIS.QDRUG_YN
+            , B1.PITM_SPEC_IDX
+            , B1.PITM_VER
+            , B1.AITM_SPEC_IDX
+            , B1.USE_VER_YN AS SPEC_USE_VER_YN
+            , 'N' AS EMG_YN
+            , QPAP.ANS_IDX
+            , QPAP.ANS_NO
+            , QPAP.ANS_TYP
+            , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = QPAP.ANS_TYP) AS ANS_TYP_NM
+        FROM QT_PITM_ANS_REQ QPAR
+        LEFT JOIN QT_PITM_ANS_PROC QPAP ON QPAR.REQ_IDX = QPAP.REQ_IDX AND QPAR.PLNT_CD = QPAP.PLNT_CD
+        LEFT JOIN (
+            SELECT A1.PLNT_CD, A1.PITM_CD, A1.PITM_SPEC_IDX, QPS.AITM_SPEC_IDX, QPS.PITM_VER, QPS.USE_VER_YN
+            FROM (SELECT MAX(QS.PITM_SPEC_IDX) AS PITM_SPEC_IDX, QS.PLNT_CD, QS.PITM_CD
+                FROM QM_PITM_SPEC QS
+                GROUP BY QS.PLNT_CD, QS.PITM_CD) A1
+            LEFT JOIN QM_PITM_SPEC QPS ON QPS.PITM_CD = A1.PITM_CD AND QPS.PLNT_CD = A1.PLNT_CD AND QPS.PITM_SPEC_IDX = A1.PITM_SPEC_IDX
+        ) B1
+        ON QPAR.MTR_CD = B1.PITM_CD AND QPAR.PLNT_CD = B1.PLNT_CD
+        LEFT JOIN QM_PITM QP ON B1.PITM_CD = QP.PITM_CD AND B1.PITM_VER = QP.PITM_VER AND QPAR.PLNT_CD = QP.PLNT_CD
+        LEFT JOIN QM_PITM_INFO QPI ON QP.PITM_CD = QPI.PITM_CD AND QP.PITM_VER = QPI.PITM_VER AND QP.PLNT_CD = QPI.PLNT_CD
+        LEFT JOIN QM_PITM_INFO_SAP QPIS ON QP.PITM_CD = QPIS.PITM_CD AND QP.PITM_VER = QPIS.PITM_VER AND QP.PLNT_CD = QPIS.PLNT_CD
+        WHERE QPAR.PLNT_CD = #{plntCd}
+        <!--AND QPAP.ANS_IDX IS NULL-->
+        AND DECODE(QPAP.ANS_PROC_CD, NULL, 'S0130200', QPAP.ANS_PROC_CD) = #{ansProcCd}
+        AND QP.PITM_CD IS NOT NULL
+        <if test="pitmTyp != '' and pitmTyp != null">
+            AND QPI.PITM_TYP = #{pitmTyp}
+        </if>
+        <if test="pitmNm != null and pitmNm != ''">
+            AND TRIM(UPPER(QPI.PITM_NM)) LIKE ('%' || TRIM(UPPER(#{pitmNm})) || '%')
+        </if>
+        <if test="pitmCd != null and pitmCd != ''">
+            AND TRIM(UPPER(QPI.PITM_CD)) LIKE ('%' || TRIM(UPPER(#{pitmCd})) || '%')
+        </if>
+        <if test="ispReqNo != null and ispReqNo != ''">
+            AND TRIM(UPPER(QPAR.ISP_REQ_NO)) LIKE ('%' || TRIM(UPPER(#{ispReqNo})) || '%')
+        </if>
+        <if test="lotNo != null and lotNo != ''">
+            AND TRIM(UPPER(QPAR.LOT_NO)) LIKE ('%' || TRIM(UPPER(#{lotNo})) || '%')
+        </if>
+        <if test="batchNo != null and batchNo != ''">
+            AND TRIM(UPPER(QPAR.BATCH_NO)) LIKE ('%' || TRIM(UPPER(#{batchNo})) || '%')
+        </if>
+        <if test="formIspReqDt != null and formIspReqDt != ''">
+            AND QPAR.ISP_REQ_DT BETWEEN #{formIspReqDt[0]} AND #{formIspReqDt[1]}
+        </if>
+        ORDER BY QPAP.ANS_IDX, QPAR.REQ_IDX
+    </select>
+
+    <select id="getTestAitm" parameterType="TestReceiptVO" resultType="TestReceiptVO">
+        SELECT QPS.PITM_CD
+            , QPS.PITM_SPEC_IDX
+            , QPS.PITM_VER
+            , QPS.AITM_SPEC_IDX
+            , QPSA.AITM_SEQ
+            , QPSA.ANS_DPT_CD
+            , QPSA.ISP_DUR_TM
+            , QPSA.EQM_USE_TM
+            , QPSA.AMITM_CD
+            , (SELECT VRIA_KN FROM MS_AMITM MA WHERE MA.AMITM_CD = QPSA.AMITM_CD) AS VRIA_KN
+            , (SELECT VRIA_NO FROM MS_AMITM MA WHERE MA.AMITM_CD = QPSA.AMITM_CD) AS VRIA_NO
+            , (SELECT AITM_KN FROM MS_AITM WHERE AITM_CD = (SELECT AITM_CD FROM MS_AMITM MA WHERE MA.AMITM_CD = QPSA.AMITM_CD)) AS AITM_KN
+            , QPSA.AITM_ORD
+            , QPSA.PERSPEC_TXT
+            , QPSA.OWC_SPEC_TXT
+            , QPSA.SPEC_TXT_EN
+            , QPSA.PER_SLV_LOW
+            , QPSA.PER_SLV_UPP
+            , QPSA.PER_SLV_DESC
+            , QPSA.OWC_SLV_LOW
+            , QPSA.OWC_SLV_UPP
+            , QPSA.OWC_SLV_DESC
+            , QPSA.RST_DPNT
+            , QPSA.RPT_PRT_SLV_VAL
+            , QPSA.RPT_PRT_ITM_NM
+            , QPSA.MKR_QTY
+            , QPSA.AITM_RMK
+            , QPAS.AITM_SPEC_VER
+            , DECODE(QPSA.RPT_PRT_YN, 'Y', '출력함', '출력안함') AS RPT_PRT_YN
+            , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = QPSA.SPEC_TYP) AS SPEC_TYP_NM
+            , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = QPSA.JDG_TYP) AS JDG_TYP_NM
+            , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = QPSA.SLV_JDG_CFM AND SCD.PLNT_CD = QPS.PLNT_CD) AS SLV_JDG_CFM_NM
+            , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = QPSA.SLV_JDG_NON_CFM AND SCD.PLNT_CD = QPS.PLNT_CD) AS SLV_JDG_NON_CFM_NM
+            , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = QPSA.RST_UNIT_CD AND SCD.PLNT_CD = QPS.PLNT_CD) AS RST_UNIT_NM
+            , (SELECT DPT_NM FROM SY_DPT SD WHERE SD.DPT_CD = QPSA.ANS_DPT_CD AND SD.PLNT_CD = QPS.PLNT_CD) AS ANS_DPT_NM
+        FROM QM_PITM_SPEC QPS
+        LEFT JOIN QM_PITM_SPEC_AITM QPSA ON QPS.AITM_SPEC_IDX = QPSA.AITM_SPEC_IDX AND QPS.PLNT_CD = QPSA.PLNT_CD
+        LEFT JOIN QM_PITM_AITM_SPEC QPAS ON QPS.AITM_SPEC_IDX = QPAS.AITM_SPEC_IDX AND QPS.PLNT_CD = QPAS.PLNT_CD
+        WHERE QPS.PLNT_CD = #{plntCd}
+        AND QPS.PITM_CD = #{pitmCd}
+        AND QPS.PITM_VER = #{pitmVer}
+        AND QPS.AITM_SPEC_IDX = #{aitmSpecIdx}
+        ORDER BY QPSA.AITM_ORD
+    </select>
+
+    <select id="getAnsIdx" parameterType="TestReceiptVO" resultType="int">
+        SELECT NVL(MAX(ANS_IDX), 0) + 1 AS ANS_IDX
+        FROM QT_PITM_ANS_PROC
+        WHERE PLNT_CD = #{plntCd}
+    </select>
+
+    <insert id="insertTestProc" parameterType="TestReceiptVO">
+        INSERT INTO QT_PITM_ANS_PROC(
+            PLNT_CD
+            , ANS_IDX
+            , REQ_IDX
+            , PITM_SPEC_IDX
+            , ANS_PROC_CD
+            , ANS_TYP
+            , REQ_DT
+            , ANS_EDT
+            , ANS_NO
+            , RCP_DT
+            , RCP_DS
+            , RCP_DPT_CD
+            , RCP_UID
+            , RCP_RMK
+        ) VALUES (
+            #{plntCd}
+            , #{ansIdx}
+            , #{reqIdx}
+            , #{pitmSpecIdx}
+            , #{ansProcCd}
+            , DECODE(#{addCol1}, 'A', 'S0230001', DECODE(#{addCol1}, 'B', 'S0230002', 'S0230003'))
+            , #{ispReqDt}
+            , (SELECT FN_GET_EDT(#{ispReqDt}, ANS_DUR_DAY) AS ANS_EDT FROM QM_PITM_INFO WHERE PLNT_CD = #{plntCd} AND PITM_CD = #{pitmCd} AND PITM_VER = #{pitmVer})
+            , FN_GET_ANS_NO('T', #{pitmTyp}, #{plntCd})
+            , TO_CHAR(SYSDATE, 'YYYY-MM-DD')
+            , SYSDATE
+            , #{rcpDptCd}
+            , #{rcpUid}
+            , #{rcpRmk}
+        )
+    </insert>
+
+    <update id="save" parameterType="TestReceiptVO">
+        UPDATE QT_PITM_ANS_PROC SET
+            ANS_PROC_CD = #{ansProcCd}
+            , RCP_DT = TO_CHAR(SYSDATE, 'YYYY-MM-DD')
+            , RCP_DS = SYSDATE
+            , RCP_DPT_CD = #{rcpDptCd}
+            , RCP_UID = #{rcpUid}
+            , RCP_RMK = #{rcpRmk}
+        WHERE ANS_IDX = #{ansIdx}
+        AND PLNT_CD = #{plntCd}
+    </update>
+
+    <insert id="insertTestInfo" parameterType="TestReceiptVO">
+        INSERT INTO QT_PITM_ANS_INFO (
+            PLNT_CD
+            , ANS_IDX
+            , CRG_DPT_CD
+            , SPCM_NO
+            , CLLT_MTD
+            , CLLT_MCN
+            , CLLT_PLA
+            , SMP_STRG_MTD
+            , SMP_VOL_UNIT
+            , SMP_VOL_ANS
+            , SMP_VOL_ETC
+            , SMP_VOL_MNG
+            , ANS_NEW_YN
+            , MIC_YN
+            , EMG_YN
+            , PKG_MTR_SPEC
+            , RMTR_SPEC
+            , RMTR_CFMUL
+            , QDRUG_YN
+        )
+        SELECT
+            #{plntCd}
+            , #{ansIdx}
+            , CRG_DPT_CD
+            , SPCM_NO
+            , CLLT_MTD
+            , CLLT_MCN
+            , CLLT_PLA
+            , SMP_STRG_MTD
+            , SMP_VOL_UNIT
+            , SMP_VOL_ANS
+            , SMP_VOL_ETC
+            , SMP_VOL_MNG
+            , (SELECT DECODE(COUNT(*),0,'Y','N') FROM QT_PITM_ANS_PROC QPAP
+                LEFT JOIN QM_PITM_SPEC QPS ON QPAP.PITM_SPEC_IDX = QPS.PITM_SPEC_IDX AND QPS.PITM_CD = #{pitmCd}) AS ANS_NEW_YN
+            , MIC_YN
+            , #{emgYn}
+            , PKG_MTR_SPEC
+            , #{rmtrSpec}
+            , #{rmtrCfmul}
+            , #{qdrugYn}
+        FROM QM_PITM_INFO
+        WHERE PLNT_CD = #{plntCd}
+        AND PITM_CD = #{pitmCd}
+        AND PITM_VER = #{pitmVer}
+    </insert>
+
+    <insert id="insertTestRst" parameterType="TestReceiptVO">
+        INSERT INTO QT_PITM_ANS_RST (
+            PLNT_CD
+            , ANS_IDX
+            , RST_SEQ
+            , RST_PROC_CD
+            , ANS_DPT_CD
+            , AMITM_CD
+            , AITM_ORD
+            , PERSPEC_TXT
+            , OWC_SPEC_TXT
+            , SPEC_TXT_EN
+            , SPEC_TYP
+            , JDG_TYP
+            , PER_SLV_LOW
+            , PER_SLV_UPP
+            , PER_SLV_DESC
+            , OWC_SLV_LOW
+            , OWC_SLV_UPP
+            , OWC_SLV_DESC
+            , SLV_JDG_CFM
+            , SLV_JDG_NON_CFM
+            , RST_UNIT_CD
+            , RST_DPNT
+            , RPT_PRT_SLV_VAL
+            , RPT_PRT_ITM_NM
+            , RPT_PRT_YN
+            , ISP_DPT_CD
+            , SMP_CLLT_QTY
+            , SMP_CLLT_UNIT
+            , ISP_DUR_TM
+            , EQM_USE_TM
+        )
+        SELECT
+            #{plntCd}
+            , #{ansIdx}
+            , AITM_SEQ
+            , 'S0140100'
+            , ANS_DPT_CD
+            , AMITM_CD
+            , AITM_ORD
+            , PERSPEC_TXT
+            , OWC_SPEC_TXT
+            , SPEC_TXT_EN
+            , SPEC_TYP
+            , JDG_TYP
+            , PER_SLV_LOW
+            , PER_SLV_UPP
+            , PER_SLV_DESC
+            , OWC_SLV_LOW
+            , OWC_SLV_UPP
+            , OWC_SLV_DESC
+            , SLV_JDG_CFM
+            , SLV_JDG_NON_CFM
+            , RST_UNIT_CD
+            , RST_DPNT
+            , RPT_PRT_SLV_VAL
+            , RPT_PRT_ITM_NM
+            , RPT_PRT_YN
+            , ISP_DPT_CD
+            , SMP_CLLT_QTY
+            , SMP_CLLT_UNIT
+            , ISP_DUR_TM
+            , EQM_USE_TM
+        FROM QM_PITM_SPEC_AITM
+        WHERE PLNT_CD = #{plntCd}
+        AND AITM_SPEC_IDX = #{aitmSpecIdx}
+    </insert>
+
+    <!--변수테이블은 현재 사용하지 않으나 추후 사용할 가능성 있음-->
+    <insert id="insertTestVrib" parameterType="TestReceiptVO">
+        INSERT INTO QT_PITM_ANS_VRIB (
+            PLNT_CD
+            , MITM_REQ_IDX
+            , RST_SEQ
+            , VRIB_SEQ
+        )
+        SELECT
+            #{plntCd}
+            , #{ansIdx}
+            , RST_SEQ
+            , VRIB_SEQ
+        FROM QM_PITM_SPEC_VRIB
+        WHERE PLNT_CD = #{plntCd}
+        AND AITM_SPEC_IDX = #{aitmSpecIdx}
+    </insert>
+
+    <select id="getNonconformityTestList" parameterType="TestReceiptVO" resultType="TestReceiptVO">
+        SELECT PLNT_CD,
+            REQ_IDX,
+            NON_CFM_SEQ,
+            ISP_REQ_NO,
+            ISP_REQ_NO_BLK,
+            ZEXFIELD1,
+            ZEXFIELD2,
+            ZEXFIELD3,
+            ZEXFIELD4,
+            ZEXFIELD5,
+            CRT_DS,
+            IF_INFO_IDX
+        FROM QT_PITM_ANS_REQ_NON_CFM
+        WHERE PLNT_CD = #{plntCd}
+        AND REQ_IDX = #{reqIdx}
+    </select>
+</mapper>

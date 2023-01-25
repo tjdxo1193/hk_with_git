@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.integration.dao.InterfaceCommonDao">
+
+    <select id="nextIdxInTestStatus" resultType="int">
+        SELECT NVL(MAX(IDX), 0) + 1
+        FROM IF_TRS_TEST_STATUS
+    </select>
+
+    <select id="nextDegreeInTestStatus" resultType="int">
+        SELECT NVL(MAX(DEGREE), 0) + 1
+        FROM IF_TRS_TEST_STATUS
+    </select>
+
+    <update id="updateTrsStatusOfTestStatus" parameterType="lims.api.integration.domain.eai.TrsStateful">
+        UPDATE IF_TRS_TEST_STATUS
+        SET
+        TRS_STATUS = #{trsStatus}
+        <if test="ifInfoIdx != null and ifInfoIdx != ''">
+            ,IF_INFO_IDX = #{ifInfoIdx}
+        </if>
+        <if test="errorlogId != null and errorlogId != ''">
+            ,ERRORLOG_ID = #{errorlogId}
+        </if>
+        WHERE
+        IDX = #{idx}
+    </update>
+
+
+    <select id="nextIdxInTestResult" resultType="int">
+        SELECT NVL(MAX(IDX), 0) + 1
+        FROM IF_TRS_TEST_RESULT
+    </select>
+
+    <select id="nextDegreeInTestResult" resultType="int">
+        SELECT NVL(MAX(DEGREE), 0) + 1
+        FROM IF_TRS_TEST_RESULT
+    </select>
+
+    <update id="updateTrsStatusOfTestResult" parameterType="lims.api.integration.domain.eai.TrsStateful">
+        UPDATE IF_TRS_TEST_RESULT
+        SET
+        TRS_STATUS = #{trsStatus}
+        <if test="ifInfoIdx != null and ifInfoIdx != ''">
+            ,IF_INFO_IDX = #{ifInfoIdx}
+        </if>
+        <if test="errorlogId != null and errorlogId != ''">
+            ,ERRORLOG_ID = #{errorlogId}
+        </if>
+        WHERE
+        IDX = #{idx}
+    </update>
+
+</mapper>

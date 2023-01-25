@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.sy.dao.LoginHistoryDao">
+    <select id="find" parameterType="LoginHistoryVO" resultType="LoginHistoryVO">
+        SELECT SJL.PLNT_CD,
+        SP.PLNT_NM,
+        SJL.ACSS_IDX,
+        SJL.ACSS_DIV,
+        SJL.ACSS_UID,
+        SU.USER_NM,
+        SJL.ACSS_DS,
+        SJL.ACSS_IP
+        FROM SY_JNT_LOG SJL,
+        SY_PLNT SP,
+        SY_USER SU
+        WHERE SJL.PLNT_CD = SP.PLNT_CD
+        AND SU.PLNT_CD = SJL.PLNT_CD
+        AND SP.USE_YN = 'Y'
+        <if test="plntNm != ''">
+            AND UPPER(SP.PLNT_NM) LIKE '%' || UPPER(#{plntNm}) || '%'
+        </if>
+        <if test="userNm != ''">
+            AND UPPER(SU.USER_NM) LIKE '%' || UPPER(#{userNm}) || '%'
+        </if>
+        <if test="acssUid != ''">
+            AND UPPER(SJL.ACSS_UID) LIKE '%' || UPPER(#{acssUid}) || '%'
+        </if>
+        <if test="acssDsList != ''">
+            AND ACSS_DS BETWEEN TO_DATE(#{acssDsList[0]}) AND TO_DATE(#{acssDsList[1]})
+        </if>
+        ORDER BY ACSS_DS DESC
+    </select>
+</mapper>

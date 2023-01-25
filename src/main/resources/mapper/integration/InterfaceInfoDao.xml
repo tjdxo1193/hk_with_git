@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.integration.dao.InterfaceInfoDao">
+
+    <select id="nextId" resultType="int">
+        SELECT NVL(MAX(IDX), 0) + 1
+        FROM IF_INFO
+    </select>
+
+    <insert id="createInfo" parameterType="IfInfoVO">
+        INSERT INTO IF_INFO
+        (IDX, REV_TRS_DIV, XSYSID, IF_TYPE, XSTAT, XMSG, XTID, XIFID, XDATE, XTIME, CRT_DS)
+        VALUES (#{idx},
+                #{infoDiv},
+                #{xsysid},
+                #{ifType},
+                #{xstat},
+                #{xmsg},
+                #{xtid},
+                #{xifid},
+                #{xdate},
+                #{xtime},
+                SYSDATE)
+    </insert>
+
+    <update id="updateStatusInfo" parameterType="IfInfoVO">
+        UPDATE IF_INFO
+        SET XSTAT = #{xstat}
+            ,XMSG = #{xmsg}
+            <if test="errorLogId != null and errorLogId != ''">
+                ,ERRORLOG_ID = #{errorLogId}
+            </if>
+            <if test="xdate != null and xdate != ''">
+                ,XDATE = #{xdate}
+            </if>
+            <if test="xtime != null and xtime != ''">
+                ,XTIME = #{xtime}
+            </if>
+        WHERE IDX = #{idx}
+    </update>
+
+    <select id="findById" resultType="IfInfoVO">
+        SELECT IDX,
+               XTID,
+               XIFID,
+               XSYSID,
+               XDATE,
+               XTIME,
+               REV_TRS_DIV AS INFO_DIV,
+               XSTAT,
+               XMSG
+        FROM IF_INFO
+        WHERE IDX = #{value}
+    </select>
+
+</mapper>

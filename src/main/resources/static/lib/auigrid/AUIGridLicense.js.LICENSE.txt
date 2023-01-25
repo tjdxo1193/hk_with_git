@@ -1,0 +1,13 @@
+/*!
+
+* AUIGrid 3.0.11 License
+
+* License Type :  Enterprise Dev License
+
+* Authorized Domain(or IP) : lims.kolmar.co.kr, qms.kolmar.co.kr, limsqa.kolmar.co.kr, qmsqa.kolmar.co.kr, limsdev.kolmar.co.kr, qmsdev.kolmar.co.kr
+
+* Expiration Date :  2023-12-31
+
+* www.auisoft.net
+
+*/

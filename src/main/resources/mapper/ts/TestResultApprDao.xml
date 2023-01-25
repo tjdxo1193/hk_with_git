@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.ts.dao.TestResultApprDao">
+
+    <select id="findAll" parameterType="TestResultApprVO" resultType="TestResultApprVO">
+        SELECT
+            A.PLNT_CD,
+            A.ANS_IDX,
+            A.RCP_DT,
+            NVL(B.EMG_YN, 'N') AS EMG_YN,
+            A.ANS_NO,
+            A.REQ_DT,
+            A.PITM_SPEC_IDX,
+            F.PITM_TYP,
+            (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = F.PITM_TYP) AS PITM_TYP_NM,
+            F.PITM_CD,
+            F.PITM_NM,
+            G.LOT_NO,
+            A.REQ_RMK,
+            A.RCP_RMK,
+            A.ASS_SPCC,
+            G.MAK_DT,
+            G.ETR_DT,
+            G.SPL_LOT_NO,
+            G.USE_LMT,
+            A.CLLT_RMK,
+            A.CLLT_UID,
+            (SELECT USER_NM FROM SY_USER WHERE USER_ID = A.CLLT_UID AND PLNT_CD = A.PLNT_CD) AS CLLT_NM,
+            A.CLLT_DT,
+            A.CPL_RQM_DT,
+            A.ASS_NO,
+            A.ASS_DT,
+            G.SPL_CD,
+            G.SPL_NM,
+            A.REQ_UID,
+            (SELECT USER_NM FROM SY_USER WHERE USER_ID = A.REQ_UID AND PLNT_CD = A.PLNT_CD) AS REQ_NM,
+            A.REQ_DPT_CD,
+            (SELECT DPT_NM FROM SY_DPT WHERE DPT_CD = A.REQ_DPT_CD AND PLNT_CD = A.PLNT_CD) AS REQ_DPT_NM,
+            G.ETR_QTY,
+            G.INP_UNIT,
+            A.RJT_UID,
+            (SELECT USER_NM FROM SY_USER WHERE USER_ID = A.RJT_UID AND PLNT_CD = A.PLNT_CD) AS RJT_NM,
+            TO_CHAR(A.RJT_DS, 'YYYY-MM-DD') AS RJT_DS,
+            A.RJT_REA,
+            A.ANS_PROC_CD,
+            A.OOS_YN,
+            A.REVW_CMMT,
+            A.SYT_JDG,
+            A.REVW_DT,
+            F.PITM_EN,
+            A.RST_APR_REQ_IDX,
+            B.ANS_FILE_IDX AS FILE_IDX,
+            ((SELECT COUNT(FILE_SRLNO) FROM SY_FILE_INFO WHERE FILE_IDX = B.ANS_FILE_IDX AND DEL_YN = 'N') || '건') AS FILE_CNT,
+            F.CRG_DPT_CD,
+            (SELECT DPT_NM FROM SY_DPT WHERE DPT_CD = F.CRG_DPT_CD AND PLNT_CD = F.PLNT_CD) AS CRG_DPT_NM,
+            G.BATCH_NO,
+            G.ISP_REQ_NO,
+            G.PHS_ORDER_NO,
+            G.PDT_ORDER_NO,
+            A.PITM_SPCC,
+            B.NON_CFM_REA,
+            B.PITM_SPCC,
+            (NVL(B.SMP_VOL_ANS, 0) + NVL(B.SMP_VOL_ETC, 0) + NVL(B.SMP_VOL_STRG, 0)) AS SMP_VOL_TOT
+        FROM QT_PITM_ANS_PROC A
+        JOIN QT_PITM_ANS_INFO B ON A.PLNT_CD = B.PLNT_CD AND A.ANS_IDX = B.ANS_IDX
+        JOIN QM_PITM_SPEC D ON A.PLNT_CD = D.PLNT_CD AND A.PITM_SPEC_IDX = D.PITM_SPEC_IDX
+        JOIN QM_PITM E ON D.PLNT_CD = E.PLNT_CD AND D.PITM_CD = E.PITM_CD AND D.PITM_VER = E.PITM_VER
+        JOIN QM_PITM_INFO F ON E.PLNT_CD = F.PLNT_CD AND E.PITM_CD = F.PITM_CD AND E.PITM_VER = F.PITM_VER
+        JOIN QT_PITM_ANS_REQ G ON A.PLNT_CD = G.PLNT_CD AND A.REQ_IDX = G.REQ_IDX
+        JOIN SY_APR_INFO C ON A.RST_APR_REQ_IDX = C.APR_IDX
+        WHERE A.PLNT_CD = #{plntCd} AND A.ANS_PROC_CD = #{ansProcCd} AND A.HLD_YN = 'N'
+            AND C.APR_UID IN ( ${withDelegateUserIds} ) AND C.APR_YN = 'N'
+        <if test="pitmTyp != null and pitmTyp != ''">
+            AND F.PITM_TYP = #{pitmTyp}
+        </if>
+        <if test="pitmCd != null and pitmCd != ''">
+            AND UPPER(F.PITM_CD) LIKE '%' || UPPER(#{pitmCd}) || '%'
+        </if>
+        <if test="ansNo != null and ansNo != ''">
+            AND UPPER(A.ANS_NO) LIKE '%' || UPPER(#{ansNo}) || '%'
+        </if>
+        <if test="lotNo != null and lotNo != ''">
+            AND UPPER(G.LOT_NO) LIKE '%' || UPPER(#{lotNo}) || '%'
+        </if>
+        <if test="assNo != null and assNo != ''">
+            AND UPPER(A.ASS_NO) LIKE '%' || UPPER(#{assNo}) || '%'
+        </if>
+        <if test="pitmNm != null and pitmNm != ''">
+            AND UPPER(F.PITM_NM) LIKE '%' || UPPER(#{pitmNm}) || '%'
+        </if>
+        <if test="searchReqDt != null and searchReqDt != ''">
+            AND A.REQ_DT BETWEEN #{searchReqDt[0]} AND #{searchReqDt[1]}
+        </if>
+        ORDER BY B.EMG_YN DESC, A.ANS_IDX, A.REQ_IDX
+    </select>
+
+    <select id="findResultItem" parameterType="TestResultApprVO" resultType="TestResultApprVO">
+        SELECT
+            C.PLNT_CD,
+            A.REQ_IDX,
+            C.ANS_IDX,
+            C.RST_SEQ,
+            C.RST_FILE_IDX AS FILE_IDX,
+            A.PITM_SPEC_IDX,
+            F.PITM_TYP,
+            F.PITM_CD,
+            F.PITM_NM,
+            I.AITM_CD,
+            I.AITM_KN,
+            H.VRIA_NO,
+            H.VRIA_KN,
+            C.ANS_DPT_CD,
+            (SELECT DPT_NM FROM SY_DPT WHERE DPT_CD = C.ANS_DPT_CD AND PLNT_CD = C.PLNT_CD) AS ANS_DPT_NM,
+            C.ANS_UID,
+            (SELECT USER_NM FROM SY_USER WHERE USER_ID = C.ANS_UID AND PLNT_CD = C.PLNT_CD) AS ANS_NM,
+            C.PERSPEC_TXT,
+            C.OWC_SPEC_TXT,
+            C.SPEC_TYP,
+            (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = C.SPEC_TYP) AS SPEC_TYP_NM,
+            C.JDG_TYP,
+            (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = C.JDG_TYP) AS JDG_TYP_NM,
+            (DECODE(SUBSTR(C.RST_VAL, 0, 4), 'U008', (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = C.RST_VAL AND PLNT_CD = C.PLNT_CD), RST_VAL)) AS RST_VAL,
+            C.MARK_VAL,
+            C.RST_UNIT_CD,
+            (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = C.RST_UNIT_CD AND PLNT_CD = C.PLNT_CD) AS RST_UNIT_NM,
+            C.RPT_PRT_ITM_NM,
+            C.RST_JDG,
+            (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = C.RST_JDG) AS RST_JDG_NM,
+            C.RPT_PRT_SLV_VAL,
+            C.RST_RMK,
+            C.ANS_RST_INP_DS,
+            C.RST_DPNT,
+            C.PER_SLV_LOW,
+            C.PER_SLV_UPP,
+            C.PER_SLV_DESC,
+            C.OWC_SLV_LOW,
+            C.OWC_SLV_UPP,
+            C.OWC_SLV_DESC,
+            C.RPT_PRT_YN,
+            A.ANS_PROC_CD,
+            C.RST_PROC_CD,
+            A.ANS_NO,
+            G.LOT_NO,
+            G.BATCH_NO,
+            C.AMITM_CD,
+            J.LAB_EVT_IDX,
+            J.LAB_EVT_APR_IDX,
+            K.APR_YN,
+            NVL(G.PHS_ORDER_NO, G.PDT_ORDER_NO) AS ORDER_NO,
+            C.SLV_JDG_CFM,
+            (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = C.SLV_JDG_CFM AND PLNT_CD = C.PLNT_CD) AS SLV_JDG_CFM_NM,
+            C.SLV_JDG_NON_CFM,
+            (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = C.SLV_JDG_NON_CFM AND PLNT_CD = C.PLNT_CD) AS SLV_JDG_NON_CFM_NM,
+            ((SELECT COUNT(FILE_SRLNO) FROM SY_FILE_INFO WHERE FILE_IDX = C.RST_FILE_IDX AND DEL_YN = 'N') || '건') AS FILE_CNT,
+            C.MKR_QTY,
+            C.AITM_RMK
+        FROM QT_PITM_ANS_PROC A
+        JOIN QT_PITM_ANS_INFO B ON A.PLNT_CD = B.PLNT_CD AND A.ANS_IDX = B.ANS_IDX
+        JOIN QT_PITM_ANS_RST C ON A.PLNT_CD = C.PLNT_CD AND A.ANS_IDX = C.ANS_IDX
+        JOIN QM_PITM_SPEC D ON A.PLNT_CD = D.PLNT_CD AND A.PITM_SPEC_IDX = D.PITM_SPEC_IDX
+        JOIN QM_PITM E ON D.PLNT_CD = E.PLNT_CD AND D.PITM_CD = E.PITM_CD AND D.PITM_VER = E.PITM_VER
+        JOIN QM_PITM_INFO F ON E.PLNT_CD = F.PLNT_CD AND E.PITM_CD = F.PITM_CD AND E.PITM_VER = F.PITM_VER
+        JOIN QT_PITM_ANS_REQ G ON A.PLNT_CD = G.PLNT_CD AND A.REQ_IDX = G.REQ_IDX
+        JOIN MS_AMITM H ON C.AMITM_CD = H.AMITM_CD
+        JOIN MS_AITM I ON H.AITM_CD = I.AITM_CD
+        LEFT OUTER JOIN QE_LAB_EVT J ON C.ANS_IDX = J.ANS_IDX AND C.RST_SEQ = J.RST_SEQ AND C.PLNT_CD = J.PLNT_CD
+        LEFT OUTER JOIN SY_APR_INFO K ON J.LAB_EVT_APR_IDX = K.APR_IDX AND J.PLNT_CD = K.PLNT_CD
+        WHERE A.ANS_IDX = #{ansIdx} AND A.ANS_PROC_CD = #{ansProcCd} AND A.HLD_YN = 'N' AND C.DEL_YN = 'N'
+            AND C.RST_PROC_CD = #{rstProcCd}
+        ORDER BY C.RST_SEQ
+    </select>
+
+    <update id="approve" parameterType="TestResultApprVO">
+        UPDATE QT_PITM_ANS_PROC SET
+            SYT_JDG = #{sytJdg}
+            , ANS_PROC_CD = #{ansProcCd}
+        WHERE PLNT_CD = #{plntCd} AND ANS_IDX = #{ansIdx}
+    </update>
+
+    <update id="requestHold" parameterType="TestResultApprVO">
+        UPDATE QT_PITM_ANS_PROC SET
+            HLD_YN = 'Y',
+            HLD_DS = SYSDATE,
+            HLD_UID = #{hldUid},
+            HLD_REA = #{hldRea},
+            HLD_CANL_DS = NULL,
+            HLD_CANL_UID = NULL,
+            HLD_CANL_REA = NULL
+        WHERE PLNT_CD = #{plntCd} AND ANS_IDX = #{ansIdx}
+    </update>
+
+    <update id="requestRejection" parameterType="TestResultApprVO">
+        UPDATE QT_PITM_ANS_PROC SET
+            ANS_PROC_CD = #{ansProcCd}
+            , RJT_UID = #{rjtUid}
+            , RJT_DS = SYSDATE
+            , RJT_REA = #{rjtRea}
+        WHERE PLNT_CD = #{plntCd} AND ANS_IDX = #{ansIdx}
+    </update>
+
+</mapper>

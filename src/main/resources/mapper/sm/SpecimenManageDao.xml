@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.sm.dao.SpecimenManageDao">
+
+    <select id="getSpecimenList" parameterType="SpecimenManageVO" resultType="SpecimenManageVO">
+        SELECT SS.PLNT_CD
+            , SS.SPCM_IDX
+            , SS.PITM_VER
+            , SS.PITM_CD
+            , SS.REV_NO
+            , SS.ENM_DT
+            , TO_CHAR(SS.EXPIR_DT, 'YYYY-MM-DD') AS EXPIR_DT
+            , SS.APR_UID
+            , (SELECT USER_NM FROM SY_USER SU WHERE SU.USER_ID = SS.APR_UID) APR_UNM
+            , SS.MUFT
+            , SS.RMK
+            , SS.USE_YN
+            , QPI.PITM_NM
+            , QPI.PITM_EN
+            , QPI.PITM_TYP
+            , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = QPI.PITM_TYP) AS PITM_TYP_NM
+        FROM SD_SPCM SS
+        LEFT JOIN QM_PITM_INFO QPI ON SS.PITM_CD = QPI.PITM_CD AND SS.PITM_VER = QPI.PITM_VER AND SS.PLNT_CD = QPI.PLNT_CD
+        WHERE SS.PLNT_CD = #{plntCd}
+        <if test="pitmNm != null and pitmNm != ''">
+            AND TRIM(UPPER(QPI.PITM_NM)) LIKE ('%' || TRIM(UPPER(#{pitmNm})) || '%')
+        </if>
+        <if test="pitmCd != null and pitmCd != ''">
+            AND TRIM(UPPER(SS.PITM_CD)) LIKE ('%' || TRIM(UPPER(#{pitmCd})) || '%')
+        </if>
+        <if test="useYn != null and useYn != ''">
+            AND SS.USE_YN = #{useYn}
+        </if>
+        <if test="formEnmDt != null and formEnmDt != ''">
+            AND SS.ENM_DT BETWEEN #{formEnmDt[0]} AND #{formEnmDt[1]}
+        </if>
+        <if test="formExpirDt != null and formExpirDt != ''">
+            AND SS.EXPIR_DT BETWEEN #{formExpirDt[0]} AND #{formExpirDt[1]}
+        </if>
+    </select>
+
+    <select id="getSpecimenHis" parameterType="SpecimenManageVO" resultType="SpecimenManageVO">
+        SELECT SSH.PLNT_CD
+            , SSH.SPCM_IDX
+            , SSH.HIS_SEQ
+            , SSH.HIS_REV_NO
+            , SSH.CHG_REA
+            , SSH.UDT_HIS
+            , SSH.UDT_IP
+            , SSH.UDT_DS
+            , SSH.UDT_UID
+            , (SELECT USER_NM FROM SY_USER SU WHERE SU.USER_ID = SSH.UDT_UID) UDT_UNM
+        FROM SD_SPCM_HIS SSH
+        WHERE SSH.PLNT_CD = #{plntCd}
+        AND SSH.SPCM_IDX = #{spcmIdx}
+        ORDER BY HIS_SEQ
+    </select>
+
+    <insert id="insertSpecimen" parameterType="SpecimenManageVO">
+        <selectKey resultType="integer" keyProperty="spcmIdx" order="BEFORE">
+            SELECT NVL(MAX(SPCM_IDX)+1,1) FROM SD_SPCM WHERE PLNT_CD = #{plntCd}
+        </selectKey>
+        INSERT INTO SD_SPCM(
+            PLNT_CD
+            , SPCM_IDX
+            , PITM_VER
+            , PITM_CD
+            , REV_NO
+            , ENM_DT
+            , EXPIR_DT
+            , APR_UID
+            , MUFT
+            , RMK
+        ) VALUES (
+            #{plntCd}
+            , #{spcmIdx}
+            , #{pitmVer}
+            , #{pitmCd}
+            , '1'
+            , #{enmDt}
+            , TO_DATE(#{expirDt}, 'YYYY-MM-DD HH24:MI:SS')
+            , #{aprUid}
+            , #{muft}
+            , #{rmk}
+        )
+    </insert>
+
+    <update id="updateSpecimen" parameterType="SpecimenManageVO">
+        UPDATE SD_SPCM SET
+            REV_NO = (SELECT NVL(MAX(REV_NO)+1,1) FROM SD_SPCM WHERE PLNT_CD = #{plntCd} AND SPCM_IDX = #{spcmIdx})
+            , EXPIR_DT = TO_DATE(#{expirDt}, 'YYYY-MM-DD HH24:MI:SS')
+            , MUFT = #{muft}
+            , RMK = #{rmk}
+            , USE_YN = #{useYn}
+        WHERE PLNT_CD = #{plntCd}
+        AND SPCM_IDX = #{spcmIdx}
+    </update>
+
+    <insert id="insertSpecimenHis" parameterType="SpecimenManageVO">
+        <selectKey resultType="integer" keyProperty="hisSeq" order="BEFORE">
+            SELECT NVL(MAX(HIS_SEQ)+1,1) FROM SD_SPCM_HIS WHERE PLNT_CD = #{plntCd} AND SPCM_IDX = #{spcmIdx}
+        </selectKey>
+        INSERT INTO SD_SPCM_HIS(
+            PLNT_CD
+            , SPCM_IDX
+            , HIS_SEQ
+            , HIS_REV_NO
+            , CHG_REA
+            , UDT_HIS
+        ) VALUES (
+            #{plntCd}
+            , #{spcmIdx}
+            , #{hisSeq}
+            , #{revNo}
+            , #{chgRea}
+            , #{udtHis}
+        )
+    </insert>
+
+</mapper>
