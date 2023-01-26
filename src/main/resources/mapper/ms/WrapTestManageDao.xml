@@ -619,4 +619,8 @@
 		ORDER BY 
 			PRDHA NULLS LAST
 	</select>
+
+	<select id="getSapPrdhaDuplicateCheck" parameterType="WrapTestManageVO" resultType="integer">
+		SELECT COUNT(SAP_PRDHA) FROM QM_PKGA WHERE SAP_PRDHA = #{sapPrdha} AND PLNT_CD = #{plntCd}
+	</select>
 </mapper>

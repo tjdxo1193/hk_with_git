@@ -1,8 +1,5 @@
 package lims.api.sc.controller;
 
-import lims.api.auth.annotation.AuthToken;
-import lims.api.auth.domain.Token;
-import lims.api.auth.service.impl.JwtResolver;
 import lims.api.sc.service.InspectProductionPerformanceService;
 import lims.api.sc.vo.InspectProductionPerformanceVO;
 import lombok.RequiredArgsConstructor;
@@ -18,11 +15,14 @@ import java.util.List;
 @RequestMapping("${apiPrefix}/sc/inspectProductionPerformance")
 public class InspectProductionPerformanceController {
     private final InspectProductionPerformanceService service;
-    private final JwtResolver jwtResolver;
 
     @GetMapping
-    public ResponseEntity<List<InspectProductionPerformanceVO>> get(@AuthToken Token token, InspectProductionPerformanceVO request) {
-        request.setPlntCd(jwtResolver.getPlantCode(token.getJwt()));
+    public ResponseEntity<List<InspectProductionPerformanceVO>> get(InspectProductionPerformanceVO request) {
         return ResponseEntity.ok(service.find(request));
+    }
+
+    @GetMapping("/detail")
+    public ResponseEntity<List<InspectProductionPerformanceVO>> getDetail(InspectProductionPerformanceVO request) {
+        return ResponseEntity.ok(service.findDetail(request));
     }
 }

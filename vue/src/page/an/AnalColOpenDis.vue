@@ -153,7 +153,10 @@ export default {
         this.$eSignWithReason(() => this.$axios.put('/an/analColOpenDis/open', parameter))
           .then(() => {
             this.$info(this.$message.info.opened);
+
+            const openState = 'S0020200';
             this.getAnalColOpenDis();
+            this.setChangeButtonsState(openState);
           })
           .catch(() => {
             this.$error(this.$message.error.updateData);

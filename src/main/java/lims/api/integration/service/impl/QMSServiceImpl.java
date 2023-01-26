@@ -26,7 +26,8 @@ public class QMSServiceImpl implements QMSService {
     }
 
     @Override
-    public void publishOutboundRequestList() {
+    public void publishShiptData(int orderNo, long LotNo) {
+
     }
 
     @Override

@@ -24,7 +24,7 @@ public class GlassLabelPrintServiceImpl implements GlassLabelPrintService {
 
     @Override
     public void update(GlassMaterialVO param) {
-        if(!GlassMaterialProcess.WAREHOUSING.getProcessCode().equals(param.getMngProcCd())) {
+        if(param.getMngProcCd() != null) {
             dao.reprint(param);
             return;
         }

@@ -53,7 +53,7 @@
         <repository>
             <id>local</id>
             <name>local repository</name>
-            <url>file://${project.basedir}/lib</url>
+            <url>file:${file.separator}${file.separator}${project.basedir}${file.separator}lib</url>
         </repository>
     </repositories>
 
@@ -260,7 +260,7 @@
             <artifactId>audit</artifactId>
             <version>1.0.15</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/lib/audit-1.0.15.jar</systemPath>
+            <systemPath>${project.basedir}${file.separator}lib${file.separator}audit-1.0.15.jar</systemPath>
         </dependency>
 
         <dependency>
@@ -268,7 +268,7 @@
             <artifactId>sapjco3</artifactId>
             <version>3.1.6</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/lib/sapjco3.jar</systemPath>
+            <systemPath>${project.basedir}${file.separator}lib${file.separator}sapjco3.jar</systemPath>
         </dependency>
 
         <dependency>
@@ -276,13 +276,13 @@
             <artifactId>ers-invoker</artifactId>
             <version>7.2.3.324</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/lib/ers-invoker.jar</systemPath>
+            <systemPath>${project.basedir}${file.separator}lib${file.separator}ers-invoker.jar</systemPath>
         </dependency>
     </dependencies>
 
     <build>
         <defaultGoal>install</defaultGoal>
-        <directory>${project.basedir}/target</directory>
+        <directory>${project.basedir}${file.separator}target</directory>
         <finalName>${project.artifactId}-${project.version}</finalName>
         <pluginManagement>
             <plugins>
@@ -358,11 +358,11 @@
                     <failOnMissingWebXml>false</failOnMissingWebXml>
                     <webResources>
                         <resource>
-                            <directory>${project.basedir}\lib</directory>
-                            <targetPath>WEB-INF/lib</targetPath>
+                            <directory>${project.basedir}${file.separator}lib</directory>
+                            <targetPath>WEB-INF${file.separator}lib</targetPath>
                             <filtering>false</filtering>
                             <includes>
-                                <include>**/*.jar</include>
+                                <include>**${file.separator}*.jar</include>
                             </includes>
                         </resource>
                     </webResources>
@@ -377,11 +377,11 @@
                     <forkMode>once</forkMode>
                     <reportFormat>xml</reportFormat>
                     <excludes>
-                        <exclude>**/Abstract*.java</exclude>
-                        <exclude>**/*Suite.java</exclude>
+                        <exclude>**${file.separator}Abstract*.java</exclude>
+                        <exclude>**${file.separator}*Suite.java</exclude>
                     </excludes>
                     <includes>
-                        <include>**/*Test.java</include>
+                        <include>**${file.separator}*Test.java</include>
                     </includes>
                 </configuration>
             </plugin>
@@ -408,7 +408,7 @@
     </build>
 
     <reporting>
-        <outputDirectory>${basedir}/target/site</outputDirectory>
+        <outputDirectory>${basedir}${file.separator}target${file.separator}site</outputDirectory>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

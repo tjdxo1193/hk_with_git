@@ -26,9 +26,9 @@ public class InspectPurchasingPerformanceController {
         return ResponseEntity.ok(service.find(request));
     }
 
-    @GetMapping("/request")
-    public ResponseEntity<List<InspectPurchasingPerformanceVO>> getRequest(@AuthToken Token token, InspectPurchasingPerformanceVO request) {
+    @GetMapping("/detail")
+    public ResponseEntity<List<InspectPurchasingPerformanceVO>> getDetail(@AuthToken Token token, InspectPurchasingPerformanceVO request) {
         request.setPlntCd(jwtResolver.getPlantCode(token.getJwt()));
-        return ResponseEntity.ok(service.findRequest(request));
+        return ResponseEntity.ok(service.findDetail(request));
     }
 }

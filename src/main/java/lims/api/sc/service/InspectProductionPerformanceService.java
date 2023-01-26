@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface InspectProductionPerformanceService {
     List<InspectProductionPerformanceVO> find(InspectProductionPerformanceVO param);
+
+    List<InspectProductionPerformanceVO> findDetail(InspectProductionPerformanceVO param);
 }

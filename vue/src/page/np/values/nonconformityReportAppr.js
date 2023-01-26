@@ -129,11 +129,11 @@ const testInfo = {
       .Input('etrDt', '입고일자', { readonly: true })
       .Textarea('nonCfmRea', '부적합사유', { rows: 2, readonly: true })
       .spanCol(2)
-      .Textarea('nonCfmRev', '부적합통보서수신', { rows: 2, readonly: true })
+      .Textarea('nonCfmRev', '부적합통보서(수신)', { rows: 2, readonly: true })
       .spanCol(2)
-      .Textarea('nonCfmRef', '부적합통보서참조', { rows: 2, readonly: true })
+      .Textarea('nonCfmRef', '부적합통보서(참조)', { rows: 2, readonly: true })
       .spanCol(2)
-      .Textarea('nonCfmEtc', '부적합통보서기타', { rows: 2, readonly: true })
+      .Textarea('nonCfmEtc', '부적합통보서(기타)', { rows: 2, readonly: true })
       .spanCol(2)
       .build(),
   columns: () =>

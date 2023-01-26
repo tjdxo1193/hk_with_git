@@ -24,16 +24,15 @@ public class ReagentDisApprController {
 
     @GetMapping
     public ResponseEntity<List<ReagentMaterialVO>> findAll(@AuthToken Token token, ReagentMaterialVO param) {
-        String jwt = token.getJwt();
-        param.setPlntCd(jwtResolver.getPlantCode(jwt));
+        param.setPlntCd(getAuthUserPlntCd(token));
+        param.setAprUid(getAuthUserId(token));
         return ResponseEntity.ok(service.findAll(param));
     }
 
     @PutMapping("/approve")
     public ResponseEntity<CommonResponse> approve(@AuthToken Token token, @RequestBody List<ReagentMaterialVO> list) {
-        String jwt = token.getJwt();
         for(ReagentMaterialVO row : list) {
-            row.setPlntCd(jwtResolver.getPlantCode(jwt));
+            row.setPlntCd(getAuthUserPlntCd(token));
         }
         service.approve(list);
         return ResponseEntity.ok(new CommonResponse());
@@ -41,13 +40,22 @@ public class ReagentDisApprController {
 
     @PutMapping("/reject")
     public ResponseEntity<CommonResponse> reject(@AuthToken Token token, @ESign ESignInfo esign, @RequestBody List<ReagentMaterialVO> list) {
-        String jwt = token.getJwt();
         for(ReagentMaterialVO row : list) {
-            row.setPlntCd(jwtResolver.getPlantCode(jwt));
-            row.setRjtUid(jwtResolver.getUserId(jwt));
+            row.setPlntCd(getAuthUserPlntCd(token));
+            row.setRjtUid(getAuthUserId(token));
             row.setRjtRea(esign.getReason());
         }
         service.reject(list);
         return ResponseEntity.ok(new CommonResponse());
+    }
+
+    private String getAuthUserPlntCd(Token token) {
+        String jwt = token.getJwt();
+        return jwtResolver.getPlantCode(jwt);
+    }
+
+    private String getAuthUserId(Token token) {
+        String jwt = token.getJwt();
+        return jwtResolver.getUserId(jwt);
     }
 }

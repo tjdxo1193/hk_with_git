@@ -31,4 +31,4 @@ logging:
     rollingpolicy:
       max-history: 60
   file:
-    path: D:\LOG\jeuslog\LIMS_80\spring
+    path: D:/LOG/jeuslog/LIMS_80/spring

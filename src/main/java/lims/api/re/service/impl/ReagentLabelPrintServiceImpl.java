@@ -24,7 +24,7 @@ public class ReagentLabelPrintServiceImpl implements ReagentLabelPrintService {
 
     @Override
     public void update(ReagentMaterialVO param) {
-        if(!ReagentMaterialProcess.WAREHOUSING.getProcessCode().equals(param.getMngProcCd())) {
+        if(param.getMngProcCd() != null) {
             dao.reprint(param);
             return;
         }

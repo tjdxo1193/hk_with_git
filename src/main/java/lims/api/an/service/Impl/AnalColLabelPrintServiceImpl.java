@@ -25,7 +25,7 @@ public class AnalColLabelPrintServiceImpl implements AnalColLabelPrintService {
 
     @Override
     public void update(AnalColMaterialVO param) {
-        if(!AnalColMaterialProcess.WAREHOUSING.getProcessCode().equals(param.getMngProcCd())) {
+        if(param.getMngProcCd() != null) {
             dao.reprint(param);
             return;
         }

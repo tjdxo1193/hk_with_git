@@ -45,6 +45,8 @@ public interface SAPPostProcessDao {
 
     int updateStatusOfPItemSpec(SAPPostProcessVO.Material.PItemSpec param);
 
+    int updatePItemVersionOfSpec(SAPPostProcessVO.Material.PItemSpec param);
+
 
     List<Integer> findReqIdxByIspReqNo(String ispReqNo);
 

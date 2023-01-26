@@ -69,6 +69,9 @@ public class SAPPostProcessVO {
             private String pitmTyp;
             private Integer ansDurDay;
 
+            @Setter
+            private Integer tempPitmVersion;
+
             public PItemInfo(PItemKey itemKey) {
                 this.plntCd = itemKey.getPlntCd();
                 this.pitmCd = itemKey.getPitmCd();

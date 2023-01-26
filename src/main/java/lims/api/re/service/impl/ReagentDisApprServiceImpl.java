@@ -2,6 +2,7 @@ package lims.api.re.service.impl;
 
 import lims.api.common.exception.NoUpdatedDataException;
 import lims.api.common.service.ApproveService;
+import lims.api.common.service.UserService;
 import lims.api.common.vo.ApproveVO;
 import lims.api.re.dao.ReagentDisApprDao;
 import lims.api.re.enums.ReagentMaterialProcess;
@@ -19,6 +20,7 @@ public class ReagentDisApprServiceImpl implements ReagentDisApprService {
 
     private final ReagentDisApprDao dao;
     private final ApproveService approveService;
+    private final UserService userService;
 
     @Override
     public List<ReagentMaterialVO> findAll(ReagentMaterialVO param) {
@@ -27,6 +29,7 @@ public class ReagentDisApprServiceImpl implements ReagentDisApprService {
         processCodeList.add(ReagentMaterialProcess.DISPOSAL_REQUEST_IN_STOCK.getProcessCode());
         processCodeList.add(ReagentMaterialProcess.DISPOSAL_REQUEST_IN_OPEN.getProcessCode());
         param.setProcessCodeList(processCodeList);
+        param.setWithDelegateUserIds(userService.getDelegateAssignUserIdsWithMe(param.getAprUid()));
         return dao.findAll(param);
     }
 

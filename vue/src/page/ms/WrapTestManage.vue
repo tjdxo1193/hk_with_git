@@ -149,6 +149,7 @@ export default {
       this.enableAddTestItemButton();
 
       this.fetchQmPkgaList();
+      this.getQmPkgaListForDuplicateCheck();
     },
     async fetchQmPkgaList() {
       const { $grid, forms } = this.qmPkgaList;
@@ -193,6 +194,11 @@ export default {
       specListGrid.setGridData(
         data.filter((row) => row.specProcCd != this.processCode.temporarySave),
       );
+    },
+
+    getQmPkgaListForDuplicateCheck(){
+        const data = this.$axios.get('ms/wrapTestManage/getSapPrdhaDuplicateCheck', {})
+        .then(({ data }) => data);
     },
 
     setPkgaInfoToPkgaGridValueForm(item) {

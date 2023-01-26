@@ -2,24 +2,57 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="lims.api.sc.dao.InspectProductionPerformanceDao">
     <select id="find" parameterType="InspectProductionPerformanceVO" resultType="InspectProductionPerformanceVO">
-        SELECT QPAR.PLNT_CD AS PLNT_CD,
-               QPAR.REQ_IDX AS REQ_IDX,
-               QPAP.REQ_DT  AS REQ_DT,
-               QPAR.MTR_CD,
-               QPAR.MTR_NM,
-               QPAR.PHS_ORDER_NO,
-               QPAR.LOT_NO,
+        SELECT QPAR.ETR_DT,
+               MAX(SCD.DTL_NM)           AS DTL_NM,
+               QPAR.MTR_CD               AS PITM_CD,
+               MAX(QPAR.MTR_NM)          AS PITM_NM,
+               QPAR.PDT_ORDER_NO,
                QPAR.BATCH_NO,
+               SUM(SCD.EXT_CD2)          AS ISP_SCR,
+               MAX(QPAI.ISP_PFA_CANL_YN) AS ISP_PFA_CANL_YN,
+               MAX(QPAI.ISP_PFA_IF_DS)   AS ISP_PFA_IF_DS
+        FROM QT_PITM_ANS_PROC PAP
+                 JOIN QT_PITM_ANS_REQ QPAR ON PAP.PLNT_CD = QPAR.PLNT_CD AND PAP.REQ_IDX = QPAR.REQ_IDX
+                 JOIN QT_PITM_ANS_INFO QPAI ON PAP.PLNT_CD = QPAI.PLNT_CD AND PAP.ANS_IDX = QPAI.ANS_IDX
+                 JOIN QM_PITM_SPEC QPS ON PAP.PLNT_CD = QPS.PLNT_CD AND PAP.PITM_SPEC_IDX = QPS.PITM_SPEC_IDX
+                 JOIN QM_PITM_INFO QPI
+                      ON QPS.PLNT_CD = QPI.PLNT_CD AND QPS.PITM_CD = QPI.PITM_CD AND QPS.PITM_VER = QPI.PITM_VER
+                 JOIN SY_CD_DTL SCD ON SCD.HIR_CD = 'S018' AND QPI.PITM_TYP = SCD.DTL_CD
+        WHERE QPI.PITM_TYP IN ('S0180100', 'S0180101', 'S0180201', 'S0180202', 'S0180203')
+          AND QPAR.ETR_DT BETWEEN #{etrDtList[0]} AND #{etrDtList[1]}
+          AND QPAR.ETR_DT IS NOT NULL
+          AND QPAR.MTR_CD IS NOT NULL
+          AND QPAR.PDT_ORDER_NO IS NOT NULL
+          AND QPAR.BATCH_NO IS NOT NULL
+        GROUP BY QPAR.MTR_CD, QPAR.PDT_ORDER_NO, QPAR.BATCH_NO, QPAR.ETR_DT
+    </select>
+
+    <select id="findDetail" parameterType="InspectProductionPerformanceVO" resultType="InspectProductionPerformanceVO">
+        SELECT QPAR.PLNT_CD,
+               QPAR.REQ_IDX,
                QPAR.ISP_REQ_NO,
-               QPAP.RCP_DT,
-               QPAP.ANS_NO,
-               QPAI.FTN_YN,
-               QPAI.IF_YN,
-               QPAI.IF_DS
+               QPAR.ISP_REQ_DT,
+               QPAR.MTR_NM,
+               QPAR.BATCH_NO,
+               QPAR.ETR_QTY,
+               QPAR.INP_UNIT,
+               QPAR.SAVE_PLA,
+               QPAR.ETR_DT,
+               QPAR.AMT_UNIT,
+               QPAR.LOT_NO,
+               QPAR.PDT_ORDER_TYP,
+               QPAR.PDT_ORDER_NO,
+               QPAR.UDT_DS,
+               QPAR.REV_DS,
+               QPI.PITM_CD,
+               QPI.PITM_VER,
+               QPI.PITM_TYP,
+               QPI.PITM_NM,
+               QPI.ANS_DUR_DAY
         FROM QT_PITM_ANS_REQ QPAR
-                 LEFT JOIN QT_PITM_ANS_PROC QPAP ON QPAR.PLNT_CD = QPAP.PLNT_CD AND QPAR.REQ_IDX = QPAP.REQ_IDX
-                 LEFT JOIN QT_PITM_ANS_INFO QPAI ON QPAP.PLNT_CD = QPAI.PLNT_CD AND QPAP.ANS_IDX = QPAI.ANS_IDX
-        WHERE QPAR.PLNT_CD = #{plntCd}
-        ORDER BY QPAP.REQ_DT DESC
+                 LEFT JOIN QM_PITM_INFO QPI on QPAR.PLNT_CD = QPI.PLNT_CD AND QPAR.MTR_CD = QPI.PITM_CD
+        WHERE QPAR.PDT_ORDER_NO = #{pdtOrderNo}
+          AND QPI.PITM_CD = #{pitmCd}
+          AND QPAR.BATCH_NO = #{batchNo}
     </select>
 </mapper>

@@ -291,17 +291,18 @@ textarea:read-only,
 input[type="number"]:read-only,
 input[type="password"]:read-only,
 input[type="text"]:read-only {
-  border: 1px solid #ddd
+  border: 1px solid #bbb;
+  background: rgb(240, 240, 240);
 }
 
 textarea:read-only:hover, input[type="number"]:read-only:hover, input[type="password"]:read-only:hover, input[type="text"]:read-only:hover {
   box-shadow: none;
-  border: 1px solid #ddd
+  border: 1px solid #bbb
 }
 
 /*select는 readonly 속성이 적용되지 않는다*/
 textarea:read-only:focus, input[type="number"]:read-only:hover, input[type="password"]:read-only:focus, input[type="text"]:read-only:focus {
-  border: 1px solid #ddd
+  border: 1px solid #bbb
 }
 
 input[type="checkbox"] {

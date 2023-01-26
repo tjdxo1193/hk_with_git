@@ -3,13 +3,13 @@ import dayjs from 'dayjs';
 import { ColumnBuilder, FormBuilder } from '@/util';
 
 const todayDate = dayjs().format('YYYY-MM-DD');
-const monthAgoDate = dayjs().add(-1, 'month').format('YYYY-MM-DD');
 
-const searchGridWithForm = {
+const weekAgoDate = dayjs().add(-1, 'week').format('YYYY-MM-DD');
+
+const performanceGrid = {
   static: {
     title: '조회',
     countPerRow: 4,
-    $grid: null,
     buttons: [{ name: 'search', label: '조회' }],
     props: {
       editable: false,
@@ -18,33 +18,56 @@ const searchGridWithForm = {
   },
   forms: () =>
     FormBuilder.builder()
-      .Input('mtrCd', '자재코드')
-      .Input('mtrNm', '자재명')
-      .DatepickerTwinWithSwitch('reqDtList', '의뢰일자', { value: [monthAgoDate, todayDate] })
-      .spanCol(2)
-      .Input('phsOrderNo', 'Order No.')
-      .Input('lotNo', 'Lot No.')
-      .Input('vatNo', 'Batch')
-      .Input('ansReqNo', '검사요청번호')
+      .Input('pdtOrderNo', '생산오더번호')
+      .Input('pitmCd', '품목코드')
+      .Input('mtrNm', '품목명')
+      .Input('batchNo', '배치번호')
+      .DatepickerTwin('etrDtList', '입고일자', { value: [weekAgoDate, todayDate] })
+
       .build(),
   columns: () =>
     ColumnBuilder.builder()
-      .col('reqDt', '의뢰일자')
-      .col('mtrCd', '자재코드')
-      .col('mtrNm', '자재명')
-      .col('phsOrderNo', 'OrderNo')
-      .col('lotNo', 'LotNo')
-      .col('batchNo', 'Batch')
-      .col('ispReqNo', '검사요청번호')
-      .col('rcpDt', '접수일자')
-      .col('ansNo', '시험번호')
-      .col('j', '검사횟수')
-      .col('ftnYn', '기능성유무')
-      .col('ifYn', '연계여부')
-      .col('ifDs', '연계일시')
+      .col('reqIdx')
+      .col('pdtOrderNo', '생산오더번호')
+      .col('pitmCd', '품목코드')
+      .col('pitmNm', '품목명')
+      .col('etrDt', '입고일')
+      .col('batchNo', '배치번호')
+      .build(),
+};
+
+const detailGrid = {
+  static: {
+    props: {
+      editable: false,
+      showRowCheckColumn: false,
+    },
+  },
+  columns: () =>
+    ColumnBuilder.builder()
+      .col('plntCd', '플랜트')
+      .col('reqIdx', false)
+      .col('ispReqNo', false)
+      .col('ispReqDt', false)
+      .col('mtrNm', '품목명')
+      .col('batchNo', '배치번호')
+      .col('etrQty', false)
+      .col('inpUnit', false)
+      .col('savePla', false)
+      .col('etrDt', '입고일자')
+      .col('amtUnit', false)
+      .col('lotNo', '제조번호')
+      .col('pdtOrderTyp', false)
+      .col('pdtOrderNo', '생산오더번호')
+      .col('udtDs', false)
+      .col('revDs', false)
+      .col('pitmCd', '품목코드')
+      .col('pitmTyp', '품목유형')
+      .col('pitmNm', '품목명')
       .build(),
 };
 
 export default {
-  searchGridWithForm,
+  performanceGrid,
+  detailGrid,
 };

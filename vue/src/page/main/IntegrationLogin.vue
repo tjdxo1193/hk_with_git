@@ -5,12 +5,12 @@ import store from '@/store';
 export default {
   name: 'WelcomePage',
   created() {
-    // if (this.isNoSSOLogin()) {
-    this.toLoginPage();
-    // } else {
-    //   this.logout();
-    //   this.toSSOLoginPage();
-    // }
+    if (this.isNoSSOLogin()) {
+      this.toLoginPage();
+    } else {
+      this.logout();
+      this.toSSOLoginPage();
+    }
   },
   methods: {
     async toSSOLoginPage() {

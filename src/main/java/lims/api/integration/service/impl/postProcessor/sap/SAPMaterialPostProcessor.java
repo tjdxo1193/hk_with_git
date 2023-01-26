@@ -112,7 +112,6 @@ public class SAPMaterialPostProcessor implements PostProcessor {
         int pitemNewVersion;
         String pitmStatusCode;
         String specStatusCode;
-        boolean isTempSaveStatusOfPItem;
 
         /**
          * TODO
@@ -141,8 +140,7 @@ public class SAPMaterialPostProcessor implements PostProcessor {
             pitmStatusCode = postProcessDao.currentFinalVersionStatusCodeOfPItem(pItemKeyWithCurrentPItemVersion);
             specStatusCode = postProcessDao.currentFinalVersionStatusCodeOfSpec(pItemKeyWithCurrentPItemVersion);
 
-            isTempSaveStatusOfPItem = ItemManage.TEMP_SAVE.equals(pitmStatusCode);
-            if (isTempSaveStatusOfPItem) {
+            if (ItemManage.TEMP_SAVE.equals(pitmStatusCode)) {
                 updateInactiveOfCurrentPItem(latestMarc, pItemKeyWithCurrentPItemVersion, SpecProgress.APPROVED);
 
                 nextPItemVersion = postProcessDao.nextVersionOfPItem(pitemKey);
@@ -150,19 +148,20 @@ public class SAPMaterialPostProcessor implements PostProcessor {
                 continue;
             }
 
-            boolean isApprovedPItm = ItemManage.APRROVED.equals(pitmStatusCode);
-            if (isApprovedPItm) {
-                if (SpecProgress.TEMPORARY_STORAGE.equals(specStatusCode)) {
-                    updateInterfaceDataOfCurrentPItem(latestMarc, pItemKeyWithCurrentPItemVersion);
+            if (ItemManage.APRROVED.equals(pitmStatusCode)) {
+                nextPItemVersion = postProcessDao.nextVersionOfPItem(pitemKey);
+
+                if (SpecProgress.TEMPORARY_STORAGE.equals(specStatusCode) || SpecProgress.REVIEW_RETURN.equals(specStatusCode)) {
+                    updateInterfaceDataOfCurrentPItem(latestMarc, pItemKeyWithCurrentPItemVersion, nextPItemVersion);
+                    synchronizePItemVersionToSpec(pItemKeyWithCurrentPItemVersion, nextPItemVersion);
                     continue;
                 }
 
                 updateInactiveOfCurrentPItem(latestMarc, pItemKeyWithCurrentPItemVersion, SpecProgress.APPROVED);
-
-                nextPItemVersion = postProcessDao.nextVersionOfPItem(pitemKey);
                 versionUpOfPItem(nextPItemVersion, latestMarc, pitemKey);
 
-                if (SpecProgress.APPROVAL_REQUEST.equals(specStatusCode)) {
+                if (SpecProgress.APPROVAL_REQUEST.equals(specStatusCode) || SpecProgress.REQUEST_REVIEW.equals(specStatusCode) ||
+                        SpecProgress.APPROVAL_REJECTION.equals(specStatusCode)) {
                     updateInactiveOfCurrentPItemSpec(pItemKeyWithCurrentPItemVersion, SpecProgress.SPEC_REMOVE);
                     versionUpOfPItemSpec(nextPItemVersion, pitemKey, latestMara);
                     continue;
@@ -228,19 +227,35 @@ public class SAPMaterialPostProcessor implements PostProcessor {
                 .pitmVer(pitemKey.getVersion())
                 .specProcCd(specProgress)
                 .useVerYn(UseType.N)
+                .udtUid(PlantType.SYSTEM.getUid())
+                .udtIp(PlantType.SYSTEM.getIp())
                 .build();
         postProcessDao.updatePItem(pitem);
-        updateInterfaceDataOfCurrentPItem(latestMarc, pitemKey);
+        updateInterfaceDataOfCurrentPItem(latestMarc, pitemKey, pitemKey.getVersion());
     }
 
-    private void updateInterfaceDataOfCurrentPItem(List<SAPMaterialVO.Marc> latestMarc, SAPPostProcessVO.Material.PItemKey pitemKey) {
+    private void updateInterfaceDataOfCurrentPItem(List<SAPMaterialVO.Marc> latestMarc, SAPPostProcessVO.Material.PItemKey pitemKey, Integer pitmVersion) {
         SAPPostProcessVO.Material.PItemInfo pitemInfo = new SAPPostProcessVO.Material.PItemInfo(pitemKey);
         SAPMaterialVO.Marc currentMatchedMarc = getMarcByPItemKey(latestMarc, pitemKey);
         pitemInfo.setPItemTypByMRPCode(currentMatchedMarc.getDispo());
+        pitemInfo.setTempPitmVersion(pitmVersion);
         postProcessDao.updatePItemInfo(pitemInfo);
 
         SAPPostProcessVO.Material.PItemInfoSap pitemInfoSap = createPItemInfoSAPByCreateAndUpdate(pitemKey.getPlntCd(), pitemKey.getPitmCd(), pitemKey.getVersion());
         postProcessDao.updatePItemInfoSap(pitemInfoSap);
+    }
+
+    private void synchronizePItemVersionToSpec(SAPPostProcessVO.Material.PItemKey pitemKey, Integer nextPItemVersion) {
+        Integer currentPItemVersion = postProcessDao.currentVersionOfSpec(pitemKey);
+        SAPPostProcessVO.Material.PItemSpec spec = SAPPostProcessVO.Material.PItemSpec.builder()
+                .plntCd(pitemKey.getPlntCd())
+                .pitmCd(pitemKey.getPitmCd())
+                .pitmVer(nextPItemVersion)
+                .currentVersion(currentPItemVersion)
+                .udtUid(PlantType.SYSTEM.getUid())
+                .udtIp(PlantType.SYSTEM.getIp())
+                .build();
+        postProcessDao.updatePItemVersionOfSpec(spec);
     }
 
     private void createFirstVersionOfPItemSpec(Integer nextVersion, List<SAPMaterialVO.Mara> latestMara, SAPPostProcessVO.Material.PItemKey pitemKey) {

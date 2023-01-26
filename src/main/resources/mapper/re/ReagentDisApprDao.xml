@@ -100,6 +100,8 @@
         <foreach item="item" index="index" collection="processCodeList" separator="," open="(" close=")">
             #{item}
         </foreach>
+            AND D.APR_YN = 'N'
+            AND D.APR_UID IN ( ${withDelegateUserIds} )
         <if test="upperRitmTreeCd != null and upperRitmTreeCd != ''">
             AND E.HIR_TREE_CD = #{upperRitmTreeCd}
         </if>

@@ -24,5 +24,5 @@ public interface WrapTestManageService {
 	Integer updateWrapTest(WrapTestManageVO param);
 	Integer updateWrapTestUseYn(WrapTestManageVO param);
 	void approval(WrapTestManageVO param);
-	
+	Integer getSapPrdhaDuplicateCheck(WrapTestManageVO param);
 }

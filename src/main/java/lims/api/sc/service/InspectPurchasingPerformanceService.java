@@ -7,5 +7,5 @@ import java.util.List;
 public interface InspectPurchasingPerformanceService {
     List<InspectPurchasingPerformanceVO> find(InspectPurchasingPerformanceVO param);
 
-    List<InspectPurchasingPerformanceVO> findRequest(InspectPurchasingPerformanceVO param);
+    List<InspectPurchasingPerformanceVO> findDetail(InspectPurchasingPerformanceVO param);
 }

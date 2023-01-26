@@ -19,7 +19,7 @@ public class InspectPurchasingPerformanceServiceImpl implements InspectPurchasin
     }
 
     @Override
-    public List<InspectPurchasingPerformanceVO> findRequest(InspectPurchasingPerformanceVO param) {
-        return dao.findRequest(param);
+    public List<InspectPurchasingPerformanceVO> findDetail(InspectPurchasingPerformanceVO param) {
+        return dao.findDetail(param);
     }
 }

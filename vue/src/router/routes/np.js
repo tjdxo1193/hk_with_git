@@ -41,7 +41,7 @@ export default [
         component: NonconformityTestPreventRecurrence.PreventRecurrenceReview,
         meta: {
           menu: {
-            code: 'M132',
+            code: 'M155',
             title: '재발방지대책서검토',
           },
         },
@@ -52,7 +52,7 @@ export default [
         component: NonconformityTestPreventRecurrence.PreventRecurrenceAppr,
         meta: {
           menu: {
-            code: 'M134',
+            code: 'M156',
             title: '재발방지대책서승인',
           },
         },
@@ -63,7 +63,7 @@ export default [
         component: NonconformityTestPreventRecurrence.NonconformityReportSearch,
         meta: {
           menu: {
-            code: 'M133',
+            code: 'M157',
             title: '부적합통보서조회',
           },
         },

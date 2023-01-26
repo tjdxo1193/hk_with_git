@@ -1,78 +1,70 @@
+import dayjs from 'dayjs';
+
 import { ColumnBuilder, FormBuilder } from '@/util';
 
-const searchForm = {
+const todayDate = dayjs().format('YYYY-MM-DD');
+
+const weekAgoDate = dayjs().add(-1, 'month').format('YYYY-MM-DD');
+
+const performanceGrid = {
   static: {
     title: '조회',
     countPerRow: 4,
-    buttons: [{ name: 'search', label: '조회' }],
+    buttons: [{ value: 'search', label: '조회' }],
+    props: {
+      editable: false,
+      showRowCheckColumn: false,
+    },
   },
   forms: () =>
     FormBuilder.builder()
-      .Select('fiscalYr', '회계연도')
-      .Select('month', '기간(월)', { elements: monthList })
-      .Input('mtrCd', '자재코드')
-      .Input('mtrNm', '자재명')
-      .Input('phsOrderNo', 'Order No.')
+      .Input('phsOrderNo', '구매오더번호')
+      .Input('pitm', '품목코드')
+      .Input('lotNo', '제조번호')
+      .Input('batchNo', '배치번호')
+      .Input('pitmNm', '품목명')
+      .DatepickerTwin('etrDtList', '입고일자', { value: [weekAgoDate, todayDate] })
+      .build(),
+  columns: () =>
+    ColumnBuilder.builder()
+      .col('phsOrderNo', '구매오더번호')
+      .col('pitmCd', '품목코드')
+      .col('lotNo', '제조번호')
+      .col('batchNo', '배치번호')
+      .col('pitmNm', '품목명')
       .build(),
 };
 
-const itemGrid = {
+const detailGrid = {
   static: {
-    title: '조회결과',
+    title: '상세조회',
+    countPerRow: 4,
     props: {
       editable: false,
-      showRowCheckColumns: false,
+      showRowCheckColumn: false,
     },
   },
   columns: () =>
     ColumnBuilder.builder()
-      .col('fiscalYr', '회계연도')
-      .col('month', '기간(월)')
-      .col('mtrCd', '자재코드')
-      .col('mtrNm', '자재명')
-      .col('phsOrderNo', 'OrderNo.')
-      .col('etrQty', '입고량')
-      .col('ansCnt', '검사횟수')
-      .col('ifYn', '연계여부')
-      .col('ifDs', '연계일시')
+      .col('plntCd', false)
+      .col('reqIdx', false)
+      .col('ispReqNo', false)
+      .col('ispReqDt', '시험의뢰일자')
+      .col('batchNo', '배치번호')
+      .col('etrQty', '입고수량')
+      .col('inpUnit', '입력단위')
+      .col('savePla', false)
+      .col('etrDt', '입고일자')
+      .col('lotNo', '제조번호')
+      .col('phsOrderTyp', false)
+      .col('phsOrderNo', '구매오더번호')
+      .col('udtDs', false)
+      .col('pitmCd', '품목코드')
+      .col('pitmNm', '품목명')
       .build(),
 };
-
-const requestGrid = {
-  static: {
-    title: '조회결과',
-    props: {
-      editable: false,
-      showRowCheckColumns: false,
-    },
-  },
-  columns: () =>
-    ColumnBuilder.builder()
-      .col('reqDt', '의뢰일자')
-      .col('ispReqNo', '검사요청번호')
-      .col('rcpDt', '접수일자')
-      .col('ansNo', '시험번호')
-      .col('ftnYn', '기능성여부')
-      .build(),
-};
-
-const monthList = [
-  { value: '1', label: '1월' },
-  { value: '2', label: '2월' },
-  { value: '3', label: '3월' },
-  { value: '4', label: '4월' },
-  { value: '5', label: '5월' },
-  { value: '6', label: '6월' },
-  { value: '7', label: '7월' },
-  { value: '8', label: '8월' },
-  { value: '9', label: '9월' },
-  { value: '10', label: '10월' },
-  { value: '11', label: '11월' },
-  { value: '12', label: '12월' },
-];
 
 export default {
-  searchForm,
-  itemGrid,
-  requestGrid,
+  performanceGrid,
+  detailGrid,
 };

@@ -1,1 +1,5 @@
-/*! For license information please see AUIGrid.js.LICENSE.txt */
+/*!
+ * AUIGrid 3.0.11.19
+ * Copyright AUISoft Co., Ltd.
+ * www.auisoft.net
+ */

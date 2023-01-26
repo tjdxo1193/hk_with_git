@@ -191,6 +191,11 @@ public class WrapTestManageServiceImpl implements WrapTestManageService {
 		}
 	}
 
+	@Override
+	public Integer getSapPrdhaDuplicateCheck(WrapTestManageVO param) {
+		return wrapTestManageDao.getSapPrdhaDuplicateCheck(param);
+	}
+
 	private ApproveVO setApproveVO(WrapTestManageVO param) {
 		ApproveVO approveInfo = new ApproveVO();
 		approveInfo.setPlntCd(param.getPlntCd());
@@ -200,5 +205,7 @@ public class WrapTestManageServiceImpl implements WrapTestManageService {
 		approveInfo.setAprRea(param.getAprRea());
 		return approveInfo;
 	}
+
+
 	
 }

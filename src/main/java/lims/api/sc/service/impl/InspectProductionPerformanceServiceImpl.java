@@ -17,4 +17,9 @@ public class InspectProductionPerformanceServiceImpl implements InspectProductio
     public List<InspectProductionPerformanceVO> find(InspectProductionPerformanceVO param) {
         return dao.find(param);
     }
+
+    @Override
+    public List<InspectProductionPerformanceVO> findDetail(InspectProductionPerformanceVO param) {
+        return dao.find(param);
+    }
 }

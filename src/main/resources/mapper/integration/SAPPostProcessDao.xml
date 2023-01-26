@@ -4,7 +4,7 @@
 
     <select id="existsPItem" resultType="boolean"
             parameterType="lims.api.integration.vo.SAPPostProcessVO$Material$PItemKey">
-        SELECT CASE WHEN count(1) = 3 THEN 1 ELSE 0 END
+        SELECT CASE WHEN count(1) > 0 THEN 1 ELSE 0 END
         FROM QM_PITM
         WHERE PLNT_CD = #{plntCd}
           AND PITM_CD = #{pitmCd}
@@ -62,6 +62,11 @@
         WHERE PLNT_CD = #{plntCd}
           AND PITM_CD = #{pitmCd}
           AND PITM_VER = #{version}
+          AND PITM_SPEC_IDX = (SELECT MAX(PITM_SPEC_IDX)
+                               FROM QM_PITM_SPEC
+                               WHERE PLNT_CD = #{plntCd}
+                                 AND PITM_CD = #{pitmCd}
+                                 AND PITM_VER = #{version})
     </select>
 
     <select id="nextPItemSpecIdxOfSpec" resultType="Integer"
@@ -123,7 +128,7 @@
             UDT_UID      = #{udtUid}
         WHERE PLNT_CD = #{plntCd}
           AND PITM_CD = #{pitmCd}
-          AND PITM_VER = #{version}
+          AND PITM_VER = #{pitmVer}
     </update>
 
 
@@ -151,14 +156,15 @@
     <update id="updatePItemInfo"
             parameterType="lims.api.integration.vo.SAPPostProcessVO$Material$PItemInfo">
         UPDATE QM_PITM_INFO
-        SET PITM_TYP    = #{pitmTyp},
+        SET PITM_VER = #{tempPitmVersion},
+            PITM_TYP    = #{pitmTyp},
             PITM_NM     = (SELECT MAKTX FROM MS_SAP_MTR_MAKT WHERE MATNR = #{pitmCd} AND SPRAS = #{materialLangKO}),
             PITM_EN     = (SELECT MAKTX FROM MS_SAP_MTR_MAKT WHERE MATNR = #{pitmCd} AND SPRAS = #{materialLangEN}),
             SAP_PRDHA   = (SELECT PRDHA FROM MS_SAP_MTR_MARA WHERE MATNR = #{pitmCd}),
             ANS_DUR_DAY = (SELECT WEBAZ FROM MS_SAP_MTR_MARC WHERE MATNR = #{pitmCd} AND WERKS = #{plntCd})
         WHERE PLNT_CD = #{plntCd}
           AND PITM_CD = #{pitmCd}
-          AND PITM_VER = #{version}
+          AND PITM_VER = #{pitmVer}
     </update>
 
 
@@ -242,7 +248,7 @@
             PNX_FE_YN     = #{pnxFeYn}
         WHERE PLNT_CD = #{plntCd}
           AND PITM_CD = #{pitmCd}
-          AND PITM_VER = #{version}
+          AND PITM_VER = #{pitmVer}
     </update>
 
     <update id="updateStatusOfPItemSpec"
@@ -250,6 +256,17 @@
         UPDATE QM_PITM_SPEC
         SET SPEC_PROC_CD = #{specProcCd},
             USE_VER_YN   = #{useVerYn}
+        WHERE PLNT_CD = #{plntCd}
+          AND PITM_CD = #{pitmCd}
+          AND PITM_VER = #{currentVersion}
+    </update>
+
+    <update id="updatePItemVersionOfSpec" parameterType="lims.api.integration.vo.SAPPostProcessVO$Material$PItemSpec">
+        UPDATE QM_PITM_SPEC
+        SET UDT_UID  = #{udtUid},
+            UDT_DS   = SYSDATE,
+            UDT_IP   = #{udtIp},
+            PITM_VER = #{pitmVer}
         WHERE PLNT_CD = #{plntCd}
           AND PITM_CD = #{pitmCd}
           AND PITM_VER = #{currentVersion}

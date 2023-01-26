@@ -2,6 +2,7 @@ package lims.api.sd.service.impl;
 
 import lims.api.common.exception.NoUpdatedDataException;
 import lims.api.common.service.ApproveService;
+import lims.api.common.service.UserService;
 import lims.api.common.vo.ApproveVO;
 import lims.api.sd.dao.StdItemDisApprDao;
 import lims.api.sd.enums.StandardMaterialProcess;
@@ -19,6 +20,7 @@ public class StdItemDisApprServiceImpl implements StdItemDisApprService {
 
     private final StdItemDisApprDao dao;
     private final ApproveService approveService;
+    private final UserService userService;
 
     @Override
     public List<StandardMaterialVO> findAll(StandardMaterialVO param) {
@@ -27,6 +29,7 @@ public class StdItemDisApprServiceImpl implements StdItemDisApprService {
         processCodeList.add(StandardMaterialProcess.DISPOSAL_REQUEST_IN_STOCK.getProcessCode());
         processCodeList.add(StandardMaterialProcess.DISPOSAL_REQUEST_IN_OPEN.getProcessCode());
         param.setProcessCodeList(processCodeList);
+        param.setWithDelegateUserIds(userService.getDelegateAssignUserIdsWithMe(param.getAprUid()));
         return dao.findAll(param);
     }
 

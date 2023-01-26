@@ -6,7 +6,7 @@ import lims.api.an.service.AnalColDisApprService;
 import lims.api.an.vo.AnalColMaterialVO;
 import lims.api.common.exception.NoUpdatedDataException;
 import lims.api.common.service.ApproveService;
-import lims.api.common.vo.ApproveVO;
+import lims.api.common.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +19,7 @@ public class AnalColDisApprServiceImpl implements AnalColDisApprService {
 
     private final AnalColDisApprDao dao;
     private final ApproveService approveService;
+    private final UserService userService;
 
     @Override
     public List<AnalColMaterialVO> findAll(AnalColMaterialVO param) {
@@ -27,6 +28,7 @@ public class AnalColDisApprServiceImpl implements AnalColDisApprService {
         processCodeList.add(AnalColMaterialProcess.DISPOSAL_REQUEST_IN_STOCK.getProcessCode());
         processCodeList.add(AnalColMaterialProcess.DISPOSAL_REQUEST_IN_OPEN.getProcessCode());
         param.setProcessCodeList(processCodeList);
+        param.setWithDelegateUserIds(userService.getDelegateAssignUserIdsWithMe(param.getAprUid()));
         return dao.findAll(param);
     }
 
@@ -35,7 +37,7 @@ public class AnalColDisApprServiceImpl implements AnalColDisApprService {
         int result = 0;
         for(AnalColMaterialVO row : list) {
             row.setMngProcCd(AnalColMaterialProcess.DISPOSAL.getProcessCode());
-            approveService.approve(row.getEtrReqAprIdx());
+            approveService.approve(row.getDpsReqAprIdx());
             result += dao.approve(row);
         }
 

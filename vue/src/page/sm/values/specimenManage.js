@@ -98,9 +98,9 @@ const detailList = {
         FormBuilder.builder()
           .Datepicker('expirDt')
           .spanCol(3)
-          .Button('add1Year', 'add1Year', { label: '+1' })
+          .Button('add1Year', 'add1Year', { label: '+ 1년' })
           .spanCol(0.5)
-          .Button('add2Year', 'add2Year', { label: '+2' })
+          .Button('add2Year', 'add2Year', { label: '+ 2년' })
           .spanCol(0.5)
           .build(),
       )

@@ -10,4 +10,6 @@ import java.util.List;
 @Repository
 public interface InspectProductionPerformanceDao {
     List<InspectProductionPerformanceVO> find(InspectProductionPerformanceVO param);
+
+    List<InspectProductionPerformanceVO> findDetail(InspectProductionPerformanceVO param);
 }

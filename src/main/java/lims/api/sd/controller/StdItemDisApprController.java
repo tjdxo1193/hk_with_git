@@ -25,6 +25,7 @@ public class StdItemDisApprController {
     @GetMapping
     public ResponseEntity<List<StandardMaterialVO>> findAll(@AuthToken Token token, StandardMaterialVO param) {
         param.setPlntCd(getAuthUserPlntCd(token));
+        param.setAprUid(getAuthUserId(token));
         return ResponseEntity.ok(service.findAll(param));
     }
 

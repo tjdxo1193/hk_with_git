@@ -14,7 +14,7 @@ public class QtPitmAnsReq {
     private String mtrCd;
     private String mtrNm;
     private String batchNo;
-    private String etrNo;
+    private String etrQty;
     private String inpUnit;
     private String savePla;
     private String etrDt;
@@ -44,7 +44,7 @@ public class QtPitmAnsReq {
     private String pdtOrderTyp;
     private String pdtOrderNo;
     private String itnPrsCompCd;
-    private String otmPrsCompNm;
+    private String itmPrsCompNm;
     private String makEqp;
     private String wrkNm;
     private String mtrDocNo;
@@ -56,6 +56,7 @@ public class QtPitmAnsReq {
     private String addCol2;
     private String addCol3;
     private String addCol4;
+    private String addCol5;
     private String udtDs;
     private String revDs;
 }

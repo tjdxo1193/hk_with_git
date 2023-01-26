@@ -25,6 +25,7 @@ public class AnalColDisApprController {
     @GetMapping
     public ResponseEntity<List<AnalColMaterialVO>> findAll(@AuthToken Token token, AnalColMaterialVO param) {
         param.setPlntCd(getAuthUserPlntCd(token));
+        param.setAprUid(getAuthUserId(token));
         return ResponseEntity.ok(service.findAll(param));
     }
 
@@ -50,5 +51,10 @@ public class AnalColDisApprController {
     private String getAuthUserPlntCd(Token token) {
         String jwt = token.getJwt();
         return jwtResolver.getPlantCode(jwt);
+    }
+
+    private String getAuthUserId(Token token) {
+        String jwt = token.getJwt();
+        return jwtResolver.getUserId(jwt);
     }
 }

@@ -38,4 +38,5 @@ public interface WrapTestManageDao {
 	int updateApprovalSideEffect(WrapTestManageVO param);
 	@Audit(target = QmPkga.class, label = AuditEvent.WrapTest.requestApproveWrapTest)
 	Integer approval(WrapTestManageVO param);
+	Integer getSapPrdhaDuplicateCheck(WrapTestManageVO param);
 }

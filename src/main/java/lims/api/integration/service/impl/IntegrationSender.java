@@ -2,6 +2,7 @@ package lims.api.integration.service.impl;
 
 import lims.api.common.service.impl.ReportDesignerHelper;
 import lims.api.integration.service.MESService;
+import lims.api.integration.service.QMSService;
 import lims.api.integration.service.SAPService;
 import lims.api.integration.service.SRMService;
 import lims.api.integration.vo.intergation.ConvertMrd;
@@ -11,6 +12,9 @@ import lims.api.util.FileUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+import java.util.Comparator;
+
 @Service
 @RequiredArgsConstructor
 public class IntegrationSender {
@@ -18,6 +22,7 @@ public class IntegrationSender {
     private final SAPService sapService;
     private final SRMService srmService;
     private final MESService mesService;
+    private final QMSService qmsService;
 
     private final ReportDesignerHelper rdHelper;
 
@@ -61,6 +66,14 @@ public class IntegrationSender {
 
     private TempFile toTempFile(ConvertMrd mrdVO) {
         return rdHelper.toTempFile(mrdVO.getName(), mrdVO.getParameter(), mrdVO.getTargetFullName());
+    }
+
+    private void sendFinishedTestForShipt() {
+        // TODO 승인 완료된 실험건들 QMS로 전송
+    }
+
+    private void sendDeviation() {
+        // TODO 일탈 정보를 QMS로 전송
     }
 
     /**

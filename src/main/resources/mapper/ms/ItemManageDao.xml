@@ -94,6 +94,7 @@
         ) QPS ON QP.PLNT_CD = QPS.PLNT_CD AND QP.PITM_CD = QPS.PITM_CD AND QP.PITM_VER = QPS.PITM_VER
         <where>
             QP.DEL_YN = 'N'
+            AND QP.USE_VER_YN = 'Y'
             <if test="pitmTyp != null and pitmTyp != ''">
                 AND QPI.PITM_TYP = #{pitmTyp}
             </if>

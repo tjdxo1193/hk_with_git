@@ -14,6 +14,8 @@ import lims.api.ms.service.WrapTestManageService;
 import lims.api.ms.vo.WrapTestManageVO;
 import lombok.RequiredArgsConstructor;
 
+import javax.persistence.criteria.CriteriaBuilder;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("${apiPrefix}/ms/wrapTestManage")
@@ -94,5 +96,13 @@ public class WrapTestManageController {
 		wrapTestManageService.approval(param);
 
 		return ResponseEntity.ok(new CommonResponse());
+	}
+
+	@GetMapping("/getSapPrdhaDuplicateCheck")
+	public ResponseEntity<Integer> getSapPrdhaDuplicateCheck(@AuthToken Token token, @RequestBody WrapTestManageVO param) {
+		String jwt = token.getJwt();
+		param.setPlntCd(jwtResolver.getPlantCode(jwt));
+
+		return ResponseEntity.ok(wrapTestManageService.getSapPrdhaDuplicateCheck(param));
 	}
 }

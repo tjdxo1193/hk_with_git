@@ -4,7 +4,7 @@ public interface QMSService {
 
     void publishTestMethodSemiAndFinished();
 
-    void publishOutboundRequestList();
+    void publishShiptData(int orderNo, long LotNo);
 
     void publishOutboundTestResult();
 
