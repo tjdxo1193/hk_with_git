@@ -54,6 +54,11 @@ public class SAPMaterialVO {
         private String zlabno;
         private String zprodAbbr;
 
+        private boolean changedLabNo = false;
+
+        public void markingChangeLabNo() {
+            this.changedLabNo = true;
+        }
     }
 
     @Getter

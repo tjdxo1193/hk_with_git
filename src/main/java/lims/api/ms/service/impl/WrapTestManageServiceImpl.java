@@ -4,14 +4,19 @@ import lims.api.common.exception.NoUpdatedDataException;
 import lims.api.common.service.ApproveService;
 import lims.api.common.vo.ApproveVO;
 import lims.api.ms.dao.WrapTestManageDao;
+import lims.api.ms.enums.ItemManage;
+import lims.api.ms.enums.PItemType;
 import lims.api.ms.enums.SpecProgress;
 import lims.api.ms.service.WrapTestManageService;
+import lims.api.ms.vo.ItemManageVO;
+import lims.api.ms.vo.SpecManageVO;
 import lims.api.ms.vo.WrapTestManageVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -166,6 +171,31 @@ public class WrapTestManageServiceImpl implements WrapTestManageService {
 	@Override
 	public void approval(WrapTestManageVO param) {
 		param.setSpecProcCd(SpecProgress.APPROVED.getCode());
+
+		// 먼저는 해당 sapprdha 코드를 가지고 있는 품목 정보들을 모두 가져온다.(포장재, delyn, useVeryn, 승인완료) pitmCd, pitmVer
+		// 그 품목정보들의 규격서중에.. 포장재 이전버전에 aitmidx를 가지고 있는 규격서들을 찾는다.
+		Set<String> codes = PItemType.getCodesRelatedToSpec();
+		String pItemTypeInClauseCondition = "'" +String.join("','", codes) + "'";
+		param.setPitmTyp(pItemTypeInClauseCondition);
+		List<ItemManageVO> itemList = wrapTestManageDao.getItemListBySapPrdha(param);
+		for(ItemManageVO ivo : itemList){
+			SpecManageVO specInfo = wrapTestManageDao.findSpecListByItemInfo(ivo);
+			if(SpecProgress.TEMPORARY_STORAGE.equals(specInfo.getSpecProcCd())
+			||SpecProgress.REVIEW_RETURN.equals(specInfo.getSpecProcCd())){
+				// 규격 IDX 만 변경
+				wrapTestManageDao.updateAitmIdxByTemporaryStorage(ivo);
+			}else if(SpecProgress.REQUEST_REVIEW.equals(specInfo.getSpecProcCd())
+			||SpecProgress.APPROVAL_REJECTION.equals(specInfo.getSpecProcCd())
+			||SpecProgress.APPROVAL_REQUEST.equals(specInfo.getSpecProcCd())){
+				// 버전업 규격 새로 임시저장에 aitmIdx 새거 넣고 기존거 규격삭제
+				wrapTestManageDao.updateProcessCodeToSpecRemove(ivo);
+				wrapTestManageDao.insertVersionUpBySapPrdha(ivo);
+			}else if(SpecProgress.APPROVED.equals(specInfo.getSpecProcCd())){
+				System.out.println("버전업 규격 새로 임시저장에 aitmIdx 새거 넣고 기존거 N");
+
+			}
+		}
+
 		ApproveVO approveInfo = setApproveVO(param);
 
 		if (param.getPkgaSpecAprIdx() != null) {
@@ -205,7 +235,6 @@ public class WrapTestManageServiceImpl implements WrapTestManageService {
 		approveInfo.setAprRea(param.getAprRea());
 		return approveInfo;
 	}
-
 
 	
 }

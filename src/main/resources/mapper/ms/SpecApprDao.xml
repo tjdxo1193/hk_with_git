@@ -50,6 +50,18 @@
           AND QP.DEL_YN = 'N'
           AND QPS.SPEC_PROC_CD = #{specProcCd}
           AND SAI.APR_UID = #{loginUserUid}
+        <if test="crgDptCd != '' and crgDptCd != null">
+            AND QPI.CRG_DPT_CD = #{crgDptCd}
+        </if>
+        <if test="pitmTyp != '' and pitmTyp != null">
+            AND QPI.PITM_TYP = #{pitmTyp}
+        </if>
+        <if test="pitmNm != '' and pitmNm != null">
+            AND QPI.PITM_NM LIKE '%' || #{pitmNm} || '%'
+        </if>
+        <if test="pitmCd != '' and pitmCd != null">
+            AND QPI.PITM_CD LIKE '%' || #{pitmCd} || '%'
+        </if>
     </select>
 
     <select id="getAItmList" parameterType="specApprVO" resultType="specApprVO">

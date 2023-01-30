@@ -544,6 +544,9 @@
 		 		 , #{rjtRea}
 			)
 	</insert>
+	<insert id="insertVersionUpBySapPrdha">
+
+	</insert>
 
 	<update id="updateApprovalSideEffect" parameterType="WrapTestManageVO">
 		UPDATE
@@ -571,8 +574,22 @@
         	AND PKGA_CD = #{pkgaCd}
         	AND PKGA_VER = #{pkgaVer}
     </update>
-    
-    <select id="getSapList" parameterType="WrapTestManageVO" resultType="WrapTestManageVO">
+
+	<update id="updateAitmIdxByTemporaryStorage" parameterType="ItemManageVO">
+		UPDATE QM_PITM_SPEC
+			SET AITM_SPEC_IDX = #{aitmSpecIdx}
+		WHERE PITM_CD = #{pitmCd}
+		AND PITM_VER = #{pitmVer}
+	</update>
+
+	<update id="updateProcessCodeToSpecRemove" parameterType="ItemManageVO">
+		UPDATE QM_PITM_SPEC
+			SET SPEC_PROC_CD = #{specProcCd}
+		WHERE PITM_CD = #{pitmCd}
+	    AND PITM_VER = #{pitmVer}
+	</update>
+
+	<select id="getSapList" parameterType="WrapTestManageVO" resultType="WrapTestManageVO">
 		SELECT
 			IDX
 			 , DEGREE
@@ -622,5 +639,24 @@
 
 	<select id="getSapPrdhaDuplicateCheck" parameterType="WrapTestManageVO" resultType="java.lang.String">
 		SELECT MAX(PKGA_CD) FROM QM_PKGA WHERE SAP_PRDHA = #{sapPrdha} AND PLNT_CD = #{plntCd}
+	</select>
+
+	<select id="getItemListBySapPrdha" parameterType="WrapTestManageVO" resultType="ItemManageVO">
+			SELECT
+				QPI.PITM_CD,
+				QPI.PITM_VER,
+			    #{aitmSpecIdx} AS AITM_SPEC_IDX
+			FROM QM_PITM_INFO QPI
+			LEFT JOIN QM_PITM QP ON QP.PLNT_CD = QPI.PLNT_CD AND QP.PITM_VER = QPI.PITM_VER AND QP.PITM_CD = QPI.PITM_CD
+			WHERE QPI.PLNT_CD = #{plntCd}
+		  	AND PITM_TYP IN (${pitmTyp})
+			AND QP.USE_VER_YN = 'Y'
+		    AND QP.DEL_YN = 'N'
+			AND QP.SPEC_PROC_CD = #{specProcCd}
+			AND SAP_PRDHA = #{sapPrdha}
+	</select>
+
+	<select id="findSpecListByItemInfo" parameterType="WrapTestManageVO" resultType="SpecManageVO">
+
 	</select>
 </mapper>

@@ -210,7 +210,7 @@ export default {
       } else if (name == 'reset') {
         this.resetTestItemPerInfo();
       } else if (name == 'elnSend'){
-        this.elnSendTestItemMethod();
+        this.elnSendTestItemMethodInfo();
       }
     },
     testItemPerFormEvent({ type, item }) {
@@ -261,6 +261,7 @@ export default {
       return parameter;
     },
     elnSendTestItemMethodInfo(){
+      const parameter = FormUtil.getData(this.testItemPerInfo.forms);
       this.$eSign(() => this.$axios.post('/ms/testItemPerManage/elnSendTestItemMethod', parameter))
         .then(() => {
           this.$info(this.$message.info.saved);

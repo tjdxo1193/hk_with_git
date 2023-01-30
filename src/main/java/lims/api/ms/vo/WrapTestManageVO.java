@@ -137,4 +137,7 @@ public class WrapTestManageVO implements UpdateDetect {
 	// Etc.
 	private String loginUserUid;	// 로그인 User Uid
 	private String loginUserIp;		// 로그인 User IP
+
+	// pitm_info
+	private String pitmTyp;
 }

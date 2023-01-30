@@ -18,8 +18,4 @@ public enum ELNProductDiv {
         }
         return null;
     }
-
-    public static String getName(String code) {
-        return "name";
-    }
 }

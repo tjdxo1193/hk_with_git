@@ -3,6 +3,8 @@ package lims.api.ms.dao;
 import lims.api.common.domain.AuditEvent;
 import lims.api.ms.entity.QmPitmSpecAitm;
 import lims.api.ms.entity.QmPkga;
+import lims.api.ms.vo.ItemManageVO;
+import lims.api.ms.vo.SpecManageVO;
 import lims.api.ms.vo.WrapTestManageVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
@@ -39,4 +41,12 @@ public interface WrapTestManageDao {
 	@Audit(target = QmPkga.class, label = AuditEvent.WrapTest.requestApproveWrapTest)
 	Integer approval(WrapTestManageVO param);
 	String getSapPrdhaDuplicateCheck(WrapTestManageVO param);
+	List<ItemManageVO> getItemListBySapPrdha(WrapTestManageVO param);
+	SpecManageVO findSpecListByItemInfo(ItemManageVO ivo);
+
+	int updateAitmIdxByTemporaryStorage(ItemManageVO ivo);
+
+	int updateProcessCodeToSpecRemove(ItemManageVO ivo);
+
+	int insertVersionUpBySapPrdha(ItemManageVO ivo);
 }

@@ -1,5 +1,5 @@
 import api from '@/api';
-import { ColumnBuilder, FormBuilder } from '@/util';
+import {ColumnBuilder, FormBuilder} from '@/util';
 
 const rvsDivPsComboList = [
   { value: 'P', label: '품목' },
@@ -24,9 +24,9 @@ const versionList = {
   forms: () =>
     FormBuilder.builder()
       .Select('pitmTyp', '품목유형', { async: () => api.combo.systemCommon.getPitmDivCombo() })
+      .Input('pitmCd', '품목코드')
       .Input('pitmNm', '품목명')
       .Select('crgDptCd', '담당부서', { async: api.combo.common.getDpt })
-      .blank()
       .build(),
 
   columns: () =>

@@ -56,6 +56,9 @@
         <if test="pitmNm != '' and pitmNm != null">
             AND QPI.PITM_NM LIKE '%' || #{pitmNm} || '%'
         </if>
+        <if test="pitmCd != '' and pitmCd != null">
+            AND QPI.PITM_CD LIKE '%' || #{pitmCd} || '%'
+        </if>
     </select>
 
     <select id="getAItemList" parameterType="specApprRequestVO" resultType="specApprRequestVO">

@@ -25,8 +25,9 @@ public enum SAPPItemType {
         return ROH3.name().equals(code) || ROH4.name().equals(code);
     }
 
-    public static boolean isSemi(String code) {
-        return HALB.name().equals(code);
+    public static boolean isSemiByELN(String code, String mrpCode) {
+        MaterialMRP mrp = MaterialMRP.getByMRPCode(mrpCode);
+        return HALB.name().equals(code) && (MaterialMRP.SEMI_MANUFACTURES_BULK == mrp || MaterialMRP.SEMI_MANUFACTURES_BASE == mrp);
     }
 
 }

@@ -2,6 +2,7 @@ package lims.api.util.process;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -30,7 +31,7 @@ public class SimpleSaveProcess<T extends KeyGenerator> {
      *                          equals, hashCode의 구현은 ide의 자동 완성 기능을 이용하는 거나 lombok의 @EqualsAndHashCode 어노테이션을 권장합니다.
      */
     public SaveResult forEachSave(List<T> dataList, List<T> targetDataList, Function<T, Integer> createHandler,
-                                  BiFunction<T, Boolean, Integer> updateHandler, Consumer<T> changeDataHandler) {
+                                  BiFunction<T, Boolean, Integer> updateHandler, BiConsumer<T, T> changeDataHandler) {
         Map<KeyObject, T> targetData = targetDataList.stream().collect(Collectors.toMap(T::generateKey, t -> t, (oldKey, newkey) -> oldKey));
 
         int createdCount = 0;
@@ -45,11 +46,11 @@ public class SimpleSaveProcess<T extends KeyGenerator> {
             if (exists) {
                 existsChangeField = !data.equals(targetData.get(key));
                 if (existsChangeField) {
-                    executeChangeDataHandler(changeDataHandler, data);
+                    executeChangeDataHandler(changeDataHandler, data, targetData.get(key));
                 }
                 updatedCount += updateHandler.apply(data, existsChangeField);
             } else {
-                executeChangeDataHandler(changeDataHandler, data);
+                executeChangeDataHandler(changeDataHandler, data, targetData.get(key));
                 createdCount += createHandler.apply(data);
             }
 
@@ -67,15 +68,15 @@ public class SimpleSaveProcess<T extends KeyGenerator> {
                 .build();
     }
 
-    private void executeChangeDataHandler(Consumer<T> handler, T data) {
+    private void executeChangeDataHandler(BiConsumer<T, T> handler, T data, T targetData) {
         if (handler == null) {
             return;
         }
-        handler.accept(data);
+        handler.accept(data, targetData);
     }
 
     public SaveResult forEachSave(List<T> dataList, List<T> targetDataList, Function<T, Integer> createHandler,
-                                  Function<T, Integer> updateHandler, Consumer<T> changeDataHandler) {
+                                  Function<T, Integer> updateHandler, BiConsumer<T, T> changeDataHandler) {
         return forEachSave(dataList, targetDataList, createHandler, (t, existsChangeData) -> updateHandler.apply(t), changeDataHandler);
     }
 

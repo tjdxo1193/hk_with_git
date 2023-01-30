@@ -19,6 +19,7 @@ import lims.api.ms.enums.SpecProgress;
 import lims.api.util.process.SimpleSaveProcess;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -52,7 +53,12 @@ public class SAPMaterialPostProcessor implements PostProcessor {
                 masterDao.findMaterialMara(maras),
                 masterDao::createMaterialMara,
                 masterDao::updateMaterialMara,
-                mara -> differentVO.getMara().add(mara)
+                (mara, existsMara) -> {
+                    if (!StringUtils.equals(mara.getZlabno(), existsMara.getZlabno())) {
+                        mara.markingChangeLabNo();
+                    }
+                    differentVO.getMara().add(mara);
+                }
         ).getTotalCount();
 
         List<SAPMaterialVO.Marc> marcs = sapDao.findMarcAllByDegree(degree);
@@ -61,7 +67,7 @@ public class SAPMaterialPostProcessor implements PostProcessor {
                 masterDao.findMaterialMarc(marcs),
                 masterDao::createMaterialMarc,
                 masterDao::updateMaterialMarc,
-                marc -> differentVO.getMarc().add(marc)
+                (marc, existsMara) -> differentVO.getMarc().add(marc)
         ).getTotalCount();
 
         List<SAPMaterialVO.Mvke> mvkes = sapDao.findMvkeAllByDegree(degree);
@@ -70,7 +76,7 @@ public class SAPMaterialPostProcessor implements PostProcessor {
                 masterDao.findMaterialMvke(mvkes),
                 masterDao::createMaterialMvke,
                 masterDao::updateMaterialMvke,
-                mvke -> differentVO.getMvke().add(mvke)
+                (mvke, existsMvke) -> differentVO.getMvke().add(mvke)
         ).getTotalCount();
 
         List<SAPMaterialVO.Zmdv> zmdvs = sapDao.findZmdvAllByDegree(degree);
@@ -79,7 +85,7 @@ public class SAPMaterialPostProcessor implements PostProcessor {
                 masterDao.findMaterialZmdv(zmdvs),
                 masterDao::createMaterialZmdv,
                 masterDao::updateMaterialZmdv,
-                zmdv -> differentVO.getZmdv().add(zmdv)
+                (zmdv, existsZmdv) -> differentVO.getZmdv().add(zmdv)
         ).getTotalCount();
 
         List<SAPMaterialVO.Makt> makts = sapDao.findMaktAllByDegree(degree);
@@ -88,7 +94,7 @@ public class SAPMaterialPostProcessor implements PostProcessor {
                 masterDao.findMaterialMakt(makts),
                 masterDao::createMaterialMakt,
                 masterDao::updateMaterialMakt,
-                makt -> differentVO.getMakt().add(makt)
+                (makt, existsMakt) -> differentVO.getMakt().add(makt)
         ).getTotalCount();
 
         if (count == 0) {
@@ -111,9 +117,12 @@ public class SAPMaterialPostProcessor implements PostProcessor {
         Map<String, SAPMaterialVO.Mara> materialMap = toMaterialMapByMaterialCode(latestMara);
 
         List<SAPMaterialVO.Marc> latestMarc = masterDao.findMaterialMarcAll();
+        
         Set<SAPPostProcessVO.Material.PItemKey> pitemKeys = getChangedPItemKeyForUpdate(latestMarc, changedMaterialCodes);
 
         SAPPostProcessVO.Material.PItemKey pItemKeyWithCurrentPItemVersion;
+        SAPMaterialVO.Mara material;
+        SAPMaterialVO.Marc matchedMarc;
         Integer nextPItemVersion;
         boolean noExistsPItem;
         int pitemNewVersion;
@@ -121,21 +130,24 @@ public class SAPMaterialPostProcessor implements PostProcessor {
         String specStatusCode;
 
         /**
-         * TODO
-         *  품목 임시저장 -> 업데이트
-         *  품목 승인완료 -> 품목 버전 증가(상태값은 승인완료 고정)
-         *                  -> 1. 규격서 INSERT
-         *                  -> 2. 규격서 승인완료 > 버전업
-         *                  -> 3. 규격서 승인요청 -> 버전업하고 기존거 취소
-         *                  ->          임시저장 -> 기존 품목의 SAP 연계 필드들을 새로 연계받은 데이터로 업데이트
+         * @implNote
+         *  품목 최초생성 -> 새 품목 버전 생성 및 새 규격서 생성
+         *  품목 임시저장 -> 기존 버전 비활성화 및 새 품목 버전 생성 (상태값 = 승인완료)
+         *  품목 승인완료 &
+         *      규격서 [임시저장, 검토반려]             -> 기존 품목의 SAP 연계 필드들을 새로 연계받은 데이터로 업데이트
+         *      규격서 [검토요청, 승인요청, 승인반려]    -> 기존 버전 비활성화 및 새 품목 버전 생성 (상태값 = 승인완료)
+         *                                             기존 규격서 비활성화 및 새 규격서 생성 (상태값 = 규격서 삭제)
+         *      규격서 [승인완료]                     -> 기존 버전 비활성화 및 새 품목 버전 생성 (상태값 = 승인완료)
+         *                                             기존 규격서 비활성화 및 새 규격서 생성 (상태값 = 승인완료)
          */
         for (SAPPostProcessVO.Material.PItemKey pitemKey : pitemKeys) {
-            SAPMaterialVO.Mara material = materialMap.get(pitemKey.getPitmCd());
+            material = materialMap.get(pitemKey.getPitmCd());
+            matchedMarc = getMarcByPItemKey(latestMarc, pitemKey);
 
             noExistsPItem = !postProcessDao.existsPItem(pitemKey);
             if (noExistsPItem) {
                 pitemNewVersion = postProcessDao.nextVersionOfPItem(pitemKey);
-                createFirstVersionOfPItem(pitemNewVersion, latestMarc, pitemKey);
+                createFirstVersionOfPItem(pitemNewVersion, matchedMarc, pitemKey);
                 createFirstVersionOfPItemSpec(pitemNewVersion, material, pitemKey);
                 continue;
             }
@@ -149,35 +161,35 @@ public class SAPMaterialPostProcessor implements PostProcessor {
             specStatusCode = postProcessDao.currentFinalVersionStatusCodeOfSpec(pItemKeyWithCurrentPItemVersion);
 
             if (ItemManage.TEMP_SAVE.equals(pitmStatusCode)) {
-                updateInactiveOfCurrentPItem(latestMarc, pItemKeyWithCurrentPItemVersion, SpecProgress.APPROVED);
+                updateInactiveOfCurrentPItem(matchedMarc, pItemKeyWithCurrentPItemVersion, SpecProgress.APPROVED);
 
                 nextPItemVersion = postProcessDao.nextVersionOfPItem(pitemKey);
-                versionUpOfPItem(nextPItemVersion, latestMarc, pitemKey);
+                versionUpOfPItem(nextPItemVersion, matchedMarc, pitemKey);
                 continue;
             }
 
             if (ItemManage.APRROVED.equals(pitmStatusCode)) {
 
                 if (SpecProgress.TEMPORARY_STORAGE.equals(specStatusCode) || SpecProgress.REVIEW_RETURN.equals(specStatusCode)) {
-                    updateInterfaceDataOfCurrentPItem(latestMarc, pItemKeyWithCurrentPItemVersion);
+                    updateInterfaceDataOfCurrentPItem(matchedMarc, pItemKeyWithCurrentPItemVersion);
                     continue;
                 }
 
                 nextPItemVersion = postProcessDao.nextVersionOfPItem(pitemKey);
 
-                updateInactiveOfCurrentPItem(latestMarc, pItemKeyWithCurrentPItemVersion, SpecProgress.APPROVED);
-                versionUpOfPItem(nextPItemVersion, latestMarc, pitemKey);
+                updateInactiveOfCurrentPItem(matchedMarc, pItemKeyWithCurrentPItemVersion, SpecProgress.APPROVED);
+                versionUpOfPItem(nextPItemVersion, matchedMarc, pitemKey);
 
                 if (SpecProgress.APPROVAL_REQUEST.equals(specStatusCode) || SpecProgress.REQUEST_REVIEW.equals(specStatusCode) ||
                         SpecProgress.APPROVAL_REJECTION.equals(specStatusCode)) {
                     updateInactiveOfCurrentPItemSpec(pItemKeyWithCurrentPItemVersion, SpecProgress.SPEC_REMOVE);
-                    versionUpOfPItemSpec(nextPItemVersion, pitemKey, material);
+                    versionUpOfPItemSpec(nextPItemVersion, pitemKey, material, matchedMarc);
                     continue;
                 }
 
                 if (SpecProgress.APPROVED.equals(specStatusCode)) {
                     updateInactiveOfCurrentPItemSpec(pItemKeyWithCurrentPItemVersion, SpecProgress.APPROVED);
-                    versionUpOfPItemSpec(nextPItemVersion, pitemKey, material);
+                    versionUpOfPItemSpec(nextPItemVersion, pitemKey, material, matchedMarc);
                 }
             }
 
@@ -195,15 +207,15 @@ public class SAPMaterialPostProcessor implements PostProcessor {
                 .collect(Collectors.toSet());
     }
 
-    private void createFirstVersionOfPItem(Integer newVersion, List<SAPMaterialVO.Marc> latestMarc, SAPPostProcessVO.Material.PItemKey pitemKey) {
-        createNextVersionOfPItem(newVersion, latestMarc, pitemKey, SpecProgress.TEMPORARY_STORAGE);
+    private void createFirstVersionOfPItem(Integer newVersion, SAPMaterialVO.Marc marc, SAPPostProcessVO.Material.PItemKey pitemKey) {
+        createNextVersionOfPItem(newVersion, marc, pitemKey, SpecProgress.TEMPORARY_STORAGE);
     }
 
-    private void versionUpOfPItem(Integer newVersion, List<SAPMaterialVO.Marc> latestMarc, SAPPostProcessVO.Material.PItemKey pitemKey) {
-        createNextVersionOfPItem(newVersion, latestMarc, pitemKey, SpecProgress.APPROVED);
+    private void versionUpOfPItem(Integer newVersion, SAPMaterialVO.Marc marc, SAPPostProcessVO.Material.PItemKey pitemKey) {
+        createNextVersionOfPItem(newVersion, marc, pitemKey, SpecProgress.APPROVED);
     }
 
-    private void createNextVersionOfPItem(Integer newVersion, List<SAPMaterialVO.Marc> latestMarc, SAPPostProcessVO.Material.PItemKey pitemKey, SpecProgress progress) {
+    private void createNextVersionOfPItem(Integer newVersion, SAPMaterialVO.Marc marc, SAPPostProcessVO.Material.PItemKey pitemKey, SpecProgress progress) {
         SAPPostProcessVO.Material.PItem pitem = SAPPostProcessVO.Material.PItem.builder()
                 .plntCd(pitemKey.getPlntCd())
                 .pitmCd(pitemKey.getPitmCd())
@@ -220,15 +232,14 @@ public class SAPMaterialPostProcessor implements PostProcessor {
         postProcessDao.createPItem(pitem);
 
         SAPPostProcessVO.Material.PItemInfo pitemInfo = new SAPPostProcessVO.Material.PItemInfo(pitemKey, newVersion);
-        SAPMaterialVO.Marc currentMatchedMarc = getMarcByPItemKey(latestMarc, pitemKey);
-        pitemInfo.setPItemTypByMRPCode(currentMatchedMarc.getDispo());
+        pitemInfo.setPItemTypByMRPCode(marc.getDispo());
         postProcessDao.createPItemInfo(pitemInfo);
 
         SAPPostProcessVO.Material.PItemInfoSap pitemInfoSap = createPItemInfoSAPByCreateAndUpdate(pitemKey.getPlntCd(), pitemKey.getPitmCd(), newVersion);
         postProcessDao.createPItemInfoSap(pitemInfoSap);
     }
 
-    private void updateInactiveOfCurrentPItem(List<SAPMaterialVO.Marc> latestMarc, SAPPostProcessVO.Material.PItemKey pitemKey, SpecProgress specProgress) {
+    private void updateInactiveOfCurrentPItem(SAPMaterialVO.Marc marc, SAPPostProcessVO.Material.PItemKey pitemKey, SpecProgress specProgress) {
         SAPPostProcessVO.Material.PItem pitem = SAPPostProcessVO.Material.PItem.builder()
                 .plntCd(pitemKey.getPlntCd())
                 .pitmCd(pitemKey.getPitmCd())
@@ -239,13 +250,12 @@ public class SAPMaterialPostProcessor implements PostProcessor {
                 .udtIp(PlantType.SYSTEM.getIp())
                 .build();
         postProcessDao.updatePItem(pitem);
-        updateInterfaceDataOfCurrentPItem(latestMarc, pitemKey);
+        updateInterfaceDataOfCurrentPItem(marc, pitemKey);
     }
 
-    private void updateInterfaceDataOfCurrentPItem(List<SAPMaterialVO.Marc> latestMarc, SAPPostProcessVO.Material.PItemKey pitemKey) {
+    private void updateInterfaceDataOfCurrentPItem(SAPMaterialVO.Marc marc, SAPPostProcessVO.Material.PItemKey pitemKey) {
         SAPPostProcessVO.Material.PItemInfo pitemInfo = new SAPPostProcessVO.Material.PItemInfo(pitemKey);
-        SAPMaterialVO.Marc currentMatchedMarc = getMarcByPItemKey(latestMarc, pitemKey);
-        pitemInfo.setPItemTypByMRPCode(currentMatchedMarc.getDispo());
+        pitemInfo.setPItemTypByMRPCode(marc.getDispo());
         postProcessDao.updatePItemInfo(pitemInfo);
 
         SAPPostProcessVO.Material.PItemInfoSap pitemInfoSap = createPItemInfoSAPByCreateAndUpdate(pitemKey.getPlntCd(), pitemKey.getPitmCd(), pitemKey.getVersion());
@@ -283,25 +293,26 @@ public class SAPMaterialPostProcessor implements PostProcessor {
         postProcessDao.updateStatusOfPItemSpec(removeSpec);
     }
 
-    private void versionUpOfPItemSpec(Integer nextPItemVersion, SAPPostProcessVO.Material.PItemKey pitemKey, SAPMaterialVO.Mara material) {
+    private void versionUpOfPItemSpec(Integer nextPItemVersion, SAPPostProcessVO.Material.PItemKey pitemKey, SAPMaterialVO.Mara material, SAPMaterialVO.Marc marc) {
         /**
          * TODO
-         *  ○ 일반 품목 -> 기존 규격 IDX를 next에 넣어줌
-         *  ○ 포장재    -> SAP 계층 코드에 맞는 최신버전이고 승인완료된 규격 IDX를 가져와야 한다. (포장 시험 테이블에 있는)
-         *  ○ 반제품    -> 규격 IDX는 null
+         *  ○ 완제품, 포장재    -> SAP 계층 코드에 맞는 최신버전이고 승인완료된 규격 IDX를 가져와야 한다. (포장 시험 테이블에 있는)
+         *  ○ ELN 기준 반제품(Bulk, Base 한정)    -> 규격 IDX는 null
+         *  ○ 나머지 -> 규격서 버전을 새로 하나 생성하여 생성된 규격서 버전 IDX를 새로 생성한 규격서 정보에 넣어줌
          */
         SAPPostProcessVO.Material.PItemSpec currentVersionPItemSpec = postProcessDao.currentVersionOfSpec(pitemKey);
         Integer nextSpecIdx = postProcessDao.nextPItemSpecIdxOfSpec(pitemKey);
 
-        Integer alreadyApprovedPackageTestSpecIdxOrNull = null;
+        Integer alreadyApprovedPackageTestSpecIdxOrNull;
 
         if (isFinishOrPackagingMaterial(material)) {
             alreadyApprovedPackageTestSpecIdxOrNull = getAlreadyApprovedPackageSpecIdxOrNull(material);
-        }
-
-        if (isSemiMaterial(material)) {
+        } else if (isSemiMaterialByELN(material, marc)) {
             alreadyApprovedPackageTestSpecIdxOrNull = null;
         } else {
+            /**
+             * 완제품, 포장재, ELN기준 반제품(ELN기준의 반제품은 Bulk, Base로 한정)이 아니면 규격서의 버전을 새로 하나 생성한다.
+             */
             SAPPostProcessVO.Material.PItemSpecVersion specVersion = SAPPostProcessVO.Material.PItemSpecVersion.builder()
                     .plntCd(currentVersionPItemSpec.getPlntCd())
                     .currentAitmSpecIdx(currentVersionPItemSpec.getAitmSpecIdx())
@@ -354,8 +365,8 @@ public class SAPMaterialPostProcessor implements PostProcessor {
         return mara != null && (SAPPItemType.isFinished(mara.getMatnr()) || SAPPItemType.isPackaging(mara.getMatnr()));
     }
 
-    private boolean isSemiMaterial(SAPMaterialVO.Mara mara) {
-        return mara != null && SAPPItemType.isSemi(mara.getMatnr());
+    private boolean isSemiMaterialByELN(SAPMaterialVO.Mara mara, SAPMaterialVO.Marc marc) {
+        return mara != null && SAPPItemType.isSemiByELN(mara.getMtart(), marc.getDispo());
     }
 
     private SAPMaterialVO.Marc getMarcByPItemKey(List<SAPMaterialVO.Marc> list, SAPPostProcessVO.Material.PItemKey itemKey) {
