@@ -25,12 +25,12 @@ const testSearchGrid = {
       .build(),
   columns: () =>
     ColumnBuilder.builder()
-      .col('plntCd', { visible: false })
-      .col('ansTyp', { visible: false })
-      .col('reqIdx', { visible: false })
-      .col('smpMngIdx')
-      .col('ansNo', '시험번호')
+      .col('plntCd', false)
+      .col('ansTyp', false)
+      .col('reqIdx', false)
+      .col('smpMngIdx', false)
       .col('pitmNm', '품목명')
+      .col('ansNo', '시험번호')
       .col('pitmCd', '품목코드')
       .col('ansTypNm', '시험유형')
       .col('rcpDt', '접수일자')

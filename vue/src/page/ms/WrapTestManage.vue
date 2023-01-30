@@ -57,8 +57,8 @@
 </template>
 
 <script>
-import {ItemsByTestMethodModal} from '@/page/modal';
-import {FormUtil, StringUtil} from '@/util';
+import { ItemsByTestMethodModal } from '@/page/modal';
+import { FormUtil, StringUtil } from '@/util';
 
 import values from './values/wrapTestManage';
 
@@ -149,7 +149,6 @@ export default {
       this.enableAddTestItemButton();
 
       this.fetchQmPkgaList();
-      this.getQmPkgaListForDuplicateCheck();
     },
     async fetchQmPkgaList() {
       const { $grid, forms } = this.qmPkgaList;
@@ -196,9 +195,19 @@ export default {
       );
     },
 
-    getQmPkgaListForDuplicateCheck(){
-        const data = this.$axios.get('ms/wrapTestManage/getSapPrdhaDuplicateCheck', {})
-        .then(({ data }) => data);
+    isSapPrdhaDuplicate(sapPrdha) {
+      this.$axios
+        .get('ms/wrapTestManage/getSapPrdhaDuplicateCheck', { sapPrdha })
+        .then(({ data }) => {
+          if (data > 0) {
+            this.$error(this.$message.error.isSapPrdhaDuplicate);
+            return true;
+          }
+        })
+        .catch(() => {
+          this.$error(this.$message.error.fetchData);
+        });
+      return false;
     },
 
     setPkgaInfoToPkgaGridValueForm(item) {

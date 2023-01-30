@@ -39,14 +39,14 @@ public class SampleManageController {
         return ResponseEntity.ok(new CommonResponse());
     }
 
-    @PutMapping("delete")
+    @PutMapping("/delete")
     public ResponseEntity<CommonResponse> delete(@AuthToken Token token, @RequestBody SampleManageVO request) {
         request.setPlntCd(jwtResolver.getPlantCode(token.getJwt()));
         service.delete(request);
         return ResponseEntity.ok(new CommonResponse());
     }
 
-    @GetMapping("test")
+    @GetMapping("/test")
     public ResponseEntity<List<SampleManageVO>> getTestInfo(@AuthToken Token token, SampleManageVO request) {
         request.setPlntCd(jwtResolver.getPlantCode(token.getJwt()));
         return ResponseEntity.ok(service.findTest(request));

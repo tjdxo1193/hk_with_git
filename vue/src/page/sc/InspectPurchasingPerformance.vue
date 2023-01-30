@@ -3,12 +3,15 @@
     v-bind="performanceGrid"
     @grid-created="(proxy) => $setState('performanceGrid.$grid', proxy)"
   />
-  <AUIGridWithHeader v-bind="detailGrid"
-  @grid-created="(proxy) => $setState('detailGrid.$grid', proxy)"/>
+  <AUIGridWithHeader
+    v-bind="detailGrid"
+    @grid-created="(proxy) => $setState('detailGrid.$grid', proxy)"
+  />
 </template>
 
 <script>
 import { FormUtil } from '@/util/index.js';
+
 import values from './values/inspectPurchasingPerformance.js';
 
 export default {
@@ -23,7 +26,7 @@ export default {
         event: {
           cellDoubleClick: (event) => {
             this.makeParam(event);
-          }
+          },
         },
       },
       detailGrid: {
@@ -40,7 +43,8 @@ export default {
     async fetchPerformanceGrid() {
       const { $grid, forms } = this.performanceGrid;
       const param = FormUtil.getData(forms);
-      const data = await $grid._useLoader(() => this.$axios.get('/sc/inspectPurchasingPerformance', param))
+      const data = await $grid
+        ._useLoader(() => this.$axios.get('/sc/inspectPurchasingPerformance', param))
         .then(({ data }) => data)
         .catch(() => {
           this.$error(this.$message.error.fetchData);
@@ -49,7 +53,8 @@ export default {
     },
     async fetchDetailGrid(param) {
       const { $grid } = this.detailGrid;
-      const data = await $grid._useLoader(() => this.$axios.get('/sc/inspectPurchasingPerformance', param))
+      const data = await $grid
+        ._useLoader(() => this.$axios.get('/sc/inspectPurchasingPerformance', param))
         .then(({ data }) => data)
         .catch(() => {
           this.$error(this.$message.error.fetchData);
@@ -64,7 +69,7 @@ export default {
         phsOrderNo: event.item.phsOrderNo,
       };
       this.fetchDetailGrid(param);
-    }
+    },
   },
   mounted() {
     this.fetchPerformanceGrid();

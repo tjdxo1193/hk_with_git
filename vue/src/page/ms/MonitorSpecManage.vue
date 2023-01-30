@@ -17,14 +17,10 @@
     @button-click="onClickBtnEvent"
   />
 
-  <Form-Base
-    v-bind="valueWithMItemSpecList"
-  />
+  <Form-Base v-bind="valueWithMItemSpecList" />
 
-  <Form-Base
-    v-bind="valueWithVersionList"
-  />
-  
+  <Form-Base v-bind="valueWithVersionList" />
+
   <ItemsByTestMethodModal
     :show="itemsByTestMethodModal.show"
     @close="hideItemsByTestMethodModal()"
@@ -55,7 +51,13 @@ export default {
     RequestReviewerModal,
   },
   data() {
-    const { mItemSpecList, versionList, testItemList, valueWithVersionList, valueWithMItemSpecList } = this.$copy(values);
+    const {
+      mItemSpecList,
+      versionList,
+      testItemList,
+      valueWithVersionList,
+      valueWithMItemSpecList,
+    } = this.$copy(values);
     return {
       mItemSpecList: {
         ...mItemSpecList.static,
@@ -112,7 +114,7 @@ export default {
       },
       valueWithMItemSpecList: {
         forms: valueWithMItemSpecList.forms(),
-      }
+      },
     };
   },
   methods: {
@@ -136,10 +138,10 @@ export default {
 
       this.bottomGridSetting($grid);
     },
-    setValueWithMItemSpecListHiddenForm(item){
+    setValueWithMItemSpecListHiddenForm(item) {
       FormUtil.setData(this.valueWithMItemSpecList.forms, item);
     },
-    setValueWithVersionListHiddenForm(item){
+    setValueWithVersionListHiddenForm(item) {
       FormUtil.setData(this.valueWithMItemSpecList.forms, item);
     },
     bottomGridSetting($grid) {
@@ -288,9 +290,7 @@ export default {
       const parameter = FormUtil.getData(this.valueWithVersionList.forms);
       Object.assign(parameter, popupParam);
 
-      this.$eSignWithReason(() =>
-        this.$axios.put('/ms/monitorSpecManage/requestReview', parameter),
-      )
+      this.$eSignWithReason(() => this.$axios.put('/ms/monitorSpecManage/requestReview', parameter))
         .then(() => {
           this.$info(this.$message.info.reviewRequest);
           this.init();
@@ -302,9 +302,7 @@ export default {
     },
     delete() {
       const parameter = FormUtil.getData(this.valueWithVersionList.forms);
-      this.$eSignWithReason(() =>
-        this.$axios.put('/ms/monitorSpecManage/mSpec/delete', parameter),
-      )
+      this.$eSignWithReason(() => this.$axios.put('/ms/monitorSpecManage/mSpec/delete', parameter))
         .then(() => {
           this.$info(this.$message.info.delete);
           this.init();
@@ -359,19 +357,19 @@ export default {
         });
     },
     isTemporaryStorage() {
-      const {specProcCd} = FormUtil.getData(this.valueWithVersionList.forms);
+      const { specProcCd } = FormUtil.getData(this.valueWithVersionList.forms);
       return specProcCd == 'S0080100';
     },
     isReviewReject() {
-      const {specProcCd} = FormUtil.getData(this.valueWithVersionList.forms);
+      const { specProcCd } = FormUtil.getData(this.valueWithVersionList.forms);
       return specProcCd == 'S0080110';
     },
     isApproved() {
-      const {specProcCd} = FormUtil.getData(this.valueWithVersionList.forms);
+      const { specProcCd } = FormUtil.getData(this.valueWithVersionList.forms);
       return specProcCd == 'S0080400';
     },
     isUseVersionY() {
-      const {useVerYn} = FormUtil.getData(this.valueWithVersionList.forms);
+      const { useVerYn } = FormUtil.getData(this.valueWithVersionList.forms);
       return useVerYn == 'Y';
     },
     updateVersion() {
@@ -384,8 +382,9 @@ export default {
       }
 
       const gridData = this.testItemList.$grid.getGridData();
-      const { mitmCd, aitmSpecVer, rvsDt, enfoDt, rvsCtt, rvsDivPs, rvsReaCd } =
-        FormUtil.getData(this.valueWithVersionList.forms);
+      const { mitmCd, aitmSpecVer, rvsDt, enfoDt, rvsCtt, rvsDivPs, rvsReaCd } = FormUtil.getData(
+        this.valueWithVersionList.forms,
+      );
 
       const parameter = gridData.map((row, index) => ({
         ...row,

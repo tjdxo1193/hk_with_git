@@ -14,18 +14,18 @@ const searchForm = {
   forms: () =>
     FormBuilder.builder()
       .Input('pitmNm', '품목명')
+      .Input('pitmCd', '품목코드')
       .Select('ansKnd', '시험종류', {
         async: () => api.combo.userCommon.getAnsKndCombo(),
       })
-      .DatepickerTwinWithSwitch('ansEdtBetween', '시험예정일', {
-        value: [todayDate, todayDate],
+      .Select('ansPps', '시험목적', {
+        async: () => api.combo.userCommon.getAnsPpsCombo(),
       })
-      .spanCol(2)
       .Input('lotNo', '제조번호')
       .Select('sbtCrgUid', '담당자', {
         async: api.combo.common.getUserList,
       })
-      .DatepickerTwinWithSwitch('6', '시험일', {
+      .DatepickerTwinWithSwitch('ansEdtBetween', '시험예정일', {
         value: [todayDate, todayDate],
       })
       .spanCol(2)
@@ -62,7 +62,7 @@ const gridForSearchResult = {
         if (statusList.stop.includes(item.sbtAnsProc)) {
           return 'testStop';
         }
-        return null;
+        return 'stabilityTest';
       },
     },
   },
@@ -70,12 +70,12 @@ const gridForSearchResult = {
     ColumnBuilder.builder()
       .button('fileAttacher', '첨부')
       .col('pitmNm', '품목명')
-      .col('pitmCd', '품목코드', { visible: false })
+      .col('pitmCd', '품목코드')
       // .col('3', '공정명')
       .col('lotNo', '제조번호')
       .col('makDt', '제조일자')
       .col('sbtAnsProc', '진행상황', { visible: false })
-      .col('sbtAnsProcNm', '진행상황')
+      .col('sbtAnsProcNm', '진행상황', { width: '150' })
       .col('ansPps', '시험목적', { visible: false })
       .col('ansPpsNm', '시험목적')
       .col('ansPpsDtl', '상세시험목적')
@@ -98,7 +98,7 @@ const gridForSearchResult = {
       .col('strgPla', '보관장소', { visible: false })
       .col('strgPlaNm', '보관장소')
       .col('rmk', '비고')
-      .col('sbtAnsPlnNo', '시험번호')
+      .col('sbtAnsPlnNo', '시험 계획 번호')
       .col('docNo', '문서번호')
       .col('clltDt', '채취일자', { visible: false })
       .col('clltUid', '채취 UID', { visible: false })
@@ -131,7 +131,7 @@ const gridForSearchResult = {
 
 const stabItemSearchForm = {
   static: {
-    title: '안정성품목조회',
+    title: '안정성시험조회',
     countPerRow: 1,
   },
   forms: () =>
@@ -235,7 +235,9 @@ const stabInfoRegForm = {
       .required()
       .Input('ansPpsDtl', '상세시험목적', { maxlength: 100 })
       .Input('docNo', '문서번호', { maxlength: 25 })
-      .Input('sbtAnsPlnNo', '시험번호', { maxlength: 11 })
+      .readonly()
+      .Input('sbtAnsPlnNo', '시험 계획 번호', { maxlength: 11 })
+      .readonly()
       .Textarea('rmk', '비고', { rows: 4, maxlength: 2000 })
       .spanRow(2)
       // .Input('14', '제조번호구분')

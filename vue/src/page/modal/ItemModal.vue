@@ -32,9 +32,7 @@ export default {
       default: null,
     },
   },
-  mounted() {
-    this.getItemList();
-  },
+  mounted() {},
   data() {
     const { searchForm } = this.$copy(values);
     return {

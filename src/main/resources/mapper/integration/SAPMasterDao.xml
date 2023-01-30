@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="lims.api.integration.dao.SAPMasterDao">
 
-    <select id="findMaterialMara" resultType="lims.api.integration.vo.SAPMaterialVO$Mara">
+    <select id="findMaterialMaraAll" resultType="lims.api.integration.vo.SAPMaterialVO$Mara">
         SELECT MATNR,
                MTART,
                MEINS,
@@ -23,6 +23,35 @@
                CRT_DS,
                UDT_DS
         FROM MS_SAP_MTR_MARA
+    </select>
+
+    <select id="findMaterialMara" resultType="lims.api.integration.vo.SAPMaterialVO$Mara"
+            parameterType="lims.api.integration.vo.SAPMaterialVO$Mara">
+        SELECT MATNR,
+               MTART,
+               MEINS,
+               MATKL,
+               BISMT,
+               PRDHA,
+               SPART,
+               MSTAE,
+               WRKST,
+               ZEINR,
+               TAKLV,
+               BSTME,
+               XCHPF,
+               EKWSL,
+               MHDHB,
+               ZLABNO,
+               ZPROD_ABBR,
+               CRT_DS,
+               UDT_DS
+        FROM MS_SAP_MTR_MARA
+        WHERE
+              MATNR IN
+                <foreach collection="list" item="item" open="(" close=")" separator=",">
+                    #{item.matnr}
+                </foreach>
     </select>
 
     <insert id="createMaterialMara" parameterType="lims.api.integration.vo.SAPMaterialVO$Mara">
@@ -71,8 +100,7 @@
         WHERE MATNR = #{matnr}
     </update>
 
-
-    <select id="findMaterialMarc" resultType="lims.api.integration.vo.SAPMaterialVO$Marc">
+    <select id="findMaterialMarcAll" resultType="lims.api.integration.vo.SAPMaterialVO$Marc">
         SELECT WERKS,
                MATNR,
                LADGR,
@@ -105,6 +133,51 @@
                CRT_DS,
                UDT_DS
         FROM MS_SAP_MTR_MARC
+    </select>
+
+    <select id="findMaterialMarc" resultType="lims.api.integration.vo.SAPMaterialVO$Marc"
+            parameterType="lims.api.integration.vo.SAPMaterialVO$Marc">
+        SELECT WERKS,
+               MATNR,
+               LADGR,
+               MMSTA,
+               EKGRP,
+               INSMK,
+               DISMM,
+               FXHOR,
+               DISPO,
+               DISLS,
+               BSTRF,
+               BSTMI,
+               BESKZ,
+               SOBSL,
+               LGPRO,
+               LGFSB,
+               PLIFZ,
+               WEBAZ,
+               ELSLO,
+               STRGR,
+               MTVFP,
+               FEVOR,
+               KZECH,
+               AWSLS,
+               PRCTR,
+               LOSGR,
+               SOBSK,
+               FVIDK,
+               ZFIRST_GI_DATE,
+               CRT_DS,
+               UDT_DS
+        FROM MS_SAP_MTR_MARC
+        WHERE
+            MATNR IN
+                <foreach collection="list" item="item" open="(" close=")" separator=",">
+                    #{item.matnr}
+                </foreach>
+        AND WERKS IN
+                <foreach collection="list" item="item" open="(" close=")" separator=",">
+                    #{item.werks}
+                </foreach>
     </select>
 
     <select id="findMaterialMarcByMatnr" resultType="lims.api.integration.vo.SAPMaterialVO$Marc">
@@ -216,7 +289,8 @@
     </update>
 
 
-    <select id="findMaterialMvke" resultType="lims.api.integration.vo.SAPMaterialVO$Mvke">
+    <select id="findMaterialMvke" resultType="lims.api.integration.vo.SAPMaterialVO$Mvke"
+            parameterType="lims.api.integration.vo.SAPMaterialVO$Mvke">
         SELECT MATNR,
                VKORG,
                VTWEG,
@@ -226,6 +300,19 @@
                CRT_DS,
                UDT_DS
         FROM MS_SAP_MTR_MVKE
+        WHERE
+            MATNR IN
+                <foreach collection="list" item="item" open="(" close=")" separator=",">
+                    #{item.matnr}
+                </foreach>
+        AND VKORG IN
+                <foreach collection="list" item="item" open="(" close=")" separator=",">
+                    #{item.vkorg}
+                </foreach>
+        AND VTWEG IN
+                <foreach collection="list" item="item" open="(" close=")" separator=",">
+                    #{item.vtweg}
+                </foreach>
     </select>
 
     <insert id="createMaterialMvke" parameterType="lims.api.integration.vo.SAPMaterialVO$Mvke">
@@ -253,7 +340,8 @@
     </update>
 
 
-    <select id="findMaterialZmdv" resultType="lims.api.integration.vo.SAPMaterialVO$Zmdv">
+    <select id="findMaterialZmdv" resultType="lims.api.integration.vo.SAPMaterialVO$Zmdv"
+            parameterType="lims.api.integration.vo.SAPMaterialVO$Zmdv">
         SELECT MATNR,
                CLASS_TYPE,
                CLAZZ,
@@ -264,6 +352,27 @@
                CRT_DS,
                UDT_DS
         FROM MS_SAP_MTR_ZMDV
+        WHERE
+            MATNR IN
+            <foreach collection="list" item="item" open="(" close=")" separator=",">
+                #{item.matnr}
+            </foreach>
+        AND CLASS_TYPE IN
+            <foreach collection="list" item="item" open="(" close=")" separator=",">
+                #{item.classType}
+            </foreach>
+        AND CLAZZ IN
+            <foreach collection="list" item="item" open="(" close=")" separator=",">
+                #{item.clazz}
+            </foreach>
+        AND CHAR_CODE IN
+            <foreach collection="list" item="item" open="(" close=")" separator=",">
+                #{item.charCode}
+            </foreach>
+        AND CHAR_DATA_TYP IN
+            <foreach collection="list" item="item" open="(" close=")" separator=",">
+                #{item.charDataTyp}
+            </foreach>
     </select>
 
     <select id="findMaterialZmdvByMaterialCode" resultType="lims.api.integration.vo.SAPMaterialVO$Zmdv">
@@ -307,12 +416,22 @@
     </update>
 
 
-    <select id="findMaterialMakt" resultType="lims.api.integration.vo.SAPMaterialVO$Makt">
+    <select id="findMaterialMakt" resultType="lims.api.integration.vo.SAPMaterialVO$Makt"
+            parameterType="lims.api.integration.vo.SAPMaterialVO$Makt">
         SELECT MATNR, SPRAS, MAKTX, CRT_DS, UDT_DS
         FROM MS_SAP_MTR_MAKT
+        WHERE
+        MATNR IN
+            <foreach collection="list" item="item" open="(" close=")" separator=",">
+                #{item.matnr}
+            </foreach>
+        AND SPRAS IN
+            <foreach collection="list" item="item" open="(" close=")" separator=",">
+                #{item.spras}
+            </foreach>
     </select>
 
-    <insert id="createMaterialMakt" parameterType="lims.api.integration.vo.SAPMaterialVO$Makt">
+    <insert id=" createMaterialMakt" parameterType="lims.api.integration.vo.SAPMaterialVO$Makt">
         INSERT INTO MS_SAP_MTR_MAKT
             (MATNR, SPRAS, MAKTX, CRT_DS, UDT_DS)
         VALUES (#{matnr},

@@ -42,6 +42,12 @@
     :show="resultHistoryModal.show"
     @close="hideModal('resultHistoryModal')"
   />
+
+  <FinalOrderModal
+    :parameter="finalOrderModal.parameter"
+    :show="finalOrderModal.show"
+    @close="hideModal('finalOrderModal')"
+  ></FinalOrderModal>
 </template>
 
 <script>
@@ -50,6 +56,7 @@ import {
   TestLabEventModal,
   RequestReviewerModal,
   ResultHistoryModal,
+  FinalOrderModal,
 } from '@/page/modal';
 import { FormUtil, StringUtil } from '@/util';
 
@@ -62,6 +69,7 @@ export default {
     TestLabEventModal,
     RequestReviewerModal,
     ResultHistoryModal,
+    FinalOrderModal,
   },
   mounted() {
     this.getResultInputList();
@@ -100,6 +108,10 @@ export default {
         show: false,
       },
       resultHistoryModal: {
+        show: false,
+        parameter: {},
+      },
+      finalOrderModal: {
         show: false,
         parameter: {},
       },
@@ -149,6 +161,9 @@ export default {
         } else {
           return this.$warn(this.$message.warn.unSelectedData);
         }
+      }
+      if (name === 'finalOrder') {
+        return this.showModal('finalOrderModal');
       }
       if (name === 'requestReview') {
         return this.beforeCheckRequestReview();
@@ -580,6 +595,11 @@ export default {
         this.resultHistoryModal.parameter = parameter;
         return (this.resultHistoryModal.show = true);
       }
+      if (name === 'finalOrderModal') {
+        const parameter = FormUtil.getData(this.resultInputInfo.forms);
+        this.finalOrderModal.parameter = parameter;
+        return (this.finalOrderModal.show = true);
+      }
     },
     hideModal(name) {
       if (name === 'fileAttacherModal') {
@@ -593,6 +613,9 @@ export default {
       }
       if (name === 'resultHistoryModal') {
         return (this.resultHistoryModal.show = false);
+      }
+      if (name === 'finalOrderModal') {
+        return (this.finalOrderModal.show = false);
       }
     },
     afterModalEvent(ansIdx) {

@@ -13,14 +13,18 @@ import java.util.List;
 @Repository
 public interface SAPMasterDao {
 
-    List<SAPMaterialVO.Mara> findMaterialMara();
+    List<SAPMaterialVO.Mara> findMaterialMaraAll();
+
+    List<SAPMaterialVO.Mara> findMaterialMara(List<SAPMaterialVO.Mara> mara);
 
     int createMaterialMara(SAPMaterialVO.Mara param);
 
     int updateMaterialMara(SAPMaterialVO.Mara param);
 
 
-    List<SAPMaterialVO.Marc> findMaterialMarc();
+    List<SAPMaterialVO.Marc> findMaterialMarcAll();
+
+    List<SAPMaterialVO.Marc> findMaterialMarc(List<SAPMaterialVO.Marc> param);
 
     List<SAPMaterialVO.Marc> findMaterialMarcByMatnr(String matnr);
 
@@ -29,7 +33,7 @@ public interface SAPMasterDao {
     int updateMaterialMarc(SAPMaterialVO.Marc param);
 
 
-    List<SAPMaterialVO.Mvke> findMaterialMvke();
+    List<SAPMaterialVO.Mvke> findMaterialMvke(List<SAPMaterialVO.Mvke> param);
 
     int createMaterialMvke(SAPMaterialVO.Mvke param);
 
@@ -37,14 +41,14 @@ public interface SAPMasterDao {
 
     List<SAPMaterialVO.Zmdv> findMaterialZmdvByMaterialCode(String meterialCode);
 
-    List<SAPMaterialVO.Zmdv> findMaterialZmdv();
+    List<SAPMaterialVO.Zmdv> findMaterialZmdv(List<SAPMaterialVO.Zmdv> param);
 
     int createMaterialZmdv(SAPMaterialVO.Zmdv param);
 
     int updateMaterialZmdv(SAPMaterialVO.Zmdv param);
 
 
-    List<SAPMaterialVO.Makt> findMaterialMakt();
+    List<SAPMaterialVO.Makt> findMaterialMakt(List<SAPMaterialVO.Makt> param);
 
     int createMaterialMakt(SAPMaterialVO.Makt param);
 

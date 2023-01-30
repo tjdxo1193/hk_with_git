@@ -20,10 +20,16 @@ public interface StabPlanService {
     int update(StabPlanVO param);
     // 안정성시험계획 삭제
     int delete(StabPlanVO param);
-    // 안정성시험계획 중단용청
+    // 안정성시험계획 중단요청
     int stopRequest(StabPlanVO param);
     // 안정성시험계획 중단취소 요청
     int stopCancelRequest(StabPlanVO param);
     // 안정성시험계획 승인 요청
     int approveRequest(StabPlanVO param);
+    // 안정성상세계획 저장
+    int saveAns(StabPlanVO param);
+    // 안정성시험 삭제
+    int deleteAns(StabPlanVO param);
+    // 안정성상세계획 저장(체크박스)
+    int saveDetailPlanReg(StabPlanVO param);
 }

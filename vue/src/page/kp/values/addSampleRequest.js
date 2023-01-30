@@ -100,16 +100,10 @@ const inputForm = {
           .required()
           .build(),
       )
-      .multiple(
-        'addSmp',
-        '요청검체수량',
-        FormBuilder.builder()
-          .InputNumber('reqSmpVol')
-          .required()
-          .Input('inpUnit')
-          .required()
-          .build(),
-      )
+      .InputNumber('reqSmpVol', '요청검체수량')
+      .required()
+      .Input('inpUnit', '입력단위')
+      .required()
       .RadioGroup('smpReqRea', '요청사유', {
         groups: [
           { label: '기준일탈', checkedValue: 'U0250001' },

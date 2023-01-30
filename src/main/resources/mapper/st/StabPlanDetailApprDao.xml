@@ -79,47 +79,32 @@
                 ON(SSP.PLNT_CD = SAT.PLNT_CD AND SSP.ANS_TRM_CD = SAT.ANS_TRM_CD)
         WHERE 1 = 1
             AND SSP.PLNT_CD = #{plntCd}
-            AND SSP.SBT_ANS_PROC = #{sbtAnsProc}
+            AND SSP.SBT_ANS_PROC IN
+            <foreach item="item" index="index" collection="sbtAnsProcList" separator="," open="(" close=")">
+                '${item}'
+            </foreach>
+            <if test="pitmNm != null and pitmNm != ''">
+                AND UPPER(QPI.PITM_NM) LIKE UPPER('%' || #{pitmNm} || '%')
+            </if>
+            <if test="pitmCd != null and pitmCd != ''">
+                AND UPPER(QPI.PITM_CD) LIKE UPPER('%' || #{pitmCd} || '%')
+            </if>
             <if test="ansKnd != null and ansKnd != ''">
                  AND SSP.ANS_KND = #{ansKnd}
             </if>
-<!--            <if test="pitmNm != null and pitmNm != ''">-->
-<!--                AND UPPER(QPI.PITM_NM) LIKE UPPER('%' || #{pitmNm} || '%')-->
-<!--            </if>-->
+            <if test="ansPps != null and ansPps != ''">
+                AND SSP.ANS_PPS = #{ansPps}
+            </if>
+            <if test="sbtAnsPlnNo != null and sbtAnsPlnNo != ''">
+                AND UPPER(SSP.SBT_ANS_PLN_NO) LIKE UPPER('%' || #{sbtAnsPlnNo} || '%')
+            </if>
+            <if test="sbtCrgUid != null and sbtCrgUid != ''">
+                AND SSP.SBT_CRG_UID = #{sbtCrgUid}
+            </if>
+            <if test="ansEdtBetween != null and ansEdtBetween.size() > 0">
+                AND TO_DATE(QPAP.ANS_EDT) BETWEEN TO_DATE(#{ansEdtBetween[0]}) AND TO_DATE(#{ansEdtBetween[1]})
+            </if>
     </select>
-
-    <!-- 안정성상세계획 조회(헤더 디테일, headerDetail) -->
-    <select id="getHeaderDetail" parameterType="StabPlanDetailApprVO" resultType="StabPlanDetailApprVO">
-        SELECT SSA.SBT_PLN_IDX
-            , SSA.SBT_ANS_STT
-            , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = SSA.SBT_ANS_STT) AS SBT_ANS_STT_NM
-            , SSA.ANS_DEL_YN
-            , SSA.ANS_DT
-            , SSA.ACC_MARK_NM
-            , SSA.ANS_SMP_VOL
-            , SSAA.PLNT_CD
-            , SSAA.SBT_ANS_IDX
-            , SSAA.AITM_SEQ
-            , SSAA.AMITM_CD
-            , MA.AITM_CD
-            , MA.AITM_KN
-        FROM ST_SBT_ANS SSA
-        --             INNER JOIN ST_SBT_ANS_AITM SSAA
-           LEFT OUTER JOIN ST_SBT_ANS_AITM SSAA
-           ON(SSA.PLNT_CD = SSAA.PLNT_CD AND SSA.SBT_ANS_IDX = SSAA.SBT_ANS_IDX)
-           LEFT OUTER JOIN MS_AMITM MAM
-           ON(SSAA.AMITM_CD = MAM.AMITM_CD AND MAM.USE_YN = 'Y')
-           LEFT OUTER JOIN MS_AITM MA
-           ON(MAM.AITM_CD = MA.AITM_CD)
-        WHERE 1 = 1
-           AND SSA.PLNT_CD = #{plntCd}
-           AND SSA.ANS_DEL_YN = 'N'
-           AND SSA.SBT_PLN_IDX = #{sbtPlnIdx}
-        ORDER BY
-           SSA.SBT_ANS_IDX, SSAA.AITM_SEQ
-    </select>
-
-
 
     <!-- 안정성시험계획 승인 -->
     <update id="approve" parameterType="StabPlanDetailApprVO">

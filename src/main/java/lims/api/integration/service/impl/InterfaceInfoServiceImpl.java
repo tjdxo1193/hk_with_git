@@ -13,7 +13,7 @@ public class InterfaceInfoServiceImpl implements InterfaceInfoService {
     private final InterfaceInfoDao infoDao;
 
     @Override
-    public Integer createInfo(IfInfoVO data) {
+    public synchronized Integer createInfo(IfInfoVO data) {
         Integer idx = infoDao.nextId();
         data.setIdx(idx);
         infoDao.createInfo(data);

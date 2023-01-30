@@ -28,9 +28,6 @@ export default {
       default: false,
     },
   },
-  mounted() {
-    this.getTestList();
-  },
   data() {
     const { searchForm } = this.$copy(values);
     return {

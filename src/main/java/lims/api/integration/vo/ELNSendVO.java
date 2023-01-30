@@ -5,9 +5,7 @@ import lims.api.integration.enums.ELNCmdType;
 import lims.api.integration.domain.eai.TrsStateful;
 import lims.api.integration.enums.InterfaceSystemType;
 import lims.api.integration.enums.TestStatusProcess;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 public class ELNSendVO {
 
@@ -16,6 +14,9 @@ public class ELNSendVO {
      */
     @Getter
     @Setter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class TestMethodByItem extends TrsStateful {
         private Integer idx;
         private Integer degree;

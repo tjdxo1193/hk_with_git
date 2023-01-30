@@ -170,9 +170,9 @@ export default {
       if (!this.hasNonResultJudge()) {
         return this.$warn(this.$message.warn.noResultJudge);
       }
-      if (this.hasNonConformity()) {
-        return this.$warn(this.$message.warn.inputNonConformityReason);
-      }
+      // if (this.hasNonConformity()) {
+      //   return this.$warn(this.$message.warn.inputNonConformityReason);
+      // }
       return this.showModal('requestApproverModal');
     },
     hasNonResultJudge() {
@@ -182,9 +182,7 @@ export default {
     hasNonConformity() {
       const conformity = 'S0110001';
       const item = FormUtil.getData(this.requestInfo.forms);
-      return item.sytJdg !== conformity && StringUtil.isEmpty(item.revwCmmt)
-        ? true
-        : false;
+      return item.sytJdg !== conformity && StringUtil.isEmpty(item.revwCmmt) ? true : false;
     },
     requestApproverModalReturnDataEvent(approveInfo) {
       let parameter = FormUtil.getData(this.requestInfo.forms);

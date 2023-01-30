@@ -19,7 +19,11 @@
 
   <FileAttacherModal :show="fileAttacherModal.show" @close="hideModal('fileAttacherModal')" />
 
-  <InputReasonModal :show="inputReasonModal.show" @modalReturnDataEvent="modalReturnDataEvent" @close="hideModal('inputReasonModal')" />
+  <InputReasonModal
+    :show="inputReasonModal.show"
+    @modalReturnDataEvent="modalReturnDataEvent"
+    @close="hideModal('inputReasonModal')"
+  />
 
   <DesignateApproversModal
     :show="designateApproversModal.show"
@@ -28,8 +32,10 @@
 
   <StabDetailPlanRegModal
     :show="stabDetailPlanRegModal.show"
+    :height="stabDetailPlanRegModal.height"
     :sbtAnsProc="stabDetailPlanRegModal.sbtAnsProc"
     :selectedItem="stabDetailPlanRegModal.selectedItem"
+    :disable="stabDetailPlanRegModal.disable"
     @close="hideModal('stabDetailPlanRegModal')"
   />
 
@@ -37,7 +43,7 @@
     :show="requestApproverModal.show"
     :aprReqDiv="requestApproverModal.aprReqDiv"
     @close="hideModal('requestApproverModal')"
-    @modalReturnDataEvent="approveRequest"
+    @modalReturnDataEvent="preAllApprove"
   ></RequestApproverModal>
 
   <ActionBar :buttons="buttonGroups.buttons" @button-click="onEventsButton" />
@@ -52,7 +58,6 @@ import {
   InputReasonModal,
   RequestApproverModal,
 } from '@/page/modal';
-
 import { FormUtil } from '@/util';
 
 import values from './values/stabPlan';
@@ -65,16 +70,11 @@ export default {
     DesignateApproversModal,
     StabDetailPlanRegModal,
     InputReasonModal,
-    RequestApproverModal
+    RequestApproverModal,
   },
   data() {
-    const {
-      searchForm,
-      gridForSearchResult,
-      stabItemSearchForm,
-      stabInfoRegForm,
-      buttonGroups,
-    } = this.$copy(values);
+    const { searchForm, gridForSearchResult, stabItemSearchForm, stabInfoRegForm, buttonGroups } =
+      this.$copy(values);
     return {
       searchForm: {
         ...searchForm.static,
@@ -120,9 +120,11 @@ export default {
         show: false,
         selectedItem: null,
         sbtAnsProc: null,
+        disable: false,
       },
       requestApproverModal: {
         show: false,
+        updateType: null,
         aprReqDiv: 'S0050002',
       },
     };
@@ -171,27 +173,49 @@ export default {
       this.setTxtinfo(selectedItem);
 
       const { sbtAnsProc } = selectedItem;
-      if(this.isSaved(sbtAnsProc)) {
+      if (this.isSaved(sbtAnsProc) || this.isApproveReject(sbtAnsProc) || this.isStopReject(sbtAnsProc)) {
         disabledBtnName = ['stopRequest', 'stopCancelRequest', 'save'];
         enabledBtnName = ['approveRequest', 'update', 'delete', 'init'];
 
         // 등록 폼에서 수정 못하는 요소들
-        FormUtil.disable(this.stabInfoRegForm.forms, ['ansTrmCd', 'ansStrDt']);
-      } else if(this.isStopRequest(sbtAnsProc)) {
-        disabledBtnName = ['stopRequest', 'stopCancelRequest', 'approveRequest', 'save', 'update', 'delete'];
+        FormUtil.disable(this.stabInfoRegForm.forms, [
+          'ansTrmCd',
+          'ansStrDt',
+          'docNo',
+          'sbtAnsPlnNo',
+        ]);
+        this.stabDetailPlanRegModal.disable = false;
+      } else if (this.isStopRequest(sbtAnsProc) || this.isStopCancelRequest(sbtAnsProc) || this.isResultApproved(sbtAnsProc)) {
+        disabledBtnName = [
+          'stopRequest',
+          'stopCancelRequest',
+          'approveRequest',
+          'save',
+          'update',
+          'delete',
+        ];
         enabledBtnName = ['init'];
         FormUtil.disable(this.stabInfoRegForm.forms);
-      } else if(this.isStop(sbtAnsProc)) {
+        this.stabDetailPlanRegModal.disable = true;
+      } else if (this.isStop(sbtAnsProc) || this.isStopCancelReject(sbtAnsProc)) {
         disabledBtnName = ['stopRequest', 'approveRequest', 'save', 'update', 'delete'];
         enabledBtnName = ['stopCancelRequest', 'init'];
         FormUtil.disable(this.stabInfoRegForm.forms);
-      } else if(this.isApproveRequest(sbtAnsProc)) {
+        this.stabDetailPlanRegModal.disable = true;
+      } else if (this.isApproveRequest(sbtAnsProc)) {
         disabledBtnName = ['stopCancelRequest', 'approveRequest', 'save', 'update', 'delete'];
         enabledBtnName = ['stopRequest', 'init'];
         FormUtil.disable(this.stabInfoRegForm.forms);
+        this.stabDetailPlanRegModal.disable = true;
+      } else if (this.isApproved(sbtAnsProc) || this.isStopCancel(sbtAnsProc)) {
+        disabledBtnName = ['stopCancelRequest', 'approveRequest', 'save', 'delete'];
+        enabledBtnName = ['stopRequest', 'update', 'init'];
+        FormUtil.disable(this.stabInfoRegForm.forms);
+        this.stabDetailPlanRegModal.disable = true;
       } else {
         disabledBtnName = [];
         enabledBtnName = [];
+        this.stabDetailPlanRegModal.disable = true;
       }
 
       this.disabledBtnInBtnGroups(disabledBtnName);
@@ -210,7 +234,13 @@ export default {
       this.stabInfoRegForm.forms = values.stabInfoRegForm.forms();
     },
     resetButtons() {
-      const disabledBtnName = ['stopCancelRequest', 'approveRequest', 'stopRequest', 'update', 'delete'];
+      const disabledBtnName = [
+        'stopCancelRequest',
+        'approveRequest',
+        'stopRequest',
+        'update',
+        'delete',
+      ];
       const enabledBtnName = ['save', 'init'];
 
       this.disabledBtnInBtnGroups(disabledBtnName);
@@ -219,7 +249,10 @@ export default {
 
     btnTypeChangeInform() {
       FormUtil.disableButtons(this.stabItemSearchForm.forms[0]._multiForms, ['search']);
-      FormUtil.enableButtons(this.stabItemSearchForm.forms[0]._multiForms, ['detailPlanReg', 'itemReg']);
+      FormUtil.enableButtons(this.stabItemSearchForm.forms[0]._multiForms, [
+        'detailPlanReg',
+        'itemReg',
+      ]);
     },
     disabledBtnInBtnGroups(btnName) {
       FormUtil.disableButtons(this.buttonGroups.buttons, btnName);
@@ -260,7 +293,7 @@ export default {
       const item = FormUtil.getData(stabItemSearchFormForms);
       const sbtPlnIdx = FormUtil.getValue(stabInfoRegFormForms, 'sbtPlnIdx');
 
-      if(item) {
+      if (item) {
         const selectedItem = { ...item, sbtPlnIdx };
         this.setStabDetailPlanRegModalPropsSelectedItem(selectedItem);
       }
@@ -273,28 +306,24 @@ export default {
         this.setUpdateTypeAndInputReasonModalShowOn('stopRequest');
       }
       if (name == 'stopCancelRequest') {
-        this.setUpdateTypeAndInputReasonModalShowOn('stopCancelRequest');
+        this.requestApproverModal.show = true;
+        this.requestApproverModal.updateType = 'stopCancelRequest';
       }
       if (name == 'approveRequest') {
         this.requestApproverModal.show = true;
+        this.requestApproverModal.updateType = 'approveRequest';
       }
       if (name == 'save') {
-        this.stabItemSearchForm.forms
-          .validate()
-          .then(() => 
-            this.stabInfoRegForm.forms
-              .validate()
-              .then(() => {
-                this.save();
-              })
-            );
+        this.stabItemSearchForm.forms.validate().then(() =>
+          this.stabInfoRegForm.forms.validate().then(() => {
+            this.save();
+          }),
+        );
       }
       if (name == 'update') {
-        this.stabInfoRegForm.forms
-          .validate()
-          .then(() => {
-            this.setUpdateTypeAndInputReasonModalShowOn('update');
-          })
+        this.stabInfoRegForm.forms.validate().then(() => {
+          this.setUpdateTypeAndInputReasonModalShowOn('update');
+        });
       }
       if (name == 'delete') {
         this.setUpdateTypeAndInputReasonModalShowOn('delete');
@@ -308,16 +337,32 @@ export default {
     },
     setTxtinfo(item) {
       const { forms } = this.stabItemSearchForm;
-      const txtinfo1 = 'Initial 시험번호 : ' + (item.ansNo ? item.ansNo : '') + '\n' + 
-        '제조번호 : ' + (item.lotNo ? item.lotNo : '');
+      const txtinfo1 =
+        'Initial 시험번호 : ' +
+        (item.ansNo ? item.ansNo : '') +
+        '\n' +
+        '제조번호 : ' +
+        (item.lotNo ? item.lotNo : '');
 
-      const txtinfo2 = '채취자 : ' + (item.clltUidNm ? item.clltUidNm : '') + '\n' + 
-        '채취일자 : ' + (item.clltDt ? item.clltDt : '') + '\n' +
-        '제조일자 : ' + (item.makDt ? item.makDt : '');
+      const txtinfo2 =
+        '채취자 : ' +
+        (item.clltUidNm ? item.clltUidNm : '') +
+        '\n' +
+        '채취일자 : ' +
+        (item.clltDt ? item.clltDt : '') +
+        '\n' +
+        '제조일자 : ' +
+        (item.makDt ? item.makDt : '');
 
-      const txtinfo3 = '보관조건 : ' + (item.strgTermsNm ? item.strgTermsNm : '') + '\n' +
-        '안정성검체량 : ' + (item.sbtSmpVol ? item.sbtSmpVol : '') + ' ' + (item.smpVolUnitNm ? item.smpVolUnitNm : '');
-      
+      const txtinfo3 =
+        '보관조건 : ' +
+        (item.strgTermsNm ? item.strgTermsNm : '') +
+        '\n' +
+        '안정성검체량 : ' +
+        (item.sbtSmpVol ? item.sbtSmpVol : '') +
+        ' ' +
+        (item.smpVolUnitNm ? item.smpVolUnitNm : '');
+
       FormUtil.setData(forms, { ...item, txtinfo1, txtinfo2, txtinfo3 });
     },
     setUpdateTypeAndInputReasonModalShowOn(updateType = null) {
@@ -339,11 +384,11 @@ export default {
           this.$error(this.$message.error.updateData);
         });
     },
-    stopCancelRequest() {
+    stopCancelRequest({ aprReqUid, aprUid }) {
       // 시험중단취소 요청
       const { forms } = this.stabInfoRegForm;
       const data = FormUtil.getData(forms);
-      const parameter = { ...data, rjtReaDiv, rjtRea };
+      const parameter = { ...data, aprReqUid, aprUid };
 
       this.$eSign(() => this.$axios.put('st/stabPlan/stopCancelRequest', parameter))
         .then(() => {
@@ -356,7 +401,7 @@ export default {
     },
     approveRequest({ aprReqUid, aprUid }) {
       // 승인요청
-      if(!aprReqUid || !aprUid) {
+      if (!aprReqUid || !aprUid) {
         return;
       }
 
@@ -373,6 +418,15 @@ export default {
           this.$error(this.$message.error.updateData);
         });
     },
+    preAllApprove({ aprReqUid, aprUid }) {
+      const updateType = this.requestApproverModal.updateType;
+
+      if(updateType === 'approveRequest') {
+        this.approveRequest({ aprReqUid, aprUid });
+      } else if(updateType === 'stopCancelRequest') {
+        this.stopCancelRequest({ aprReqUid, aprUid });
+      }
+    },
     save() {
       // 저장
       const stabInfoRegFormForms = this.stabInfoRegForm.forms;
@@ -384,7 +438,7 @@ export default {
       const ansIdx = stabItemSearchFormData?.ansIdx;
 
       const parameter = { ...stabInfoRegFormData, pitmCd, ansIdx };
-      
+
       this.$eSign(() => this.$axios.post('st/stabPlan', parameter))
         .then(() => {
           this.$info(this.$message.info.saved);
@@ -397,19 +451,22 @@ export default {
 
     modalReturnDataEvent({ rjtReaDiv, rjtRea }) {
       const updateType = this.inputReasonModal.updateType;
-      if(!updateType || !rjtReaDiv || !rjtRea) {
+      
+      if (!updateType || !rjtReaDiv || !rjtRea) {
         return;
       }
 
-      if(updateType === 'update') {
+      if (updateType == 'update') {
         this.update({ rjtReaDiv, rjtRea });
-      } else if(updateType === 'delete') {
+      } else if (updateType == 'delete') {
         this.delete({ rjtReaDiv, rjtRea });
-      } else if(updateType === 'stopRequest') {
+      } else if (updateType == 'stopRequest') {
         this.stopRequest({ rjtReaDiv, rjtRea });
+      } else if (updateType == 'stopCancelRequest') {
+        this.requestApproverModal.show = true;
       }
     },
-    
+
     preUpdate() {
       this.inputReasonModal.updateType = 'update';
       this.showModal('inputReasonModal');
@@ -419,7 +476,7 @@ export default {
       const { forms } = this.stabInfoRegForm;
       const stabInfoRegFormData = FormUtil.getData(forms);
       const parameter = { ...stabInfoRegFormData, rjtReaDiv, rjtRea };
-      
+
       this.$eSign(() => this.$axios.put('st/stabPlan', parameter))
         .then(() => {
           this.$info(this.$message.info.saved);
@@ -453,14 +510,35 @@ export default {
     isSaved(sbtAnsProc) {
       return sbtAnsProc === 'S0290100';
     },
+    isApproveRequest(sbtAnsProc) {
+      return sbtAnsProc === 'S0290200';
+    },
+    isApproveReject(sbtAnsProc) {
+      return sbtAnsProc === 'S0290210';
+    },
+    isApproved(sbtAnsProc) {
+      return sbtAnsProc === 'S0290300';
+    },
     isStopRequest(sbtAnsProc) {
       return sbtAnsProc === 'S0290400';
+    },
+    isStopReject(sbtAnsProc) {
+      return sbtAnsProc === 'S0290410';
     },
     isStop(sbtAnsProc) {
       return sbtAnsProc === 'S0290500';
     },
-    isApproveRequest(sbtAnsProc) {
-      return sbtAnsProc === 'S0290200';
+    isStopCancelRequest(sbtAnsProc) {
+      return sbtAnsProc === 'S0290600';
+    },
+    isStopCancelReject(sbtAnsProc) {
+      return sbtAnsProc === 'S0290610';
+    },
+    isStopCancel(sbtAnsProc) {
+      return sbtAnsProc === 'S0290700';
+    },
+    isResultApproved(sbtAnsProc) {
+      return sbtAnsProc === 'S0290800';
     }
   },
 };

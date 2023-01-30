@@ -11,9 +11,7 @@ const list = {
     title: '조회',
     countPerRow: 4,
     $grid: null,
-    buttons: [
-      { name: 'select', label: '조회' },
-    ],
+    buttons: [{ name: 'select', label: '조회' }],
     legends: [{ value: 'OOS 재시험', className: 'oosReTest' }],
     props: {
       showRowCheckColumn: false,

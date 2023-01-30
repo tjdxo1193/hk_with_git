@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="lims.api.ms.dao.TestItemPerManageDao">
-	<select id="getList" parameterType="TestItemPerManageVO" resultType="TestItemPerManageVO">
+	<select id="checkDuplicateAmitemCd" parameterType="TestItemPerManageVO" resultType="java.lang.String">
+		SELECT XSTAT
+		FROM IF_INFO
+	 	WHERE IDX =
+	 	      (SELECT IF_INFO_IDX
+	 	       FROM IF_TRS_ELN_TEST_METHOD_BY_ITEM
+	 	       WHERE AMITM_CD = #{amitmCd})
+	</select>
+    <select id="getList" parameterType="TestItemPerManageVO" resultType="TestItemPerManageVO">
         SELECT
             AITM_CD
              , AITM_KN

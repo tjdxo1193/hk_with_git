@@ -9,9 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -22,51 +20,25 @@ public class StabPlanDetailApprServiceImpl implements StabPlanDetailApprService 
 
     @Override
     public List<StabPlanDetailApprVO> findAll(StabPlanDetailApprVO param) {
-        param.setSbtAnsProc(SbtAnsProcess.APPROVE_REQUEST.getProcessCode());
+        List<String> sbtAnsProcList = new ArrayList<>();
+        sbtAnsProcList.add(SbtAnsProcess.APPROVE_REQUEST.getSbtAnsProc());
+        sbtAnsProcList.add(SbtAnsProcess.STOP_REQUEST.getSbtAnsProc());
+        sbtAnsProcList.add(SbtAnsProcess.STOP_CANCEL_REQUEST.getSbtAnsProc());
+        param.setSbtAnsProcList(sbtAnsProcList);
         return stabPlanDetailApprDao.findAll(param);
-    }
-
-    @Override
-    public Map<String, List<StabPlanDetailApprVO>> getDetail(StabPlanDetailApprVO param) {
-        Map<String, List<StabPlanDetailApprVO>> result = new HashMap<>();
-
-        List<StabPlanDetailApprVO> headerDetail = new ArrayList<>();
-        List<StabPlanDetailApprVO> aitmData = new ArrayList<>();
-        List<StabPlanDetailApprVO> decisionData = new ArrayList<>();
-        // 데이터 조회
-        try {
-            headerDetail = stabPlanDetailApprDao.getHeaderDetail(param);
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
-
-        // 시험항목 조회
-        try {
-//            aitmData = stabPlanDao.getAnsList(param);
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
-
-        // Decision 데이터 조회(실제로 사용은..)
-        try {
-//            decisionData = stabPlanDao.getDecisionData(param);
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
-
-
-        result.put("headerDetail", headerDetail);
-        result.put("aitmData", aitmData);
-        result.put("decisionData", decisionData);
-
-        return result;
     }
 
     @Override
     public int approve(List<StabPlanDetailApprVO> param) {
         param.forEach(item -> {
-            item.setSbtAnsProc(SbtAnsProcess.APPROVED.getProcessCode());
-            approveService.approve(item.getSbtAnsPlnAprIdx());
+            String preSbtAnsProc = item.getSbtAnsProc();
+            SbtAnsProcess sbtAnsProcess = SbtAnsProcess.getApproveCode(preSbtAnsProc);
+            String sbtAnsProc = sbtAnsProcess.getSbtAnsProc();
+            item.setSbtAnsProc(sbtAnsProc);
+
+            if(sbtAnsProcess.equals(SbtAnsProcess.APPROVED)) {
+                approveService.approve(item.getSbtAnsPlnAprIdx());
+            }
         });
 
         param.forEach(this::approve);
@@ -81,7 +53,10 @@ public class StabPlanDetailApprServiceImpl implements StabPlanDetailApprService 
     @Override
     public int reject(List<StabPlanDetailApprVO> param) {
         param.forEach(item -> {
-            item.setSbtAnsProc(SbtAnsProcess.APPROVE_REJECT.getProcessCode());
+            String preSbtAnsProc = item.getSbtAnsProc();
+            SbtAnsProcess sbtAnsProcess = SbtAnsProcess.getRejectCode(preSbtAnsProc);
+            String sbtAnsProc = sbtAnsProcess.getSbtAnsProc();
+            item.setSbtAnsProc(sbtAnsProc);
         });
 
         param.forEach(this::reject);

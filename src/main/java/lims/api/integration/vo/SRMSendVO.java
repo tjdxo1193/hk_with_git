@@ -25,6 +25,8 @@ public class SRMSendVO {
         @EnumType(TestStatusProcess.class)
         private Integer status;
         private String holdReason;
+        private String chargerName;
+        private String chargerEmId;
     }
 
     /**
@@ -44,6 +46,8 @@ public class SRMSendVO {
         private String hardness;
         private String rmk;
         private String nonCfmReason;
+        private String chargerName;
+        private String chargerEmId;
     }
 
     /**

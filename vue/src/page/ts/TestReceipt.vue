@@ -18,6 +18,7 @@
   </Card>
 
   <FinalOrderModal
+    :parameter="finalOrderModal.parameter"
     :show="finalOrderModal.show"
     @close="hideModal('finalOrderModal')"
   ></FinalOrderModal>
@@ -39,6 +40,12 @@
     :reqIdx="nonconformityTestModal.reqIdx"
     @close="hideModal('nonconformityTestModal')"
   ></NonconformityTestModal>
+
+<InputPerformanceModal
+  :show="inputPerformanceModal.show"
+  :parameter="inputPerformanceModal.parameter"
+  @close="hideModal('inputPerformanceModal')"
+></InputPerformanceModal> -->
 </template>
 
 <script>
@@ -48,6 +55,7 @@ import {
   SrmReportModal,
   PackingSpecificationModal,
   NonconformityTestModal,
+  InputPerformanceModal,
 } from '@/page/modal';
 import { FormUtil } from '@/util';
 
@@ -61,6 +69,7 @@ export default {
     SrmReportModal,
     PackingSpecificationModal,
     NonconformityTestModal,
+    InputPerformanceModal,
   },
   mounted() {
     this.getTestReceiptList();
@@ -86,6 +95,7 @@ export default {
               'srmReport',
               'packagingSpec',
               'nonconformityTestList',
+              'inputPerformance',
             ]);
           },
         },
@@ -100,6 +110,7 @@ export default {
       },
       finalOrderModal: {
         show: false,
+        parameter: {},
       },
       relapsePreventionPlanModal: {
         show: false,
@@ -113,6 +124,10 @@ export default {
       nonconformityTestModal: {
         show: false,
         reqIdx: '',
+      },
+      inputPerformanceModal: {
+        show: false,
+        parameter: {},
       },
       tabs,
     };
@@ -153,6 +168,7 @@ export default {
         this.init();
       }
       if (name === 'finalOrder') {
+        this.finalOrderModal.parameter = FormUtil.getData(this.requestInfo.forms);
         return (this.finalOrderModal.show = true);
       }
       if (name === 'relapsePrev') {
@@ -166,6 +182,9 @@ export default {
       }
       if (name === 'nonconformityTestList') {
         return (this.nonconformityTestModal.show = true);
+      }
+      if (name === 'inputPerformance') {
+        return (this.inputPerformanceModal.show = true);
       }
       if (name === 'specimen') {
         const parameter = FormUtil.getData(this.requestInfo.forms);
@@ -241,6 +260,7 @@ export default {
         'srmReport',
         'packagingSpec',
         'nonconformityTestList',
+        'inputPerformance',
       ]);
     },
     showModal(name) {

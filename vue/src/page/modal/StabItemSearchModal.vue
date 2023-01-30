@@ -72,12 +72,12 @@ export default {
     },
   },
   watch: {
-    show: function() {
-      if(!this.$props.show) return;
+    show: function () {
+      if (!this.$props.show) return;
 
       this.onInit();
-    }
-  }
+    },
+  },
 };
 </script>
 

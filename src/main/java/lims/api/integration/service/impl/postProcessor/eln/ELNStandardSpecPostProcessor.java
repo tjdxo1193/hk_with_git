@@ -12,6 +12,7 @@ import lims.api.integration.domain.eai.RevStateful;
 import lims.api.integration.service.impl.postProcessor.PostProcessor;
 import lims.api.integration.vo.ELNPostProcessVO;
 import lims.api.integration.vo.ELNStandardSpecVO;
+import lims.api.integration.vo.SAPPostProcessVO;
 import lims.api.ms.enums.SpecProgress;
 import lims.api.util.process.KeyObject;
 import lombok.RequiredArgsConstructor;
@@ -180,6 +181,7 @@ public class ELNStandardSpecPostProcessor implements PostProcessor {
                 }
 
                 if (SpecProgress.APPROVED.equals(specProgress)) {
+                    // TODO 기존 규격서를 사용여부 N으로
                     createNextVersionOfSpec(spec);
                 }
             }
@@ -200,5 +202,16 @@ public class ELNStandardSpecPostProcessor implements PostProcessor {
                 .build();
         postProcessDao.createNewVersionOfSpec(itemSpec);
     }
+
+//    private void updateInactiveOfCurrentPItemSpec(SAPPostProcessVO.Material.PItemKey pitemKey, SpecProgress specProgress) {
+//        SAPPostProcessVO.Material.PItemSpec removeSpec = SAPPostProcessVO.Material.PItemSpec.builder()
+//                .plntCd(pitemKey.getPlntCd())
+//                .pitmCd(pitemKey.getPitmCd())
+//                .currentVersion(pitemKey.getVersion())
+//                .specProcCd(specProgress)
+//                .useVerYn(UseType.N)
+//                .build();
+//        postProcessDao.updateStatusOfPItemSpec(removeSpec);
+//    }
 
 }

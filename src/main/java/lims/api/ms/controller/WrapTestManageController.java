@@ -96,7 +96,7 @@ public class WrapTestManageController {
 	}
 
 	@GetMapping("/getSapPrdhaDuplicateCheck")
-	public ResponseEntity<Integer> getSapPrdhaDuplicateCheck(@AuthToken Token token, @RequestBody WrapTestManageVO param) {
+	public ResponseEntity<String> getSapPrdhaDuplicateCheck(@AuthToken Token token, WrapTestManageVO param) {
 		String jwt = token.getJwt();
 		param.setPlntCd(jwtResolver.getPlantCode(jwt));
 

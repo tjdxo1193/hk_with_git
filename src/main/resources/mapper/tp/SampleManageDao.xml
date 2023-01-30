@@ -69,7 +69,7 @@
 
     <insert id="create" parameterType="SampleManageVO">
         <selectKey resultType="Integer" keyProperty="smpMngIdx" order="BEFORE">
-            SELECT MAX(SMP_MNG_IDX) + 1
+            SELECT NVL(MAX(SMP_MNG_IDX) + 1, 1)
             FROM QS_SMP_MNG
             WHERE PLNT_CD = #{plntCd}
         </selectKey>

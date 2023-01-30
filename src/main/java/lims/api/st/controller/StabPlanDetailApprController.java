@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,13 +24,6 @@ public class StabPlanDetailApprController {
     public ResponseEntity<List<StabPlanDetailApprVO>> findAll(@AuthToken Token token, StabPlanDetailApprVO param) {
         param = this.setLoginUserData(token, param);
         return ResponseEntity.ok(stabPlanDetailApprService.findAll(param));
-    }
-
-    // 안정성상세계획 조회
-    @PostMapping("/getDetail")
-    public ResponseEntity<Map<String, List<StabPlanDetailApprVO>>> getDetail(@AuthToken Token token, @RequestBody StabPlanDetailApprVO param) {
-        param = this.setLoginUserData(token, param);
-        return ResponseEntity.ok(stabPlanDetailApprService.getDetail(param));
     }
 
     // 안정성시험계획 승인

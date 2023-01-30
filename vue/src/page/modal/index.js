@@ -39,6 +39,7 @@ import TestMaterialOpenItemModal from './TestMaterialOpenItemModal';
 import TestModal from './TestModal';
 import TestSearchModal from './TestSearchModal.vue';
 import TreeCommonCodeModal from './TreeCommonCodeModal';
+import InputPerformanceModal from './InputPerformanceModal';
 
 export {
   ItemModal,
@@ -82,4 +83,5 @@ export {
   SampleSearchModal,
   TestModal,
   InputReasonForDeleteModal,
+  InputPerformanceModal,
 };

@@ -17,7 +17,7 @@ public interface SAPPostProcessDao {
 
     Integer nextVersionOfPItem(SAPPostProcessVO.Material.PItemKey param);
 
-    Integer currentVersionOfSpec(SAPPostProcessVO.Material.PItemKey param);
+    SAPPostProcessVO.Material.PItemSpec currentVersionOfSpec(SAPPostProcessVO.Material.PItemKey param);
 
     Integer nextPItemSpecIdxOfSpec(SAPPostProcessVO.Material.PItemKey param);
 
@@ -37,6 +37,12 @@ public interface SAPPostProcessDao {
 
     int createNextPItemSpec(SAPPostProcessVO.Material.PItemSpec param);
 
+    SAPPostProcessVO.Material.PItemSpecVersion findPItemSpecVersionNextKey(SAPPostProcessVO.Material.PItemSpecVersion param);
+
+    int createPItemSpecVersion(SAPPostProcessVO.Material.PItemSpecVersion param);
+
+    int createPItemSpecAitm(SAPPostProcessVO.Material.PItemSpecVersion param);
+
     int updatePItem(SAPPostProcessVO.Material.PItem param);
 
     int updatePItemInfo(SAPPostProcessVO.Material.PItemInfo param);
@@ -44,8 +50,6 @@ public interface SAPPostProcessDao {
     int updatePItemInfoSap(SAPPostProcessVO.Material.PItemInfoSap param);
 
     int updateStatusOfPItemSpec(SAPPostProcessVO.Material.PItemSpec param);
-
-    int updatePItemVersionOfSpec(SAPPostProcessVO.Material.PItemSpec param);
 
 
     List<Integer> findReqIdxByIspReqNo(String ispReqNo);

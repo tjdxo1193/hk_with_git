@@ -6,20 +6,23 @@ public interface AuditEvent {
         String update = "사용자 수정";
         String initPwd = "비밀번호 초기화";
     }
+
     interface Department {
         String create = "부서 생성";
         String update = "부서 수정";
     }
-    
+
     interface Document {
         String create = "등록";
         String update = "수정";
     }
+
     interface File {
         String create = "파일 저장";
         String delete = "파일 삭제";
         String deleteAll = "파일 일괄 삭제";
     }
+
     interface Plant {
         String create = "사업장 신규 저장";
         String update = "사업장 수정";
@@ -29,7 +32,7 @@ public interface AuditEvent {
         String create = "메뉴 생성";
         String update = "메뉴 수정";
     }
-    
+
     interface CommonCode {
         String create = "공통코드 생성";
         String update = "공통코드 수정";
@@ -129,7 +132,7 @@ public interface AuditEvent {
         String approve = "승인";
         String reject = "반려";
     }
-    
+
     interface TestCycle {
         String create = "추가";
         String update = "수정";
@@ -268,7 +271,7 @@ public interface AuditEvent {
         String delete = "표준견본 삭제";
         String revise = "표준견본 개정";
     }
-    
+
     interface Equipment {
         String historySave = "이력관리 저장";
         String historyUpdate = "이력관리 수정";
@@ -297,7 +300,7 @@ public interface AuditEvent {
     }
 
     interface Instrument {
-        String create ="기기 생성";
+        String create = "기기 생성";
         String update = "기기 수정";
         String delete = "기기 삭제";
         String savedFile = "기기 파일 등록";
@@ -339,9 +342,32 @@ public interface AuditEvent {
         String approve = "안정성시험계획 승인";
 
         String createAns = "안정성계획 생성";
+
+        String updateAns = "안정성계획 수정";
         String deleteAns = "안정성계획 삭제";
 
         String createAitm = "안정성 시험 시험항목 생성";
         String deleteAitm = "안정성 시험 시험항목 삭제";
+    }
+
+    interface Sample {
+        String createSample = "검체 생성";
+        String updateSample = "검체 수정";
+        String deleteSample = "검체 삭제";
+        String createSampleUsage = "검체 사용 생성";
+        String updateSampleUsage = "검체 사용 수정";
+        String deleteSampleUsage = "검체 사용 삭제";
+        String requestApproveUse = "검체 사용 승인 요청";
+        String approve = "검체 승인";
+        String reject = "검체 반려";
+        String requestApproveDispose = "검체 폐기 승인 요청";
+        String requestApproveCancelDispose = "검체 폐기 취소 승인 요청";
+
+        String requestApproveAddSample = "추가 검체 승인 요청";
+        String createAddSample = "추가 검체 생성";
+        String updateAddSample = "추가 검체 수정";
+        String deleteAddSample = "추가 검체 삭제";
+        String approveAddSample = "추가 검체 승인";
+        String rejectAddSample = "추가 검체 반려";
     }
 }

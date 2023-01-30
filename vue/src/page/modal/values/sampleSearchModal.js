@@ -5,6 +5,9 @@ const sampleGrid = {
   static: {
     countPerRow: 2,
     buttons: [{ name: 'search', label: '조회' }],
+    props: {
+      editable: false,
+    },
   },
   forms: () =>
     FormBuilder.builder()
@@ -24,17 +27,21 @@ const sampleGrid = {
       .col('plntCd', false)
       .col('smpMngIdx', false)
       .col('smpDpsProc', false)
-      .col('smpDpsNm', '검체입고')
       .col('pitmTyp', false)
-      .col('pitmTypNm', '검체상태')
+      .col('pitmTypNm', '품목구분')
       .col('pitmCd', '품목코드')
       .col('pitmNm', '품목명')
       .col('ansTyp', false)
       .col('ansTypNm', '시험유형')
       .col('ansIdx', false)
       .col('smpDivCd', false)
-      .col('ansDivNm', '검체구분')
-      .col('mngSmpVol', '')
+      .col('smpDivNm', '검체구분')
+      .col('ansTypNm', '시험구분')
+      .col('mngSmpVol', '검체량')
+      .col('sumVol', '총사용량')
+      .col('remains', '재고량')
+      .col('inpUnit', '보관수량단위')
+      .col('smpDpsNm', '검체상태')
       .build(),
 };
 

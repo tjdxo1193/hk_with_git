@@ -98,6 +98,9 @@ public class TestResultInputVO implements UpdateDetect {
     private String amitmCd;
     private String amitmNm;
     private String orderNo;
+    private String phsOrderNo;
+    private String pdtOrderNo;
+    private String phsOrderItm; //구매 오더 항목
     private String ocrDt;
     private String crtvMsr;
     private String aprYn;

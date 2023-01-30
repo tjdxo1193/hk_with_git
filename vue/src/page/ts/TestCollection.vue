@@ -60,8 +60,8 @@ export default {
           cellDoubleClick: (e) => {
             FormUtil.setData(this.requestInfo.forms, e.item);
             FormUtil.setData(this.testCollectionInfo.forms, e.item);
-            if(e.item.clltUnm === null){
-              FormUtil.setData(this.testCollectionInfo.forms, {clltUnm : TokenUtil.myName()});
+            if (e.item.clltUnm === null) {
+              FormUtil.setData(this.testCollectionInfo.forms, { clltUnm: TokenUtil.myName() });
             }
             this.enableButtons(['save', 'collection', 'init']);
           },
@@ -163,9 +163,7 @@ export default {
         ) {
           const forms = FormUtil.getData(this.testCollectionInfo.forms);
           const smpVolTot =
-            Number(forms.smpVolAns) +
-            Number(forms.smpVolStrg) +
-            Number(forms.smpVolEtc);
+            Number(forms.smpVolAns) + Number(forms.smpVolStrg) + Number(forms.smpVolEtc);
           FormUtil.setData(this.testCollectionInfo.forms, { smpVolTot: smpVolTot });
         }
       }

@@ -82,7 +82,7 @@ export default {
         .then(() => {
           this.init();
           this.fetchSearchGridWithForm();
-          this.$info(this.$info.saved);
+          this.$info(this.$message.info.saved);
         })
         .catch(() => {});
     },
@@ -92,7 +92,7 @@ export default {
         .then(() => {
           this.init();
           this.fetchSearchGridWithForm();
-          this.$info(this.$info.updated);
+          this.$info(this.$message.info.updated);
         })
         .catch(() => {});
     },
@@ -102,7 +102,7 @@ export default {
         .then(() => {
           this.init();
           this.fetchSearchGridWithForm();
-          this.$info(this.$info.updated);
+          this.$info(this.$message.info.deleted);
         })
         .catch(() => {});
     },

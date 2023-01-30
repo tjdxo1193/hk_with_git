@@ -3,7 +3,6 @@ package lims.api.tp.service.impl;
 import lims.api.common.exception.NoCreatedDataException;
 import lims.api.common.exception.NoDeletedDataException;
 import lims.api.common.exception.NoUpdatedDataException;
-import lims.api.common.service.ApproveService;
 import lims.api.tp.dao.SampleManageDao;
 import lims.api.tp.enums.SampleDisposalProgress;
 import lims.api.tp.service.SampleManageService;

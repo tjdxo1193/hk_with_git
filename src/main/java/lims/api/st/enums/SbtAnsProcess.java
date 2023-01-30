@@ -2,6 +2,11 @@ package lims.api.st.enums;
 
 import lombok.Getter;
 
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 @Getter
 public enum SbtAnsProcess {
 
@@ -17,11 +22,52 @@ public enum SbtAnsProcess {
     STOP_CANCEL("S0290700"),
     RESULT_APPROVED("S0290800");
 
-    private final String processCode;
-    SbtAnsProcess(String code) {
-            processCode = code;
+    private final String sbtAnsProc;
+    SbtAnsProcess(String code) { sbtAnsProc = code; }
+    public String getSbtAnsProc() {
+        return sbtAnsProc;
+    }
+    public boolean equals(SbtAnsProcess sbtAnsProc) {
+            return this == sbtAnsProc;
         }
-    public boolean equals(SbtAnsProcess process) {
-            return this == process;
+    private static final Map<String, SbtAnsProcess> BY_CODE = Stream.of(SbtAnsProcess.values()).collect(Collectors.toMap(SbtAnsProcess::getSbtAnsProc, Function.identity()));
+
+    public static SbtAnsProcess valueOfCode(String code) {
+        return BY_CODE.get(code);
+    }
+
+    public static SbtAnsProcess getApproveCode(String code) {
+        SbtAnsProcess current = valueOfCode(code);
+        SbtAnsProcess next = null;
+
+        if(SbtAnsProcess.APPROVE_REQUEST.equals(current)) {
+            next = SbtAnsProcess.APPROVED;
         }
+        if(SbtAnsProcess.STOP_REQUEST.equals(current)) {
+            next = SbtAnsProcess.STOP;
+        }
+        if(SbtAnsProcess.STOP_CANCEL_REQUEST.equals(current)) {
+            next = SbtAnsProcess.STOP_CANCEL;
+        }
+
+        return next;
+    }
+
+    public static SbtAnsProcess getRejectCode(String code) {
+        SbtAnsProcess current = valueOfCode(code);
+        SbtAnsProcess next = null;
+
+        if(SbtAnsProcess.APPROVE_REQUEST.equals(current)) {
+            next = SbtAnsProcess.APPROVE_REJECT;
+        }
+        if(SbtAnsProcess.STOP_REQUEST.equals(current)) {
+            next = SbtAnsProcess.STOP_REJECT;
+        }
+        if(SbtAnsProcess.STOP_CANCEL_REQUEST.equals(current)) {
+            next = SbtAnsProcess.STOP_CANCEL_REJECT;
+        }
+
+        return next;
+    }
+
 }

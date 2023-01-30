@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+
 import api from '@/api';
 import { TokenUtil } from '@/util';
 import { ColumnBuilder, FormBuilder } from '@/util/builder';
@@ -163,7 +164,7 @@ const testCollectionInfo = {
         async: () => api.combo.userCommon.getClltPlaCombo(),
       })
       .InputNumber('smpVolEtc', '기타검체량')
-      .Input('clltUnm', '채취자', { value : TokenUtil.myName(), disabled: true })
+      .Input('clltUnm', '채취자', { value: TokenUtil.myName(), disabled: true })
       .Select('smpStrgMtd', '검체보관방법', {
         async: () => api.combo.userCommon.getSmpStrgMtdCombo(),
       })

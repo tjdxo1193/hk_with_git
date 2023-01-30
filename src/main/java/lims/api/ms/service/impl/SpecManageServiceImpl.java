@@ -3,6 +3,7 @@ package lims.api.ms.service.impl;
 import lims.api.common.exception.NoCreatedDataException;
 import lims.api.common.exception.NoUpdatedDataException;
 import lims.api.ms.dao.SpecManageDao;
+import lims.api.ms.enums.ELNProductDiv;
 import lims.api.ms.enums.PItemType;
 import lims.api.ms.enums.SpecProgress;
 import lims.api.ms.service.SpecManageService;
@@ -40,6 +41,13 @@ public class SpecManageServiceImpl implements SpecManageService {
 
     @Override
     public List<SpecManageAitmVO> getSemiAItemList(SpecManageVO param) {
+        if(PItemType.SEMI_MANUFACTURES_FILLING_FOAM.getCode().equals(param.getPitmTyp())
+                || PItemType.SEMI_MANUFACTURES_OTHER_PRODUCT.getCode().equals(param.getPitmTyp())){
+            param.setPrdDiv(ELNProductDiv.F.name());
+        }else if(PItemType.SEMI_MANUFACTURES_BASE.getCode().equals(param.getPitmTyp())
+                || PItemType.SEMI_MANUFACTURES_BULK.getCode().equals(param.getPitmTyp())){
+            param.setPrdDiv(ELNProductDiv.S.name());
+        }
         return dao.getSemiAItemList(param);
     }
 

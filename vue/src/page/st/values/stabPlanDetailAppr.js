@@ -1,5 +1,9 @@
+import dayjs from 'dayjs';
+
 import api from '@/api';
 import { ColumnBuilder, FormBuilder } from '@/util';
+
+const todayDate = dayjs().format('YYYY-MM-DD');
 
 const searchForm = {
   static: {
@@ -9,12 +13,23 @@ const searchForm = {
   },
   forms: () =>
     FormBuilder.builder()
+      .Input('pitmNm', '품목명')
+      .Input('pitmCd', '품목코드')
       .Select('ansKnd', '시험종류', {
         async: () => api.combo.userCommon.getAnsKndCombo(),
       })
-      .Input('pitmNm', '품목명')
-      .Input('lotNo', '제조번호')
-      .Input('pitmCd', '품목코드')
+      .Select('ansPps', '시험목적', {
+        async: () => api.combo.userCommon.getAnsPpsCombo(),
+      })
+      .Input('sbtAnsPlnNo', '안정성 계획 번호')
+      .Select('sbtCrgUid', '담당자', {
+        async: api.combo.common.getUserList,
+      })
+      .DatepickerTwinWithSwitch('ansEdtBetween', '시험예정일', {
+        value: [todayDate, todayDate],
+      })
+      .spanCol(2)
+      .Hidden('sbtPlnIdx', '안정성 계획 IDX')
       .build(),
 };
 
@@ -63,9 +78,11 @@ const gridForSearchResult = {
       // .col('30', '유효기한')
       // .col('31', '허가규격')
       .col('pitmNm', '품목명')
-      .col('pitmCd', '품목코드', { visible: false })
+      .col('pitmCd', '품목코드')
       .col('lotNo', '제조번호')
       .col('makDt', '제조일자')
+      .col('sbtAnsProc', '진행상황', { visible: false })
+      .col('sbtAnsProcNm', '진행상황', { width: '150' })
       .col('ansPps', '시험목적', { visible: false })
       .col('ansPpsNm', '시험목적')
       .col('ansPpsDtl', '상세시험목적')
@@ -94,20 +111,10 @@ const gridForSearchResult = {
       .col('plnRjtUid', '반려자', { visible: false })
       .col('plnRjtUidNm', '반려자')
       .col('plnRjtRea', '반려사유')
-      .col('sbtAnsProc', '진행상황', { visible: false })
-      .col('sbtAnsProcNm', '진행상황')
       .col('sbtPlnIdx', '안정성 계획 IDX', { visible: false })
       .col('ansIdx', '시험 IDX', { visible: false })
       .col('sbtAnsPlnAprIdx', '안정성 시험계획 승인 IDX', { visible: false })
       .build(),
-};
-
-const hiddenForms = {
-  static: {
-    title: '항목설정용 폼',
-  },
-  forms: () =>
-    FormBuilder.builder().Hidden('plntCd', '품목명').Hidden('sbtPlnIdx', '제조번호').build(),
 };
 
 const itemSettingList = {
@@ -139,7 +146,6 @@ const buttonGroups = {
 export default {
   searchForm,
   gridForSearchResult,
-  hiddenForms,
   itemSettingList,
   buttonGroups,
 };

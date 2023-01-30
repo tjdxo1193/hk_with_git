@@ -32,18 +32,23 @@ const stabEachTestInfo = {
   },
   forms: () =>
     FormBuilder.builder()
-      .Datepicker('dtTestDate', '시험일자', { value: todayDate })
+      .Datepicker('ansDt', '시험일자', { value: todayDate })
+      .required()
       .multiple(
         'txtRemark',
         '표시내용',
         FormBuilder.builder()
-          .InputNumber('txtRemark')
+          .InputNumber('accMarkNm')
           .spanCol(2)
+          .required()
           .TextView('ansCylDivNm')
           .Hidden('ansCylDiv')
           .build(),
       )
-      .InputNumber('txtSampleAmt', '검체량')
+      .InputNumber('ansSmpVol', '검체량')
+      .required()
+      .Hidden('sbtPlnIdx', '안정성 계획 IDX')
+      .Hidden('sbtAnsIdx', '안정성 시험 IDX')
       .build(),
 };
 
@@ -51,6 +56,7 @@ const itemSettingList = {
   static: {
     title: '항목설정',
     $grid: null,
+    height: '600px',
     props: {
       enableCellMerge: true,
     },

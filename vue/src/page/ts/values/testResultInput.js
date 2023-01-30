@@ -118,6 +118,7 @@ const resultInputInfo = {
     title: '결과입력',
     $grid: null,
     buttons: [
+      { name: 'finalOrder', label: '마감오더', disabled: true },
       { name: 'resultHistory', label: '결과이력', disabled: true },
       { name: 'labEventPublish', label: '실험실이벤트발행', disabled: true },
       { name: 'requestReview', label: '검토요청', disabled: true },
@@ -139,6 +140,10 @@ const resultInputInfo = {
   forms: () =>
     FormBuilder.builder()
       .Hidden('plntCd')
+      .Hidden('phsOrderNo')
+      .Hidden('pdtOrderNo')
+      .Hidden('phsOrderItm')
+      .Hidden('lotNo')
       .Hidden('ansIdx')
       .Input('pitmNm', '품목명', { readonly: true })
       .spanCol(2)

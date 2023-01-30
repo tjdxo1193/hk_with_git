@@ -206,6 +206,7 @@ const tabs = {
     { name: 'testInfo', label: '항목정보' },
   ],
   buttons: [
+    { name: 'inputPerformance', label: '투입실적', disabled: true },
     { name: 'finalOrder', label: '마감오더', disabled: true },
     { name: 'relapsePrev', label: '재발방지대책서', disabled: true },
     { name: 'srmReport', label: 'SRM성적서', disabled: true },

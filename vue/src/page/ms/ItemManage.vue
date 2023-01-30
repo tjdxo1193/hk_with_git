@@ -46,8 +46,13 @@
 </template>
 
 <script>
-import {BomModal, ItemManageFileAttacherModal, ReasonForItemRevisionModal, SapPrdhaSearchModal,} from '@/page/modal';
-import {FormUtil, TokenUtil} from '@/util';
+import {
+  BomModal,
+  ItemManageFileAttacherModal,
+  ReasonForItemRevisionModal,
+  SapPrdhaSearchModal,
+} from '@/page/modal';
+import { FormUtil, TokenUtil } from '@/util';
 
 import values from './values/itemManage';
 
@@ -194,7 +199,7 @@ export default {
       const param = FormUtil.getData(this.searchGridWithForm.forms);
       param.offset = 0;
       param.limit = 100;
-      
+
       const data = await $grid
         ._useLoader(() => this.$axios.get('/ms/itemManage/pItem', param))
         .then(({ data }) => data);

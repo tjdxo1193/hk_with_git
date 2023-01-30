@@ -10,24 +10,28 @@
   />
   <ActionBar :buttons="buttonGroups.buttons" @button-click="onEventsButton" />
 
-  <InputReasonModal :show="inputReasonModal.show" @modalReturnDataEvent="modalReturnDataEvent" @close="hideModal('inputReasonModal')" />
+  <InputReasonModal
+    :show="inputReasonModal.show"
+    @modalReturnDataEvent="modalReturnDataEvent"
+    @close="hideModal('inputReasonModal')"
+  />
 </template>
 
 <script>
-import { InputReasonModal } from '@/page/modal';
-
-import { FormUtil, ObjectUtil } from '@/util';
 import dayjs from 'dayjs';
+
+import { InputReasonModal } from '@/page/modal';
+import { FormUtil, ObjectUtil } from '@/util';
 
 import values from './values/stabPlanDetailAppr';
 
 export default {
   name: 'StabPlanDetailApprPage',
   components: {
-    InputReasonModal
+    InputReasonModal,
   },
   data() {
-    const { searchForm, gridForSearchResult, hiddenForms, itemSettingList, buttonGroups } =
+    const { searchForm, gridForSearchResult, itemSettingList, buttonGroups } =
       this.$copy(values);
     return {
       searchForm: {
@@ -43,11 +47,6 @@ export default {
             this.preLoadGrid(e);
           },
         },
-      },
-
-      hiddenForms: {
-        ...hiddenForms.static,
-        forms: hiddenForms.forms(),
       },
 
       itemSettingList: {
@@ -72,7 +71,6 @@ export default {
     doInit() {
       this.resetUpdateType();
       this.resetSearchForm();
-      this.resetHiddenForms();
       this.resetItemSettingListGrid();
       this.fetchSearchResult();
     },
@@ -85,12 +83,13 @@ export default {
       const data = await $grid
         ._useLoader(() => this.$axios.get('st/stabPlanDetailAppr', parameter))
         .then(({ data }) => data);
-      
+
       $grid.setGridData(data);
     },
 
     onClickSearchBtn({ name }) {
       if (name == 'search') {
+        this.resetItemSettingListGrid();
         this.fetchSearchResult();
       }
     },
@@ -102,9 +101,6 @@ export default {
     resetSearchForm() {
       this.searchForm.forms = values.searchForm.forms();
     },
-    resetHiddenForms() {
-      this.hiddenForms.forms = values.hiddenForms.forms();
-    },
     // 항목설정 그리드 초기화
     resetItemSettingListGrid() {
       // this.itemSettingList.$grid.clearGridData();
@@ -115,13 +111,13 @@ export default {
     onEventsButton({ name }) {
       const { $grid } = this.gridForSearchResult;
       if (name == 'approve') {
-        if(!this.isThereAnyCheckedData($grid)) {
+        if (!this.isThereAnyCheckedData($grid)) {
           return this.$warn(this.$message.warn.unCheckedData);
         }
         this.approve();
       }
       if (name == 'reject') {
-        if(!this.isThereAnyCheckedData($grid)) {
+        if (!this.isThereAnyCheckedData($grid)) {
           return this.$warn(this.$message.warn.unCheckedData);
         }
         this.setUpdateTypeAndInputReasonModalShowOn('reject');
@@ -141,11 +137,11 @@ export default {
     // inputReasonModal 이벤트
     modalReturnDataEvent({ rjtReaDiv, rjtRea }) {
       const updateType = this.inputReasonModal.updateType;
-      if(!updateType || !rjtReaDiv || !rjtRea) {
+      if (!updateType || !rjtReaDiv || !rjtRea) {
         return;
       }
 
-      if(updateType === 'reject') {
+      if (updateType === 'reject') {
         this.reject({ rjtReaDiv, rjtRea });
       }
     },
@@ -163,7 +159,7 @@ export default {
       this.itemSettingList.$grid.destroy();
       const item = event?.item;
 
-      if(!item) {
+      if (!item) {
         return;
       }
 
@@ -179,10 +175,11 @@ export default {
     async fetchItemSettingList(item) {
       const { $grid } = this.itemSettingList;
 
-      // 여기는 Hidden폼을 이용해서 set, get 한 후, Proxy 객체로 얻어낼 로직임
       // 이 부분 없이 그냥 객체로 API에 태워보낼 경우, Validator에 의해 예외 뱉어낸다.
-      const { forms } = this.hiddenForms;
-      FormUtil.setData(forms, item);
+      const { forms } = this.searchForm;
+      const sbtPlnIdx = item?.sbtPlnIdx;
+      FormUtil.setData(forms, { sbtPlnIdx });
+
       const parameter = FormUtil.getData(forms);
       // 여기까지
 
@@ -199,16 +196,16 @@ export default {
 
       const dataGrid = [
         {
-          col: "항목명"
+          col: '항목명',
         },
         {
-          col: "항목명"
+          col: '항목명',
         },
         {
-          col: "항목명"
+          col: '항목명',
         },
         {
-          col: "항목명"
+          col: '항목명',
         },
       ];
 
@@ -216,7 +213,7 @@ export default {
 
       columnLayout2.push({
         dataField: 'aitmKn',
-        headerText: "항목명",
+        headerText: '항목명',
         width: 240,
         cellMerge: true,
       });
@@ -228,15 +225,15 @@ export default {
         showRowCheckColumn: false,
         enableSorting: false,
         fixedColumnCount: 1,
-        editableOnFixedCell: true
+        editableOnFixedCell: true,
       };
 
       for (const i in data) {
-        columnLayout2.push(
-          { dataField: 'collv1' + i,
-            headerText: data[i]?.accMarkNm ? data[i].accMarkNm : '',
-            width: '120',
-            children: [
+        columnLayout2.push({
+          dataField: 'collv1' + i,
+          headerText: data[i]?.accMarkNm ? data[i].accMarkNm : '',
+          width: '120',
+          children: [
             {
               dataField: 'collv2',
               headerText: data[i]?.ansDt ? dayjs(data[i].ansDt).format('YYYY-MM-DD') : '',
@@ -252,33 +249,52 @@ export default {
                       headerText: data[i]?.ansSmpVol ? data[i].ansSmpVol : '',
                       width: '120',
                       renderer: {
-                        type: "CheckBoxEditRenderer",
+                        type: 'CheckBoxEditRenderer',
                         showLabel: false,
                         editable: true,
-                        checkableFunction: (rowIndex, columnIndex, value, isChecked, item, dataField) => {
+                        checkableFunction: (
+                          rowIndex,
+                          columnIndex,
+                          value,
+                          isChecked,
+                          item,
+                          dataField,
+                        ) => {
                           const dateTxt = data[i].ansDt;
                           const dtTestDate = dateTxt ? dayjs(dateTxt).format('YYYY-MM-DD') : null;
                           const preTxtRemark = data[i].accMarkNm;
-                          const txtRemark = preTxtRemark ? preTxtRemark.split(" ")[0] : "";
+                          const txtRemark = preTxtRemark ? preTxtRemark.split(' ')[0] : '';
 
                           return true;
                         },
-                        disabledFunction: function (rowIndex, columnIndex, value, isChecked, item, dataField) {
+                        disabledFunction: function (
+                          rowIndex,
+                          columnIndex,
+                          value,
+                          isChecked,
+                          item,
+                          dataField,
+                        ) {
                           return true;
-                        }
+                        },
                       },
-                      styleFunction: (rowIndex, columnIndex, value, headerText, item, dataField) => {
-                        // Filter 
-                        if (this.isTestStop(data[columnIndex - 1]?.sbtAnsStt))
-                          return 'testStop';
+                      styleFunction: (
+                        rowIndex,
+                        columnIndex,
+                        value,
+                        headerText,
+                        item,
+                        dataField,
+                      ) => {
+                        // Filter
+                        if (this.isTestStop(data[columnIndex - 1]?.sbtAnsStt)) return 'testStop';
                         else if (this.isTestOnProcess(data[columnIndex - 1]?.sbtAnsStt))
                           return 'testProgress';
                         else if (this.isTestEnd(data[columnIndex - 1]?.sbtAnsStt))
                           return 'textExit';
-                      }
+                      },
                     },
                   ],
-
                 },
               ],
             },
@@ -290,17 +306,13 @@ export default {
       let countData = data?.length;
       $grid.create(columnLayout2, auiGridProps2);
       // Set data grid 1
-      // 내일 할 일 ☆
-      // 밑에 배열 두 개는 일단 보류.
-      // this.auditBeforCheckData = [];
-      // this.auditAfterCheckData = [];
       let useYn = [];
       const data2 = aitmData?.table2;
       if (aitmData?.length) {
         let iAuditCnt = 0;
-        let aitmKn = "";
-        let accMarkNm = "";
-        let checkData = "";
+        let aitmKn = '';
+        let accMarkNm = '';
+        let checkData = '';
         for (const i in aitmData) {
           let objFor = { col: aitmData[i].aitmKn, col_Tag: aitmData[i].amitmCd };
           useYn[i] = aitmData[i].useYn;
@@ -313,7 +325,10 @@ export default {
           for (const i in dataHeader) {
             for (const j in aitmData) {
               for (const k in data2) {
-                if (aitmData[j]['amitmCd'] == data2[k].amitmCd && dataHeader[i].stabilityUnitCode == data2[k].stabilityUnitCode) {
+                if (
+                  aitmData[j]['amitmCd'] == data2[k].amitmCd &&
+                  dataHeader[i].stabilityUnitCode == data2[k].stabilityUnitCode
+                ) {
                   const colName = 'col' + i;
                   aitmData[j][colName] = true;
                 }
@@ -334,7 +349,7 @@ export default {
       }
 
       $grid.setGridData(aitmData);
-      
+
       const columns = [];
       const columnSize = $grid.getColumnCount();
       for (let i = 1; i < columnSize; i++) {
@@ -345,8 +360,7 @@ export default {
 
       for (let iRow = 0; iRow < dataGrid.length; iRow++) {
         //최신버전에서 삭제된 항목은 수정할 수 없도록 막음
-        if (useYn[iRow] == "N") {
-
+        if (useYn[iRow] == 'N') {
         }
       }
       // });
@@ -358,18 +372,21 @@ export default {
       for (var i = 0; i < colSizeList.length; i++) {
         if (!!columnLayout[i] && !!columnLayout[i].dataField) {
           const colValues = myGrid.getColumnDistinctValues(columnLayout[i].dataField);
-          const maxColumnSize = colValues.map(value => new Blob([value]).size).reduce((prev, current) => (prev > current) ? prev : current , 0) * 5;
+          const maxColumnSize =
+            colValues
+              .map((value) => new Blob([value]).size)
+              .reduce((prev, current) => (prev > current ? prev : current), 0) * 5;
 
           if (maxColumnSize > colSizeList[i]) {
-              colSizeList[i] = maxColumnSize;
+            colSizeList[i] = maxColumnSize;
           }
         }
 
         if (excludeColumns.includes(i)) {
           if (isExtend) {
-            colSizeList[i] = (typeof width == 'number') ? colSizeList[i] + width : null;
+            colSizeList[i] = typeof width == 'number' ? colSizeList[i] + width : null;
           } else {
-            colSizeList[i] = (typeof width == 'number') ? width : null;
+            colSizeList[i] = typeof width == 'number' ? width : null;
           }
         } else {
           colSizeList[i] += 10;
@@ -393,9 +410,17 @@ export default {
     // 안정성시험계획 승인
     approve() {
       const checkedRows = this.gridForSearchResult.$grid.getCheckedRowItems();
-
-      if (checkedRows.length) {
-        this.$eSign(() => this.$axios.put('/st/stabPlanDetailAppr/approve', checkedRows))
+      const parameter = checkedRows.map(row => row.item);
+      
+      // 내일 할 일 ☆
+      // 01. 승인, 결과승인 마무리하기
+      //  ㄴ 완료 프로세스: 계획 (승인, 반려), 중단 (승인, 반려)
+      //  ㄴ 남은 프로세스: 결과 (승인, 반려), 계획 변경(승인, 반려)(이건 상태 코드가 따로 없다.)
+      // 그러면 끝
+      // 그리고 MIM 들어가기
+      
+      if (parameter.length) {
+        this.$eSign(() => this.$axios.put('/st/stabPlanDetailAppr/approve', parameter))
           .then(() => {
             this.$info(this.$message.info.approve);
             this.fetchSearchResult();
@@ -410,7 +435,9 @@ export default {
     // 안정성시험계획 반려
     reject({ rjtReaDiv = null, rjtRea = null }) {
       let checkedRows = this.gridForSearchResult.$grid.getCheckedRowItems();
-      const parameter = checkedRows.map(row => { return { ...row.item, rjtReaDiv, plnRjtRea: rjtRea } });  
+      const parameter = checkedRows.map((row) => {
+        return { ...row.item, rjtReaDiv, plnRjtRea: rjtRea };
+      });
 
       if (parameter.length) {
         this.$eSign(() => this.$axios.put('/st/stabPlanDetailAppr/reject', parameter))

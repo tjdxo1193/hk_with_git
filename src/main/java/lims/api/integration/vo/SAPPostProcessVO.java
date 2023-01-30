@@ -69,9 +69,6 @@ public class SAPPostProcessVO {
             private String pitmTyp;
             private Integer ansDurDay;
 
-            @Setter
-            private Integer tempPitmVersion;
-
             public PItemInfo(PItemKey itemKey) {
                 this.plntCd = itemKey.getPlntCd();
                 this.pitmCd = itemKey.getPitmCd();
@@ -154,8 +151,6 @@ public class SAPPostProcessVO {
 
             private String sapPrdha;
 
-            private UseType aitmSpecIdxIsNull;
-
             public String getSpecProcCd() {
                 return specProcCd.getCode();
             }
@@ -171,6 +166,22 @@ public class SAPPostProcessVO {
                 this.pitmCd = itemKey.getPitmCd();
                 this.pitmVer = version;
             }
+        }
+
+        @Getter
+        @Setter
+        @Builder
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class PItemSpecVersion {
+            private String plntCd;
+            private Integer aitmSpecIdx;
+            private Integer aitmSpecVer;
+            private Integer currentAitmSpecIdx;
+            private String crtUid;
+            private String crtIp;
+            private String udtUid;
+            private String udtIp;
         }
     }
 

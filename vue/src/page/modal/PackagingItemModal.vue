@@ -36,9 +36,7 @@ export default {
       default: {},
     },
   },
-  mounted() {
-    this.getPackagingItemList();
-  },
+  mounted() {},
   data() {
     const { searchForm } = this.$copy(values);
     return {

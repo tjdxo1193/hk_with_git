@@ -68,4 +68,6 @@ public class SampleUsageVO {
     private String smpDivNm;        // 검체 구분 명칭
     private String ansNo;           // 시험 번호
     private String smpTypNm;        // 검체 구분 명칭
+    private String sumVol;          // 사용 검체량 총합
+    private String remains;         // 사용하고 남은 검체
 }

@@ -153,16 +153,8 @@ const inputInfoForm = {
       .Select('smpStrgMtd', '검체보관방법', {
         async: () => api.combo.userCommon.getSmpStrgMtdCombo(),
       })
-      .multiple(
-        'smp',
-        '관리검체량',
-        FormBuilder.builder()
-          .Input('mngSmpVol', { readonly: true })
-          .Select('smpVolUnit', {
-            async: () => api.combo.userCommon.getSmpVolUnitCombo(),
-          })
-          .build(),
-      )
+      .Input('mngSmpVol', '관리검체량')
+      .readonly()
       .Input('inpUnit', '입력단위')
       .readonly()
       .Input('strgLmt', '보관기한')

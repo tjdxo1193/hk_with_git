@@ -84,6 +84,7 @@ export default {
         columns: versionList.columns(),
         event: {
           cellDoubleClick: (e) => {
+            this.initVersion();
             if (this.isSelectedItemHasVersion()) {
               this.fetchAItemListMatchingByPitmType(e.item);
             }

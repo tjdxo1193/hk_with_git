@@ -1,5 +1,5 @@
 import api from '@/api';
-import {ColumnBuilder, FormBuilder} from '@/util';
+import { ColumnBuilder, FormBuilder } from '@/util';
 
 const searchGridWithForm = {
   static: {

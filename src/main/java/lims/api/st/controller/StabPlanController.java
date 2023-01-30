@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -81,6 +82,32 @@ public class StabPlanController {
     public ResponseEntity<Integer> approveRequest(@AuthToken Token token, @RequestBody StabPlanVO param) {
         param = this.setLoginUserData(token, param);
         return ResponseEntity.ok(stabPlanService.approveRequest(param));
+    }
+
+    // 안정성시험 저장
+    @PutMapping("/detail")
+    public ResponseEntity<Integer> saveAns(@AuthToken Token token, @RequestBody StabPlanVO param) {
+        param = this.setLoginUserData(token, param);
+        return ResponseEntity.ok(stabPlanService.saveAns(param));
+    }
+
+    // 안정성시험 삭제
+    @PostMapping("/detail")
+    public ResponseEntity<Integer> deleteAns(@AuthToken Token token, @RequestBody StabPlanVO param) {
+        param = this.setLoginUserData(token, param);
+        return ResponseEntity.ok(stabPlanService.deleteAns(param));
+    }
+
+    // 안정성상세계획 저장(체크박스)
+    @PutMapping("/detail/saveDetailPlanReg")
+    public ResponseEntity<Integer> saveDetailPlanReg(@AuthToken Token token, @RequestBody StabPlanVO param) {
+        param = this.setLoginUserData(token, param);
+
+        List<StabPlanVO> detailPlanRegList = param.getDetailPlanRegList();
+        detailPlanRegList = detailPlanRegList.stream().map(e -> this.setLoginUserData(token, e)).collect(Collectors.toList());
+        param.setDetailPlanRegList(detailPlanRegList);
+
+        return ResponseEntity.ok(stabPlanService.saveDetailPlanReg(param));
     }
 
     public StabPlanVO setLoginUserData(Token token, StabPlanVO param) {

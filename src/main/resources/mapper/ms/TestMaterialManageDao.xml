@@ -7,7 +7,11 @@
             A.PLNT_CD,
             A.RITM_CD,
             B.HIR_TREE_CD AS UPPER_RITM_TREE_CD,
-            (SELECT TREE_NM FROM SY_CD_TREE WHERE TREE_CD = B.HIR_TREE_CD) AS UPPER_RITM_TREE_NM,
+            (SELECT LTRIM(SYS_CONNECT_BY_PATH(TREE_NM, '.'), '.')
+            FROM SY_CD_TREE
+            WHERE TREE_CD = B.HIR_TREE_CD
+            START WITH HIR_TREE_CD = 'R0000000'
+            CONNECT BY PRIOR TREE_CD = HIR_TREE_CD) AS UPPER_RITM_TREE_NM,
             A.RITM_TREE_CD,
             B.TREE_NM AS RITM_TREE_NM,
             A.RITM_KN,

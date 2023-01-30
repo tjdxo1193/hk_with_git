@@ -1,19 +1,14 @@
 package lims.api.integration.service.impl;
 
 import lims.api.common.service.impl.ReportDesignerHelper;
-import lims.api.integration.service.MESService;
-import lims.api.integration.service.QMSService;
-import lims.api.integration.service.SAPService;
-import lims.api.integration.service.SRMService;
+import lims.api.integration.enums.ELNCmdType;
+import lims.api.integration.service.*;
 import lims.api.integration.vo.intergation.ConvertMrd;
 import lims.api.integration.vo.intergation.InterfaceSendVO;
 import lims.api.integration.vo.intergation.TempFile;
 import lims.api.util.FileUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.Arrays;
-import java.util.Comparator;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +18,7 @@ public class IntegrationSender {
     private final SRMService srmService;
     private final MESService mesService;
     private final QMSService qmsService;
+    private final ELNService elnService;
 
     private final ReportDesignerHelper rdHelper;
 
@@ -74,6 +70,13 @@ public class IntegrationSender {
 
     private void sendDeviation() {
         // TODO 일탈 정보를 QMS로 전송
+    }
+
+    /**
+     * ~~ 저장 시 시험항목 별 시험방법
+     */
+    public void sendMethodByItem(ELNCmdType cmdType, InterfaceSendVO.MethodByItem data) {
+        elnService.publishTestMethodByItem(cmdType, data.toELN());
     }
 
     /**

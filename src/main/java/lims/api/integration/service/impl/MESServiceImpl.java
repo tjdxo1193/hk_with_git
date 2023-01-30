@@ -9,6 +9,7 @@ import lims.api.integration.domain.eai.TrsEventHandler;
 import lims.api.integration.enums.InterfaceSystemType;
 import lims.api.integration.enums.RevInterface;
 import lims.api.integration.enums.TrsInterface;
+import lims.api.integration.exception.IntegrationNoSavedException;
 import lims.api.integration.model.InterfaceTrsResponse;
 import lims.api.integration.service.MESService;
 import lims.api.integration.service.RevService;
@@ -53,61 +54,57 @@ public class MESServiceImpl implements MESService {
 
     @Override
     public void savePackageSpecReport(Integer infoIdx, MESPackageSpecReportVO data, List<MultipartFile> files) {
+        int count = 0;
+        Integer degree = mesDao.nextDegreeInPackageSpec();
         RevInterface revInterface = RevInterface.MES_PACKAGE_SPEC_REPORT;
 
-        revService.execute(
-                revInterface,
-                mesDao.nextDegreeInPackageSpec(),
-                degree -> {
-                    int count = 0;
+        if (data != null && CollectionUtils.isNotEmpty(files)) {
+            for (MultipartFile file : files) {
+                MESPackageSpecReportVO param = new MESPackageSpecReportVO();
+                param.setIdx(mesDao.nextIdxInPackageSpec());
+                param.setDegree(degree);
+                param.setIfInfoIdx(infoIdx);
+                param.setMatnr(data.getMatnr());
+                param.setVersion(data.getVersion());
+                param.setFileName(FileUtil.getName(file));
+                param.setFileData(FileUtil.toBytes(file));
+                count += mesDao.createPackageSpec(param);
+            }
+        }
 
-                    if (data != null && CollectionUtils.isNotEmpty(files)) {
-                        for (MultipartFile file : files) {
-                            MESPackageSpecReportVO param = new MESPackageSpecReportVO();
-                            param.setIdx(mesDao.nextIdxInPackageSpec());
-                            param.setDegree(degree);
-                            param.setIfInfoIdx(infoIdx);
-                            param.setMatnr(data.getMatnr());
-                            param.setVersion(data.getVersion());
-                            param.setFileName(FileUtil.getName(file));
-                            param.setFileData(FileUtil.toBytes(file));
-                            count += mesDao.createPackageSpec(param);
-                        }
-                    }
-                    return count;
-                },
-                degree -> new Thread(() -> postProcessorMap
-                        .get(revInterface)
-                        .execute(new RevStateful(degree, infoIdx)))
-                        .start()
-        );
+        if (count == 0) {
+            throw new IntegrationNoSavedException();
+        }
+
+        new Thread(() -> postProcessorMap
+                .get(revInterface)
+                .execute(new RevStateful(degree, infoIdx)))
+                .start();
     }
 
     @Override
     public void saveFinalOrder(Integer infoIdx, List<MESFinalOrderVO> data) {
+        int count = 0;
+        Integer degree = mesDao.nextDegreeInFinalOrder();
         RevInterface revInterface = RevInterface.MES_FINAL_ORDER;
 
-        revService.execute(
-                revInterface,
-                mesDao.nextDegreeInFinalOrder(),
-                degree -> {
-                    int count = 0;
+        if (CollectionUtils.isNotEmpty(data)) {
+            for (MESFinalOrderVO order : data) {
+                order.setDegree(degree);
+                order.setIdx(mesDao.nextIdxInFinalOrder());
+                order.setIfInfoIdx(infoIdx);
+                count += mesDao.createFinalOrder(order);
+            }
+        }
 
-                    if (CollectionUtils.isNotEmpty(data)) {
-                        for (MESFinalOrderVO order : data) {
-                            order.setDegree(degree);
-                            order.setIdx(mesDao.nextIdxInFinalOrder());
-                            order.setIfInfoIdx(infoIdx);
-                            count += mesDao.createFinalOrder(order);
-                        }
-                    }
-                    return count;
-                },
-                degree -> new Thread(() -> postProcessorMap
-                        .get(revInterface)
-                        .execute(new RevStateful(degree, infoIdx)))
-                        .start()
-        );
+        if (count == 0) {
+            throw new IntegrationNoSavedException();
+        }
+
+        new Thread(() -> postProcessorMap
+                .get(revInterface)
+                .execute(new RevStateful(degree, infoIdx)))
+                .start();
     }
 
     @Override

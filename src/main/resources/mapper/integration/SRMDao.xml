@@ -43,7 +43,8 @@
 
     <insert id="createTestStatus" parameterType="lims.api.integration.vo.SRMSendVO$TestStatus">
         INSERT INTO IF_TRS_TEST_STATUS
-        (IDX, DEGREE, TARGET_SYSTEM, PHS_ORDER_NO, LOT_NO, BATCH_NO, STATUS, HOLD_REASON, CRT_DS, TRS_STATUS)
+        (IDX, DEGREE, TARGET_SYSTEM, PHS_ORDER_NO, LOT_NO, BATCH_NO, STATUS, HOLD_REASON,
+         CHARGER_NAME, CHARGER_EM_ID, CRT_DS, TRS_STATUS)
         VALUES (#{idx},
                 #{degree},
                 #{targetSystem},
@@ -52,6 +53,8 @@
                 #{batchNo},
                 #{status},
                 #{holdReason},
+                #{chargerName},
+                #{chargerEmId},
                 SYSDATE,
                 #{trsStatus})
     </insert>
@@ -60,7 +63,7 @@
     <insert id="createTestResult" parameterType="lims.api.integration.vo.SRMSendVO$TestResult">
         INSERT INTO IF_TRS_TEST_RESULT
         (IDX, DEGREE, TARGET_SYSTEM, PHS_ORDER_NO, LOT_NO, BATCH_NO, SYT_JDG, SPEC_GRV, HARDNESS, RMK, NON_CFM_REASON,
-         CRT_DS, TRS_STATUS)
+         CHARGER_NAME, CHARGER_EM_ID, CRT_DS, TRS_STATUS)
         VALUES (#{idx},
                 #{degree},
                 #{targetSystem},
@@ -72,6 +75,8 @@
                 #{hardness},
                 #{rmk},
                 #{nonCfmReason},
+                #{chargerName},
+                #{chargerEmId},
                 SYSDATE,
                 #{trsStatus})
     </insert>

@@ -9,6 +9,7 @@ import lims.api.integration.domain.eai.TrsEventHandler;
 import lims.api.integration.enums.InterfaceSystemType;
 import lims.api.integration.enums.RevInterface;
 import lims.api.integration.enums.TrsInterface;
+import lims.api.integration.exception.IntegrationNoSavedException;
 import lims.api.integration.model.InterfaceTrsResponse;
 import lims.api.integration.service.RevService;
 import lims.api.integration.service.SRMService;
@@ -56,100 +57,94 @@ public class SRMServiceImpl implements SRMService {
 
     @Override
     public void saveReoccurPreventReport(Integer infoIdx, SRMReoccurPreventReportVO data, List<MultipartFile> files) {
+        int count = 0;
+        Integer degree = srmDao.nextDegreeInReoccurPreventionReport();
         RevInterface revInterface = RevInterface.SRM_REOCCUR_PREVENT_REPORT;
 
-        revService.execute(
-                revInterface,
-                srmDao.nextDegreeInReoccurPreventionReport(),
-                degree -> {
-                    int count = 0;
+        if (data != null && CollectionUtils.isNotEmpty(files)) {
+            for (MultipartFile file : files) {
+                SRMReoccurPreventReportVO param = new SRMReoccurPreventReportVO();
+                param.setIdx(srmDao.nextIdxInReoccurPreventionReport());
+                param.setDegree(degree);
+                param.setIfInfoIdx(infoIdx);
+                param.setIfId(data.getIfId());
+                param.setPhsOrderNo(data.getPhsOrderNo());
+                param.setLotNo(data.getLotNo());
+                param.setBatchNo(data.getBatchNo());
+                param.setFileId(data.getFileId());
+                param.setFileName(FileUtil.getName(file));
+                param.setFileData(FileUtil.toBytes(file));
+                count += srmDao.createReoccurPreventionReport(param);
+            }
+        }
 
-                    if (data != null && CollectionUtils.isNotEmpty(files)) {
-                        for (MultipartFile file : files) {
-                            SRMReoccurPreventReportVO param = new SRMReoccurPreventReportVO();
-                            param.setIdx(srmDao.nextIdxInReoccurPreventionReport());
-                            param.setDegree(degree);
-                            param.setIfInfoIdx(infoIdx);
-                            param.setIfId(data.getIfId());
-                            param.setPhsOrderNo(data.getPhsOrderNo());
-                            param.setLotNo(data.getLotNo());
-                            param.setBatchNo(data.getBatchNo());
-                            param.setFileId(data.getFileId());
-                            param.setFileName(FileUtil.getName(file));
-                            param.setFileData(FileUtil.toBytes(file));
-                            count += srmDao.createReoccurPreventionReport(param);
-                        }
-                    }
-                    return count;
-                },
-                degree -> new Thread(() -> postProcessorMap
-                        .get(revInterface)
-                        .execute(new RevStateful(degree, infoIdx)))
-                        .start()
-        );
+        if (count == 0) {
+            throw new IntegrationNoSavedException();
+        }
+
+        new Thread(() -> postProcessorMap
+                .get(revInterface)
+                .execute(new RevStateful(degree, infoIdx)))
+                .start();
     }
 
     @Override
     public void saveSupplierReport(Integer infoIdx, SRMSupplierReportVO data, List<MultipartFile> files) {
+        int count = 0;
+        Integer degree = srmDao.nextDegreeInConsignSupplierReport();
         RevInterface revInterface = RevInterface.SRM_CONSIGNMENT_AND_SUPPLIER_REPORT;
 
-        revService.execute(
-                revInterface,
-                srmDao.nextDegreeInConsignSupplierReport(),
-                degree -> {
-                    int count = 0;
+        if (data != null && CollectionUtils.isNotEmpty(files)) {
+            for (MultipartFile file : files) {
+                SRMSupplierReportVO param = new SRMSupplierReportVO();
+                param.setIdx(srmDao.nextIdxInConsignSupplierReport());
+                param.setDegree(degree);
+                param.setIfInfoIdx(infoIdx);
+                param.setIfId(data.getIfId());
+                param.setPhsOrderNo(data.getPhsOrderNo());
+                param.setLotNo(data.getLotNo());
+                param.setBatchNo(data.getBatchNo());
+                param.setReportDiv(data.getReportDiv());
+                param.setFileId(data.getFileId());
+                param.setFileName(FileUtil.getName(file));
+                param.setFileData(FileUtil.toBytes(file));
+                count += srmDao.createConsignSupplierReport(param);
+            }
+        }
 
-                    if (data != null && CollectionUtils.isNotEmpty(files)) {
-                        for (MultipartFile file : files) {
-                            SRMSupplierReportVO param = new SRMSupplierReportVO();
-                            param.setIdx(srmDao.nextIdxInConsignSupplierReport());
-                            param.setDegree(degree);
-                            param.setIfInfoIdx(infoIdx);
-                            param.setIfId(data.getIfId());
-                            param.setPhsOrderNo(data.getPhsOrderNo());
-                            param.setLotNo(data.getLotNo());
-                            param.setBatchNo(data.getBatchNo());
-                            param.setReportDiv(data.getReportDiv());
-                            param.setFileId(data.getFileId());
-                            param.setFileName(FileUtil.getName(file));
-                            param.setFileData(FileUtil.toBytes(file));
-                            count += srmDao.createConsignSupplierReport(param);
-                        }
-                    }
-                    return count;
-                },
-                degree -> new Thread(() -> postProcessorMap
-                        .get(revInterface)
-                        .execute(new RevStateful(degree, infoIdx)))
-                        .start()
-        );
+        if (count == 0) {
+            throw new IntegrationNoSavedException();
+        }
+
+        new Thread(() -> postProcessorMap
+                .get(revInterface)
+                .execute(new RevStateful(degree, infoIdx)))
+                .start();
     }
 
     @Override
     public void saveFinalOrder(Integer infoIdx, List<SRMFinalOrderVO> data) {
+        int count = 0;
+        Integer degree = srmDao.nextDegreeInFinalOrder();
         RevInterface revInterface = RevInterface.SRM_FINAL_ORDER;
 
-        revService.execute(
-                revInterface,
-                srmDao.nextDegreeInFinalOrder(),
-                degree -> {
-                    int count = 0;
+        if (CollectionUtils.isNotEmpty(data)) {
+            for (SRMFinalOrderVO vo : data) {
+                vo.setDegree(degree);
+                vo.setIdx(srmDao.nextIdxInFinalOrder());
+                vo.setIfInfoIdx(infoIdx);
+                count += srmDao.createFinalOrder(vo);
+            }
+        }
 
-                    if (CollectionUtils.isNotEmpty(data)) {
-                        for (SRMFinalOrderVO vo : data) {
-                            vo.setDegree(degree);
-                            vo.setIdx(srmDao.nextIdxInFinalOrder());
-                            vo.setIfInfoIdx(infoIdx);
-                            count += srmDao.createFinalOrder(vo);
-                        }
-                    }
-                    return count;
-                },
-                degree -> new Thread(() -> postProcessorMap
-                        .get(revInterface)
-                        .execute(new RevStateful(degree, infoIdx)))
-                        .start()
-        );
+        if (count == 0) {
+            throw new IntegrationNoSavedException();
+        }
+
+        new Thread(() -> postProcessorMap
+                .get(revInterface)
+                .execute(new RevStateful(degree, infoIdx)))
+                .start();
     }
 
     @Override

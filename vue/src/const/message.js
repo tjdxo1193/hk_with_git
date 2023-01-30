@@ -78,6 +78,7 @@ export default {
     pwdIncludeTripleLetter: '비밀번호에 같은 연속된 문자 3개가 있습니다.',
     pwdIncludeConsecutiveLetter: '비밀번호에 연속된 문자 3개가 있습니다.',
     pwdIncludeResidentRegistrationBackNumber: '비밀번호에 주민등록번호 뒷자리가 포함되어있습니다.',
+    isSapPrdhaDuplicate: 'SAP코드가 중복되었습니다.',
   },
   warn: {
     unSelectedData: '선택된 정보가 없습니다.',
@@ -85,7 +86,8 @@ export default {
     accessOneCheckedRow: '1개의 행을 선택해 주세요.',
     biggerThanExpirDt: '개봉일이 사용기한 이후일 수 없습니다.',
     biggerThanEtrDt: '개봉일이 입고일 이전일 수 없습니다.',
-    biggerThanEtrEachQty: '사용량이 재고량보다 많을 수 없습니다',
+    biggerThanEtrEachQty: '사용량이 재고량보다 많을 수 없습니다.',
+    biggerThanRemains: '사용 검체량이 재고량보다 더 클 수 없습니다.',
     useItemNotCancel: '이미 사용된 품목은 취소할 수 없습니다.',
     notAddRowBecauseExcess: '행개수를 초과해 추가할 수 없습니다.',
     noSaveGridData: '저장할 데이터가 없습니다.',
@@ -105,7 +107,7 @@ export default {
     noJudgementData: '판정할 데이터가 없습니다.',
     reviseAfterSpecApprove: '규격서가 승인 대기중 입니다. 규격서를 승인후 개정해주세요',
     pwdNotIncludeRolue:
-      '비밀번호를 다시 확인해주세요.\n비밀번호는 8자이상 한글,공백 없이 숫자,영문,특수문자로 입력되어야합니다.',
+      '비밀번호를 다시 확인해 주세요.\n비밀번호는 8자 이상 한글, 공백 없이 숫자, 영문, 특수문자로 입력되어야 합니다.',
     noSlvJdgCfm: '기준 적합/부적합 값이 없습니다.',
     noExcOwcSlvLowOrSlvUpp: '초과/미만 : 자사 하한 or 상한 값이 없습니다.',
     noExcPerSlvLowOrSlvUpp: '초과/미만 : 허가 하한 or 상한 값이 없습니다.',
@@ -120,6 +122,8 @@ export default {
     notAddSameItem: '동일한 품목을 추가할 수 없습니다.',
     noStabPlanDetailData: '시험항목이 정의되어있지않습니다',
     noResultJudge: '결과 판정을 선택해주세요.',
+    noExceedAnsSmpVol: '안정성검체량을 초과하였습니다',
+    noNegativeNumber: '사용검체량은 0이거나 0보다 작을 수 없습니다.',
   },
   confirm: {
     saveData: '저장하시겠습니까?',

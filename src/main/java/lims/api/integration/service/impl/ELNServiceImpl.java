@@ -9,6 +9,7 @@ import lims.api.integration.enums.ELNCmdType;
 import lims.api.integration.enums.InterfaceSystemType;
 import lims.api.integration.enums.RevInterface;
 import lims.api.integration.enums.TrsInterface;
+import lims.api.integration.exception.IntegrationNoSavedException;
 import lims.api.integration.model.InterfaceTrsResponse;
 import lims.api.integration.service.ELNService;
 import lims.api.integration.service.RevService;
@@ -49,59 +50,55 @@ public class ELNServiceImpl implements ELNService {
 
     @Override
     public void saveCtReport(Integer infoIdx, ELNCtReportVO param) {
+        int count = 0;
+        Integer degree = elnDao.nextDegreeInReportCt();
         RevInterface revInterface = RevInterface.ELN_CT_REPORT;
 
-        revService.execute(
-                revInterface,
-                elnDao.nextDegreeInReportCt(),
-                degree -> {
-                    int count = 0;
+        ELNCtReportVO.File file = param.getFile();
+        file.setDegree(degree);
+        file.setIdx(elnDao.nextIdxInReportCtFile());
+        file.decodedFileData();
+        file.setIfInfoIdx(infoIdx);
+        count += elnDao.createReportCtFile(file);
 
-                    ELNCtReportVO.File file = param.getFile();
-                    file.setDegree(degree);
-                    file.setIdx(elnDao.nextIdxInReportCtFile());
-                    file.decodedFileData();
-                    file.setIfInfoIdx(infoIdx);
-                    count += elnDao.createReportCtFile(file);
+        for (ELNCtReportVO.Matnr matnr : param.getMatnr()) {
+            matnr.setDegree(degree);
+            matnr.setIdx(elnDao.nextIdxInReportCtMatnr());
+            matnr.setIfInfoIdx(infoIdx);
+            count += elnDao.createReportCtMatnr(matnr);
+        }
 
-                    for (ELNCtReportVO.Matnr matnr : param.getMatnr()) {
-                        matnr.setDegree(degree);
-                        matnr.setIdx(elnDao.nextIdxInReportCtMatnr());
-                        matnr.setIfInfoIdx(infoIdx);
-                        count += elnDao.createReportCtMatnr(matnr);
-                    }
-                    return count;
-                },
-                degree -> new Thread(() -> postProcessorMap
-                        .get(revInterface)
-                        .execute(new RevStateful(degree, infoIdx)))
-                        .start()
-        );
+        if (count == 0) {
+            throw new IntegrationNoSavedException();
+        }
+
+        new Thread(() -> postProcessorMap
+                .get(revInterface)
+                .execute(new RevStateful(degree, infoIdx)))
+                .start();
     }
 
     @Override
     public void saveFinishedAndSemiStandard(Integer infoIdx, List<ELNStandardSpecVO> data) {
+        int count = 0;
+        Integer degree = elnDao.nextDegreeInStandardSpec();
         RevInterface revInterface = RevInterface.ELN_STANDARD_FINISH_AND_SEMI;
 
-        revService.execute(
-                revInterface,
-                elnDao.nextDegreeInStandardSpec(),
-                degree -> {
-                    int count = 0;
+        for (ELNStandardSpecVO standard : data) {
+            standard.setDegree(degree);
+            standard.setIdx(elnDao.nextIdxInStandardSpec());
+            standard.setIfInfoIdx(infoIdx);
+            count += elnDao.createStandardSpec(standard);
+        }
 
-                    for (ELNStandardSpecVO standard : data) {
-                        standard.setDegree(degree);
-                        standard.setIdx(elnDao.nextIdxInStandardSpec());
-                        standard.setIfInfoIdx(infoIdx);
-                        count += elnDao.createStandardSpec(standard);
-                    }
-                    return count;
-                },
-                degree -> new Thread(() -> postProcessorMap
-                        .get(revInterface)
-                        .execute(new RevStateful(degree, infoIdx)))
-                        .start()
-        );
+        if (count == 0) {
+            throw new IntegrationNoSavedException();
+        }
+
+        new Thread(() -> postProcessorMap
+                .get(revInterface)
+                .execute(new RevStateful(degree, infoIdx)))
+                .start();
     }
 
     @Override

@@ -36,7 +36,7 @@
 </template>
 
 <script>
-import { FormUtil } from '@/util';
+import {FormUtil} from '@/util';
 
 import values from './values/testItemPerManage';
 
@@ -209,6 +209,8 @@ export default {
         this.checkTestItemPer();
       } else if (name == 'reset') {
         this.resetTestItemPerInfo();
+      } else if (name == 'elnSend'){
+        this.elnSendTestItemMethod();
       }
     },
     testItemPerFormEvent({ type, item }) {
@@ -258,6 +260,16 @@ export default {
 
       return parameter;
     },
+    elnSendTestItemMethodInfo(){
+      this.$eSign(() => this.$axios.post('/ms/testItemPerManage/elnSendTestItemMethod', parameter))
+        .then(() => {
+          this.$info(this.$message.info.saved);
+          this.doInit();
+        })
+        .catch(() => {
+          this.$error(this.$message.error.createData);
+        });
+    }
   },
   computed: {
     testItemSearchButtons() {

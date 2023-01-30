@@ -225,40 +225,38 @@ public class SAPServiceImpl implements SAPService {
 
     @Override
     public synchronized void saveInputPerformanceByBatch(Integer infoIdx, SAPInputPerformanceByBatchVO param) {
+        int count = 0;
+        Integer degree = sapDao.nextDegreeInInputPerformance();
         RevInterface revInterface = RevInterface.SAP_INPUT_PERFORMANCE;
 
-        revService.execute(
-                revInterface,
-                sapDao.nextDegreeInInputPerformance(),
-                degree -> {
-                    int count = 0;
+        List<SAPInputPerformanceByBatchVO.InputPerformanceHeader> headers = param.getPerformanceHeader();
+        if (CollectionUtils.isNotEmpty(headers)) {
+            for (SAPInputPerformanceByBatchVO.InputPerformanceHeader header : headers) {
+                header.setDegree(degree);
+                header.setIdx(sapDao.nextIdxInInputPerformanceHeader());
+                header.setIfInfoIdx(infoIdx);
+                count += sapDao.createInputPerformanceHeader(header);
+            }
+        }
 
-                    List<SAPInputPerformanceByBatchVO.InputPerformanceHeader> headers = param.getPerformanceHeader();
-                    if (CollectionUtils.isNotEmpty(headers)) {
-                        for (SAPInputPerformanceByBatchVO.InputPerformanceHeader header : headers) {
-                            header.setDegree(degree);
-                            header.setIdx(sapDao.nextIdxInInputPerformanceHeader());
-                            header.setIfInfoIdx(infoIdx);
-                            count += sapDao.createInputPerformanceHeader(header);
-                        }
-                    }
+        List<SAPInputPerformanceByBatchVO.InputPerformanceDetail> details = param.getPerformanceDetails();
+        if (CollectionUtils.isNotEmpty(details)) {
+            for (SAPInputPerformanceByBatchVO.InputPerformanceDetail detail : details) {
+                detail.setDegree(degree);
+                detail.setIdx(sapDao.nextIdxInInputPerformanceDetail());
+                detail.setIfInfoIdx(infoIdx);
+                count += sapDao.createInputPerformanceDetail(detail);
+            }
+        }
 
-                    List<SAPInputPerformanceByBatchVO.InputPerformanceDetail> details = param.getPerformanceDetails();
-                    if (CollectionUtils.isNotEmpty(details)) {
-                        for (SAPInputPerformanceByBatchVO.InputPerformanceDetail detail : details) {
-                            detail.setDegree(degree);
-                            detail.setIdx(sapDao.nextIdxInInputPerformanceDetail());
-                            detail.setIfInfoIdx(infoIdx);
-                            count += sapDao.createInputPerformanceDetail(detail);
-                        }
-                    }
-                    return count;
-                },
-                degree -> new Thread(() -> postProcessorMap
-                        .get(revInterface)
-                        .execute(new RevStateful(degree, infoIdx)))
-                        .start()
-        );
+        if (count == 0) {
+            throw new IntegrationNoSavedException();
+        }
+
+        new Thread(() -> postProcessorMap
+                .get(revInterface)
+                .execute(new RevStateful(degree, infoIdx)))
+                .start();
     }
 
     @Override

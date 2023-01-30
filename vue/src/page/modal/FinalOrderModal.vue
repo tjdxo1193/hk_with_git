@@ -1,17 +1,17 @@
 <template>
-  <ModalBase :title="title" :show="show" width="1100px" :top="30" @close="close">
+  <ModalBase :title="title" :show="show" width="1300px" height="560px" @close="close">
     <Horizontal align-items="center" :spans="[10, 0.1, 10]">
-      <AUIGridSearch
-        v-bind="srmSearchForm"
+      <AUIGridWithHeader
+        v-bind="srmOrderList"
         @button-click="onClickButton"
-        @grid-created="(proxy) => $setState('srmSearchForm.$grid', proxy)"
+        @grid-created="(proxy) => $setState('srmOrderList.$grid', proxy)"
       />
       <div></div>
 
-      <AUIGridSearch
-        v-bind="mesSearchForm"
+      <AUIGridWithHeader
+        v-bind="mesOrderList"
         @button-click="onClickButton"
-        @grid-created="(proxy) => $setState('mesSearchForm.$grid', proxy)"
+        @grid-created="(proxy) => $setState('mesOrderList.$grid', proxy)"
       />
     </Horizontal>
   </ModalBase>
@@ -34,53 +34,57 @@ export default {
       type: Boolean,
       default: false,
     },
+    parameter: {},
   },
   mounted() {},
   data() {
-    const { srmSearchForm, mesSearchForm } = this.$copy(values);
+    const { srmOrderList, mesOrderList } = this.$copy(values);
     return {
-      srmSearchForm: {
-        ...srmSearchForm.static,
-        forms: srmSearchForm.forms(),
-        columns: srmSearchForm.columns(),
-        buttons: srmSearchForm.static.buttons,
-        event: {
-          cellDoubleClick: (e) => {
-            this.$emit('modalReturnDataEvent', e.item);
-          },
-        },
+      srmOrderList: {
+        ...srmOrderList.static,
+        forms: srmOrderList.forms(),
+        columns: srmOrderList.columns(),
+        buttons: srmOrderList.static.buttons,
+        event: {},
       },
-      mesSearchForm: {
-        ...mesSearchForm.static,
-        forms: mesSearchForm.forms(),
-        columns: mesSearchForm.columns(),
-        buttons: mesSearchForm.static.buttons,
-        event: {
-          cellDoubleClick: (e) => {
-            this.$emit('modalReturnDataEvent', e.item);
-          },
-        },
+      mesOrderList: {
+        ...mesOrderList.static,
+        forms: mesOrderList.forms(),
+        columns: mesOrderList.columns(),
+        buttons: mesOrderList.static.buttons,
+        event: {},
       },
     };
   },
+  watch: {
+    show() {
+      if (this.$props.show) {
+        const item = this.$props.parameter;
+        FormUtil.setData(this.srmOrderList.forms, item);
+        FormUtil.setData(this.mesOrderList.forms, item);
+        this.getSrmFinalOrderList();
+        this.getMesFinalOrderList();
+      }
+    },
+  },
   methods: {
     getSrmFinalOrderList() {
-      const { $grid, forms } = this.srmSearchForm;
+      const { $grid, forms } = this.srmOrderList;
       const parameter = FormUtil.getData(forms);
       const data = $grid
-        ._useLoader(() => this.$axios.get('/ts/srmMesModal/getSrmFinalOrderList', parameter))
+        ._useLoader(() => this.$axios.get('/ts/testIFModal/getSrmFinalOrderList', parameter))
         .then(({ data }) => data);
       $grid.setGridData(data);
     },
     getMesFinalOrderList() {
-      const { $grid, forms } = this.mesSearchForm;
+      const { $grid, forms } = this.mesOrderList;
       const parameter = FormUtil.getData(forms);
       const data = $grid
-        ._useLoader(() => this.$axios.get('/ts/srmMesModal/getMesFinalOrderList', parameter))
+        ._useLoader(() => this.$axios.get('/ts/testIFModal/getMesFinalOrderList', parameter))
         .then(({ data }) => data);
       $grid.setGridData(data);
     },
-    searchFormEvent(event) {
+    OrderListEvent(event) {
       if (event.type === 'keydown' && event.originEvent.key === 'Enter') {
         return this.getSrmFinalOrderList();
       }
@@ -94,8 +98,8 @@ export default {
       }
     },
     init() {
-      this.srmSearchForm.forms = values.srmSearchForm.forms();
-      this.mesSearchForm.forms = values.mesSearchForm.forms();
+      this.srmOrderList.$grid.clearGridData();
+      this.mesOrderList.$grid.clearGridData();
     },
     close() {
       this.init();

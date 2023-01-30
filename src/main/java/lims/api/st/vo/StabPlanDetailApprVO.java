@@ -3,6 +3,8 @@ package lims.api.st.vo;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 public class StabPlanDetailApprVO {
@@ -90,4 +92,6 @@ public class StabPlanDetailApprVO {
 
     // Etc.
     private String loginUserUid;
+    private List<String> sbtAnsProcList;        // S029, 안정성 시험 프로세스 조회용 리스트
+    private List<String> ansEdtBetween;         // 시험 예정일 리스트 조회용
 }

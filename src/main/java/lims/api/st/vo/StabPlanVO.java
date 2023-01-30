@@ -65,7 +65,7 @@ public class StabPlanVO {
     private String ansDelYn;                  // 시험 삭제 여부
     private String ansDt;                     // 시험 일자
     private String accMarkNm;                 // 누적 표기명
-    private Integer ansSmpVol;                // 시험 검체량
+    private Double ansSmpVol;                // 시험 검체량
 
     // ST_SBT_ANS_AITM
     private Integer aitmSeq;                  // 시험항목 순번
@@ -132,6 +132,9 @@ public class StabPlanVO {
     // ETC.
     private String loginUserUid;                // 로그인 유저 UID
     private String ansEndDt;                    // 시험종료일(임의추가)
-    private List<String> reqDtBetween;          // 의로욀(임의추가)
-    private List<String> ansDtList;             // 안정성상세계획 조회용 시험일(ANS_DT) 리스트
+    private List<String> reqDtBetween;          // 의뢰일(임의추가)
+    private List<Integer> sbtAnsIdxList;        // 안정성상세계획 조회용 안정성 시험 IDX(SBT_ANS_IDX) 리스트
+    private List<StabPlanVO> detailPlanRegList; // 안정성상세계획 저장(체크박스)용 리스트
+    private String numReg;                      // 안정성 계획, 시험, 문서 번호 순번 조회용
+    private List<String> ansEdtBetween;         // 시험 예정일 리스트 조회용
 }

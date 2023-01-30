@@ -52,7 +52,7 @@ export default {
         forms: list.forms(),
         columns: list.columns(),
         event: {
-        cellDoubleClick: (e) => {
+          cellDoubleClick: (e) => {
             FormUtil.setData(this.requestInfo.forms, e.item);
             this.getResultDetail(e);
             this.enableButtons(['init']);

@@ -13,8 +13,6 @@ import java.util.List;
 @Repository
 public interface StabPlanDetailApprDao {
     List<StabPlanDetailApprVO> findAll(StabPlanDetailApprVO param);
-    List<StabPlanDetailApprVO> getHeaderDetail(StabPlanDetailApprVO param);
-    List<StabPlanDetailApprVO> getAnsList(StabPlanDetailApprVO param);
     @Audit(target = StSbtPln.class, label = AuditEvent.StabPln.approve)
     int approve(StabPlanDetailApprVO param);
     @Audit(target = StSbtPln.class, label = AuditEvent.StabPln.reject)

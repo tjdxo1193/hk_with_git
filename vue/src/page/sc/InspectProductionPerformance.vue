@@ -5,15 +5,13 @@
     @button-click="fetchPerformanceGrid"
   />
   <Card>
-    <AUIGrid
-      v-bind="detailGrid"
-      @grid-created="(proxy) => $setState('detailGrid.$grid', proxy)"
-    />
+    <AUIGrid v-bind="detailGrid" @grid-created="(proxy) => $setState('detailGrid.$grid', proxy)" />
   </Card>
 </template>
 
 <script>
 import { FormUtil } from '@/util/index.js';
+
 import values from './values/inspectProductionPerformance.js';
 
 export default {
@@ -28,7 +26,7 @@ export default {
         event: {
           cellDoubleClick: (event) => {
             this.makeParam(event);
-          }
+          },
         },
       },
       detailGrid: {
@@ -51,8 +49,8 @@ export default {
         .catch(() => {
           this.$error(this.$message.error.fetchData);
         });
-        $grid.setGridData(data);
-        this.init();
+      $grid.setGridData(data);
+      this.init();
     },
     async fetchDetailGrid(param) {
       const { $grid } = this.detailGrid;

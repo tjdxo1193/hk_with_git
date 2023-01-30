@@ -530,6 +530,7 @@
                              WHERE QPI.PLNT_CD = #{plntCd}
                                AND QPI.PITM_CD = #{pitmCd}
                                AND QPI.PITM_VER = #{pitmVer}) QPITM ON QPITM.LAB_NO = MESD.LAB_NO
+        WHERE PRD_DIV = #{prdDiv}
     </select>
 
     <select id="getPackagingItemListToModal" parameterType="SpecManageVO" resultType="specManagePitmVO">

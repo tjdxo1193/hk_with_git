@@ -149,27 +149,43 @@ export default {
     },
     async save() {
       const param = FormUtil.getData(this.inputForm.forms);
-      await this.$eSign(() => this.$axios.post('/tp/sampleUsage', param))
-        .then(() => {
-          this.$info(this.$message.info.saved);
-          this.fetchSampleUsageGrid();
-          this.init();
-        })
-        .catch(() => {
-          this.$error(this.$message.error.saveData);
-        });
+      if (this.isBiggerThanSmpVol()) {
+        if (this.isPositive()) {
+          await this.$eSign(() => this.$axios.post('/tp/sampleUsage', param))
+            .then(() => {
+              this.$info(this.$message.info.saved);
+              this.fetchSampleUsageGrid();
+              this.init();
+            })
+            .catch(() => {
+              this.$error(this.$message.error.saveData);
+            });
+        } else {
+          return this.$warn(this.$message.warn.noNegativeNumber);
+        }
+      } else {
+        return this.$warn(this.$message.warn.biggerThanRemains);
+      }
     },
     async update() {
       const param = FormUtil.getData(this.inputForm.forms);
-      await this.$eSign(() => this.$axios.put('/tp/sampleUsage', param))
-        .then(() => {
-          this.$info(this.$message.info.saved);
-          this.init();
-          this.fetchSampleUsageGrid();
-        })
-        .catch(() => {
-          this.$error(this.$message.error.saveData);
-        });
+      if (this.isBiggerThanSmpVol()) {
+        if (this.isPositive()) {
+          await this.$eSign(() => this.$axios.put('/tp/sampleUsage', param))
+            .then(() => {
+              this.$info(this.$message.info.saved);
+              this.init();
+              this.fetchSampleUsageGrid();
+            })
+            .catch(() => {
+              this.$error(this.$message.error.saveData);
+            });
+        } else {
+          return this.$warn(this.$message.warn.noNegativeNumber);
+        }
+      } else {
+        return this.$warn(this.$message.warn.biggerThanRemains);
+      }
     },
     async delete() {
       const param = FormUtil.getData(this.inputForm.forms);
@@ -182,6 +198,17 @@ export default {
         .catch(() => {
           this.$error(this.$message.error.deleteData);
         });
+    },
+    isBiggerThanSmpVol() {
+      const { forms } = this.inputForm;
+      const remains = FormUtil.getValue(forms, 'remains');
+      const useSmpVol = FormUtil.getValue(forms, 'useSmpVol');
+      return Number(remains) >= Number(useSmpVol);
+    },
+    isPositive() {
+      const { forms } = this.inputForm;
+      const useSmpVol = FormUtil.getValue(forms, 'useSmpVol');
+      return Number(useSmpVol) > 0;
     },
     onClickInputFormButtons({ name }) {
       if (name === 'requestApproveUse') {
@@ -230,6 +257,7 @@ export default {
       this.setButtonsEnable(data.smpUseProc);
     },
     onSelectSample(data) {
+      this.init();
       const forms = this.inputForm.forms;
       FormUtil.setData(forms, data);
       this.setUserInfo();

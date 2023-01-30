@@ -9,16 +9,20 @@
                (SELECT DTL_NM
                 FROM SY_CD_DTL SCD
                 WHERE SCD.PLNT_CD = #{plntCd}
-                  AND SCD.DTL_CD = QSU.SMP_USE_PROC)                                                         AS SMP_USE_NM,
+                  AND SCD.DTL_CD = QSU.SMP_USE_PROC)                                             AS SMP_USE_NM,
+               QSM.MNG_SMP_VOL,
                QSU.USE_SMP_VOL,
+               QS.SUM_VOL,
+               QS.REMAINS,
+               QSM.INP_UNIT,
                QSU.USE_PPS,
                QSU.USE_UID,
-               (SELECT USER_NM FROM SY_USER SU WHERE SU.PLNT_CD = #{plntCd} AND SU.USER_ID = QSU.USE_UID)    AS USE_NM,
+               (SELECT USER_NM FROM SY_USER WHERE PLNT_CD = #{plntCd} AND USER_ID = QSU.USE_UID) AS USE_NM,
                QSU.USE_DT,
                QSU.STRG_PLA,
                QSU.SMP_USE_APR_IDX,
                QSU.RJT_UID,
-               (SELECT USER_NM FROM SY_USER SU2 WHERE SU2.PLNT_CD = #{plntCd} AND SU2.USER_ID = QSU.RJT_UID) AS RJT_NM,
+               (SELECT USER_NM FROM SY_USER WHERE PLNT_CD = #{plntCd} AND USER_ID = QSU.RJT_UID) AS RJT_NM,
                QSU.RJT_DS,
                QSU.RJT_REA,
                QPAP.ANS_NO,
@@ -28,10 +32,23 @@
                QSM.PITM_CD,
                QSM.PITM_NM,
                QSM.PITM_TYP,
-               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = PITM_TYP)                                        AS PITM_TYP_NM,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = PITM_TYP)                            AS PITM_TYP_NM,
                QSM.SMP_DIV_CD,
-               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = SMP_DIV_CD)                                      AS SMP_DIV_NM
+               QSM.SMP_DPS_PROC,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.SMP_DPS_PROC)                    AS SMP_DPS_NM,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = SMP_DIV_CD)                          AS SMP_DIV_NM
         FROM QS_SMP_USE QSU
+                 LEFT JOIN (SELECT QSU.PLNT_CD,
+                                   QSU.SMP_MNG_IDX,
+                                   QSM.MNG_SMP_VOL,
+                                   SUM(USE_SMP_VOL)                   AS SUM_VOL,
+                                   QSM.MNG_SMP_VOL - SUM(USE_SMP_VOL) AS REMAINS
+                            FROM QS_SMP_USE QSU
+                                     LEFT JOIN QS_SMP_MNG QSM
+                                               ON QSU.PLNT_CD = QSM.PLNT_CD and QSU.SMP_MNG_IDX = QSM.SMP_MNG_IDX
+                            WHERE QSU.DEL_YN = 'N'
+                            GROUP BY QSU.PLNT_CD, QSU.SMP_MNG_IDX, QSM.MNG_SMP_VOL) QS
+                           ON QS.SMP_MNG_IDX = QSU.SMP_MNG_IDX
                  LEFT JOIN QS_SMP_MNG QSM ON QSU.PLNT_CD = QSM.PLNT_CD AND QSU.SMP_MNG_IDX = QSM.SMP_MNG_IDX
                  LEFT JOIN QT_PITM_ANS_INFO QPAI on QSM.PLNT_CD = QPAI.PLNT_CD and QSM.ANS_IDX = QPAI.ANS_IDX
                  LEFT JOIN QT_PITM_ANS_PROC QPAP on QPAI.PLNT_CD = QPAP.PLNT_CD and QPAI.ANS_IDX = QPAP.ANS_IDX
@@ -44,17 +61,17 @@
         SELECT QSM.PLNT_CD,
                QSM.SMP_MNG_IDX,
                QSM.SMP_DPS_PROC,
-               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = SMP_DPS_PROC)                      AS SMP_DPS_NM,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = SMP_DPS_PROC)                         AS SMP_DPS_NM,
                QSM.PITM_TYP,
-               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.ANS_TYP)                       AS ANS_TYP_NM,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.ANS_TYP)                          AS ANS_TYP_NM,
                QSM.PITM_CD,
-               (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = '1100' AND DTL_CD = QSM.PITM_TYP) AS PITM_TYP_NM,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = #{plntCd} AND DTL_CD = QSM.PITM_TYP) AS PITM_TYP_NM,
                QSM.PITM_NM,
                QSM.ANS_TYP,
-               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.ANS_TYP)                       AS ANS_TYP_NM,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.ANS_TYP)                          AS ANS_TYP_NM,
                QSM.ANS_IDX,
                QSM.SMP_DIV_CD,
-               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.SMP_DIV_CD)                    AS ANS_DIV_NM,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.SMP_DIV_CD)                       AS SMP_DIV_NM,
                QSM.MNG_SMP_VOL,
                QSM.SMP_STRG_MTD,
                QSM.SMP_VOL_UNIT,
@@ -69,8 +86,20 @@
                QSM.DPS_EXP_DT,
                QSM.SMP_DPS_APR_IDX,
                QSM.SMP_ETR_DT,
-               QPAP.ANS_NO
+               QPAP.ANS_NO,
+               NVL(QS.SUM_VOL, 0)                                                                 AS SUM_VOL,
+               NVL(QS.REMAINS, QSM.MNG_SMP_VOL)                                                   AS REMAINS
         FROM QS_SMP_MNG QSM
+                 LEFT JOIN (SELECT QSU.PLNT_CD,
+                                   QSU.SMP_MNG_IDX,
+                                   SUM(USE_SMP_VOL)                   AS SUM_VOL,
+                                   QSM.MNG_SMP_VOL - SUM(USE_SMP_VOL) AS REMAINS
+                            FROM QS_SMP_USE QSU
+                                     LEFT JOIN QS_SMP_MNG QSM
+                                               ON QSU.PLNT_CD = QSM.PLNT_CD AND QSU.SMP_MNG_IDX = QSM.SMP_MNG_IDX
+                            WHERE QSU.DEL_YN = 'N'
+                            GROUP BY QSU.PLNT_CD, QSU.SMP_MNG_IDX, QSM.MNG_SMP_VOL) QS
+                           ON QS.PLNT_CD = QSM.PLNT_CD AND QS.SMP_MNG_IDX = QSM.SMP_MNG_IDX
                  LEFT JOIN QT_PITM_ANS_INFO QPAI ON QSM.PLNT_CD = QPAI.PLNT_CD AND QSM.ANS_IDX = QPAI.ANS_IDX
                  LEFT JOIN QT_PITM_ANS_PROC QPAP on QPAI.PLNT_CD = QPAP.PLNT_CD and QPAI.ANS_IDX = QPAP.ANS_IDX
         WHERE QSM.PLNT_CD = #{plntCd}
@@ -81,7 +110,7 @@
 
     <insert id="create" parameterType="SampleUsageVO">
         <selectKey keyProperty="useSeq" resultType="Integer" order="BEFORE">
-            SELECT NVL(MAX(USE_SEQ) + 1, 0)
+            SELECT NVL(MAX(USE_SEQ) + 1, 1)
             FROM QS_SMP_USE
             WHERE PLNT_CD = #{plntCd} AND SMP_MNG_IDX = #{smpMngIdx}
         </selectKey>

@@ -64,7 +64,7 @@ export default {
       parameter.opsSpecUseVerYn = this.$props.yn;
       parameter.plntCd = TokenUtil.myPlantCode();
       const data = await $grid
-        ._useLoader(() => this.$axios.get('/ts/srmMesModal/getPackingSpecList', parameter))
+        ._useLoader(() => this.$axios.get('/ts/testIFModal/getPackingSpecList', parameter))
         .then(({ data }) => data);
 
       $grid.setGridData(data);

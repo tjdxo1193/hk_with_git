@@ -10,17 +10,27 @@
     />
     <ActionBar :buttons="buttonGroups.buttons" @button-click="onClickButtonGroups" />
   </ModalBase>
+
+  <InputReasonModal
+    :show="inputReasonModal.show"
+    @modalReturnDataEvent="modalReturnDataEvent"
+    @close="hideModal('inputReasonModal')"
+  />
 </template>
 
 <script>
-import { FormUtil } from '@/util/index.js';
 import dayjs from 'dayjs';
+
+import { FormUtil } from '@/util/index.js';
+
+import { InputReasonModal, }  from '@/page/modal';
 
 import values from './values/stabDetailPlanRegModal';
 
 export default {
   name: 'StabDetailPlanRegModal',
   emits: ['close'],
+  components: { InputReasonModal },
   props: {
     show: Boolean,
     title: {
@@ -38,6 +48,10 @@ export default {
     selectedItem: {
       type: Object,
       default: {},
+    },
+    disable: {
+      type: Boolean,
+      default: true,
     },
   },
   data() {
@@ -59,39 +73,74 @@ export default {
       buttonGroups: {
         buttons: buttonGroups.buttons,
       },
+      inputReasonModal: {
+        show: false,
+        updateType: null,
+      },
     };
   },
   methods: {
-    onInit() {
+    doInit() {
       this.settingInfoText();
       this.preLoadGrid();
       this.resetStabEachTestInfoForms();
-      this.enableStabEachTestInfoAddBtn();
+      if (!this.$props.disable) {
+        this.enableStabEachTestInfoAddBtn();
+        this.enableStabEachTestInfoForms();
+        this.enableButtonGroups();
+      } else {
+        this.disableStabEachTestInfoAddBtn();
+        this.disableStabEachTestInfoForms();
+        this.disableButtonGroups();
+      }
       this.disableStabEachTestInfoModifyBtn();
       this.disableStabEachTestInfoDeleteBtn();
     },
+    // 기본 정보 바인딩
     settingStabEachTestInfoForms() {
       const { forms } = this.stabEachTestInfo;
       const { selectedItem } = this.$props;
-      
+
       FormUtil.setData(forms, { ...selectedItem });
     },
+    // 상세계획정보 바인딩
     settingInfoText() {
       const { forms } = this.detailPlanInfo;
       const item = this.$props.selectedItem;
-      const txtinfo1 = "시험목적: " + (item?.ansPpsNm ? item.ansPpsNm : '') + "/ " + (item?.ansPpsDtl ? item.ansPpsDtl : '') + "\n" +
-        "시험종류: " + (item?.ansKndNm ? item.ansKndNm : '') + "\n" +
-        "시험시작일: " + (item?.ansStrDt ? item.ansStrDt : '') + "\n" +
-        "시험기간: " + (item?.ansTrmMarkNm ? item.ansTrmMarkNm : '');
+      const txtinfo1 =
+        '시험목적: ' +
+        (item?.ansPpsNm ? item.ansPpsNm : '') +
+        '/ ' +
+        (item?.ansPpsDtl ? item.ansPpsDtl : '') +
+        '\n' +
+        '시험종류: ' +
+        (item?.ansKndNm ? item.ansKndNm : '') +
+        '\n' +
+        '시험시작일: ' +
+        (item?.ansStrDt ? item.ansStrDt : '') +
+        '\n' +
+        '시험기간: ' +
+        (item?.ansTrmMarkNm ? item.ansTrmMarkNm : '');
 
-      const txtinfo2 = "보관조건: " + (item?.strgTermsNm ? item.strgTermsNm : '') + "\n" +
-        "안정성검체량: " + (item?.sbtSmpVol ? item.sbtSmpVol : '') + ' ' + (item?.smpVolUnitNm ? item.smpVolUnitNm : '');
+      const txtinfo2 =
+        '보관조건: ' +
+        (item?.strgTermsNm ? item.strgTermsNm : '') +
+        '\n' +
+        '안정성검체량: ' +
+        (item?.sbtSmpVol ? item.sbtSmpVol : '') +
+        ' ' +
+        (item?.smpVolUnitNm ? item.smpVolUnitNm : '');
 
-      const txtinfo3 = "제조번호: " + (item?.lotNo ? item.lotNo : '') + "\n" +
-        "유효기간: " + (item?.expiredate ? item.expiredate : '');
+      const txtinfo3 =
+        '제조번호: ' +
+        (item?.lotNo ? item.lotNo : '') +
+        '\n' +
+        '유효기간: ' +
+        (item?.expiredate ? item.expiredate : '');
 
       FormUtil.setData(forms, { txtinfo1, txtinfo2, txtinfo3 });
     },
+    // 폼 버튼 이벤트
     onClickEditButton({ name }) {
       if (name === 'add') {
         //추가
@@ -99,12 +148,13 @@ export default {
       }
       if (name === 'update') {
         //수정
-        this.update();
+        this.preUpdate('inputReasonModal', 'update');
       }
       if (name === 'delete') {
-        this.delete();
+        this.preUpdate('inputReasonModal', 'delete');
       }
     },
+    // 동적 그리드 컨트롤러
     async preLoadGrid() {
       const data = await this.fetchItemSettingList();
 
@@ -113,6 +163,7 @@ export default {
 
       this.loadGrid(headerDetail, aitmData);
     },
+    // 그리드에 바인딩될 데이터 조회
     async fetchItemSettingList() {
       const { $grid } = this.itemSettingList;
       const parameter = this.$props.selectedItem;
@@ -123,23 +174,26 @@ export default {
 
       return data;
     },
+    // 동적 그리드 그리기
     async loadGrid(data = [], aitmData = []) {
       const { $grid } = this.itemSettingList;
       const { forms } = this.stabEachTestInfo;
+      const ansCylDivNm = FormUtil.getValue(forms, 'ansCylDivNm');
+
       $grid.destroy();
 
       const dataGrid = [
         {
-          col: "항목명"
+          col: '항목명',
         },
         {
-          col: "항목명"
+          col: '항목명',
         },
         {
-          col: "항목명"
+          col: '항목명',
         },
         {
-          col: "항목명"
+          col: '항목명',
         },
       ];
 
@@ -147,7 +201,7 @@ export default {
 
       columnLayout2.push({
         dataField: 'aitmKn',
-        headerText: "항목명",
+        headerText: '항목명',
         width: 240,
         cellMerge: true,
       });
@@ -159,15 +213,21 @@ export default {
         showRowCheckColumn: false,
         enableSorting: false,
         fixedColumnCount: 1,
-        editableOnFixedCell: true
+        editableOnFixedCell: true,
       };
 
       for (const i in data) {
-        columnLayout2.push(
-          { dataField: 'collv1' + i,
-            headerText: data[i]?.accMarkNm ? data[i].accMarkNm : '',
-            width: '120',
-            children: [
+        columnLayout2.push({
+          // 최상단 부모 레벨의 컬럼에 핵심 데이터 저장
+          dataField: 'collv1' + i,
+          headerText: data[i]?.accMarkNm
+            ? data[i].accMarkNm + (data[i].accMarkNm != 'Initial' ? ' ' + ansCylDivNm : '')
+            : '',
+          ansSmpVol: data[i]?.ansSmpVol ? data[i].ansSmpVol : '',
+          sbtAnsIdx: data[i]?.sbtAnsIdx ? data[i].sbtAnsIdx : '',
+          ansDt: data[i]?.ansDt ? data[i].ansDt : '',
+          width: '120',
+          children: [
             {
               dataField: 'collv2',
               headerText: data[i]?.ansDt ? dayjs(data[i].ansDt).format('YYYY-MM-DD') : '',
@@ -183,20 +243,34 @@ export default {
                       headerText: data[i]?.ansSmpVol ? data[i].ansSmpVol : '',
                       width: '120',
                       renderer: {
-                        type: "CheckBoxEditRenderer",
+                        type: 'CheckBoxEditRenderer',
                         showLabel: false,
                         editable: true,
-                        checkableFunction: (rowIndex, columnIndex, value, isChecked, item, dataField) => {
+                        checkableFunction: (
+                          rowIndex,
+                          columnIndex,
+                          value,
+                          isChecked,
+                          item,
+                          dataField,
+                        ) => {
                           const dateTxt = data[i].ansDt;
-                          const dtTestDate = dateTxt ? dayjs(dateTxt).format('YYYY-MM-DD') : null;
-                          const preTxtRemark = data[i].accMarkNm;
-                          const txtRemark = preTxtRemark ? preTxtRemark.split(" ")[0] : "";
+                          const ansDt = dateTxt ? dayjs(dateTxt).format('YYYY-MM-DD') : null;
+                          const preAccMarkNm = data[i].accMarkNm;
+                          const accMarkNm = preAccMarkNm ? preAccMarkNm.split(' ')[0] : '';
 
-                          FormUtil.setData(forms, { dtTestDate, txtRemark });
+                          FormUtil.setData(forms, { ansDt, accMarkNm });
                           return true;
                         },
-                        disabledFunction: function (rowIndex, columnIndex, value, isChecked, item, dataField) {
-                          if (data[i].accMarkNm == "Initial") {
+                        disabledFunction: function (
+                          rowIndex,
+                          columnIndex,
+                          value,
+                          isChecked,
+                          item,
+                          dataField,
+                        ) {
+                          if (data[i].accMarkNm == 'Initial') {
                             return true;
                           }
                           // If the name of the line item is Anna, the checkbox is disabled
@@ -204,20 +278,25 @@ export default {
                             return true;
                           }
                           return false;
-                        }
+                        },
                       },
-                      styleFunction: (rowIndex, columnIndex, value, headerText, item, dataField) => {
-                        // Filter 
-                        if (this.isTestStop(data[columnIndex - 1]?.sbtAnsStt))
-                          return 'testStop';
+                      styleFunction: (
+                        rowIndex,
+                        columnIndex,
+                        value,
+                        headerText,
+                        item,
+                        dataField,
+                      ) => {
+                        // Filter
+                        if (this.isTestStop(data[columnIndex - 1]?.sbtAnsStt)) return 'testStop';
                         else if (this.isTestOnProcess(data[columnIndex - 1]?.sbtAnsStt))
                           return 'testProgress';
                         else if (this.isTestEnd(data[columnIndex - 1]?.sbtAnsStt))
                           return 'textExit';
-                      }
+                      },
                     },
                   ],
-
                 },
               ],
             },
@@ -228,18 +307,15 @@ export default {
       let dataHeader = data;
       let countData = data?.length;
       $grid.create(columnLayout2, auiGridProps2);
+
       // Set data grid 1
-      // 내일 할 일 ☆
-      // 밑에 배열 두 개는 일단 보류.
-      // this.auditBeforCheckData = [];
-      // this.auditAfterCheckData = [];
       let useYn = [];
       const data2 = aitmData?.table2;
       if (aitmData?.length) {
         let iAuditCnt = 0;
-        let aitmKn = "";
-        let accMarkNm = "";
-        let checkData = "";
+        let aitmKn = '';
+        let accMarkNm = '';
+        let checkData = '';
         for (const i in aitmData) {
           let objFor = { col: aitmData[i].aitmKn, col_Tag: aitmData[i].amitmCd };
           useYn[i] = aitmData[i].useYn;
@@ -252,7 +328,7 @@ export default {
           for (const i in dataHeader) {
             for (const j in aitmData) {
               for (const k in data2) {
-                if (aitmData[j]['amitmCd'] == data2[k].amitmCd && dataHeader[i].stabilityUnitCode == data2[k].stabilityUnitCode) {
+                if (aitmData[j]['amitmCd'] == data2[k].amitmCd) {
                   const colName = 'col' + i;
                   aitmData[j][colName] = true;
                 }
@@ -262,8 +338,6 @@ export default {
               accMarkNm = dataHeader[i]['accMarkNm'];
               checkData = aitmData[j]['col' + i];
               checkData = !!checkData;
-              // this.auditBeforCheckData[iAuditCnt] = analName + "/" + period + "/" + checkData;
-              // iAuditCnt++;
             }
           }
         }
@@ -273,7 +347,7 @@ export default {
       }
 
       $grid.setGridData(aitmData);
-      
+
       const columns = [];
       const columnSize = $grid.getColumnCount();
       for (let i = 1; i < columnSize; i++) {
@@ -284,28 +358,38 @@ export default {
 
       $grid.bind('cellClick', (event) => {
         if (event.columnIndex == 0) {
-          const dtTestDate = '';
-          const txtRemark = '';
-          const txtSampleAmt = '';
-          FormUtil.setData(forms, { dtTestDate, txtRemark, txtSampleAmt });
+          const ansDt = '';
+          const accMarkNm = '';
+          const ansSmpVol = '';
+          const sbtAnsIdx = '';
+          FormUtil.setData(forms, { ansDt, accMarkNm, ansSmpVol, sbtAnsIdx });
 
-          this.enableStabEachTestInfoAddBtn();
+          if (!this.$props.disable) {
+            this.enableStabEachTestInfoAddBtn();
+          } else {
+            this.disableStabEachTestInfoAddBtn();
+          }
           this.disableStabEachTestInfoModifyBtn();
           this.disableStabEachTestInfoDeleteBtn();
         } else {
-          const preDtTestDate = dataHeader[event.columnIndex - 1].ansDt;
-          const dtTestDate = preDtTestDate ? dayjs(preDtTestDate).format('YYYY-MM-DD') : '';
-          const preTxtRemark = dataHeader[event.columnIndex - 1].accMarkNm;
-          const txtRemark = preTxtRemark ? preTxtRemark.split(" ")[0] : "";
-          const txtSampleAmt = dataHeader[event.columnIndex - 1].ansSmpVol;
+          const preAnsDt = dataHeader[event.columnIndex - 1].ansDt;
+          const ansDt = preAnsDt ? dayjs(preAnsDt).format('YYYY-MM-DD') : '';
+          const preAccMarkNm = dataHeader[event.columnIndex - 1].accMarkNm;
+          const accMarkNm = preAccMarkNm ? preAccMarkNm.split(' ')[0] : '';
+          const ansSmpVol = dataHeader[event.columnIndex - 1].ansSmpVol;
+          const sbtAnsIdx = dataHeader[event.columnIndex - 1].sbtAnsIdx;
 
-          FormUtil.setData(forms, { dtTestDate, txtRemark, txtSampleAmt });
-          
+          FormUtil.setData(forms, { ansDt, accMarkNm, ansSmpVol, sbtAnsIdx });
+
           this.disableStabEachTestInfoAddBtn();
-          
+
           const { sbtAnsProc } = this.$props.selectedItem;
 
-          if (this.isPlnStop(sbtAnsProc) || this.isPlnSafetyAccepted(sbtAnsProc)) {
+          if (
+            this.isPlnStop(sbtAnsProc) ||
+            this.isPlnSafetyAccepted(sbtAnsProc) ||
+            this.$props.disable
+          ) {
             this.disableStabEachTestInfoModifyBtn();
             this.disableStabEachTestInfoDeleteBtn();
           } else {
@@ -317,15 +401,15 @@ export default {
 
       for (let iRow = 0; iRow < dataGrid.length; iRow++) {
         //최신버전에서 삭제된 항목은 수정할 수 없도록 막음
-        if (useYn[iRow] == "N") {
-
+        if (useYn[iRow] == 'N') {
         }
       }
-      // });
     },
     async stabilityDetailAnalysis(grid, stabilityCode) {
       const data = await grid
-        ._useLoader(() => this.$axios.get('/stability_test_plan/stability-detail-analysis', { stabilityCode }))
+        ._useLoader(() =>
+          this.$axios.get('/stability_test_plan/stability-detail-analysis', { stabilityCode }),
+        )
         .then(({ data }) => data)
         .catch(() => {
           this.$error(this.$message.error.fetchData);
@@ -333,6 +417,7 @@ export default {
 
       return data;
     },
+    // 그리드 크기 조정
     async setGirdColumnSizeExlude(myGrid, excludeColumns, width, isExtend) {
       let colSizeList = myGrid.getFitColumnSizeList(false);
       const columnLayout = myGrid.getColumnLayout();
@@ -340,18 +425,21 @@ export default {
       for (var i = 0; i < colSizeList.length; i++) {
         if (!!columnLayout[i] && !!columnLayout[i].dataField) {
           const colValues = myGrid.getColumnDistinctValues(columnLayout[i].dataField);
-          const maxColumnSize = colValues.map(value => new Blob([value]).size).reduce((prev, current) => (prev > current) ? prev : current , 0) * 5;
+          const maxColumnSize =
+            colValues
+              .map((value) => new Blob([value]).size)
+              .reduce((prev, current) => (prev > current ? prev : current), 0) * 5;
 
           if (maxColumnSize > colSizeList[i]) {
-              colSizeList[i] = maxColumnSize;
+            colSizeList[i] = maxColumnSize;
           }
         }
 
         if (excludeColumns.includes(i)) {
           if (isExtend) {
-            colSizeList[i] = (typeof width == 'number') ? colSizeList[i] + width : null;
+            colSizeList[i] = typeof width == 'number' ? colSizeList[i] + width : null;
           } else {
-            colSizeList[i] = (typeof width == 'number') ? width : null;
+            colSizeList[i] = typeof width == 'number' ? width : null;
           }
         } else {
           colSizeList[i] += 10;
@@ -360,39 +448,131 @@ export default {
 
       myGrid.setColumnSizeList(colSizeList);
     },
-    getToday(){
+    // 오늘 날짜 얻기
+    getToday() {
       let date = new Date();
       let year = date.getFullYear();
-      let month = ("0" + (1 + date.getMonth())).slice(-2);
-      let day = ("0" + date.getDate()).slice(-2);
+      let month = ('0' + (1 + date.getMonth())).slice(-2);
+      let day = ('0' + date.getDate()).slice(-2);
 
       return year + month + day;
     },
+    // 안정성검체량 총합 확인
+    checkAnsSmpVol() {
+      let totalSum = 0;
+      const { forms } = this.stabEachTestInfo;
+      const preAnsSmpVol = FormUtil.getValue(forms, 'ansSmpVol');
+      const ansSmpVol = preAnsSmpVol ? preAnsSmpVol : 0;
+
+      const sbtAnsIdx = FormUtil.getValue(forms, 'sbtAnsIdx');
+
+      const { $grid } = this.itemSettingList;
+      const gridHeader = $grid.getColumnLayout();
+      const ansSmpVolList = gridHeader
+        .filter((data) => data.sbtAnsIdx != sbtAnsIdx)
+        .map((data) => data.ansSmpVol)
+        .filter((data) => data);
+
+      if (ansSmpVolList.length) {
+        const sumReducer = (prev, current) => prev + current;
+        totalSum += Number(ansSmpVolList.reduce(sumReducer));
+      }
+
+      totalSum += Number(ansSmpVol);
+
+      const item = this.$props.selectedItem;
+      const sbtSmpVol = item.sbtSmpVol;
+
+      return sbtSmpVol < totalSum;
+    },
+    // 추가
     add() {
-      // 내일 할 일 ☆
-      // forms에 바인딩 된 데이터를 긁어서 추가, 수정, 삭제 작업을 진행할 것이다.
-      // 대상이 되는 주체 테이블은 ST_SBT_ANS이고 부가 테이블은 ST_SBT_ANS_AITM이다.
-      // ST_SBT_ANS_AITM은 ST_SBT_ANS에 자식 테이블이며, ST_SBT_ANS_SITM은 삭제, 사용 여부를 판단하는 컬럼이 없으므로, 수정, 체크 유무에 따라 데이터를 추가하던, 지우던 하면된다.
       const { forms } = this.stabEachTestInfo;
-      const data = FormUtil.getData(forms, 'forms');
-      console.log(data,' data');
+      const parameter = FormUtil.getData(forms);
+
+      if (this.checkAnsSmpVol()) {
+        this.$warn(this.$message.warn.noExceedAnsSmpVol);
+        return;
+      }
+
+      forms.validate().then(() => {
+        this.$eSign(() => this.$axios.put('st/stabPlan/detail', parameter))
+          .then(() => {
+            this.$info(this.$message.info.saved);
+            this.doInit();
+          })
+          .catch(() => {
+            this.$error(this.$message.error.createData);
+          });
+      });
     },
-    update() {
+    // 모달 띄우기, 가리기
+    showModal(modalName) {
+      this.$setState(modalName, { show: true });
+    },
+    hideModal(modalName) {
+      this.$setState(modalName, { show: false });
+    },
+    // 수정, 삭제 시 사유 모달
+    modalReturnDataEvent({ rjtReaDiv, rjtRea }) {
+      const updateType = this.inputReasonModal.updateType;
+      if (!updateType || !rjtReaDiv || !rjtRea) {
+        return;
+      }
+
+      if (updateType === 'update') {
+        this.update({ rjtReaDiv, rjtRea });
+      } else if (updateType === 'delete') {
+        this.delete({ rjtReaDiv, rjtRea });
+      }
+    },
+    // 수정 전, 사유 받기
+    preUpdate(modalName, updateType) {
+      this.inputReasonModal.updateType = updateType;
+      this.showModal(modalName);
+    },
+    // 수정
+    update({ rjtReaDiv, rjtRea }) {
       const { forms } = this.stabEachTestInfo;
-      const data = FormUtil.getData(forms, 'forms');
-      console.log(data,' data');
+      const parameter = { rjtReaDiv, rjtRea, ...FormUtil.getData(forms) };
+
+      if (this.checkAnsSmpVol()) {
+        this.$warn(this.$message.warn.noExceedAnsSmpVol);
+        return;
+      }
+
+      forms.validate().then(() => {
+        this.$eSign(() => this.$axios.put('st/stabPlan/detail', parameter))
+          .then(() => {
+            this.$info(this.$message.info.saved);
+            this.doInit();
+          })
+          .catch(() => {
+            this.$error(this.$message.error.createData);
+          });
+      });
     },
-    delete() {
+    // 삭제
+    delete({ rjtReaDiv, rjtRea }) {
       const { forms } = this.stabEachTestInfo;
-      const data = FormUtil.getData(forms, 'forms');
-      console.log(data,' data');
+      const parameter = { rjtReaDiv, rjtRea, ...FormUtil.getData(forms) };
+
+      this.$eSign(() => this.$axios.post('st/stabPlan/detail', parameter))
+        .then(() => {
+          this.$info(this.$message.info.saved);
+          this.doInit();
+        })
+        .catch(() => {
+          this.$error(this.$message.error.createData);
+        });
     },
+    // 하단 버튼 이벤트
     onClickButtonGroups({ name }) {
       if (name == 'save') {
         this.save();
       }
       if (name == 'reset') {
-        this.onInit();
+        this.doInit();
       }
     },
 
@@ -400,7 +580,6 @@ export default {
       return sbtAnsProc === 'S0290300';
     },
     isPlnStop(sbtAnsProc) {
-      // return this.$props.sbtAnsProc === '시험중단';
       return sbtAnsProc === 'S0290400';
     },
 
@@ -441,27 +620,87 @@ export default {
       FormUtil.disableButtons(buttons, ['delete']);
     },
 
+    enableButtonGroups() {
+      const { buttons } = this.buttonGroups;
+      FormUtil.enableButtons(buttons, ['save']);
+    },
+    disableButtonGroups() {
+      const { buttons } = this.buttonGroups;
+      FormUtil.disableButtons(buttons, ['save']);
+    },
+
+    enableStabEachTestInfoForms() {
+      const { forms } = this.stabEachTestInfo;
+      FormUtil.enable(forms, ['ansDt', 'accMarkNm', 'ansSmpVol']);
+    },
+    disableStabEachTestInfoForms() {
+      const { forms } = this.stabEachTestInfo;
+      FormUtil.disable(forms, ['ansDt', 'accMarkNm', 'ansSmpVol']);
+    },
+
     resetStabEachTestInfoForms() {
       this.stabEachTestInfo.forms = values.stabEachTestInfo.forms();
       this.settingStabEachTestInfoForms();
     },
 
+    // 체크박스 저장
     save() {
+      const tempString = 'col';
+
+      const { forms } = this.stabEachTestInfo;
       const { $grid } = this.itemSettingList;
       const gridData = $grid.getGridData();
-      
-      console.log($grid.getGridData());
+      const gridHeader = $grid.getColumnLayout();
+
+      let saveDataList = [];
+      // Initial의 안정성 시험 IDX(SBT_ANS_IDX)
+      let sbtAnsIdx = gridHeader[1]?.sbtAnsIdx;
+
+      for (const i in gridData) {
+        for (const j in gridHeader) {
+          const currentData = gridData[i];
+          const isSelected = currentData[tempString + j];
+
+          if (!isSelected || !Number(j)) {
+            continue;
+          }
+
+          const index = Number(j) + 1;
+          saveDataList.push({
+            sbtAnsIdx: gridHeader[index]?.sbtAnsIdx,
+            amitmCd: gridData[i]?.amitmCd,
+          });
+        }
+      }
+
+      if (!saveDataList.length) {
+        this.$warn(this.$message.warn.unSelectedData);
+        return;
+      }
+
+      const sbtPlnIdx = FormUtil.getValue(forms, 'sbtPlnIdx');
+      const detailPlanRegList = this.$copy(saveDataList);
+      const parameter = { sbtPlnIdx, sbtAnsIdx, detailPlanRegList };
+
+      this.$eSign(() => this.$axios.put('st/stabPlan/detail/saveDetailPlanReg', parameter))
+        .then(() => {
+          this.$info(this.$message.info.saved);
+          this.doInit();
+        })
+        .catch(() => {
+          this.$error(this.$message.error.createData);
+        });
     },
     close() {
       this.$emit('close');
     },
   },
   watch: {
-    show: function() {
-      if(!this.$props.show) return;
+    show: function () {
+      if (!this.$props.show) return;
 
-      this.onInit();
-    }
-  }
+      this.doInit();
+    },
+  },
 };
 </script>

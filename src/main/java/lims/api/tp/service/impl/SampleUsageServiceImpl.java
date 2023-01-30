@@ -95,4 +95,8 @@ public class SampleUsageServiceImpl implements SampleUsageService {
         approveInfo.setAprReqUid(param.getAprReqUid());
         return approveInfo;
     }
+
+    private boolean isBiggerThanSum() {
+        return false;
+    }
 }

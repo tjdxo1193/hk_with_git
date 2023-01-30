@@ -192,7 +192,7 @@ public class WrapTestManageServiceImpl implements WrapTestManageService {
 	}
 
 	@Override
-	public Integer getSapPrdhaDuplicateCheck(WrapTestManageVO param) {
+	public String getSapPrdhaDuplicateCheck(WrapTestManageVO param) {
 		return wrapTestManageDao.getSapPrdhaDuplicateCheck(param);
 	}
 

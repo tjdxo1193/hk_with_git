@@ -7,25 +7,22 @@ const rvsDivPsComboList = [
 ];
 
 const valueWithMItemSpecList = {
-  forms: () =>
-  FormBuilder.builder()
-  .Hidden('mitmCd', '품목코드')
-  .build()
-}
+  forms: () => FormBuilder.builder().Hidden('mitmCd', '품목코드').build(),
+};
 const valueWithVersionList = {
   forms: () =>
-  FormBuilder.builder()
-  .Hidden('specProcCd', '진행상황')
-  .Hidden('mitmCd', '모니터링항목코드')
-  .Hidden('aitmSpecIdx', '시험항목 규격 IDX')
-  .Hidden('aitmSpecVer', '버전')
-  .Hidden('rvsDt', '개정일자')
-  .Hidden('enfoDt', '시행일자')
-  .Hidden('rvsCtt', '개정내역')
-  .Hidden('rvsReaCd', '개정사유')
-  .Hidden('rvsDivPs', '개정구분')
-  .build()
-}
+    FormBuilder.builder()
+      .Hidden('specProcCd', '진행상황')
+      .Hidden('mitmCd', '모니터링항목코드')
+      .Hidden('aitmSpecIdx', '시험항목 규격 IDX')
+      .Hidden('aitmSpecVer', '버전')
+      .Hidden('rvsDt', '개정일자')
+      .Hidden('enfoDt', '시행일자')
+      .Hidden('rvsCtt', '개정내역')
+      .Hidden('rvsReaCd', '개정사유')
+      .Hidden('rvsDivPs', '개정구분')
+      .build(),
+};
 
 const mItemSpecList = {
   static: {
