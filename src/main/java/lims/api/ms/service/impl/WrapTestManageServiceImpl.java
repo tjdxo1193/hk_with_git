@@ -184,16 +184,21 @@ public class WrapTestManageServiceImpl implements WrapTestManageService {
 			||SpecProgress.REVIEW_RETURN.equals(specInfo.getSpecProcCd())){
 				// 규격 IDX 만 변경
 				wrapTestManageDao.updateAitmIdxByTemporaryStorage(ivo);
-			}else if(SpecProgress.REQUEST_REVIEW.equals(specInfo.getSpecProcCd())
-			||SpecProgress.APPROVAL_REJECTION.equals(specInfo.getSpecProcCd())
-			||SpecProgress.APPROVAL_REQUEST.equals(specInfo.getSpecProcCd())){
+				continue;
+			}
+
+			specInfo.setSpecProcCd(SpecProgress.TEMPORARY_STORAGE.getCode());
+
+			if(SpecProgress.REQUEST_REVIEW.equals(specInfo.getSpecProcCd())
+					||SpecProgress.APPROVAL_REJECTION.equals(specInfo.getSpecProcCd())
+					||SpecProgress.APPROVAL_REQUEST.equals(specInfo.getSpecProcCd())){
 				// 버전업 규격 새로 임시저장에 aitmIdx 새거 넣고 기존거 규격삭제
 				wrapTestManageDao.updateProcessCodeToSpecRemove(ivo);
 				wrapTestManageDao.insertVersionUpBySapPrdha(ivo);
 			}else if(SpecProgress.APPROVED.equals(specInfo.getSpecProcCd())){
-				System.out.println("버전업 규격 새로 임시저장에 aitmIdx 새거 넣고 기존거 N");
-
+				// 버전업 규격 새로 임시저장에 aitmIdx 새거 넣고 기존거 N
 			}
+
 		}
 
 		ApproveVO approveInfo = setApproveVO(param);

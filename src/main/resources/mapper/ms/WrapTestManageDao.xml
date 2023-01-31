@@ -544,8 +544,35 @@
 		 		 , #{rjtRea}
 			)
 	</insert>
-	<insert id="insertVersionUpBySapPrdha">
 
+	<insert id="insertVersionUpBySapPrdha" parameterType="ItemManageVO">
+
+		INSERT INTO QM_PITM_SPEC
+		(
+			PLNT_CD
+			, PITM_CD
+			, PITM_VER
+			, AITM_SPEC_IDX
+			, SPEC_PROC_CD
+			, PITM_SPEC_IDX
+			, ENFO_DT
+			, DEL_YN
+			, USE_VER_YN
+			, DOC_NO
+		)
+		VALUES
+		(
+			#{plntCd}
+		, 	#{pitmCd}
+		, 	#{pitmVer}
+		, 	#{aitmSpecIdx}
+		, 	#{specProcCd}
+		, 	#{pitmSpecIdx}
+		, 	#{enfoDt}
+		, 	'N'
+		, 	'N'
+		, 	#{docNo}
+		)
 	</insert>
 
 	<update id="updateApprovalSideEffect" parameterType="WrapTestManageVO">
@@ -575,18 +602,20 @@
         	AND PKGA_VER = #{pkgaVer}
     </update>
 
-	<update id="updateAitmIdxByTemporaryStorage" parameterType="ItemManageVO">
+	<update id="updateAitmIdxByTemporaryStorage" parameterType="SpecManageVO">
 		UPDATE QM_PITM_SPEC
 			SET AITM_SPEC_IDX = #{aitmSpecIdx}
 		WHERE PITM_CD = #{pitmCd}
 		AND PITM_VER = #{pitmVer}
+		AND PITM_SPEC_IDX = #{pitmSpecIdx}
 	</update>
 
-	<update id="updateProcessCodeToSpecRemove" parameterType="ItemManageVO">
+	<update id="updateProcessCodeToSpecRemove" parameterType="SpecManageVO">
 		UPDATE QM_PITM_SPEC
 			SET SPEC_PROC_CD = #{specProcCd}
 		WHERE PITM_CD = #{pitmCd}
 	    AND PITM_VER = #{pitmVer}
+	    AND PITM_SPEC_IDX = #{pitmSpecIdx}
 	</update>
 
 	<select id="getSapList" parameterType="WrapTestManageVO" resultType="WrapTestManageVO">
@@ -657,6 +686,20 @@
 	</select>
 
 	<select id="findSpecListByItemInfo" parameterType="WrapTestManageVO" resultType="SpecManageVO">
-
+		SELECT
+			PLNT_CD
+			,PITM_SPEC_IDX
+			,PITM_CD
+            ,PITM_VER
+            ,AITM_SPEC_IDX
+            ,SPEC_PROC_CD
+            ,DEL_YN
+            ,USE_VER_YN
+            ,DOC_NO
+            ,ENFO_DT
+		FROM QM_PITM_SPEC
+		WHERE PLNT_CD = #{plntCd}
+		AND PITM_CD = #{pitmCd}
+		AND PITM_VER = #{pitmVer}
 	</select>
 </mapper>
