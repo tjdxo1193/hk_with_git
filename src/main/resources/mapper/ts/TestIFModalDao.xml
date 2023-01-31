@@ -64,41 +64,63 @@
         ORDER BY QPAP.ANS_IDX, QPAP.REQ_IDX
     </select>
 
-    <select id="getRelapsePrevList" parameterType="TestIFModalVO" resultType="TestIFModalVO">
+    <select id="getPrvRcrReportList" parameterType="TestIFModalVO" resultType="TestIFModalVO">
         SELECT BATCH_NO
-            , SEQ
             , PHS_ORDER_NO
             , MAK_NO
-            , FILE_NAME
+            , IF_INFO_IDX AS FILE_IDX
+            , SEQ AS FILE_SRLNO
+            , FILE_NAME AS NAME
             , FILE_ID
-            , FILE_DATA
+            , FILE_DATA AS SRC
             , CRT_DS
             , IF_INFO_IDX
         FROM MS_SRM_REO_PREV
+        WHERE 1=1
+        AND BATCH_NO = #{batchNo}
+        <if test="phsOrderNo != null and phsOrderNo != ''">
+            AND PHS_ORDER_NO = #{phsOrderNo}
+        </if>
+        <if test="lotNo != null and lotNo != ''">
+            AND MAK_NO = #{lotNo}
+        </if>
     </select>
 
     <select id="getSrmReportList" parameterType="TestIFModalVO" resultType="TestIFModalVO">
         SELECT BATCH_NO
-            , SEQ
             , RPT_DIV
             , PHS_ORDER_NO
             , MAK_NO
-            , FILE_NAME
+            , IF_INFO_IDX AS FILE_IDX
+            , SEQ AS FILE_SRLNO
+            , FILE_NAME AS NAME
             , FILE_ID
-            , FILE_DATA
+            , FILE_DATA AS SRC
             , CRT_DS
             , IF_INFO_IDX
         FROM MS_SRM_RPT
+        WHERE 1=1
+        AND BATCH_NO = #{batchNo}
+        <if test="phsOrderNo != null and phsOrderNo != ''">
+            AND PHS_ORDER_NO = #{phsOrderNo}
+        </if>
+        <if test="lotNo != null and lotNo != ''">
+            AND MAK_NO = #{lotNo}
+        </if>
     </select>
 
     <select id="getPackingSpecList" parameterType="TestIFModalVO" resultType="TestIFModalVO">
         SELECT PITM_CD
             , VER
-            , FILE_NAME
-            , FILE_DATA
+            , IF_INFO_IDX AS FILE_IDX
+            , VER AS FILE_SRLNO
+            , FILE_NAME AS NAME
+            , FILE_DATA AS SRC
             , CRT_DS
             , IF_INFO_IDX
         FROM MS_MES_PKG_SPEC
+        WHERE 1=1
+        AND PITM_CD = #{pitmCd}
     </select>
 
     <select id="getInpPerformanceList" parameterType="TestIFModalVO" resultType="TestIFModalVO">

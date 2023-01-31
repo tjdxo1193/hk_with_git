@@ -12,7 +12,6 @@ import lims.api.integration.enums.TrsInterface;
 import lims.api.integration.exception.IntegrationNoSavedException;
 import lims.api.integration.model.InterfaceTrsResponse;
 import lims.api.integration.service.ELNService;
-import lims.api.integration.service.RevService;
 import lims.api.integration.service.TrsService;
 import lims.api.integration.service.impl.postProcessor.InterfacePostProcessorMap;
 import lims.api.integration.vo.ELNCtReportVO;
@@ -29,7 +28,6 @@ import java.util.stream.Collectors;
 @Service
 public class ELNServiceImpl implements ELNService {
 
-    private final RevService revService;
     private final Publisher publisher;
     private final ELNDao elnDao;
     private final TrsService trsService;
@@ -37,12 +35,10 @@ public class ELNServiceImpl implements ELNService {
 
     public ELNServiceImpl(InterfaceSystemFactory factory,
                           HttpEntityFactory entityFactory,
-                          RevService revService,
                           ELNDao elnDao,
                           TrsService trsService,
                           InterfacePostProcessorMap postProcessorMap) {
         this.publisher = new Publisher(factory.createSystem(InterfaceSystemType.ELN), entityFactory);
-        this.revService = revService;
         this.elnDao = elnDao;
         this.trsService = trsService;
         this.postProcessorMap = postProcessorMap;

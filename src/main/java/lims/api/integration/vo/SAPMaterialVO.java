@@ -55,9 +55,14 @@ public class SAPMaterialVO {
         private String zprodAbbr;
 
         private boolean changedLabNo = false;
+        private boolean changedELNStandard = false;
 
         public void markingChangeLabNo() {
             this.changedLabNo = true;
+        }
+
+        public void markingFromELNStandard() {
+            this.changedELNStandard = true;
         }
     }
 

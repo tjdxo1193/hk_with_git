@@ -150,6 +150,12 @@ public class SAPController {
     }
 
     @Permit
+    @PostMapping("devTest/bom")
+    public void devTestBOM(@RequestBody RevStateful rev) {
+        postProcessorMap.get(RevInterface.SAP_BOM).execute(rev);
+    }
+
+    @Permit
     @PostMapping("devTest/testPerformance")
     public void purchaseInboundPerformance(@RequestBody List<SAPSendVO.TestPerformanceOfPurchaseInbound> param) {
         sapService.publishTestPerformanceOfPurchaseInbound(param);

@@ -24,7 +24,7 @@ public class SAPBOMPostProcessor implements PostProcessor {
     public synchronized void execute(RevStateful rev) {
         int count = 0;
 
-        masterDao.deleteBOM();
+//        masterDao.deleteBOM();
 
         List<SAPBomVO> latestBOMs = sapDao.findBOMByDegree(rev.getDegree());
         for (SAPBomVO bom : latestBOMs) {

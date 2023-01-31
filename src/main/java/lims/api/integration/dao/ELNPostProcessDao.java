@@ -1,6 +1,7 @@
 package lims.api.integration.dao;
 
 import lims.api.integration.vo.ELNPostProcessVO;
+import lims.api.integration.vo.ELNStandardSpecVO;
 import lims.api.integration.vo.SAPPostProcessVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
@@ -11,7 +12,7 @@ import java.util.List;
 @Repository
 public interface ELNPostProcessDao {
     
-    List<ELNPostProcessVO.PItemSpec> findFinalSpecByLabNo(String materialCode);
+    List<ELNPostProcessVO.PItemSpec> findFinalSpecByLabNoAndPrdDiv(ELNStandardSpecVO.DifferentKey param);
 
     int nextIdxOfSpec(ELNPostProcessVO.PItemSpec vo);
 

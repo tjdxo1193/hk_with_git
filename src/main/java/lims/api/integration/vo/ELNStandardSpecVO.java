@@ -1,13 +1,18 @@
 package lims.api.integration.vo;
 
 import lims.api.integration.domain.eai.RevStateful;
-import lims.api.integration.enums.ProductDiv;
 import lims.api.integration.enums.StandardCategory;
+import lims.api.ms.enums.ELNProductDiv;
 import lims.api.util.process.KeyGenerator;
 import lims.api.util.process.MappingKey;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Getter
 @Setter
@@ -19,7 +24,7 @@ public class ELNStandardSpecVO extends RevStateful implements KeyGenerator {
     @MappingKey
     private String labNo;
     @MappingKey
-    private ProductDiv prdDiv;
+    private ELNProductDiv prdDiv;
     @MappingKey
     private String amitmCd;
     private String labNoErpCode;
@@ -41,7 +46,7 @@ public class ELNStandardSpecVO extends RevStateful implements KeyGenerator {
         @MappingKey
         private String labNo;
         @MappingKey
-        private ProductDiv prdDiv;
+        private ELNProductDiv prdDiv;
 
     }
 
@@ -64,7 +69,22 @@ public class ELNStandardSpecVO extends RevStateful implements KeyGenerator {
         private Float owcSlvUpp;
         private String unit;
         private String rm;
+    }
 
+    @Getter
+    @RequiredArgsConstructor
+    public static class DifferentKey {
+        private final String labNo;
+        private final ELNProductDiv prdDiv;
+
+        public String getPrdDivCode() {
+            List<String> codes = prdDiv.getPItemCodes();
+            return "'" + String.join("', '", codes) + "'";
+        }
+
+        public boolean contains(String labNo) {
+            return StringUtils.equals(this.labNo, labNo);
+        }
     }
 
 }

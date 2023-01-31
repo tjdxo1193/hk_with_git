@@ -11,7 +11,6 @@ import lims.api.integration.enums.RevInterface;
 import lims.api.integration.enums.TrsInterface;
 import lims.api.integration.exception.IntegrationNoSavedException;
 import lims.api.integration.model.InterfaceTrsResponse;
-import lims.api.integration.service.RevService;
 import lims.api.integration.service.SRMService;
 import lims.api.integration.service.TrsService;
 import lims.api.integration.service.impl.postProcessor.InterfacePostProcessorMap;
@@ -33,7 +32,6 @@ import java.util.Map;
 @Service
 public class SRMServiceImpl implements SRMService {
 
-    private final RevService revService;
     private final Publisher publisher;
     private final SRMDao srmDao;
     private final InterfaceCommonDao commonDao;
@@ -42,13 +40,11 @@ public class SRMServiceImpl implements SRMService {
 
     public SRMServiceImpl(InterfaceSystemFactory factory,
                           HttpEntityFactory entityFactory,
-                          RevService revService,
                           SRMDao srmDao,
                           InterfaceCommonDao commonDao,
                           TrsService trsService,
                           InterfacePostProcessorMap postProcessorMap) {
         this.publisher = new Publisher(factory.createSystem(InterfaceSystemType.SRM), entityFactory);
-        this.revService = revService;
         this.srmDao = srmDao;
         this.commonDao = commonDao;
         this.trsService = trsService;

@@ -15,6 +15,8 @@ public interface SAPMasterDao {
 
     List<SAPMaterialVO.Mara> findMaterialMaraAll();
 
+    SAPMaterialVO.Mara findMaterialMaraById(String matnr);
+
     List<SAPMaterialVO.Mara> findMaterialMara(List<SAPMaterialVO.Mara> mara);
 
     int createMaterialMara(SAPMaterialVO.Mara param);
@@ -23,6 +25,8 @@ public interface SAPMasterDao {
 
 
     List<SAPMaterialVO.Marc> findMaterialMarcAll();
+
+    SAPMaterialVO.Marc findMaterialMarcById(SAPMaterialVO.Marc param);
 
     List<SAPMaterialVO.Marc> findMaterialMarc(List<SAPMaterialVO.Marc> param);
 

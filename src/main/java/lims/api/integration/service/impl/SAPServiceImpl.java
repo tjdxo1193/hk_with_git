@@ -1,6 +1,5 @@
 package lims.api.integration.service.impl;
 
-import lims.api.integration.exception.IntegrationNoSavedException;
 import lims.api.integration.dao.InterfaceCommonDao;
 import lims.api.integration.dao.SAPDao;
 import lims.api.integration.domain.eai.*;
@@ -8,8 +7,8 @@ import lims.api.integration.enums.InterfaceResponseStatus;
 import lims.api.integration.enums.InterfaceSystemType;
 import lims.api.integration.enums.RevInterface;
 import lims.api.integration.enums.TrsInterface;
+import lims.api.integration.exception.IntegrationNoSavedException;
 import lims.api.integration.model.InterfaceTrsResponse;
-import lims.api.integration.service.RevService;
 import lims.api.integration.service.SAPService;
 import lims.api.integration.service.TrsService;
 import lims.api.integration.service.impl.postProcessor.InterfacePostProcessorMap;
@@ -28,7 +27,6 @@ import java.util.Map;
 @Service
 public class SAPServiceImpl implements SAPService {
 
-    private final RevService revService;
     private final Publisher publisher;
     private final SAPDao sapDao;
     private final InterfaceCommonDao commonDao;
@@ -37,13 +35,11 @@ public class SAPServiceImpl implements SAPService {
 
     public SAPServiceImpl(InterfaceSystemFactory factory,
                           HttpEntityFactory entityFactory,
-                          RevService revService,
                           SAPDao sapDao,
                           InterfaceCommonDao commonDao,
                           TrsService trsService,
                           InterfacePostProcessorMap postProcessorMap) {
         this.publisher = new Publisher(factory.createSystem(InterfaceSystemType.SAP), entityFactory);
-        this.revService = revService;
         this.sapDao = sapDao;
         this.commonDao = commonDao;
         this.trsService = trsService;

@@ -64,8 +64,12 @@ public class IntegrationSender {
         return rdHelper.toTempFile(mrdVO.getName(), mrdVO.getParameter(), mrdVO.getTargetFullName());
     }
 
-    private void sendFinishedTestForShipt() {
-        // TODO 승인 완료된 실험건들 QMS로 전송
+    /**
+     * 승인 완료된 실험건을 QMS로 전송
+     * Order No, Lot No에 포함되는 모든 완제품들이 오더 마감 되어야 전송됨.
+     */
+    private void sendFinishedTestForShipt(String batchNo) {
+        qmsService.publishShiptData(batchNo);
     }
 
     private void sendDeviation() {

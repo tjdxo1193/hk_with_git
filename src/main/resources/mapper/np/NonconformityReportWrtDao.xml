@@ -69,7 +69,7 @@
         JOIN QM_PITM_INFO F ON E.PLNT_CD = F.PLNT_CD AND E.PITM_CD = F.PITM_CD AND E.PITM_VER = F.PITM_VER
         JOIN QT_PITM_ANS_REQ G ON A.PLNT_CD = G.PLNT_CD AND A.REQ_IDX = G.REQ_IDX
         WHERE A.PLNT_CD = #{plntCd} AND A.ANS_PROC_CD = #{ansProcCd} AND A.SYT_JDG = #{sytJdg} AND A.HLD_YN = 'N'
-        AND DECODE(B.NON_CFM_PROC_CD, NULL, 'S0250100', B.NON_CFM_PROC_CD) IN ('S0250100','S0250110')
+        AND DECODE(B.NON_CFM_PROC_CD, NULL, 'S0250100', B.NON_CFM_PROC_CD) IN (#{processList[0]}, #{processList[1]})
         <if test="pitmTyp != null and pitmTyp != ''">
             AND F.PITM_TYP = #{pitmTyp}
         </if>

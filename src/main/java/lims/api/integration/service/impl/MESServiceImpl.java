@@ -12,7 +12,6 @@ import lims.api.integration.enums.TrsInterface;
 import lims.api.integration.exception.IntegrationNoSavedException;
 import lims.api.integration.model.InterfaceTrsResponse;
 import lims.api.integration.service.MESService;
-import lims.api.integration.service.RevService;
 import lims.api.integration.service.TrsService;
 import lims.api.integration.service.impl.postProcessor.InterfacePostProcessorMap;
 import lims.api.integration.vo.MESFinalOrderVO;
@@ -30,7 +29,6 @@ import java.util.Map;
 @Service
 public class MESServiceImpl implements MESService {
 
-    private final RevService revService;
     private final Publisher publisher;
     private final MESDao mesDao;
     private final InterfaceCommonDao commonDao;
@@ -39,13 +37,11 @@ public class MESServiceImpl implements MESService {
 
     public MESServiceImpl(InterfaceSystemFactory factory,
                           HttpEntityFactory entityFactory,
-                          RevService revService,
                           MESDao mesDao,
                           InterfaceCommonDao commonDao,
                           TrsService trsService,
                           InterfacePostProcessorMap postProcessorMap) {
         this.publisher = new Publisher(factory.createSystem(InterfaceSystemType.MES), entityFactory);
-        this.revService = revService;
         this.mesDao = mesDao;
         this.commonDao = commonDao;
         this.trsService = trsService;

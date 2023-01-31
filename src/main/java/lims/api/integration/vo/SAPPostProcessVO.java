@@ -22,6 +22,8 @@ public class SAPPostProcessVO {
             private String plntCd;
             private String pitmCd;
             private Integer version;
+
+//            private String labNo;
         }
 
         @Getter
@@ -68,16 +70,38 @@ public class SAPPostProcessVO {
             private Integer pitmVer;
             private String pitmTyp;
             private Integer ansDurDay;
+            private String crgDptCd;
+            private String spcmNo;
+            private String micYn;
+            private String clltMtd;
+            private String clltMcn;
+            private String clltPla;
+            private String smpStrgMtd;
+            private String smpVolUnit;
+            private String smpVolAns;
+            private String smpVolEtc;
+            private String smpVolMng;
+            private String pkgMtrSpec;
 
-            public PItemInfo(PItemKey itemKey) {
-                this.plntCd = itemKey.getPlntCd();
-                this.pitmCd = itemKey.getPitmCd();
-                this.pitmVer = itemKey.getVersion();
+            private Integer currentVersion;
+
+            public static PItemInfo of(PItemKey itemKey) {
+                return PItemInfo.builder()
+                        .plntCd(itemKey.getPlntCd())
+                        .pitmCd(itemKey.getPitmCd())
+                        .pitmVer(itemKey.getVersion())
+                        .build();
             }
 
-            public PItemInfo(PItemKey itemKey, Integer version) {
-                this.plntCd = itemKey.getPlntCd();
-                this.pitmCd = itemKey.getPitmCd();
+            public static PItemInfo ofFirstVersion(PItemKey itemKey, Integer version) {
+                return PItemInfo.builder()
+                        .plntCd(itemKey.getPlntCd())
+                        .pitmCd(itemKey.getPitmCd())
+                        .pitmVer(version)
+                        .build();
+            }
+
+            public void setPitmVer(Integer version) {
                 this.pitmVer = version;
             }
 
@@ -147,7 +171,6 @@ public class SAPPostProcessVO {
             private String udtUid;
 
             private Integer currentVersion;
-            private Integer nextVersion;
 
             private String sapPrdha;
 

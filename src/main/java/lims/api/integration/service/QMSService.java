@@ -1,10 +1,14 @@
 package lims.api.integration.service;
 
+import lims.api.integration.domain.qms.ShiptHandler;
+
 public interface QMSService {
 
     void publishTestMethodSemiAndFinished();
 
-    void publishShiptData(int orderNo, long LotNo);
+    void publishShiptData(String batchNo);
+
+    void publishShiptData(ShiptHandler handler);
 
     void publishOutboundTestResult();
 

@@ -35,7 +35,7 @@ public class NonconformityReportApprServiceImpl implements NonconformityReportAp
     public List<NonconformityReportApprVO> findAll(NonconformityReportApprVO param) {
         param.setAnsProcCd(TestProcess.TEST_FINISH.getProcessCode());
         param.setSytJdg(TestJudgement.UNSUITABLE.getJudgementCode());
-        param.setNonCfmProcCd(NonCfmProcess.UNSUITABLE_NOTICE_REQUEST.getProcessCode());
+        param.setNonCfmProcCd(NonCfmProcess.NON_CFM_REPORT_REQUEST.getProcessCode());
         return dao.findAll(param);
     }
 
@@ -49,6 +49,7 @@ public class NonconformityReportApprServiceImpl implements NonconformityReportAp
     public void approve(NonconformityReportApprVO param) {
         Token token = tokenHttpResolver.getAccessToken();
         String jwt = token.getJwt();
+        param.setNonCfmProcCd(NonCfmProcess.NON_CFM_REPORT_APPROVE.getProcessCode());
         approveService.approve(param.getNonCfmAprReqIdx());
         int result = dao.approve(param);
 
@@ -65,12 +66,12 @@ public class NonconformityReportApprServiceImpl implements NonconformityReportAp
                 .orderItm(param.getPhsOrderItm())
                 .build();
         //IFData, 부적합통보서, 재발방지대책서
-        /*sender.sendNonconformityReport(data,
+        sender.sendNonconformityReport(data,
             new ConvertMrd("NONCONFORMITY_REPORT.mrd", "/rp ["+param.getPlntCd()+"] ["+param.getAnsIdx()+"]"
                     , new TargetFile("부적합통보서_"+param.getBatchNo()+".pdf")),
             new ConvertMrd("MEASURES_TO_PREVENT_RECURRENCE.mrd", "/rp ["+param.getPlntCd()+"] ["+param.getAnsIdx()+"]"
                     , new TargetFile("재발방지대책서_"+param.getBatchNo()+".doc"))
-        );*/
+        );
         if (result == 0) {
             throw new NoUpdatedDataException();
         }
@@ -78,6 +79,7 @@ public class NonconformityReportApprServiceImpl implements NonconformityReportAp
 
     @Override
     public void reject(NonconformityReportApprVO param) {
+        param.setNonCfmProcCd(NonCfmProcess.NON_CFM_REPORT_REJECT.getProcessCode());
         int result = dao.reject(param);
 
         if (result == 0) {

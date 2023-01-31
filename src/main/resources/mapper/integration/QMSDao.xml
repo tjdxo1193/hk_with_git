@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.integration.dao.QMSDao">
+
+    <select id="findShiptBaseByBatchNo" resultType="lims.api.integration.vo.QMSSendVO$ShiptBase">
+        SELECT LOT_NO,
+               PDT_ORDER_NO,
+               PHS_ORDER_NO,
+               PHS_ORDER_ITM
+        FROM QT_PITM_ANS_REQ
+        WHERE BATCH_NO = #{batchNo}
+    </select>
+
+    <select id="findMESTestAllByOrderNoAndLotNo" resultType="lims.api.integration.vo.QMSSendVO$ShiptTest"
+            parameterType="lims.api.integration.vo.QMSSendVO$ShiptBase">
+        SELECT REQ.PLNT_CD,
+               REQ.REQ_IDX,
+               REQ.LOT_NO,
+               REQ.PDT_ORDER_NO,
+               REQ.PHS_ORDER_NO,
+               REQ.PHS_ORDER_ITM
+        FROM QT_PITM_ANS_REQ REQ
+                 LEFT JOIN QT_PITM_ANS_PROC PROC ON REQ.PLNT_CD = PROC.PLNT_CD AND REQ.REQ_IDX = PROC.REQ_IDX
+--         LEFT JOIN MS_SAP_INP_PFA IP ON REQ.PLNT_CD = IP.PLNT_CD AND REQ.MTR_CD = IP.MTR_CD AND REQ.BATCH_NO = IP.BATCH_NO
+--         LEFT JOIN MS_SAP_INP_PFA_DTL ON
+        WHERE REQ.LOT_NO = #{lotNo}
+          AND REQ.PDT_ORDER_NO = #{pdtOrderNo}
+    </select>
+
+
+    <select id="findSRMTestAllByOrderNoAndLotNo" resultType="lims.api.integration.vo.QMSSendVO$ShiptTest"
+            parameterType="lims.api.integration.vo.QMSSendVO$ShiptBase">
+        SELECT REQ.PLNT_CD,
+               REQ.REQ_IDX,
+               REQ.LOT_NO,
+               REQ.PDT_ORDER_NO,
+               REQ.PHS_ORDER_NO,
+               REQ.PHS_ORDER_ITM
+        FROM QT_PITM_ANS_REQ REQ
+                 LEFT JOIN QT_PITM_ANS_PROC PROC ON REQ.PLNT_CD = PROC.PLNT_CD AND REQ.REQ_IDX = PROC.REQ_IDX
+        WHERE LOT_NO = #{lotNo}
+          AND PHS_ORDER_NO = #{phsOrderNo}
+    </select>
+
+</mapper>

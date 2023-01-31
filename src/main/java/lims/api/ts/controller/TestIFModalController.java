@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -42,22 +43,22 @@ public class TestIFModalController {
         return ResponseEntity.ok(service.getInpPerformanceList(request));
     }
 
-    @GetMapping("/getRelapsePrevList")
-    public ResponseEntity<List<TestIFModalVO>> getRelapsePrevList(@AuthToken Token token, TestIFModalVO request) {
+    @GetMapping("/getPrvRcrReportList")
+    public ResponseEntity<List<TestIFModalVO>> getPrvRcrReportList(@AuthToken Token token, TestIFModalVO request) throws IOException {
         String jwt = token.getJwt();
         request.setPlntCd(jwtResolver.getPlantCode(jwt));
-        return ResponseEntity.ok(service.getRelapsePrevList(request));
+        return ResponseEntity.ok(service.getPrvRcrReportList(request));
     }
 
     @GetMapping("/getSrmReportList")
-    public ResponseEntity<List<TestIFModalVO>> getSrmReportList(@AuthToken Token token, TestIFModalVO request) {
+    public ResponseEntity<List<TestIFModalVO>> getSrmReportList(@AuthToken Token token, TestIFModalVO request) throws IOException {
         String jwt = token.getJwt();
         request.setPlntCd(jwtResolver.getPlantCode(jwt));
         return ResponseEntity.ok(service.getSrmReportList(request));
     }
 
     @GetMapping("/getPackingSpecList")
-    public ResponseEntity<List<TestIFModalVO>> getPackingSpecList(@AuthToken Token token, TestIFModalVO request) {
+    public ResponseEntity<List<TestIFModalVO>> getPackingSpecList(@AuthToken Token token, TestIFModalVO request) throws IOException {
         String jwt = token.getJwt();
         request.setPlntCd(jwtResolver.getPlantCode(jwt));
         return ResponseEntity.ok(service.getPackingSpecList(request));

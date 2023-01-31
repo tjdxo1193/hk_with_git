@@ -101,6 +101,7 @@ public class NonconformityReportWrtVO implements UpdateDetect {
     private String nonCfmRef; //부적합참조
     private String nonCfmEtc; //부적합기타
     private String nonCfmProcCd;
+    private List<String> processList;
     private String pitmSpcc; //품목 특이사항
     private String smpVolTot; //총검체량
 

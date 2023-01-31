@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="lims.api.np.dao.NonconformityReportApprDao">
-
-    <select id="findAll" parameterType="NonconformityReportApprVO" resultType="NonconformityReportApprVO">
+<mapper namespace="lims.api.np.dao.PreventRecurrenceReviewDao">
+    <select id="findAll" parameterType="PreventRecurrenceReviewVO" resultType="PreventRecurrenceReviewVO">
         SELECT A.PLNT_CD,
             A.ANS_IDX,
             A.RCP_DT,
@@ -61,21 +60,15 @@
             B.NON_CFM_REV,
             B.NON_CFM_REF,
             B.NON_CFM_ETC,
-            B.NON_CFM_APR_REQ_IDX,
-            (NVL(B.SMP_VOL_ANS, 0) + NVL(B.SMP_VOL_ETC, 0) + NVL(B.SMP_VOL_STRG, 0)) AS SMP_VOL_TOT,
-            G.PHS_ORDER_NO,
-            G.PHS_ORDER_ITM,
-            G.PDT_ORDER_NO
+            (NVL(B.SMP_VOL_ANS, 0) + NVL(B.SMP_VOL_ETC, 0) + NVL(B.SMP_VOL_STRG, 0)) AS SMP_VOL_TOT
         FROM QT_PITM_ANS_PROC A
         JOIN QT_PITM_ANS_INFO B ON A.PLNT_CD = B.PLNT_CD AND A.ANS_IDX = B.ANS_IDX
         JOIN QM_PITM_SPEC D ON A.PLNT_CD = D.PLNT_CD AND A.PITM_SPEC_IDX = D.PITM_SPEC_IDX
         JOIN QM_PITM E ON D.PLNT_CD = E.PLNT_CD AND D.PITM_CD = E.PITM_CD AND D.PITM_VER = E.PITM_VER
         JOIN QM_PITM_INFO F ON E.PLNT_CD = F.PLNT_CD AND E.PITM_CD = F.PITM_CD AND E.PITM_VER = F.PITM_VER
         JOIN QT_PITM_ANS_REQ G ON A.PLNT_CD = G.PLNT_CD AND A.REQ_IDX = G.REQ_IDX
-        LEFT JOIN SY_APR_INFO SAI ON SAI.PLNT_CD = A.PLNT_CD AND SAI.APR_IDX = B.NON_CFM_APR_REQ_IDX
         WHERE A.PLNT_CD = #{plntCd} AND A.ANS_PROC_CD = #{ansProcCd} AND A.SYT_JDG = #{sytJdg} AND A.HLD_YN = 'N'
-        AND B.NON_CFM_PROC_CD = #{nonCfmProcCd}
-        AND SAI.APR_UID = #{userId}
+        AND B.NON_CFM_PROC_CD IN (#{processList[0]}, #{processList[1]})
         <if test="pitmTyp != null and pitmTyp != ''">
             AND F.PITM_TYP = #{pitmTyp}
         </if>
@@ -100,7 +93,7 @@
         ORDER BY A.RCP_DT, A.ANS_IDX
     </select>
 
-    <select id="findResultItem" parameterType="NonconformityReportApprVO" resultType="NonconformityReportApprVO">
+    <select id="findResultItem" parameterType="PreventRecurrenceReviewVO" resultType="PreventRecurrenceReviewVO">
         SELECT C.PLNT_CD,
             A.REQ_IDX,
             C.ANS_IDX,
@@ -166,16 +159,17 @@
         ORDER BY C.RST_SEQ
     </select>
 
-    <update id="approve" parameterType="NonconformityReportApprVO">
+    <update id="save" parameterType="PreventRecurrenceReviewVO">
         UPDATE QT_PITM_ANS_INFO SET
-            NON_CFM_PROC_CD = #{nonCfmProcCd}
+        REO_PREV_RPY_CTT = #{reoPrevRpyCtt}
         WHERE PLNT_CD = #{plntCd} AND ANS_IDX = #{ansIdx}
     </update>
 
-    <update id="reject" parameterType="NonconformityReportApprVO">
+    <update id="requestAppr" parameterType="PreventRecurrenceReviewVO">
         UPDATE QT_PITM_ANS_INFO SET
-        NON_CFM_PROC_CD = #{nonCfmProcCd}
+        REO_PREV_APR_REQ_IDX = #{reoPrevAprReqIdx}
+        , REO_PREV_RPY_CTT = #{reoPrevRpyCtt}
+        , NON_CFM_PROC_CD = #{nonCfmProcCd}
         WHERE PLNT_CD = #{plntCd} AND ANS_IDX = #{ansIdx}
     </update>
-
 </mapper>

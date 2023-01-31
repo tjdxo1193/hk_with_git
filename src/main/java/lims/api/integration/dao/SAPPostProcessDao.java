@@ -3,6 +3,7 @@ package lims.api.integration.dao;
 import lims.api.integration.vo.SAPPostProcessVO;
 import lims.api.integration.vo.SAPTestRequestVO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -37,11 +38,9 @@ public interface SAPPostProcessDao {
 
     int createNextPItemSpec(SAPPostProcessVO.Material.PItemSpec param);
 
+    int updateToNullPItemSpecVersion(SAPPostProcessVO.Material.PItemKey param);
+
     SAPPostProcessVO.Material.PItemSpecVersion findPItemSpecVersionNextKey(SAPPostProcessVO.Material.PItemSpecVersion param);
-
-    int createPItemSpecVersion(SAPPostProcessVO.Material.PItemSpecVersion param);
-
-    int createPItemSpecAitm(SAPPostProcessVO.Material.PItemSpecVersion param);
 
     int updatePItem(SAPPostProcessVO.Material.PItem param);
 
@@ -67,5 +66,9 @@ public interface SAPPostProcessDao {
     int cancelTestRequestProcessToCancel(SAPPostProcessVO.TestRequest.PItemReqProcess param);
 
     List<SAPTestRequestVO.RequestHeader> findAllForReqTest();
+
+    SAPPostProcessVO.Material.PItemInfo findPItmInfoAllByKey(SAPPostProcessVO.Material.PItemKey param);
+
+    List<SAPPostProcessVO.Material.PItemInfoSap> findAllByLabNo(SAPPostProcessVO.Material.PItemKey param);
 
 }

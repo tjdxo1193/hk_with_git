@@ -329,6 +329,13 @@ public interface AuditEvent {
         String reject = "부적합통보서 반려";
     }
 
+    interface PreventRecurrenceReport {
+        String update = "재발방지대책서 수정";
+        String requestApprove = "재발방지대책서 승인요청";
+        String approve = "재발방지대책서 승인";
+        String reject = "재발방지대책서 반려";
+    }
+
     interface StabPln {
         String create = "안정성시험계획 생성";
         String update = "안정성시험계획 수정";

@@ -100,6 +100,7 @@ const testInfo = {
     FormBuilder.builder()
       .Hidden('plntCd')
       .Hidden('ansIdx')
+      .Hidden('nonCfmAprReqIdx')
       .Hidden('phsOrderNo', '구매오더번호')
       .Hidden('pdtOrderNo', '생산오더번호')
       .Hidden('phsOrderItm', '구매오더항목')

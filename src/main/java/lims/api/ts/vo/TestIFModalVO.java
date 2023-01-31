@@ -16,7 +16,7 @@ public class TestIFModalVO implements UpdateDetect {
     private String lotNo;
     private String finlStt;
     private String crtDs;
-    private String ifInfoIdx;
+    private Integer ifInfoIdx;
     /*의뢰정보*/
     private String phsOrderTyp; //구매 오더 유형
     private String pdtOrderTyp; //생산 오더 유형
@@ -32,15 +32,16 @@ public class TestIFModalVO implements UpdateDetect {
 
     /*재발방지대책서,SRM성적서,MES포장사양서*/
     private String batchNo;
-    private String seq;
     private String makNo;
-    private String fileName;
+    private String name;
+    private Integer fileIdx;
+    private Integer fileSrlno;
     private String fileId;
-    private String fileData;
+    private byte[] src;
+    private String type;
+    private Long size;
     private String rptDiv;
-    private String picmCd;
-    private String picmNm;
-    private String ver;
+    private Integer ver;
 
     /*투입실적*/
     private String mtrCd;

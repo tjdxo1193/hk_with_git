@@ -11,7 +11,7 @@ public interface TestIFModalDao {
 
     List<TestIFModalVO> getMesFinalOrderList(TestIFModalVO request);
 
-    List<TestIFModalVO> getRelapsePrevList(TestIFModalVO request);
+    List<TestIFModalVO> getPrvRcrReportList(TestIFModalVO request);
 
     List<TestIFModalVO> getSrmReportList(TestIFModalVO request);
 

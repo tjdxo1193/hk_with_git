@@ -373,20 +373,22 @@
     </insert>
 
     <select id="getNonconformityTestList" parameterType="TestReceiptVO" resultType="TestReceiptVO">
-        SELECT PLNT_CD,
-            REQ_IDX,
-            NON_CFM_SEQ,
-            ISP_REQ_NO,
-            ISP_REQ_NO_BLK,
-            ZEXFIELD1,
-            ZEXFIELD2,
-            ZEXFIELD3,
-            ZEXFIELD4,
-            ZEXFIELD5,
-            CRT_DS,
-            IF_INFO_IDX
-        FROM QT_PITM_ANS_REQ_NON_CFM
-        WHERE PLNT_CD = #{plntCd}
-        AND REQ_IDX = #{reqIdx}
+        SELECT QPAC.PLNT_CD
+            , QPAC.REQ_IDX
+            , QPAC.NON_CFM_SEQ
+            , QPAC.ISP_REQ_NO
+            , QPAC.ISP_REQ_NO_BLK
+            , QPAC.ZEXFIELD1
+            , QPAC.ZEXFIELD2
+            , QPAC.ZEXFIELD3
+            , QPAC.ZEXFIELD4
+            , QPAC.ZEXFIELD5
+            , QPAC.CRT_DS
+            , QPAC.IF_INFO_IDX
+            , QPAR.PHS_ORDER_TYP
+        FROM QT_PITM_ANS_REQ_NON_CFM QPAC
+        LEFT JOIN QT_PITM_ANS_REQ QPAR ON QPAC.REQ_IDX = QPAR.REQ_IDX AND QPAC.PLNT_CD = QPAR.PLNT_CD
+        WHERE QPAC.PLNT_CD = #{plntCd}
+        AND QPAC.REQ_IDX = #{reqIdx}
     </select>
 </mapper>
