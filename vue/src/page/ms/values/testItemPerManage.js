@@ -1,4 +1,4 @@
-import {ColumnBuilder, FormBuilder} from '@/util';
+import { ColumnBuilder, FormBuilder } from '@/util';
 
 const testItemSearch = {
   static: {
@@ -97,7 +97,7 @@ const testItemPerInfo = {
     title: '시험방법정보',
     countPerRow: 2,
     buttons: [
-      { name: 'elnSend', label: 'ELN전송'},
+      { name: 'elnSend', label: 'ELN전송' },
       { name: 'save', label: '저장' },
       { name: 'reset', label: '초기화' },
     ],

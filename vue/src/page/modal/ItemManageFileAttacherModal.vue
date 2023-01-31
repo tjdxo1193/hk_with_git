@@ -1,22 +1,20 @@
 <template>
   <ModalBase :title="title" :show="show" width="700px" :top="50" @close="close">
-    <AUIGrid v-bind="list" @grid-created="(proxy) => $setState('list.$grid', proxy)" />
+    <AUIGridSearch v-bind="list" @grid-created="(proxy) => $setState('list.$grid', proxy)"  
+      @button-click="onClickCommonInfoFormButtons"/>
 
     <Space :gap="10" />
 
-    <FormBase v-bind="detail">
+    <FormWithHeader v-bind="detail" @button-click="onClickCommonInfoFormButtons">
       <template #form-dropzone>
         <Dropzone @created="$setState('detail.dropzone', $event)" :option="{ readonly }" />
       </template>
-    </FormBase>
-
-    <template #footer>
-      <ActionBar :buttons="computedButtons" @button-click="onClickButton"></ActionBar>
-    </template>
+    </FormWithHeader>
   </ModalBase>
 </template>
 
 <script>
+import { FormUtil } from '@/util';
 import values from './values/itemManageFileAttacherModal';
 
 export default {
@@ -31,9 +29,9 @@ export default {
       type: Boolean,
       default: false,
     },
-    ctrptNo: {
-      type: Number,
-      default: 0,
+    initData: {
+      type: Object,
+      default: {},
     },
     readonly: {
       type: Boolean,
@@ -51,6 +49,7 @@ export default {
       list: {
         ...list.static,
         columns: list.columns(),
+        forms: list.forms(),
       },
       detail: {
         ...detail.static,
@@ -65,16 +64,17 @@ export default {
     },
     show() {
       if (this.$props.show) {
+        FormUtil.setData(this.list.forms, {pitmCd: this.$props.initData.pitmCd});
         this.getFileList();
       }
     },
   },
   methods: {
     existsCtrptNo() {
-      return this.$props.ctrptNo > 0;
+      return this.$props.initData.ctrptNo > 0;
     },
     async getFileList() {
-      const ctrptNo = this.$props.ctrptNo;
+      const ctrptNo = this.$props.initData.ctrptNo;
       const { $grid } = this.list;
 
       const data = await $grid
@@ -110,17 +110,6 @@ export default {
       this.$emit('close');
       this.list.$grid.clearGridData();
       this.detail.dropzone.clear();
-    },
-  },
-  computed: {
-    computedButtons() {
-      const { buttons } = values.list.static;
-      return (this.list.buttons = this.$props.readonly
-        ? buttons.map((button) => ({
-            ...button,
-            disabled: true,
-          }))
-        : buttons);
     },
   },
 };

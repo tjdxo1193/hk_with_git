@@ -10,14 +10,11 @@ const list = {
   static: {
     title: '조회',
     countPerRow: 4,
-    buttons: [
-      { name: 'select', label: '조회' },
-      { name: 'printExcel', label: 'Excel', disabled: true },
-    ],
+    buttons: [{ name: 'select', label: '조회' }],
     $grid: null,
     props: {
       editable: false,
-      showRowCheckColumn: true,
+      showRowCheckColumn: false,
       //headerHeight:'40px',
       rowStyleFunction: function (rowIndex, item) {
         if (item.useVerYn === 'N' || item.specUseVerYn === 'N') {

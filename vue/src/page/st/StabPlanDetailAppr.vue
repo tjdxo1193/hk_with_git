@@ -31,8 +31,7 @@ export default {
     InputReasonModal,
   },
   data() {
-    const { searchForm, gridForSearchResult, itemSettingList, buttonGroups } =
-      this.$copy(values);
+    const { searchForm, gridForSearchResult, itemSettingList, buttonGroups } = this.$copy(values);
     return {
       searchForm: {
         ...searchForm.static,
@@ -410,15 +409,15 @@ export default {
     // 안정성시험계획 승인
     approve() {
       const checkedRows = this.gridForSearchResult.$grid.getCheckedRowItems();
-      const parameter = checkedRows.map(row => row.item);
-      
+      const parameter = checkedRows.map((row) => row.item);
+
       // 내일 할 일 ☆
       // 01. 승인, 결과승인 마무리하기
       //  ㄴ 완료 프로세스: 계획 (승인, 반려), 중단 (승인, 반려)
       //  ㄴ 남은 프로세스: 결과 (승인, 반려), 계획 변경(승인, 반려)(이건 상태 코드가 따로 없다.)
       // 그러면 끝
       // 그리고 MIM 들어가기
-      
+
       if (parameter.length) {
         this.$eSign(() => this.$axios.put('/st/stabPlanDetailAppr/approve', parameter))
           .then(() => {

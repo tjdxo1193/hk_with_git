@@ -14,7 +14,7 @@ import values from './values/nonconformityTestModal';
 
 export default {
   name: 'NonconformityTestModal',
-  emits: ['close', 'modalReturnDataEvent'],
+  emits: ['close'],
   props: {
     title: {
       type: String,
@@ -36,18 +36,22 @@ export default {
         ...searchForm.static,
         columns: searchForm.columns(),
         buttons: searchForm.static.buttons,
-        event: {
-          cellDoubleClick: (e) => {
-            this.$emit('modalReturnDataEvent', e.item);
-          },
-        },
+        event: {},
       },
     };
+  },
+  watch: {
+    show() {
+      if (this.$props.show) {
+        this.getNonconformityTestList();
+      }
+    },
   },
   methods: {
     async getNonconformityTestList() {
       const { $grid } = this.searchForm;
       const parameter = { reqIdx: this.$props.reqIdx };
+      console.log(parameter, 'parameter');
       const data = await $grid
         ._useLoader(() => this.$axios.get('/ts/testReceipt/getNonconformityTestList', parameter))
         .then(({ data }) => data);

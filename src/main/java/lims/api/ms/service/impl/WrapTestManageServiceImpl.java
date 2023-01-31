@@ -171,19 +171,21 @@ public class WrapTestManageServiceImpl implements WrapTestManageService {
 	@Override
 	public void approval(WrapTestManageVO param) {
 		param.setSpecProcCd(SpecProgress.APPROVED.getCode());
-
 		// 먼저는 해당 sapprdha 코드를 가지고 있는 품목 정보들을 모두 가져온다.(포장재, delyn, useVeryn, 승인완료) pitmCd, pitmVer
 		// 그 품목정보들의 규격서중에.. 포장재 이전버전에 aitmidx를 가지고 있는 규격서들을 찾는다.
 		Set<String> codes = PItemType.getCodesRelatedToSpec();
-		String pItemTypeInClauseCondition = "'" +String.join("','", codes) + "'";
-		param.setPitmTyp(pItemTypeInClauseCondition);
+		String pItemTypeNotInClauseCondition = "'" +String.join("','", codes) + "'";
+		param.setPitmTyp(pItemTypeNotInClauseCondition);
 		List<ItemManageVO> itemList = wrapTestManageDao.getItemListBySapPrdha(param);
 		for(ItemManageVO ivo : itemList){
+
 			SpecManageVO specInfo = wrapTestManageDao.findSpecListByItemInfo(ivo);
+
 			if(SpecProgress.TEMPORARY_STORAGE.equals(specInfo.getSpecProcCd())
 			||SpecProgress.REVIEW_RETURN.equals(specInfo.getSpecProcCd())){
-				// 규격 IDX 만 변경
-				wrapTestManageDao.updateAitmIdxByTemporaryStorage(ivo);
+
+				// TODO 규격 IDX 만 변경
+				wrapTestManageDao.updateAitmIdxByTemporaryStorage(specInfo);
 				continue;
 			}
 
@@ -192,13 +194,18 @@ public class WrapTestManageServiceImpl implements WrapTestManageService {
 			if(SpecProgress.REQUEST_REVIEW.equals(specInfo.getSpecProcCd())
 					||SpecProgress.APPROVAL_REJECTION.equals(specInfo.getSpecProcCd())
 					||SpecProgress.APPROVAL_REQUEST.equals(specInfo.getSpecProcCd())){
-				// 버전업 규격 새로 임시저장에 aitmIdx 새거 넣고 기존거 규격삭제
-				wrapTestManageDao.updateProcessCodeToSpecRemove(ivo);
-				wrapTestManageDao.insertVersionUpBySapPrdha(ivo);
+
+				// TODO 버전업 규격 새로 임시저장에 aitmIdx 새거 넣고 기존거 규격삭제
+				wrapTestManageDao.updateProcessCodeToSpecRemove(specInfo); // 기존거 규격삭제
+
 			}else if(SpecProgress.APPROVED.equals(specInfo.getSpecProcCd())){
-				// 버전업 규격 새로 임시저장에 aitmIdx 새거 넣고 기존거 N
+
+				// TODO 버전업 규격 새로 임시저장에 aitmIdx 새거 넣고 기존거 N
+				wrapTestManageDao.updateSpecUseVerYnN(specInfo); // 기존거 USE_VER_YN => N
+
 			}
 
+			wrapTestManageDao.insertVersionUpBySapPrdha(specInfo); // 새로 임시저장, N , N, max+1
 		}
 
 		ApproveVO approveInfo = setApproveVO(param);

@@ -80,7 +80,7 @@ export default {
       const { $grid, forms } = this.list;
       const parameter = FormUtil.getData(forms);
       const data = await $grid
-        ._useLoader(() => this.$axios.get('/np/nonconformityReportWrt', parameter))
+        ._useLoader(() => this.$axios.get('/np/preventRecurrenceReview', parameter))
         .then(({ data }) => data);
       $grid.setGridData(data);
 
@@ -92,7 +92,7 @@ export default {
       const parameter = event.item;
       const data = await $grid
         ._useLoader(() =>
-          this.$axios.get('/np/nonconformityReportWrt/findResultItem', {
+          this.$axios.get('/np/preventRecurrenceReview/findResultItem', {
             ansIdx: parameter.ansIdx,
           }),
         )
@@ -103,7 +103,7 @@ export default {
     save() {
       const parameter = FormUtil.getData(this.testInfo.forms);
       this.$confirm(this.$message.confirm.saveData).then(() => {
-        this.$eSign(() => this.$axios.put('/np/nonconformityReportWrt/save', parameter))
+        this.$eSign(() => this.$axios.put('/np/preventRecurrenceReview/save', parameter))
           .then(() => {
             this.$info(this.$message.info.saved);
             this.init();
@@ -120,7 +120,7 @@ export default {
         ...parameter,
         approveInfo,
       };
-      this.$eSignWithReason(() => this.$axios.put('/np/nonconformityReportWrt/request', parameter))
+      this.$eSignWithReason(() => this.$axios.put('/np/preventRecurrenceReview/request', parameter))
         .then(() => {
           this.$info(this.$message.info.saved);
           this.init();

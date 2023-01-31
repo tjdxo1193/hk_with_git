@@ -12,10 +12,6 @@
       v-bind="bomGridWithForm"
       @grid-created="(proxy) => $setState('bomGridWithForm.$grid', proxy)"
     />
-
-    <template #footer>
-      <ActionBar :buttons="computedButtons" @button-click="onClickButton"></ActionBar>
-    </template>
   </ModalBase>
 </template>
 
@@ -40,6 +36,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    initData: {
+      type: Object,
+      default: {},
+    },
   },
   data() {
     const { bomGridWithForm, modalButtons } = this.$copy(values);
@@ -55,7 +55,6 @@ export default {
           },
         },
       },
-      modalButtons: modalButtons,
     };
   },
   mounted() {
@@ -63,6 +62,7 @@ export default {
   },
   watch: {
     show: function () {
+      FormUtil.setData(this.bomGridWithForm.forms, { matnr:this.$props.initData.pitmCd })
       this.fetchBomGrid();
     },
   },

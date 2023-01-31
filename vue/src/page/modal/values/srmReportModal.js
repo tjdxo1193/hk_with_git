@@ -14,8 +14,8 @@ const searchForm = {
     FormBuilder.builder()
       .Select('rptDiv', '성적서구분')
       .Input('batchNo', '배치번호')
-      .Input('makNo', '제조번호')
-      .Input('fileName', '파일명')
+      .Input('phsOrderNo', '구매오더번호')
+      .Input('lotNo', '제조번호')
       .build(),
   columns: () =>
     ColumnBuilder.builder()
@@ -23,9 +23,8 @@ const searchForm = {
       .col('rptDiv', '성적서구분')
       .col('phsOrderNo', '구매오더번호')
       .col('makNo', '제조번호')
-      .col('fileName', '파일명')
+      .col('name', '파일명')
       .col('crtDs', '수신일시')
-      .col('ifInfoIdx', '연계정보ID')
       .build(),
 };
 

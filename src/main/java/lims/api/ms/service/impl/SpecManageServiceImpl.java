@@ -44,8 +44,9 @@ public class SpecManageServiceImpl implements SpecManageService {
         if(PItemType.SEMI_MANUFACTURES_FILLING_FOAM.getCode().equals(param.getPitmTyp())
                 || PItemType.SEMI_MANUFACTURES_OTHER_PRODUCT.getCode().equals(param.getPitmTyp())){
             param.setPrdDiv(ELNProductDiv.F.name());
-        }else if(PItemType.SEMI_MANUFACTURES_BASE.getCode().equals(param.getPitmTyp())
-                || PItemType.SEMI_MANUFACTURES_BULK.getCode().equals(param.getPitmTyp())){
+        }else if(PItemType.SEMI_MANUFACTURES_BULK.getCode().equals(param.getPitmTyp())){
+            // TODO 미정 -> PItemType.SEMI_MANUFACTURES_BASE.getCode().equals(param.getPitmTyp())
+            // 반제품base는 LIMS에서 규격 추가 수정 -> ?? 위에 레벨,, 이건 원료 처럼 설정해야함. -> 확정되면 알려줌
             param.setPrdDiv(ELNProductDiv.S.name());
         }
         return dao.getSemiAItemList(param);

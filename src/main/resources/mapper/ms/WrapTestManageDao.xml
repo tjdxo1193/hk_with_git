@@ -42,13 +42,13 @@
 			 , QP.UDT_DS
 			 , QP.UDT_UID
 			 , (SELECT USER_NM FROM SY_USER B WHERE B.USER_ID = QP.UDT_UID) UDT_USER_NM
-		FROM 
+		FROM
 			QM_PKGA QP
 			INNER JOIN QM_PITM_AITM_SPEC QPAS
 				ON(QP.PLNT_CD = QPAS.PLNT_CD AND QP.AITM_SPEC_IDX = QPAS.AITM_SPEC_IDX)
-			LEFT JOIN SY_CD_DTL SDGRD 
+			LEFT JOIN SY_CD_DTL SDGRD
 				ON(QP.PLNT_CD = SDGRD.PLNT_CD AND QP.SPEC_PROC_CD = SDGRD.DTL_CD)
-		WHERE 
+		WHERE
 			1 = 1
 			AND QP.PLNT_CD = #{plntCd}
 			AND (QP.PLNT_CD, QP.PKGA_CD, QP.PKGA_VER) IN(SELECT PLNT_CD, PKGA_CD, MAX(PKGA_VER) FROM QM_PKGA WHERE PLNT_CD = #{plntCd} GROUP BY PLNT_CD, PKGA_CD)
@@ -115,7 +115,7 @@
 				AND QP.SAP_PRDHA = #{sapPrdha}
 			</if>
 	</select>
-	
+
 	<select id="getVersion" parameterType="WrapTestManageVO" resultType="WrapTestManageVO">
 		SELECT QP.PLNT_CD
 			 , QP.PKGA_CD
@@ -159,19 +159,19 @@
 			 , QP.UDT_DS
 			 , QPAS.AITM_SPEC_IDX
 			 , QPAS.AITM_SPEC_VER
-		FROM 
+		FROM
 			QM_PKGA QP
-		INNER JOIN QM_PITM_AITM_SPEC QPAS 
+		INNER JOIN QM_PITM_AITM_SPEC QPAS
 			ON (QP.PLNT_CD = QPAS.PLNT_CD AND QP.AITM_SPEC_IDX = QPAS.AITM_SPEC_IDX)
-		LEFT JOIN SY_CD_DTL SDPROC 
+		LEFT JOIN SY_CD_DTL SDPROC
 			ON (QP.PLNT_CD = SDPROC.PLNT_CD AND QP.SPEC_PROC_CD = SDPROC.DTL_CD)
-		WHERE 
+		WHERE
 			QPAS.PLNT_CD = #{plntCd}
 			AND QP.PKGA_CD = #{pkgaCd}
 		ORDER BY
 			PKGA_VER DESC
 	</select>
-	
+
 	<select id="getTestItem" parameterType="WrapTestManageVO" resultType="WrapTestManageVO">
 		SELECT
             QPSA.PLNT_CD
@@ -208,17 +208,17 @@
              , QPSA.EQM_USE_TM
 			 , QPSA.AITM_RMK
 			 , QPSA.MKR_QTY
-        FROM 
+        FROM
         	QM_PITM_SPEC_AITM QPSA
         	LEFT JOIN MS_AMITM MA ON QPSA.AMITM_CD = MA.AMITM_CD
         	LEFT JOIN MS_AITM M ON SUBSTR(QPSA.AMITM_CD, 0, 6) = M.AITM_CD
-        WHERE 
+        WHERE
         	QPSA.PLNT_CD = #{plntCd}
 	        AND QPSA.AITM_SPEC_IDX = #{aitmSpecIdx}
 	    ORDER BY
 	    	QPSA.AITM_ORD
 	</select>
-	
+
 	<select id="getSpec" parameterType="WrapTestManageVO" resultType="WrapTestManageVO">
 		SELECT DISTINCT
 			QPS.PLNT_CD
@@ -264,19 +264,19 @@
 			ON(QPS.PLNT_CD = QPAS.PLNT_CD AND QPS.AITM_SPEC_IDX = QPAS.AITM_SPEC_IDX)
 			INNER JOIN QM_PITM_INFO QPI
             ON(QPS.PLNT_CD = QPI.PLNT_CD AND QPS.PITM_CD = QPI.PITM_CD AND QPS.PITM_VER = QPI.PITM_VER)
-			LEFT JOIN SY_CD_DTL SDPROC 
+			LEFT JOIN SY_CD_DTL SDPROC
 			ON (QPS.PLNT_CD = SDPROC.PLNT_CD AND QPS.SPEC_PROC_CD = SDPROC.DTL_CD)
 		WHERE
 			QPS.PLNT_CD = #{plntCd}
 			AND QPS.AITM_SPEC_IDX IN(SELECT AITM_SPEC_IDX FROM QM_PKGA WHERE PLNT_CD = #{plntCd} AND PKGA_CD = #{pkgaCd})
-			AND (QPS.PLNT_CD, QPS.AITM_SPEC_IDX, QPAS.AITM_SPEC_VER) IN 
+			AND (QPS.PLNT_CD, QPS.AITM_SPEC_IDX, QPAS.AITM_SPEC_VER) IN
 				(SELECT A.PLNT_CD
 					  , A.AITM_SPEC_IDX
-					  , MAX(B.AITM_SPEC_VER) 
-				   FROM QM_PITM_SPEC A 
-				   		INNER JOIN QM_PITM_AITM_SPEC B 
-				   		ON (A.PLNT_CD = B.PLNT_CD AND A.AITM_SPEC_IDX = B.AITM_SPEC_IDX) 
-	   			  WHERE A.PLNT_CD = #{plntCd} 
+					  , MAX(B.AITM_SPEC_VER)
+				   FROM QM_PITM_SPEC A
+				   		INNER JOIN QM_PITM_AITM_SPEC B
+				   		ON (A.PLNT_CD = B.PLNT_CD AND A.AITM_SPEC_IDX = B.AITM_SPEC_IDX)
+	   			  WHERE A.PLNT_CD = #{plntCd}
 	   			  GROUP BY A.PLNT_CD, A.AITM_SPEC_IDX)
 		ORDER BY
 			AITM_SPEC_VER DESC, PITM_NM DESC
@@ -294,7 +294,7 @@
 		AND PKGA_VER <![CDATA[<]]> #{pkgaVer}
 		ORDER BY PKGA_VER DESC
 	</select>
-	
+
 	<insert id="insertVersion" parameterType="WrapTestManageVO">
 		<selectKey keyProperty="searchedAitmSpecIdx" resultType="int" order="BEFORE">
 			SELECT NVL(MAX(AITM_SPEC_IDX), 0) + 1 FROM QM_PITM_AITM_SPEC
@@ -311,7 +311,7 @@
 			 , #{aitmSpecVer}
 		)
 	</insert>
-	
+
 	<update id="updateWrapTest" parameterType="WrapTestManageVO">
 		UPDATE QM_PKGA
 		SET PKGA_DIV = #{pkgaDiv}
@@ -324,9 +324,9 @@
 			AND PKGA_CD = #{pkgaCd}
 			AND PKGA_VER = #{pkgaVer}
 	</update>
-	
+
 	<update id="updateWrapTestUseYn" parameterType="WrapTestManageVO">
-		UPDATE 
+		UPDATE
 			QM_PKGA
 		SET
 			USE_VER_YN = #{useVerYn}
@@ -335,7 +335,7 @@
 			AND PKGA_CD = #{pkgaCd}
 			AND SPEC_PROC_CD = 'S0080400'
 	</update>
-	
+
 	<insert id="putTestItem" parameterType="WrapTestManageVO">
 		MERGE INTO QM_PITM_SPEC_AITM A
 		USING (
@@ -343,7 +343,7 @@
 			FROM QM_PITM_SPEC_AITM
 			WHERE PLNT_CD = #{plntCd}
 				AND AITM_SPEC_IDX = #{aitmSpecIdx}
-				AND AITM_SEQ = #{aitmSeq} 
+				AND AITM_SEQ = #{aitmSeq}
 		) B
 		ON (B.CNT > 0)
 		WHEN MATCHED THEN
@@ -378,12 +378,12 @@
 				A.MKR_QTY = #{mkrQty}
 			WHERE A.PLNT_CD = #{plntCd}
 				AND A.AITM_SPEC_IDX = #{aitmSpecIdx}
-				AND A.AITM_SEQ = #{aitmSeq} 
+				AND A.AITM_SEQ = #{aitmSeq}
 		WHEN NOT MATCHED THEN
 			INSERT (
 				PLNT_CD
 				 , AITM_SPEC_IDX
-				 , AITM_SEQ 
+				 , AITM_SEQ
 				 , ANS_DPT_CD
 				 , AMITM_CD
 				 , AITM_ORD
@@ -447,14 +447,14 @@
 			     , #{mkrQty}
 			)
 	</insert>
-	
+
 	<delete id="deleteTestItem" parameterType="WrapTestManageVO">
 		DELETE FROM QM_PITM_SPEC_AITM
 		WHERE PLNT_CD = #{plntCd}
 				AND AITM_SPEC_IDX = #{aitmSpecIdx}
-				AND AITM_SEQ = #{aitmSeq} 
+				AND AITM_SEQ = #{aitmSeq}
 	</delete>
-	
+
 	<insert id="putWrapTest" parameterType="WrapTestManageVO">
 		MERGE INTO QM_PKGA A
 		USING (
@@ -462,7 +462,7 @@
 			FROM QM_PKGA
 			WHERE PLNT_CD = #{plntCd}
 				AND PKGA_CD = #{pkgaCd}
-				AND PKGA_VER = #{pkgaVer} 
+				AND PKGA_VER = #{pkgaVer}
 		) B
 		ON(B.CNT > 0)
 		WHEN MATCHED THEN
@@ -489,7 +489,7 @@
 				 , A.RJT_REA = #{rjtRea}
 			WHERE A.PLNT_CD = #{plntCd}
 				AND A.PKGA_CD = #{pkgaCd}
-				AND A.PKGA_VER = #{pkgaVer} 
+				AND A.PKGA_VER = #{pkgaVer}
 		WHEN NOT MATCHED THEN
 			INSERT (
 					PLNT_CD
@@ -545,8 +545,10 @@
 			)
 	</insert>
 
-	<insert id="insertVersionUpBySapPrdha" parameterType="ItemManageVO">
-
+	<insert id="insertVersionUpBySapPrdha" parameterType="SpecManageVO">
+		<selectKey keyProperty="pitmSpecIdx" resultType="int" order="BEFORE">
+			SELECT NVL(MAX(PITM_SPEC_IDX), 0) + 1 FROM QM_PITM_SPEC WHERE PLNT_CD = #{plntCd}
+		</selectKey>
 		INSERT INTO QM_PITM_SPEC
 		(
 			PLNT_CD
@@ -565,7 +567,7 @@
 			#{plntCd}
 		, 	#{pitmCd}
 		, 	#{pitmVer}
-		, 	#{aitmSpecIdx}
+		, 	#{newAitmSpecIdx}
 		, 	#{specProcCd}
 		, 	#{pitmSpecIdx}
 		, 	#{enfoDt}
@@ -584,10 +586,10 @@
 			AND PKGA_CD = #{pkgaCd}
 			AND PKGA_VER = #{pkgaVer}
 	</update>
-	
+
 	<update id="approval" parameterType="WrapTestManageVO">
-        UPDATE 
-        	QM_PKGA 
+        UPDATE
+        	QM_PKGA
        	SET
 			SPEC_PROC_CD = #{specProcCd}
 			 , REVW_UID = #{loginUserUid}
@@ -596,7 +598,7 @@
 			 , PKGA_SPEC_APR_IDX = #{pkgaSpecAprIdx}
 			 , USE_VER_YN = #{useVerYn}
 			 , DEL_YN = #{delYn}
-        WHERE 
+        WHERE
         	PLNT_CD = #{plntCd}
         	AND PKGA_CD = #{pkgaCd}
         	AND PKGA_VER = #{pkgaVer}
@@ -606,6 +608,7 @@
 		UPDATE QM_PITM_SPEC
 			SET AITM_SPEC_IDX = #{aitmSpecIdx}
 		WHERE PITM_CD = #{pitmCd}
+	    AND PLNT_CD = #{plntCd}
 		AND PITM_VER = #{pitmVer}
 		AND PITM_SPEC_IDX = #{pitmSpecIdx}
 	</update>
@@ -614,8 +617,16 @@
 		UPDATE QM_PITM_SPEC
 			SET SPEC_PROC_CD = #{specProcCd}
 		WHERE PITM_CD = #{pitmCd}
+		AND PLNT_CD = #{plntCd}
 	    AND PITM_VER = #{pitmVer}
 	    AND PITM_SPEC_IDX = #{pitmSpecIdx}
+	</update>
+
+	<update id="updateSpecUseVerYnN" parameterType="SpecManageVO">
+		UPDATE QM_PITM_SPEC
+		SET USE_VER_YN = 'N'
+		WHERE PITM_CD = #{pitmCd}
+
 	</update>
 
 	<select id="getSapList" parameterType="WrapTestManageVO" resultType="WrapTestManageVO">
@@ -645,7 +656,7 @@
 		WHERE
 			1 = 1
 			<if test="sapPrdhaList != null and sapPrdhaList.size > 0">
-				AND PRDHA NOT IN 
+				AND PRDHA NOT IN
 					<foreach collection="sapPrdhaList" item="item" index="index" separator="," open="(" close=")">
 						#{item}
 					</foreach>
@@ -662,7 +673,7 @@
 			<if test="spart != '' and spart != null">
 				AND UPPER(SPART) LIKE UPPER('%' || #{spart} || '%')
 			</if>
-		ORDER BY 
+		ORDER BY
 			PRDHA NULLS LAST
 	</select>
 
@@ -678,7 +689,7 @@
 			FROM QM_PITM_INFO QPI
 			LEFT JOIN QM_PITM QP ON QP.PLNT_CD = QPI.PLNT_CD AND QP.PITM_VER = QPI.PITM_VER AND QP.PITM_CD = QPI.PITM_CD
 			WHERE QPI.PLNT_CD = #{plntCd}
-		  	AND PITM_TYP IN (${pitmTyp})
+		  	AND PITM_TYP NOT IN (${pitmTyp})
 			AND QP.USE_VER_YN = 'Y'
 		    AND QP.DEL_YN = 'N'
 			AND QP.SPEC_PROC_CD = #{specProcCd}
@@ -697,6 +708,7 @@
             ,USE_VER_YN
             ,DOC_NO
             ,ENFO_DT
+			, #{aitmSpecIdx} AS NEW_AITM_SPEC_IDX
 		FROM QM_PITM_SPEC
 		WHERE PLNT_CD = #{plntCd}
 		AND PITM_CD = #{pitmCd}

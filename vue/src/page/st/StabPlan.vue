@@ -173,7 +173,11 @@ export default {
       this.setTxtinfo(selectedItem);
 
       const { sbtAnsProc } = selectedItem;
-      if (this.isSaved(sbtAnsProc) || this.isApproveReject(sbtAnsProc) || this.isStopReject(sbtAnsProc)) {
+      if (
+        this.isSaved(sbtAnsProc) ||
+        this.isApproveReject(sbtAnsProc) ||
+        this.isStopReject(sbtAnsProc)
+      ) {
         disabledBtnName = ['stopRequest', 'stopCancelRequest', 'save'];
         enabledBtnName = ['approveRequest', 'update', 'delete', 'init'];
 
@@ -185,7 +189,11 @@ export default {
           'sbtAnsPlnNo',
         ]);
         this.stabDetailPlanRegModal.disable = false;
-      } else if (this.isStopRequest(sbtAnsProc) || this.isStopCancelRequest(sbtAnsProc) || this.isResultApproved(sbtAnsProc)) {
+      } else if (
+        this.isStopRequest(sbtAnsProc) ||
+        this.isStopCancelRequest(sbtAnsProc) ||
+        this.isResultApproved(sbtAnsProc)
+      ) {
         disabledBtnName = [
           'stopRequest',
           'stopCancelRequest',
@@ -421,9 +429,9 @@ export default {
     preAllApprove({ aprReqUid, aprUid }) {
       const updateType = this.requestApproverModal.updateType;
 
-      if(updateType === 'approveRequest') {
+      if (updateType === 'approveRequest') {
         this.approveRequest({ aprReqUid, aprUid });
-      } else if(updateType === 'stopCancelRequest') {
+      } else if (updateType === 'stopCancelRequest') {
         this.stopCancelRequest({ aprReqUid, aprUid });
       }
     },
@@ -451,7 +459,7 @@ export default {
 
     modalReturnDataEvent({ rjtReaDiv, rjtRea }) {
       const updateType = this.inputReasonModal.updateType;
-      
+
       if (!updateType || !rjtReaDiv || !rjtRea) {
         return;
       }
@@ -539,7 +547,7 @@ export default {
     },
     isResultApproved(sbtAnsProc) {
       return sbtAnsProc === 'S0290800';
-    }
+    },
   },
 };
 </script>

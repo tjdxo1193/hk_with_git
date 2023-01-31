@@ -9,7 +9,7 @@ const bomGridWithForm = {
       showRowCheckColumn: false,
     },
   },
-  forms: () => FormBuilder.builder().Input('posnr', '품목').Input('maktx', '자재내역').build(),
+  forms: () => FormBuilder.builder().Input('matnr', '자재번호').spanCol(2).build(),
   columns: () =>
     ColumnBuilder.builder()
       // .col('posnr', { visible: false })
@@ -41,15 +41,9 @@ const bomGridWithForm = {
       .col('beikz', '자재 공급 지시자')
       .col('crtDs', '수신일시')
       .col('udtDs', '수정일시')
-
       .build(),
-};
-
-const modalButtons = {
-  buttons: [{ name: 'close', label: '닫기', type: 'normal' }],
 };
 
 export default {
   bomGridWithForm,
-  modalButtons,
 };

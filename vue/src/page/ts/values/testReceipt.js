@@ -16,7 +16,7 @@ const list = {
     ],
     $grid: null,
     props: {
-      //editable: false,
+      editable: false,
       showRowCheckColumn: true,
       //headerHeight:'40px',
       rowStyleFunction: function (rowIndex, item) {
@@ -54,60 +54,60 @@ const list = {
           { value: 'N', label: 'N' },
         ],
       })
-      .col('plntCd', '사업장코드', { editable: false })
+      .col('plntCd', '사업장코드')
       .col('ansTypNm', '시험구분')
       .col('ansNo', '시험번호')
-      .col('pitmCd', '품목코드', { editable: false })
-      .col('pitmNm', '품목명(국문)', { editable: false })
-      .col('pitmEn', '품목명(영문)', { editable: false })
-      .col('lotNo', '제조번호', { editable: false })
-      .col('batchNo', '배치번호', { editable: false })
-      .col('ispReqNo', '검사요청번호', { editable: false })
-      .col('labNo', 'Lab No.', { editable: false })
-      .col('brdAbbr', '브랜드약어', { editable: false })
-      .col('etrCtnQty', '입고용기수량', { editable: false })
-      .col('rmtrSpec', '원료규격', { editable: false })
-      .col('pkgMtrSpec', '포장재규격', { editable: false })
-      .col('rmtrCfmul', '원료조성성분비', { editable: false })
-      .col('ftnYn', '기능성유무', { editable: false })
-      .col('useTrm', '사용기간', { editable: false })
-      .col('otcPrd', 'OTC제품', { editable: false })
-      .col('mkrVol', '표시용량', { editable: false })
-      .col('mkrVolUnit', '표시용량단위', { editable: false })
-      .col('etnAnsReq', '외부시험의뢰', { editable: false })
-      .col('perNo', '허가번호', { editable: false })
-      .col('chagVol', '실충전용량', { editable: false })
-      .col('chagVolUnit', '실충전용량단위', { editable: false })
-      .col('etrQty', '입고수량', { editable: false })
-      .col('inpUnit', '입력단위', { editable: false })
-      .col('etrDt', '입고일자', { editable: false })
-      .col('splCd', '공급사코드', { editable: false })
-      .col('splNm', '공급사명', { editable: false })
-      .col('vdrCtrtDt', '납품약정일자', { editable: false })
-      .col('vdrRsvTm', '납품예약시간', { editable: false })
-      .col('vdrRptRcpCrst', '거래처성적서접수현황', { editable: false })
-      .col('splLotNo', '공급사제조번호', { editable: false })
-      .col('useLmt', '사용기한', { editable: false })
-      .col('itnPrsCompNm', '내부임가공업체명', { editable: false })
-      .col('makEqp', '제조설비', { editable: false })
-      .col('wrkNm', '작업자명', { editable: false })
-      .col('csmNm', '고객처명', { editable: false })
-      .col('pcs01', '공정01', { editable: false })
-      .col('pcs02', '공정02', { editable: false })
-      .col('pcs03', '공정03', { editable: false })
-      .col('pcs04', '공정04', { editable: false })
-      .col('dioYn', '디옥산관리대상', { editable: false })
-      .col('qdrugYn', '의약외품유무', { editable: false })
-      .col('prbInYn', '파라벤포함여부', { editable: false })
-      .col('prbFeYn', '파라벤프리관리대상', { editable: false })
-      .col('pnxFeYn', '페녹시에탄올프리관리대상', { editable: false })
-      .col('dlvYn', '택배유무', { editable: false })
-      .col('dmsEptYn', '내수/수출', { editable: false })
-      .col('pearDiv', '펄구분', { editable: false })
-      .col('specUseVerYn', '규격서사용여부', { editable: false })
-      .col('addCol1Nm', '입고유형', { editable: false })
-      .col('addCol2', '입고취소여부', { editable: false })
-      .col('addCol3', '전표생성일자', { editable: false })
+      .col('pitmCd', '품목코드')
+      .col('pitmNm', '품목명(국문)')
+      .col('pitmEn', '품목명(영문)')
+      .col('lotNo', '제조번호')
+      .col('batchNo', '배치번호')
+      .col('ispReqNo', '검사요청번호')
+      .col('labNo', 'Lab No.')
+      .col('brdAbbr', '브랜드약어')
+      .col('etrCtnQty', '입고용기수량')
+      .col('rmtrSpec', '원료규격')
+      .col('pkgMtrSpec', '포장재규격')
+      .col('rmtrCfmul', '원료조성성분비')
+      .col('ftnYn', '기능성유무')
+      .col('useTrm', '사용기간')
+      .col('otcPrd', 'OTC제품')
+      .col('mkrVol', '표시용량')
+      .col('mkrVolUnit', '표시용량단위')
+      .col('etnAnsReq', '외부시험의뢰')
+      .col('perNo', '허가번호')
+      .col('chagVol', '실충전용량')
+      .col('chagVolUnit', '실충전용량단위')
+      .col('etrQty', '입고수량')
+      .col('inpUnit', '입력단위')
+      .col('etrDt', '입고일자')
+      .col('splCd', '공급사코드')
+      .col('splNm', '공급사명')
+      .col('vdrCtrtDt', '납품약정일자')
+      .col('vdrRsvTm', '납품예약시간')
+      .col('vdrRptRcpCrst', '거래처성적서접수현황')
+      .col('splLotNo', '공급사제조번호')
+      .col('useLmt', '사용기한')
+      .col('itnPrsCompNm', '내부임가공업체명')
+      .col('makEqp', '제조설비')
+      .col('wrkNm', '작업자명')
+      .col('csmNm', '고객처명')
+      .col('pcs01', '공정01')
+      .col('pcs02', '공정02')
+      .col('pcs03', '공정03')
+      .col('pcs04', '공정04')
+      .col('dioYn', '디옥산관리대상')
+      .col('qdrugYn', '의약외품유무')
+      .col('prbInYn', '파라벤포함여부')
+      .col('prbFeYn', '파라벤프리관리대상')
+      .col('pnxFeYn', '페녹시에탄올프리관리대상')
+      .col('dlvYn', '택배유무')
+      .col('dmsEptYn', '내수/수출')
+      .col('pearDiv', '펄구분')
+      .col('specUseVerYn', '규격서사용여부')
+      .col('addCol1Nm', '입고유형')
+      .col('addCol2', '입고취소여부')
+      .col('addCol3', '전표생성일자')
       .build(),
 };
 
@@ -119,6 +119,8 @@ const requestInfo = {
   forms: () =>
     FormBuilder.builder()
       .Hidden('pitmVer')
+      .Hidden('reqIdx')
+      .Hidden('batchNo')
       .Input('ispReqNo', '검사요청번호', { readonly: true })
       .Input('pitmNm', '품목명(국문)', { readonly: true })
       .Input('pitmEn', '품목명(영문)', { readonly: true })
@@ -145,9 +147,9 @@ const requestInfo = {
       .Input('etrDt', '입고일자', { readonly: true })
       .Input('makEqp', '제조설비', { readonly: true })
       .Input('wrkNm', '작업자명', { readonly: true })
-      .Input('addCol1', '입고유형', { editable: false })
-      .Input('addCol2', '입고취소여부', { editable: false })
-      .Input('addCol3', '전표생성일자', { editable: false })
+      .Input('addCol1', '입고유형')
+      .Input('addCol2', '입고취소여부')
+      .Input('addCol3', '전표생성일자')
       .build(),
 };
 
@@ -208,7 +210,7 @@ const tabs = {
   buttons: [
     { name: 'inputPerformance', label: '투입실적', disabled: true },
     { name: 'finalOrder', label: '마감오더', disabled: true },
-    { name: 'relapsePrev', label: '재발방지대책서', disabled: true },
+    { name: 'preventRecurrenceReport', label: '재발방지대책서', disabled: true },
     { name: 'srmReport', label: 'SRM성적서', disabled: true },
     { name: 'packagingSpec', label: 'MES포장사양서', disabled: true },
     { name: 'nonconformityTestList', label: '품목시험의뢰부적합', disabled: true },

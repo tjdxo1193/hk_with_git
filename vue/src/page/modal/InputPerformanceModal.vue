@@ -11,6 +11,7 @@
 
 <script>
 import { FormUtil } from '@/util';
+
 import values from './values/inputPerformanceModal';
 
 export default {
@@ -35,8 +36,7 @@ export default {
         forms: searchForm.forms(),
         columns: searchForm.columns(),
         buttons: searchForm.static.buttons,
-        event: {
-        },
+        event: {},
       },
     };
   },

@@ -10,22 +10,27 @@ const searchForm = {
     height: '480px',
     buttons: [{ name: 'select', label: '조회' }],
   },
-  forms: () =>
-    FormBuilder.builder()
-      .Hidden('phsOrderNo')
-      .Hidden('phsOrderItm')
-      .Hidden('lotNo')
-      .build(),
+  forms: () => FormBuilder.builder().Hidden('pitmCd').Hidden('batchNo').build(),
   columns: () =>
     ColumnBuilder.builder()
-      .col('pitmNm', '부적합품질검사요청번호')
-      .col('zexfield1', '추가필드1')
-      .col('zexfield2', '추가필드2')
-      .col('fileName', '추가필드3')
-      .col('crtDs', '추가필드4')
-      .col('crtDs', '추가필드5')
-      .col('crtDs', '수신일시')
-      .col('ifInfoIdx', '연계정보ID')
+      .col('mtrCd', '품목코드')
+      .col('mtrNm', '품목명')
+      .col('lotNo', '제조번호')
+      .col('batchNo', '배치번호')
+      .col('mrpMng', 'MRP관리자')
+      .col('phsOrderItm', '구매오더항목')
+      .col('phsOrderNo', '구매오더번호')
+      .col('pdtOrderNo', '생산오더번호')
+      .col('bwart', '이동유형(재고관리)')
+      .col('erfmg', '투입실적수량')
+      .col('erfme', '입력단위')
+      .col('lgort', '저장위치')
+      .col('budat', '입고일자')
+      .col('zexfield1', '입고유형')
+      .col('zexfield2', '입고취소여부')
+      .col('zexfield3', '전표생성일')
+      .col('zexfield4', '추가필드4')
+      .col('zexfield5', '추가필드5')
       .build(),
 };
 

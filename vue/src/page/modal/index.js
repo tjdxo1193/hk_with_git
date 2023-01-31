@@ -4,6 +4,7 @@ import DepartmentModal from './DepartmentModal';
 import DesignateApproversModal from './DesignateApproversModal';
 import FileAttacherModal from './FileAttacherModal';
 import FinalOrderModal from './FinalOrderModal';
+import InputPerformanceModal from './InputPerformanceModal';
 import InputReasonForDeleteModal from './InputReasonForDeleteModal.vue';
 import InputReasonForItemReviseModal from './InputReasonForItemReviseModal';
 import InputReasonModal from './InputReasonModal';
@@ -17,10 +18,10 @@ import NonconformityTestModal from './NonconformityTestModal';
 import PackagingItemModal from './PackagingItemModal';
 import PackingSpecificationModal from './PackingSpecificationModal';
 import PasswordChangeModal from './PasswordChangeModal.vue';
+import PreventRecurrenceReportModal from './PreventRecurrenceReportModal';
 import ReasonForItemRevisionModal from './ReasonForItemRevisionModal';
 import ReasonForSpecChangeModal from './ReasonForSpecChangeModal.vue';
 import RejectionReasonModal from './RejectionReasonModal.vue';
-import RelapsePreventionPlanModal from './RelapsePreventionPlanModal';
 import RequestApproverModal from './RequestApproverModal';
 import RequestReviewerModal from './RequestReviewerModal';
 import ResultHistoryModal from './ResultHistoryModal';
@@ -39,7 +40,6 @@ import TestMaterialOpenItemModal from './TestMaterialOpenItemModal';
 import TestModal from './TestModal';
 import TestSearchModal from './TestSearchModal.vue';
 import TreeCommonCodeModal from './TreeCommonCodeModal';
-import InputPerformanceModal from './InputPerformanceModal';
 
 export {
   ItemModal,
@@ -74,7 +74,7 @@ export {
   ItemManageFileAttacherModal,
   PackagingItemModal,
   FinalOrderModal,
-  RelapsePreventionPlanModal,
+  PreventRecurrenceReportModal,
   SrmReportModal,
   PackingSpecificationModal,
   BomModal,

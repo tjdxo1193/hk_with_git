@@ -12,18 +12,16 @@ const searchForm = {
   },
   forms: () =>
     FormBuilder.builder()
-      .Input('pitmNm', '품목명')
+      .Input('pitmNm', '품목명', { readonly: true })
       .Input('pitmCd', '품목코드')
       .Input('fileName', '파일명')
       .build(),
   columns: () =>
     ColumnBuilder.builder()
-      .col('pitmNm', '품목명')
       .col('pitmCd', '품목코드')
       .col('ver', '품목버전')
-      .col('fileName', '파일명')
+      .col('name', '파일명')
       .col('crtDs', '수신일시')
-      .col('ifInfoIdx', '연계정보ID')
       .build(),
 };
 

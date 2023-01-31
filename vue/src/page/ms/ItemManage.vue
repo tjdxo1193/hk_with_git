@@ -34,10 +34,14 @@
     @reg="getRevisionReason"
   />
 
-  <bomModal :show="bomModal.show" :readonly="bomModal.readonly" @close="hideModal('bomModal')" />
+  <BomModal 
+  :show="bomModal.show" 
+  :readonly="bomModal.readonly" 
+  :initData="bomModal.initData"
+  @close="hideModal('bomModal')" />
 
   <ItemManageFileAttacherModal
-    :ctrptNo="itemManageFileAttacherModal.ctrptNo"
+    :initData="itemManageFileAttacherModal.initData"
     :show="itemManageFileAttacherModal.show"
     :readonly="itemManageFileAttacherModal.readonly"
     @save="fileSave"
@@ -148,10 +152,11 @@ export default {
       bomModal: {
         show: false,
         readonly: false,
+        initData: {},
       },
       itemManageFileAttacherModal: {
         show: false,
-        ctrptNo: 0,
+        initData: {},
         readonly: false,
       },
     };
@@ -402,7 +407,8 @@ export default {
       if (isFirstStorable) {
         FormUtil.enableButtons(buttons, ['bomModal', 'firstReg']);
         FormUtil.disableButtons(buttons, ['save']);
-        this.setItemManageFileAttacherModalCtrptNo();
+        this.setItemManageFileAttacherModalInitData();
+        this.setBomModalInitData();
         this.enableFormButton('ctrptNoSearch');
         return;
       }
@@ -410,7 +416,8 @@ export default {
       if (isStorable) {
         FormUtil.enableButtons(buttons, ['bomModal', 'save']);
         FormUtil.disableButtons(buttons, ['firstReg']);
-        this.setItemManageFileAttacherModalCtrptNo();
+        this.setItemManageFileAttacherModalInitData();
+        this.setBomModalInitData();
         this.enableFormButton('ctrptNoSearch');
         return;
       }
@@ -471,11 +478,16 @@ export default {
       return FormUtil.getValue(this.materialInfoForm.forms, 'ctrptNo');
     },
 
-    setItemManageFileAttacherModalCtrptNo() {
+    setItemManageFileAttacherModalInitData() {
       const ctrptNo = Number(this.getCtrptNo());
       const ctId = Object.assign(ctrptNo, Number);
+      const {pitmCd} = FormUtil.getData(this.commonInfoForm.forms);
+      this.itemManageFileAttacherModal.initData = {ctId , pitmCd};
+    },
 
-      this.itemManageFileAttacherModal.ctrptNo = ctId;
+    setBomModalInitData(){
+      const {pitmCd} = FormUtil.getData(this.commonInfoForm.forms);
+      this.bomModal.initData = {pitmCd};
     },
 
     fileSave({ addedFiles, removedFileIds }) {

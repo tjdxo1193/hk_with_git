@@ -18,13 +18,13 @@
 </template>
 
 <script>
-import { FormUtil, TokenUtil } from '@/util';
+import { FormUtil } from '@/util';
 
 import values from './values/packingSpecificationModal';
 
 export default {
   name: 'PackingSpecificationModal',
-  emits: ['close', 'modalReturnDataEvent'],
+  emits: ['close'],
   props: {
     title: {
       type: String,
@@ -34,6 +34,11 @@ export default {
       type: Boolean,
       default: false,
     },
+    readonly: {
+      type: Boolean,
+      default: true,
+    },
+    parameter: {},
   },
   mounted() {},
   data() {
@@ -57,17 +62,26 @@ export default {
       },
     };
   },
+  watch: {
+    show() {
+      if (this.$props.show) {
+        const item = this.$props.parameter;
+        FormUtil.setData(this.searchForm.forms, item);
+        this.getPackingSpecList();
+      }
+    },
+  },
   methods: {
     async getPackingSpecList() {
       const { $grid, forms } = this.searchForm;
       const parameter = FormUtil.getData(forms);
-      parameter.opsSpecUseVerYn = this.$props.yn;
-      parameter.plntCd = TokenUtil.myPlantCode();
       const data = await $grid
         ._useLoader(() => this.$axios.get('/ts/testIFModal/getPackingSpecList', parameter))
         .then(({ data }) => data);
 
       $grid.setGridData(data);
+      this.detail.dropzone.clear();
+      this.detail.dropzone.addFiles(data);
     },
     searchFormEvent(event) {
       if (event.type === 'keydown' && event.originEvent.key === 'Enter') {
@@ -80,7 +94,9 @@ export default {
       }
     },
     init() {
+      this.searchForm.$grid.clearGridData();
       this.searchForm.forms = values.searchForm.forms();
+      this.detail.dropzone.clear();
     },
     close() {
       this.init();

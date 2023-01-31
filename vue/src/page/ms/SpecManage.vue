@@ -42,8 +42,12 @@
 </template>
 
 <script>
-import {ItemsByTestMethodModal, ItemsCopyByTestMethodModal, RequestReviewerModal,} from '@/page/modal';
-import {FormUtil, GridUtil, StringUtil} from '@/util';
+import {
+  ItemsByTestMethodModal,
+  ItemsCopyByTestMethodModal,
+  RequestReviewerModal,
+} from '@/page/modal';
+import { FormUtil, GridUtil, StringUtil } from '@/util';
 
 import values from './values/specManage';
 
@@ -178,7 +182,11 @@ export default {
 
     async fetchPItemSpecSemiAItemList({ pitmCd, pitmVer }) {
       const { $grid } = this.testItemList;
-      const parameter = { pitmCd, pitmVer, pitmTyp : FormUtil.getData(this.valueWithPitmGrid.forms).pitmTyp };
+      const parameter = {
+        pitmCd,
+        pitmVer,
+        pitmTyp: FormUtil.getData(this.valueWithPitmGrid.forms).pitmTyp,
+      };
 
       const data = await $grid
         ._useLoader(() => this.$axios.get('ms/specManage/semiAItem', parameter))

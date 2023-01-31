@@ -23,15 +23,21 @@
     @close="hideModal('finalOrderModal')"
   ></FinalOrderModal>
 
-  <RelapsePreventionPlanModal
-    :show="relapsePreventionPlanModal.show"
-    @close="hideModal('relapsePreventionPlanModal')"
-  ></RelapsePreventionPlanModal>
+  <PreventRecurrenceReportModal
+    :show="preventRecurrenceReportModal.show"
+    :parameter="preventRecurrenceReportModal.parameter"
+    @close="hideModal('preventRecurrenceReportModal')"
+  ></PreventRecurrenceReportModal>
 
-  <SrmReportModal :show="srmReportModal.show" @close="hideModal('srmReportModal')"></SrmReportModal>
+  <SrmReportModal
+    :show="srmReportModal.show"
+    :parameter="srmReportModal.parameter"
+    @close="hideModal('srmReportModal')"
+  ></SrmReportModal>
 
   <PackingSpecificationModal
     :show="packingSpecificationModal.show"
+    :parameter="packingSpecificationModal.parameter"
     @close="hideModal('packingSpecificationModal')"
   ></PackingSpecificationModal>
 
@@ -41,17 +47,17 @@
     @close="hideModal('nonconformityTestModal')"
   ></NonconformityTestModal>
 
-<InputPerformanceModal
-  :show="inputPerformanceModal.show"
-  :parameter="inputPerformanceModal.parameter"
-  @close="hideModal('inputPerformanceModal')"
-></InputPerformanceModal> -->
+  <InputPerformanceModal
+    :show="inputPerformanceModal.show"
+    :parameter="inputPerformanceModal.parameter"
+    @close="hideModal('inputPerformanceModal')"
+  ></InputPerformanceModal>
 </template>
 
 <script>
 import {
   FinalOrderModal,
-  RelapsePreventionPlanModal,
+  PreventRecurrenceReportModal,
   SrmReportModal,
   PackingSpecificationModal,
   NonconformityTestModal,
@@ -65,7 +71,7 @@ export default {
   name: 'TestReceipt',
   components: {
     FinalOrderModal,
-    RelapsePreventionPlanModal,
+    PreventRecurrenceReportModal,
     SrmReportModal,
     PackingSpecificationModal,
     NonconformityTestModal,
@@ -91,7 +97,7 @@ export default {
               'processSpecimen',
               'packagingSpecimen',
               'finalOrder',
-              'relapsePrev',
+              'preventRecurrenceReport',
               'srmReport',
               'packagingSpec',
               'nonconformityTestList',
@@ -112,14 +118,17 @@ export default {
         show: false,
         parameter: {},
       },
-      relapsePreventionPlanModal: {
+      preventRecurrenceReportModal: {
         show: false,
+        parameter: {},
       },
       srmReportModal: {
         show: false,
+        parameter: {},
       },
       packingSpecificationModal: {
         show: false,
+        parameter: {},
       },
       nonconformityTestModal: {
         show: false,
@@ -171,19 +180,25 @@ export default {
         this.finalOrderModal.parameter = FormUtil.getData(this.requestInfo.forms);
         return (this.finalOrderModal.show = true);
       }
-      if (name === 'relapsePrev') {
-        return (this.relapsePreventionPlanModal.show = true);
+      if (name === 'preventRecurrenceReport') {
+        this.preventRecurrenceReportModal.parameter = FormUtil.getData(this.requestInfo.forms);
+        return (this.preventRecurrenceReportModal.show = true);
       }
       if (name === 'srmReport') {
+        this.srmReportModal.parameter = FormUtil.getData(this.requestInfo.forms);
         return (this.srmReportModal.show = true);
       }
       if (name === 'packagingSpec') {
+        this.packingSpecificationModal.parameter = FormUtil.getData(this.requestInfo.forms);
         return (this.packingSpecificationModal.show = true);
       }
       if (name === 'nonconformityTestList') {
+        const parameter = FormUtil.getData(this.requestInfo.forms);
+        this.inputPerformanceModal.reqIdx = parameter.reqIdx;
         return (this.nonconformityTestModal.show = true);
       }
       if (name === 'inputPerformance') {
+        this.inputPerformanceModal.parameter = FormUtil.getData(this.requestInfo.forms);
         return (this.inputPerformanceModal.show = true);
       }
       if (name === 'specimen') {
@@ -256,7 +271,7 @@ export default {
         'processSpecimen',
         'packagingSpecimen',
         'finalOrder',
-        'relapsePrev',
+        'preventRecurrenceReport',
         'srmReport',
         'packagingSpec',
         'nonconformityTestList',

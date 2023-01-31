@@ -67,6 +67,7 @@ public class SpecManageVO implements UpdateDetect {
     private String mkrQty;
     private String aitmRmk;
     private String prdDiv;
+    private Integer newAitmSpecIdx;
     private List<SpecManageAitmVO> addedRowItems;
     private List<SpecManageAitmVO> editedRowItems;
     private List<SpecManageAitmVO> removedRowItems;

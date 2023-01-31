@@ -44,9 +44,11 @@ public interface WrapTestManageDao {
 	List<ItemManageVO> getItemListBySapPrdha(WrapTestManageVO param);
 	SpecManageVO findSpecListByItemInfo(ItemManageVO ivo);
 
-	int updateAitmIdxByTemporaryStorage(ItemManageVO ivo);
+	int updateAitmIdxByTemporaryStorage(SpecManageVO ivo);
 
-	int updateProcessCodeToSpecRemove(ItemManageVO ivo);
+	int updateProcessCodeToSpecRemove(SpecManageVO ivo);
 
-	int insertVersionUpBySapPrdha(ItemManageVO ivo);
+	int insertVersionUpBySapPrdha(SpecManageVO ivo);
+
+	int updateSpecUseVerYnN(SpecManageVO ivo);
 }
