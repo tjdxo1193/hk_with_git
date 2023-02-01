@@ -281,8 +281,8 @@ export default {
 
       if (aitmSpecIdx) {
         this.fetchPItemSpecAItemList({ aitmSpecIdx });
-        this.changeButtonWhenSelectedVersion();
       }
+      this.changeButtonWhenSelectedVersion();
     },
 
     changeButtonDisabledAll() {
@@ -318,7 +318,9 @@ export default {
     },
 
     isSelectedItemHasNotVersion() {
-      return this.versionList.$grid.getItemsByValue('aitmSpecVer', 1).length == 0;
+      const {aitmSpecIdx} = FormUtil.getData(this.valueWithVersionGrid.forms);
+      return (this.versionList.$grid.getItemsByValue('aitmSpecVer', 1).length == 0) 
+      && (this.versionList.$grid.getRowCount() == 1) && (aitmSpecIdx == null);
     },
 
     isTestListGridEmpty() {

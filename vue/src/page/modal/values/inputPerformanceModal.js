@@ -10,7 +10,8 @@ const searchForm = {
     height: '480px',
     buttons: [{ name: 'select', label: '조회' }],
   },
-  forms: () => FormBuilder.builder().Hidden('pitmCd').Hidden('batchNo').build(),
+  forms: () =>
+    FormBuilder.builder().Input('pitmCd', '품목코드').Input('batchNo', '배치번호').build(),
   columns: () =>
     ColumnBuilder.builder()
       .col('mtrCd', '품목코드')

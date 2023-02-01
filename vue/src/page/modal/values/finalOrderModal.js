@@ -10,10 +10,14 @@ const srmOrderList = {
     },
     countPerRow: 2,
     buttons: [{ name: 'selectSRM', label: '조회' }],
-    height: '400px',
+    height: '320px',
   },
   forms: () =>
-    FormBuilder.builder().Hidden('phsOrderNo').Hidden('phsOrderItm').Hidden('lotNo').build(),
+    FormBuilder.builder()
+      .Input('phsOrderNo', '구매오더번호')
+      .Input('phsOrderItm', '오더항목')
+      .Input('lotNo', '제조번호')
+      .build(),
   columns: () =>
     ColumnBuilder.builder()
       .col('pitmTypNm', '품목유형')
@@ -42,10 +46,14 @@ const mesOrderList = {
     },
     countPerRow: 2,
     buttons: [{ name: 'selectMES', label: '조회' }],
-    height: '400px',
+    height: '320px',
   },
   forms: () =>
-    FormBuilder.builder().Hidden('pdtOrderNo').Hidden('phsOrderItm').Hidden('lotNo').build(),
+    FormBuilder.builder()
+      .Input('pdtOrderNo', '생산오더번호')
+      .Input('phsOrderItm', '오더항목')
+      .Input('lotNo', '제조번호')
+      .build(),
   columns: () =>
     ColumnBuilder.builder()
       .col('pitmTypNm', '품목유형')

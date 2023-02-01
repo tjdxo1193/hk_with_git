@@ -121,7 +121,7 @@
 
     <insert id="create" parameterType="StandardMaterialVO">
         <selectKey resultType="int" keyProperty="ritmEtrIdx" order="BEFORE">
-            SELECT CONCAT(#{plntCd}, NVL(MAX(SUBSTR((NVL(RITM_ETR_IDX,0)), 5, LENGTH(RITM_ETR_IDX)-1)),0)+1)
+            SELECT CONCAT(#{plntCd}, NVL(MAX(SUBSTR((NVL(RITM_ETR_IDX,0)), 5, LENGTH(RITM_ETR_IDX)-1)+1),0))
                 FROM RT_RITM_ETR WHERE PLNT_CD = #{plntCd}
         </selectKey>
 

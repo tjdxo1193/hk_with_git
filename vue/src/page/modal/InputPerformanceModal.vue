@@ -4,6 +4,8 @@
       <ActionBar :buttons="searchForm.buttons" @button-click="onClickButton"></ActionBar>
     </template>
 
+    <FormBase v-bind="searchForm" @form-event="searchFormEvent" />
+    <Space :gap="10" />
     <AUIGrid v-bind="searchForm" @grid-created="(proxy) => $setState('searchForm.$grid', proxy)" />
     <Space :gap="10" />
   </ModalBase>

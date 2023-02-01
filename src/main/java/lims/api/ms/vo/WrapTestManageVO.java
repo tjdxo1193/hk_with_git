@@ -1,10 +1,10 @@
 package lims.api.ms.vo;
 
-import java.util.List;
-
 import lims.api.common.domain.UpdateDetect;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
 
 @Getter
 @Setter

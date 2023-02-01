@@ -51,7 +51,6 @@ export default {
     async getNonconformityTestList() {
       const { $grid } = this.searchForm;
       const parameter = { reqIdx: this.$props.reqIdx };
-      console.log(parameter, 'parameter');
       const data = await $grid
         ._useLoader(() => this.$axios.get('/ts/testReceipt/getNonconformityTestList', parameter))
         .then(({ data }) => data);

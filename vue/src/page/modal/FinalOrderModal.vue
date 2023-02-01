@@ -1,14 +1,14 @@
 <template>
   <ModalBase :title="title" :show="show" width="1300px" height="560px" @close="close">
     <Horizontal align-items="center" :spans="[10, 0.1, 10]">
-      <AUIGridWithHeader
+      <AUIGridSearch
         v-bind="srmOrderList"
         @button-click="onClickButton"
         @grid-created="(proxy) => $setState('srmOrderList.$grid', proxy)"
       />
       <div></div>
 
-      <AUIGridWithHeader
+      <AUIGridSearch
         v-bind="mesOrderList"
         @button-click="onClickButton"
         @grid-created="(proxy) => $setState('mesOrderList.$grid', proxy)"
