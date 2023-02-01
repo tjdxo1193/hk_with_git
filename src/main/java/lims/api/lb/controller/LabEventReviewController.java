@@ -41,6 +41,7 @@ public class LabEventReviewController {
     public ResponseEntity<Integer> reject(@AuthToken Token token, @RequestBody List<LabEventReviewVO> dto) {
         dto.forEach(item -> {
             item.setLoginUserUid(this.getAuthUserId(token));
+            item.setLoginUserIp(HttpHelper.getClientIp());
         });
         return ResponseEntity.ok(labEventReviewService.reject(dto));
     }

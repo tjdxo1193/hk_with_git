@@ -5,7 +5,8 @@ public enum ApproveRequestDivType {
     PACKAGING_TEST_VERSION("S0050003"),
     MONITORING_SPEC_VERSION("S0050004"),
     ITEM_MASTER_VERSION("S0050005"),
-    ITEM_TEST_SPEC_VERSION("S0050006");
+    ITEM_TEST_SPEC_VERSION("S0050006"),
+    LAB_EVENT_SPEC_VERSION("S0050012");
     private final String code;
 
     ApproveRequestDivType(String code){

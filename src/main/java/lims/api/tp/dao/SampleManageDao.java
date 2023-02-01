@@ -21,7 +21,7 @@ public interface SampleManageDao {
     @Audit(target = QsSmpMng.class, label = AuditEvent.Sample.updateSample, commandType = CommandType.UPDATE)
     int update(SampleManageVO param);
 
-    @Audit(target = QsSmpMng.class, label =  AuditEvent.Sample.deleteSample, commandType = CommandType.DELETE)
+    @Audit(target = QsSmpMng.class, label = AuditEvent.Sample.deleteSample, commandType = CommandType.DELETE)
     int delete(SampleManageVO param);
 
     List<SampleManageVO> findTest(SampleManageVO param);

@@ -41,5 +41,6 @@ public class LabEventApprVO {
     // ETC
     private String loginUserUid;        // 로그인 유저 UID
     private String loginUserIp;         // 로그인 유저 IP
-    private ApproveVO approveInfo;    // 승인 관련 Object
+    private String aprReqDiv;           // S005, 승인 요청 구분
+    private ApproveVO approveInfo;      // 승인 관련 Object
 }

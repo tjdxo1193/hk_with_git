@@ -3,6 +3,7 @@ package lims.api.lb.service.impl;
 import lims.api.lb.dao.LabEventSearchDao;
 import lims.api.lb.service.LabEventSearchService;
 import lims.api.lb.vo.LabEventSearchVO;
+import lims.api.ms.enums.ApproveRequestDivType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,7 @@ public class LabEventSearchServiceImpl implements LabEventSearchService {
 
     @Override
     public List<LabEventSearchVO> findAll(LabEventSearchVO dto) {
+        dto.setAprReqDiv(ApproveRequestDivType.LAB_EVENT_SPEC_VERSION.getCode());
         return labEventSearchDao.findAll(dto);
     }
 }

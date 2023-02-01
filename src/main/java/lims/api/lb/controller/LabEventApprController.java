@@ -6,11 +6,11 @@ import lims.api.auth.service.impl.HttpHelper;
 import lims.api.auth.service.impl.JwtResolver;
 import lims.api.lb.service.LabEventApprService;
 import lims.api.lb.vo.LabEventApprVO;
-import lims.api.lb.vo.LabEventReviewVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -40,10 +40,12 @@ public class LabEventApprController {
 
     @PostMapping("/reject")
     public ResponseEntity<Integer> reject(@AuthToken Token token, @RequestBody List<LabEventApprVO> dto) {
-        dto.forEach(item -> {
-            item.setLoginUserUid(this.getAuthUserId(token));
-        });
-        return ResponseEntity.ok(labEventApprService.reject(dto));
+        List<LabEventApprVO> voList = new ArrayList<>(dto);
+        for(LabEventApprVO vo : voList) {
+            vo.setLoginUserUid(this.getAuthUserId(token));
+        }
+
+        return ResponseEntity.ok(labEventApprService.reject(voList));
     }
 
 

@@ -29,14 +29,19 @@
              , (SELECT TO_CHAR(QLE.REVW_DS, 'YYYY-MM-DD') FROM DUAL) AS REVW_DT
              , QLE.REVW_IP
              , QLE.LAB_EVT_APR_IDX
+             , SAI.APR_REQ_DIV
+             , SAI.APR_YN
              , QLE.RJT_UID
+             , (SELECT USER_NM FROM SY_USER SU WHERE SU.PLNT_CD = QLE.PLNT_CD AND SU.USER_ID = QLE.RJT_UID) AS RJT_UID_NM
              , QLE.RJT_DS
+             , TO_CHAR(QLE.RJT_DS, 'YYYY-MM-DD')AS RJT_DT
              , QLE.RJT_REA
         FROM QE_LAB_EVT QLE
             LEFT JOIN SY_APR_INFO SAI ON QLE.PLNT_CD = SAI.PLNT_CD AND SAI.APR_IDX = QLE.LAB_EVT_APR_IDX
         WHERE 1 = 1
             AND QLE.PLNT_CD = #{plntCd}
-            AND (QLE.LAB_EVT_APR_IDX IS NOT NULL OR QLE.RJT_UID IS NOT NULL)
+            AND SAI.APR_REQ_DIV = #{aprReqDiv}
+            AND (QLE.LAB_EVT_APR_IDX IS NOT NULL AND SAI.APR_YN IN ('Y', 'N'))
         <if test="pitmTyp != null and pitmTyp != ''">
             AND QLE.PITM_TYP = #{pitmTyp}
         </if>

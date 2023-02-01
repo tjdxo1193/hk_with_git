@@ -6,13 +6,27 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
-@RequiredArgsConstructor
 public class SRMShiptHandler implements ShiptHandler {
 
     private final QMSDao qmsDao;
     private final List<QMSSendVO.ShiptBase> bases;
 
-    @Override
-    public void getTestList() {
+    private boolean allComplete = false;
+
+    public SRMShiptHandler(QMSDao qmsDao, List<QMSSendVO.ShiptBase> bases) {
+        this.qmsDao = qmsDao;
+        this.bases = bases;
+
+        validate();
     }
+
+    @Override
+    public boolean isAllComplete() {
+        return allComplete;
+    }
+
+    private void validate() {
+
+    }
+
 }

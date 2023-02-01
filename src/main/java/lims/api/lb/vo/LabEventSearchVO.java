@@ -35,11 +35,15 @@ public class LabEventSearchVO {
     private String revwIp;              // 검토 IP
     private Integer labEvtAprIdx;       // 실험실 이벤트 승인 IDX
     private String rjtUid;              // 반려 UID
+    private String rjtUidNm;              // 반려자(임의)
     private String rjtDs;               // 반려 일시
+    private String rjtDt;               // 반려 일자(임의 추가)
     private String rjtRea;              // 반려 사유
 
     // ETC
     private String loginUserUid;        // 로그인 유저 UID
     private String loginUserIp;         // 로그인 유저 IP
-    private ApproveVO approveInfo;    // 승인 관련 Object
+    private ApproveVO approveInfo;      // 승인 관련 Object
+    private String aprReqDiv;           // S005, 승인 요청 구분
+    private String aprYn;               // 승인 여부
 }

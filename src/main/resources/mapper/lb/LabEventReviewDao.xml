@@ -71,7 +71,8 @@
         UPDATE QE_LAB_EVT SET
             RJT_UID = #{loginUserUid},
             RJT_DS = SYSDATE,
-            RJT_REA = #{rjtRea}
+            RJT_REA = #{rjtRea},
+            LAB_EVT_APR_IDX = #{labEvtAprIdx}
         WHERE 1 = 1
             AND PLNT_CD = #{plntCd}
             AND LAB_EVT_IDX = #{labEvtIdx}

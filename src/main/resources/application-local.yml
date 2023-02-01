@@ -12,6 +12,12 @@ spring:
     url: jdbc:log4jdbc:oracle:thin:@203.229.218.220:22221/ORCL
     username: HK_LIMS_APP
     password: HK_LIMS_APP
+  mail:
+    protocol: smtp
+    host: mail.kolmar.kr
+    port: 25
+    username: kolmar_lims@kolmar.co.kr
+    password: kkmlims123!@#
 
 report-designer:
   service-name: KOLMAR_LIMS

@@ -12,8 +12,8 @@ public interface QMSDao {
 
     List<QMSSendVO.ShiptBase> findShiptBaseByBatchNo(String batchNo);
 
-    List<QMSSendVO.ShiptBase> findMESTestAllByOrderNoAndLotNo(QMSSendVO.ShiptBase param);
+    List<QMSSendVO.ShiptTest> findMESTestAllByOrderNoAndLotNo(QMSSendVO.ShiptBase param);
 
-    List<QMSSendVO.ShiptBase> findSRMTestAllByOrderNoAndLotNo(QMSSendVO.ShiptBase param);
+    List<QMSSendVO.ShiptTest> findSRMTestAllByOrderNoAndLotNo(QMSSendVO.ShiptBase param);
 
 }

@@ -6,6 +6,7 @@ import lims.api.common.service.ApproveService;
 import lims.api.common.service.FileService;
 import lims.api.ts.dao.TestCollectionDao;
 import lims.api.ts.enums.TestProcess;
+import lims.api.ts.enums.TestSample;
 import lims.api.ts.service.TestCollectionService;
 import lims.api.ts.vo.TestCollectionVO;
 import lims.api.ts.vo.TestResultInputVO;
@@ -45,21 +46,28 @@ public class TestCollectionServiceImpl implements TestCollectionService {
     }
 
     public void insertSampleInfo(TestCollectionVO request) {
-        TestCollectionVO item = dao.getSmpInfo(request);
         int result = 0;
         List<TestCollectionVO> list = new ArrayList<>();
         if(request.getSmpVolAns() != 0){
-            item.setSmpDivCd(TestProcess.TEST_INSTRUCTION.getProcessCode());
+            TestCollectionVO item = dao.getSmpInfo(request);
+            item.setSmpDivCd(TestSample.TEST_SAMPLE.getSampleCode());
             item.setMngSmpVol(request.getSmpVolAns());
-            list.add(item);
-        }if(request.getSmpVolEtc() != 0){
-            item.setSmpDivCd(TestProcess.TEST_INSTRUCTION.getProcessCode());
-            item.setMngSmpVol(request.getSmpVolAns());
-            list.add(item);
-        }if(request.getSmpVolStrg() != 0){
-            item.setSmpDivCd(TestProcess.TEST_INSTRUCTION.getProcessCode());
-            item.setMngSmpVol(request.getSmpVolAns());
-            list.add(item);
+            list.add(list.size(), item);
+            System.out.println(list.get(list.size()).getSmpDivCd() + " >>>>>>>>>>>>>>>>>>>>>>>> SmpDivCd");
+        }
+        if(request.getSmpVolEtc() != 0){
+            TestCollectionVO item = dao.getSmpInfo(request);
+            item.setSmpDivCd(TestSample.ETC_SAMPLE.getSampleCode());
+            item.setMngSmpVol(request.getSmpVolEtc());
+            list.add(list.size(), item);
+            System.out.println(list.get(list.size()).getSmpDivCd() + " >>>>>>>>>>>>>>>>>>>>>>>> SmpDivCd");
+        }
+        if(request.getSmpVolStrg() != 0){
+            TestCollectionVO item = dao.getSmpInfo(request);
+            item.setSmpDivCd(TestSample.STORAGE_SAMPLE.getSampleCode());
+            item.setMngSmpVol(request.getSmpVolStrg());
+            list.add(list.size(), item);
+            System.out.println(list.get(list.size()).getSmpDivCd() + " >>>>>>>>>>>>>>>>>>>>>>>> SmpDivCd");
         }
         for(TestCollectionVO row : list) {
             int smpMngIdx = dao.getSmpMngIdx(request);

@@ -4,6 +4,7 @@ import lims.api.common.service.ApproveService;
 import lims.api.lb.dao.LabEventApprDao;
 import lims.api.lb.service.LabEventApprService;
 import lims.api.lb.vo.LabEventApprVO;
+import lims.api.ms.enums.ApproveRequestDivType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +19,7 @@ public class LabEventApprServiceImpl implements LabEventApprService {
 
     @Override
     public List<LabEventApprVO> findAll(LabEventApprVO dto) {
+        dto.setAprReqDiv(ApproveRequestDivType.LAB_EVENT_SPEC_VERSION.getCode());
         return labEventApprDao.findAll(dto);
     }
 

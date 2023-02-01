@@ -39,7 +39,8 @@
             AND QLE.LAB_EVT_APR_IDX IS NOT NULL
             AND SAI.APR_UID = #{loginUserUid}
             AND SAI.APR_YN = 'N'
-            AND SAI.APR_REQ_DIV = 'S0080300'
+            AND SAI.APR_REQ_DIV = #{aprReqDiv}
+            AND QLE.RJT_UID IS NULL
         <if test="pitmTyp != null and pitmTyp != ''">
             AND QLE.PITM_TYP = #{pitmTyp}
         </if>

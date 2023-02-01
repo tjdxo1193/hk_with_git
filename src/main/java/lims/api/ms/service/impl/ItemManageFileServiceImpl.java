@@ -2,9 +2,7 @@ package lims.api.ms.service.impl;
 
 import lims.api.ms.dao.MsElnCtRptFileDao;
 import lims.api.ms.domain.MsElnCtRptFileKey;
-import lims.api.ms.entity.MsElnCtRptFile;
 import lims.api.ms.service.ItemManageFileService;
-import lims.api.ms.vo.ItemManageVO;
 import lims.api.ms.vo.MsElnCtRptFileVO;
 import lims.api.util.FileUtil;
 import lombok.RequiredArgsConstructor;
@@ -12,9 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Service

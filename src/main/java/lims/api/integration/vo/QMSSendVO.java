@@ -1,10 +1,12 @@
 package lims.api.integration.vo;
 
 import lims.api.integration.annotation.EnumType;
+import lims.api.integration.enums.SAPPItemType;
 import lims.api.ts.enums.TestProcess;
 import lims.api.ts.enums.TestType;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 public class QMSSendVO {
 
@@ -17,6 +19,8 @@ public class QMSSendVO {
         private String phsOrderItm;
     }
 
+    @Getter
+    @Setter
     public static class ShiptTest {
         private String lotNo;
         private String pdtOrderNo;
@@ -26,6 +30,8 @@ public class QMSSendVO {
         private String ansTyp;
         @EnumType(TestProcess.class)
         private String ansProcCd;
+
+        private SAPPItemType mtart;
     }
 
 }
