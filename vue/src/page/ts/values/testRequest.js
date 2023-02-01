@@ -14,7 +14,6 @@ const list = {
       editable: false,
       showRowCheckColumn: true,
     },
-    legends: [{ value: '안정성시험', className: 'stabilityTest' }],
   },
   forms: () =>
     FormBuilder.builder()

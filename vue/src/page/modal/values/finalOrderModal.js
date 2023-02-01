@@ -1,4 +1,3 @@
-import api from '@/api';
 import { ColumnBuilder, FormBuilder } from '@/util/builder';
 
 const srmOrderList = {

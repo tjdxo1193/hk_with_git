@@ -42,7 +42,7 @@ export default {
     },
   },
   data() {
-    const { bomGridWithForm, modalButtons } = this.$copy(values);
+    const { bomGridWithForm } = this.$copy(values);
     return {
       bomGridWithForm: {
         ...bomGridWithForm.static,
@@ -62,7 +62,7 @@ export default {
   },
   watch: {
     show: function () {
-      FormUtil.setData(this.bomGridWithForm.forms, { matnr:this.$props.initData.pitmCd })
+      FormUtil.setData(this.bomGridWithForm.forms, { matnr: this.$props.initData.pitmCd });
       this.fetchBomGrid();
     },
   },

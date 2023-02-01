@@ -195,21 +195,6 @@ export default {
       );
     },
 
-    isSapPrdhaDuplicate(sapPrdha) {
-      this.$axios
-        .get('ms/wrapTestManage/getSapPrdhaDuplicateCheck', { sapPrdha })
-        .then(({ data }) => {
-          if (data > 0) {
-            this.$error(this.$message.error.isSapPrdhaDuplicate);
-            return true;
-          }
-        })
-        .catch(() => {
-          this.$error(this.$message.error.fetchData);
-        });
-      return false;
-    },
-
     setPkgaInfoToPkgaGridValueForm(item) {
       FormUtil.setData(this.valueWithqmPkgaListGrid.forms, item);
     },
@@ -341,10 +326,10 @@ export default {
       } else if (name == 'temporarySave') {
         this.isTestListGridChanged() ||
         (this.isTestListGridNotEmpty() && this.isVersionFormChanged())
-          ? this.preputQmPkga()
+          ? this.isSapPrdhaDuplicate(this.preputQmPkga)
           : this.$error(this.$message.warn.noSaveGridData);
       } else if (name == 'updateVersion') {
-        this.preputQmPkga();
+        this.isSapPrdhaDuplicate(this.preputQmPkga);
       } else if (name == 'approval') {
         this.approval();
       } else if (name == 'addTestItem') {
@@ -612,8 +597,23 @@ export default {
         this.putQmPkga(qmPkgaListParameter);
       }
     },
-    putQmPkga(parameter) {
-      this.$eSignWithReason(() =>
+
+    async isSapPrdhaDuplicate(callback) {
+      const { sapPrdha, pkgaCd } = FormUtil.getData(this.versionForm.forms);
+      await this.$axios
+        .get('ms/wrapTestManage/getSapPrdhaDuplicateCheck', { sapPrdha })
+        .then(({ data }) => {
+          if (data && data != pkgaCd) {
+            this.$error(this.$message.error.isSapPrdhaDuplicate);
+            return;
+          } else {
+            return callback();
+          }
+        });
+    },
+
+    async putQmPkga(parameter) {
+      await this.$eSignWithReason(() =>
         this.$axios
           .post('/ms/wrapTestManage/putQmPkga', parameter)
           .then(() => {
@@ -625,6 +625,7 @@ export default {
           }),
       );
     },
+
     addTestItemClick(items) {
       const aitmSpecIdx = FormUtil.getData(this.valueWithqmPkgaListGrid.forms).aitmSpecIdx ?? '';
       const testItemListGrid = this.testItemList.$grid;

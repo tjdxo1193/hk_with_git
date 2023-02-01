@@ -11,7 +11,6 @@ const searchGridWithForm = {
   static: {
     title: '조회',
     countPerRow: 4,
-    $grid: null,
     buttons: [{ name: 'search', label: '조회' }],
     props: {
       editable: false,

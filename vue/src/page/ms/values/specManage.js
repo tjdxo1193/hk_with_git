@@ -159,6 +159,7 @@ const testItemList = {
       { name: 'updateVersion', label: '수정', disabled: true },
       { name: 'addRow', label: '항목추가', disabled: true },
       { name: 'copyRow', label: '항목복사', disabled: true },
+      { name: 'elnSpec', label: 'ELN규격', disabled: true },
       { name: 'removeRow', label: '항목삭제', disabled: true },
       { name: 'up', label: '위', type: 'up', disabled: true },
       { name: 'down', label: '아래', type: 'down', disabled: true },

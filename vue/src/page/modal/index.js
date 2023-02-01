@@ -40,6 +40,7 @@ import TestMaterialOpenItemModal from './TestMaterialOpenItemModal';
 import TestModal from './TestModal';
 import TestSearchModal from './TestSearchModal.vue';
 import TreeCommonCodeModal from './TreeCommonCodeModal';
+import ElnSpecCopyForTestMethodModal from './ElnSpecCopyForTestMethodModal';
 
 export {
   ItemModal,
@@ -84,4 +85,5 @@ export {
   TestModal,
   InputReasonForDeleteModal,
   InputPerformanceModal,
+  ElnSpecCopyForTestMethodModal,
 };

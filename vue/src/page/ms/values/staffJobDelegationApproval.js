@@ -21,8 +21,10 @@ const searchForm = {
         ],
       })
       .Input('userNm', '부재자')
-      .DatepickerTwinWithSwitch('dlgDtList', '위임일', { value: [todayDate, todayDate] })
-      .spanCol(2)
+      .DatepickerTwinWithSwitch('dlgDtList', '위임일', {
+        value: [todayDate, todayDate],
+        _colSpan: 2,
+      })
       .build(),
 };
 
@@ -42,21 +44,21 @@ const searchResultGrid = {
   columns: () =>
     ColumnBuilder.builder()
       .col('dlgSeq', { visible: false })
-      .col('userNm', '부재자')
       .col('userId', { visible: false })
-      .col('dlgNm', '대리자')
       .col('dlgUid', { visible: false })
+      .col('dlgSttCd', { visible: false })
+      .col('dlgProcCd', { visible: false })
+      .col('dlgAprReqIdx', { visible: false })
+      .col('userNm', '부재자')
+      .col('dlgNm', '대리자')
       .col('dlgDt', '위임시작일')
       .col('gbkDt', '재실일자')
-      .col('dlgSttCd', { visible: false })
       .col('dlgSttNm', '재실여부')
       .col('dlgRea', '위임사유')
-      .col('dlgProcCd', '업무위임진행상태코드', { visible: false })
       .col('dlgProcNm', '진행상황')
       .col('rjtYn', '반려여부')
       .col('rjtDs', '반려일')
       .col('rjtRea', '반려사유')
-      .col('dlgAprReqIdx', {})
       .build(),
 };
 
@@ -68,21 +70,17 @@ const staffInfoForm = {
   },
   forms: () =>
     FormBuilder.builder()
-      .Input('userNm', '부재자')
-      .disabled()
-      .Textarea('dlgRea', '위임사유', { rows: 3 })
-      .disabled()
-      .spanCol(3)
-      .spanRow(2)
-      .Select('dlgUid', '대리자', {
-        async: api.combo.common.getUserList,
-      })
-      .disabled()
       .Hidden('dlgUid')
       .Hidden('userId')
       .Hidden('dlgAprReqIdx')
       .Hidden('dlgSeq')
       .Hidden('dlgAprReqIdx')
+      .Input('userNm', '부재자', { disabled: true })
+      .Textarea('dlgRea', '위임사유', { disabled: true, rows: 3, _colSpan: 3, _rowSpan: 2 })
+      .Select('dlgUid', '대리자', {
+        async: api.combo.common.getUserList,
+        disabled: true,
+      })
       .build(),
 };
 

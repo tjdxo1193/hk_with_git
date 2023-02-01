@@ -26,18 +26,18 @@ const addSampleGrid = {
       .build(),
   columns: () =>
     ColumnBuilder.builder()
-      .col('plntCd', false)
-      .col('addSmpIdx', false)
-      .col('addSmpProc', false)
-      .col('smpMngIdx', false)
-      .col('addSmpAprReqIdx', false)
+      .col('plntCd', { visible: false })
+      .col('addSmpIdx', { visible: false })
+      .col('addSmpProc', { visible: false })
+      .col('smpMngIdx', { visible: false })
+      .col('addSmpAprReqIdx', { visible: false })
+      .col('smpReqRea', { visible: false })
       .col('pitmCd', '품목코드')
       .col('pitmNm', '품목명')
       .col('ansNo', '시험번호')
       .col('lotNo', '제조번호')
       .col('reqSmpVol', '요청검체수량')
       .col('inpUnit', '요청검체단위')
-      .col('smpReqRea', false)
       .col('smpReqReaNm', '요청사유')
       .col('smpReqReaDtl', '요청사유상세')
       .build(),
@@ -65,44 +65,30 @@ const inputForm = {
         'pitm',
         '품목정보',
         FormBuilder.builder()
-          .Input('pitmCd')
-          .required()
-          .readonly()
-          .Input('pitmNm')
-          .readonly()
+          .Input('pitmCd', { readonly: true, _required: true })
+          .Input('pitmNm', { readonly: true })
           .build(),
       )
+      .spanCol(2)
       .multiple(
         'number',
         '시험번호 및 제조번호',
         FormBuilder.builder()
-          .Input('ansNo')
-          .required()
-          .readonly()
-          .Input('lotNo')
-          .readonly()
+          .Input('ansNo', { readonly: true, _required: true })
+          .Input('lotNo', { readonly: true })
           .build(),
       )
-      .multiple(
-        'addSample',
-        '요청검체수량',
-        FormBuilder.builder()
-          .Input('reqSmpVol')
-          .readonly()
-          .required()
-          .Input('inpUnit')
-          .readonly()
-          .build(),
-      )
+      .spanCol(2)
+      .InputNumber('reqSmpVol', '요청검체수량', { readonly: true, _required: true })
+      .Input('inpUnit', '입력단위', { readonly: true, _required: true })
       .RadioGroup('smpReqRea', '요청사유', {
         groups: [
           { label: '기준일탈', checkedValue: 'U0250001' },
           { label: '기타', checkedValue: 'U0250002' },
         ],
+        disabled: true,
       })
-      .readonly()
-      .Textarea('smpReqReaDtl', '요청사유상세')
-      .readonly()
+      .Textarea('smpReqReaDtl', '요청사유상세', { readonly: true })
       .build(),
 };
 

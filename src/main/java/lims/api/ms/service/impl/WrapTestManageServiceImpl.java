@@ -247,5 +247,4 @@ public class WrapTestManageServiceImpl implements WrapTestManageService {
 		return approveInfo;
 	}
 
-	
 }

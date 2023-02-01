@@ -124,6 +124,7 @@ export default {
     noResultJudge: '결과 판정을 선택해주세요.',
     noExceedAnsSmpVol: '안정성검체량을 초과하였습니다',
     noNegativeNumber: '사용검체량은 0이거나 0보다 작을 수 없습니다.',
+    noCtrptNo: 'CT성적서 ID가 없습니다.',
   },
   confirm: {
     saveData: '저장하시겠습니까?',

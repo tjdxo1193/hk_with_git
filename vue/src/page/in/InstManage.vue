@@ -51,7 +51,7 @@ export default {
         forms: searchGridWithForm.forms(),
         columns: searchGridWithForm.columns(),
         event: {
-          cellClick: (event) => {
+          cellDoubleClick: (event) => {
             this.onClickSearchGridWithFormCell(event);
             this.setButtonsEnable();
           },
@@ -154,10 +154,10 @@ export default {
     setButtonsEnable(name) {
       const buttons = this.registerForm.buttons;
       if (name === 'init') {
-        FormUtil.enableButtons(buttons, ['excel', 'save', 'init']);
+        FormUtil.enableButtons(buttons, ['save', 'init']);
         FormUtil.disableButtons(buttons, ['saveFile', 'update', 'delete']);
       } else {
-        FormUtil.enableButtons(buttons, ['excel', 'saveFile', 'update', 'delete', 'init']);
+        FormUtil.enableButtons(buttons, ['saveFile', 'update', 'delete', 'init']);
         FormUtil.disableButtons(buttons, ['save']);
       }
     },
@@ -225,9 +225,6 @@ export default {
       }
     },
     onClickRegisterFormButtons({ name }) {
-      if (name === 'excel') {
-        alert(name);
-      }
       if (name === 'saveFile') {
         this.fileAttacherModal.fileIdx = FormUtil.getValue(this.registerForm.forms, 'eqmFileIdx');
         this.showModal('fileAttacherModal');

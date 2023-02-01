@@ -55,9 +55,9 @@ public class ItemManageController {
         return ResponseEntity.ok(new CommonResponse());
     }
 
-    @GetMapping("/getFileList/{ctrptNo}")
-    public ResponseEntity<List<MsElnCtRptFileVO>> getFileList(@PathVariable String ctrptNo) {
-        return ResponseEntity.ok(service.getFileList(ctrptNo));
+    @GetMapping("/getFileList")
+    public ResponseEntity<List<MsElnCtRptFileVO>> getFileList(MsElnCtRptFileVO request) {
+        return ResponseEntity.ok(service.getFileList(request));
     }
 
     @PostMapping("/saveFile")

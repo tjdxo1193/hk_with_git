@@ -9,12 +9,12 @@ const list = {
     height: '150px',
     buttons: [{ name: 'search', label: '조회' }],
   },
-  forms: () => FormBuilder.builder().Input('pitmCd', '자재번호').spanCol(2).build(),
+  forms: () => FormBuilder.builder().Input('ctId', 'CT성적서 ID').Input('matnr', 'ERP-LAB NO').build(),
   columns: () =>
     ColumnBuilder.builder()
-      .col('ctId', false)
+      .col('ctId', "CT성적서 ID")
       .col('ctSeq', false)
-      .col('pitmCd', '자재번호')
+      .col('matnr', 'ERP-LAB NO')
       .col('fileName', '파일명')
       .col('crtDs', false)
       .col('crtDt', '최초등록일')
@@ -27,7 +27,7 @@ const detail = {
   static: {
     title: '첨부파일',
     countPerRow: 2,
-    buttons: [{name: 'save', label: '저장' }],
+    buttons: [{ name: 'save', label: '저장' }],
   },
   forms: () => FormBuilder.builder().Slot('dropzone', '첨부파일').spanCol(2).build(),
 };

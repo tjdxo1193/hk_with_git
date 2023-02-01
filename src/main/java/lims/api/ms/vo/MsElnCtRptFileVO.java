@@ -23,6 +23,7 @@ public class MsElnCtRptFileVO implements UpdateDetect {
     private String type;                        // 파일타입(DropZone용 임의 변수)
     private Long size;                          // 파일크기(DropZone용 임의 변수)
     private byte[] src;                         // 파일(DropZone용 임의 변수)
-    private Integer fileIdx;                    // 파일 idx(DropZone용 임의 변수)
+    private String fileIdx;                    // 파일 idx(DropZone용 임의 변수)
     private Integer fileSrlno;                    // 파일 seq(DropZone용 임의 변수)
+    private String matnr;
 }

@@ -87,25 +87,26 @@ const staffInfoForm = {
   },
   forms: () =>
     FormBuilder.builder()
-      .Input('userNm', '부재자')
-      .readonly()
-      .required()
-      .Textarea('dlgRea', '위임사유', { rows: 3 })
-      .spanCol(3)
-      .spanRow(3)
-      .required()
+      .Hidden('aprReqDiv')
+      .Hidden('userId', 'userId')
+      .Hidden('dlgAprReqIdx', 'dlgAprReqIdx')
+      .Hidden('dlgSeq', 'dlgSeq')
+      .Input('userNm', '부재자', { readonly: true, _required: true })
+      .Textarea('dlgRea', '위임사유', {
+        maxLength: 300,
+        rows: 3,
+        _colSpan: 3,
+        _rowSpan: 3,
+        _required: true,
+      })
       .Select('dlgUid', '대리자', {
         async: () =>
           api.combo.common.getUserList().then((res) => {
             res.data = res.data.filter(({ value }) => value !== TokenUtil.myId());
             return res;
           }),
+        _required: true,
       })
-      .required()
-      .Hidden('aprReqDiv')
-      .Hidden('userId', 'userId')
-      .Hidden('dlgAprReqIdx', 'dlgAprReqIdx')
-      .Hidden('dlgSeq', 'dlgSeq')
       .build(),
 };
 

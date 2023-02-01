@@ -34,11 +34,12 @@
     @reg="getRevisionReason"
   />
 
-  <BomModal 
-  :show="bomModal.show" 
-  :readonly="bomModal.readonly" 
-  :initData="bomModal.initData"
-  @close="hideModal('bomModal')" />
+  <BomModal
+    :show="bomModal.show"
+    :readonly="bomModal.readonly"
+    :initData="bomModal.initData"
+    @close="hideModal('bomModal')"
+  />
 
   <ItemManageFileAttacherModal
     :initData="itemManageFileAttacherModal.initData"
@@ -479,18 +480,26 @@ export default {
     },
 
     setItemManageFileAttacherModalInitData() {
-      const ctrptNo = Number(this.getCtrptNo());
-      const ctId = Object.assign(ctrptNo, Number);
-      const {pitmCd} = FormUtil.getData(this.commonInfoForm.forms);
-      this.itemManageFileAttacherModal.initData = {ctId , pitmCd};
+      let ctrptNo = null;
+      let ctId = null;
+      if(this.getCtrptNo() != null){
+        ctrptNo = Number(this.getCtrptNo());
+        ctId = Object.assign(ctrptNo, Number);
+      }
+      const { labNo } = FormUtil.getData(this.commonInfoForm.forms);
+      this.itemManageFileAttacherModal.initData = { ctId, matnr : labNo };
     },
 
-    setBomModalInitData(){
-      const {pitmCd} = FormUtil.getData(this.commonInfoForm.forms);
-      this.bomModal.initData = {pitmCd};
+    setBomModalInitData() {
+      const { pitmCd } = FormUtil.getData(this.commonInfoForm.forms);
+      this.bomModal.initData = { pitmCd };
     },
 
     fileSave({ addedFiles, removedFileIds }) {
+      if(this.getCtrptNo() == null){
+        this.$error(this.$message.warn.noCtrptNo);
+        return;
+      }
       const ctrptNo = Number(this.getCtrptNo());
       const ctId = Object.assign(ctrptNo, Number);
       const commonInfoFormData = FormUtil.getData(this.commonInfoForm.forms);

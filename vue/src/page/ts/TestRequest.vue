@@ -106,6 +106,10 @@ export default {
         })
         .catch(() => this.$error(this.$message.error.updateData));
     },
+    checkTestType(){
+      const item = FormUtil.getData(this.testInfo.forms);
+      return item.ansTyp === null || item.ansTyp === '' ? true : false;
+    },
     searchFormEvent(event) {
       if (event.type === 'keydown' && event.originEvent.key === 'Enter') {
         this.getTestRequestList();
@@ -119,13 +123,19 @@ export default {
         this.init();
       }
       if (name === 'requestRegist') {
-        this.requestRegist();
+        if(this.checkTestType()){
+          return this.$warn(this.$message.validate.requiredValueNotInput);
+        }
+        return this.requestRegist();
       }
       if (name === 'request') {
         this.request();
       }
       if (name === 'save') {
-        this.save();
+        if(this.checkTestType()){
+          return this.$warn(this.$message.validate.requiredValueNotInput);
+        }
+        return this.save();
       }
     },
     formEvent(event) {

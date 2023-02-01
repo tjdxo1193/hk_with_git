@@ -7,15 +7,10 @@ const monthAgoDate = dayjs().add(-1, 'month').format('YYYY-MM-DD');
 
 const todayDate = dayjs().format('YYYY-MM-DD');
 
-const legendList = [];
-
 const searchGridWithForm = {
   static: {
     title: '조회',
     countPerRow: 4,
-    legends: legendList,
-    data: [],
-    $grid: null,
     buttons: [{ name: 'search', label: '조회' }],
     props: {
       editable: false,
@@ -58,10 +53,29 @@ const searchGridWithForm = {
       .col('plntCd', false)
       .col('smpMngIdx', false)
       .col('smpDpsProc', false)
-      .col('smpDivNm', '검체구분')
       .col('smpDivCd', false)
-      .col('smpDpsNm', '검체상태')
       .col('pitmTyp', false)
+      .col('ansTyp', false)
+      .col('ansIdx', false)
+      .col('mngSmpVol', false)
+      .col('smpStrgMtd', false)
+      .col('smpStrgMtdNm', false)
+      .col('inpUnit', false)
+      .col('makDt', false)
+      .col('strgLmt', false)
+      .col('useLmt', false)
+      .col('irgYn', false)
+      .col('smpEtrDt', false)
+      .col('smpRmk', false)
+      .col('dpsExpDt', false)
+      .col('dpsFixDt', false)
+      .col('smpDpsAprIdx', false)
+      .col('dpsRea', false)
+      .col('dpsCanRea', false)
+      .col('rjtUid', false)
+      .col('rjtNm', false)
+      .col('rjtRea', false)
+      .col('smpDivNm', '검체구분')
       .col('ansNo', '시험번호')
       .col('pitmTypNm', '품목유형')
       .col('ansTypNm', '시험유형')
@@ -69,28 +83,7 @@ const searchGridWithForm = {
       .col('pitmNm', '품목명')
       .col('lotNo', '제조번호')
       .col('batchNo', '배치번호')
-      .col('ansTyp', false)
-      .col('ansIdx', false)
-      .col('mngSmpVol', '관리검체량', false)
-      .col('smpStrgMtd', false)
-      .col('smpStrgMtdNm', '검체보관방법', false)
-      .col('smpVolUnit', false)
-      .col('smpVolUnitNm', '검체량단위', false)
-      .col('inpUnit', '입력단위', false)
-      .col('makDt', '제조일자', false)
-      .col('strgLmt', '보관기한', false)
-      .col('useLmt', '사용기한', false)
-      .col('irgYn', '이상여부', false)
-      .col('smpEtrDt', '검체입고일자', false)
-      .col('smpRmk', '검체비고', false)
-      .col('dpsExpDt', '폐기예정일자', false)
-      .col('dpsFixDt', '폐기확정일자', false)
-      .col('smpDpsAprIdx', false)
-      .col('dpsRea', '폐기사유', false)
-      .col('dpsCanRea', '폐기취소사유', false)
-      .col('rjtUid', false)
-      .col('rjtNm', '반려자', false)
-      .col('rjtRea', '반려사유', false)
+      .col('smpDpsNm', '검체상태')
       .build(),
 };
 
@@ -111,65 +104,48 @@ const inputInfoForm = {
       .Hidden('smpMngIdx')
       .Hidden('smpdpsProc')
       .Hidden('ansIdx')
+      .Hidden('pitmCd')
+      .Hidden('pitmTyp')
+      .Hidden('smpDpsProc')
+      .Hidden('pitmTyp')
+      .Hidden('ansTyp')
       .multiple(
         'pitm',
         '품목명',
         FormBuilder.builder()
-          .Input('pitmNm')
-          .required()
-          .readonly()
-          .spanCol(10)
+          .Input('pitmNm', { readonly: true, _required: true, _colSpan: 10 })
           .Button('search', '검색', { type: 'search' })
           .build(),
       )
-      .Hidden('pitmCd', '품목코드')
-      .Hidden('pitmTyp')
-      .Input('pitmTypNm', '품목구분')
-      .readonly()
-      .Input('ansNo', '시험번호')
-      .readonly()
+      .Input('pitmTypNm', '품목구분', { readonly: true })
+      .Input('ansNo', '시험번호', { readonly: true })
       .Select('smpDivCd', '검체구분', {
         async: () => api.combo.systemCommon.getSmpDivCombo(),
+        _required: true,
       })
-      .Input('lotNo', '제조번호')
-      .readonly()
-      .Input('batchNo', '배치번호')
-      .readonly()
-      .Input('smpDpsNm', '검체상태')
-      .readonly()
-      .Input('ansTypNm', '시험유형')
-      .readonly()
-      .Hidden('ansTyp')
-      .Input('rcpDt', '접수일자')
-      .readonly()
-      .Input('makDt', '제조일자')
-      .readonly()
-      .Input('smpEtrDt', '검체입고일자')
-      .readonly()
-      .Hidden('smpDpsProc')
-      .Hidden('pitmTyp')
-      .Input('pitmTypNm', '품목유형')
-      .readonly()
+      .Input('lotNo', '제조번호', { readonly: true })
+      .Input('batchNo', '배치번호', { readonly: true })
+      .Input('smpDpsNm', '검체상태', { readonly: true })
+      .Input('ansTypNm', '시험유형', { readonly: true })
+      .Input('rcpDt', '접수일자', { readonly: true })
+      .Input('makDt', '제조일자', { readonly: true, _required: true })
+      .Input('smpEtrDt', '검체입고일자', { readonly: true })
+      .Input('pitmTypNm', '품목유형', { readonly: true })
       .Select('smpStrgMtd', '검체보관방법', {
         async: () => api.combo.userCommon.getSmpStrgMtdCombo(),
       })
-      .Input('mngSmpVol', '관리검체량')
-      .readonly()
-      .Input('inpUnit', '입력단위')
-      .readonly()
-      .Input('strgLmt', '보관기한')
-      .readonly()
-      .Input('useLmt', '사용기한')
-      .readonly()
+      .Input('mngSmpVol', '관리검체량', { readonly: true, _required: true })
+      .Input('inpUnit', '입력단위', { readonly: true, _required: true })
+      .Input('strgLmt', '보관기한', { readonly: true })
+      .Input('useLmt', '사용기한', { readonly: true })
       .RadioGroup('irgYn', '이상여부', {
         groups: [
           { label: '정상', checkedValue: 'N' },
           { label: '이상', checkedValue: 'Y' },
         ],
       })
-      .readonly()
       .Datepicker('dpsExpDt', '폐기예정일자', { value: todayDate })
-      .Textarea('smpRmk', '검체비고')
+      .Textarea('smpRmk', '검체비고', { maxLength: 4000 })
       .build(),
 };
 

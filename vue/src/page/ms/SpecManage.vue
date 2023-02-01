@@ -39,6 +39,12 @@
     @close="hideRequestReviewerModal()"
     @modalReturnDataEvent="requestReview"
   />
+
+  <ElnSpecCopyForTestMethodModal
+    :show="elnSpecCopyForTestMethodModal.show"
+    @close="hideElnSpecCopyForTestMethodModal()"
+    @select="copyRowTestItem"
+  />
 </template>
 
 <script>
@@ -46,6 +52,7 @@ import {
   ItemsByTestMethodModal,
   ItemsCopyByTestMethodModal,
   RequestReviewerModal,
+  ElnSpecCopyForTestMethodModal,
 } from '@/page/modal';
 import { FormUtil, GridUtil, StringUtil } from '@/util';
 
@@ -60,6 +67,7 @@ export default {
     ItemsByTestMethodModal,
     RequestReviewerModal,
     ItemsCopyByTestMethodModal,
+    ElnSpecCopyForTestMethodModal,
   },
   data() {
     const { pitmList, versionList, testItemList, valueWithPitmGrid, valueWithVersionGrid } =
@@ -115,6 +123,9 @@ export default {
       },
       itemsCopyByTestMethodModal: {
         show: false,
+      },
+      elnSpecCopyForTestMethodModal: {
+        show: false,  
       },
       processCode: {
         temporarySave: 'S0080100',
@@ -318,9 +329,12 @@ export default {
     },
 
     isSelectedItemHasNotVersion() {
-      const {aitmSpecIdx} = FormUtil.getData(this.valueWithVersionGrid.forms);
-      return (this.versionList.$grid.getItemsByValue('aitmSpecVer', 1).length == 0) 
-      && (this.versionList.$grid.getRowCount() == 1) && (aitmSpecIdx == null);
+      const { aitmSpecIdx } = FormUtil.getData(this.valueWithVersionGrid.forms);
+      return (
+        this.versionList.$grid.getItemsByValue('aitmSpecVer', 1).length == 0 &&
+        this.versionList.$grid.getRowCount() == 1 &&
+        aitmSpecIdx == null
+      );
     },
 
     isTestListGridEmpty() {

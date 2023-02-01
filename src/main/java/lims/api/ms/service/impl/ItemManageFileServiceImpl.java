@@ -24,11 +24,8 @@ public class ItemManageFileServiceImpl implements ItemManageFileService {
     private final MsElnCtRptFileDao fileDao;
 
     @Override
-    public List<MsElnCtRptFileVO> getMsElnCtRptFileList(String ctrptNo) {
-        MsElnCtRptFileVO vo = new MsElnCtRptFileVO();
-        vo.setCtrptNo(ctrptNo);
-        vo.setCtId(ctrptNo);
-        return fileDao.getMsElnCtRptFileList(vo);
+    public List<MsElnCtRptFileVO> getMsElnCtRptFileList(MsElnCtRptFileVO param) {
+        return fileDao.getMsElnCtRptFileList(param);
     }
 
     @Override

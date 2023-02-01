@@ -98,7 +98,7 @@ export default {
     },
     async delete() {
       const param = FormUtil.getData(this.inputInfoForm.forms);
-      await this.$eSignWithReason(() => this.$axios.put('/tp/sampleManage/delete', param))
+      await this.$eSign(() => this.$axios.put('/tp/sampleManage/delete', param))
         .then(() => {
           this.init();
           this.fetchSearchGridWithForm();

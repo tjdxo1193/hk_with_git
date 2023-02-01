@@ -11,15 +11,15 @@ public interface ItemManageService {
 
     List<ItemManageVO> findVersion(ItemManageVO param);
 
-    void revision(ItemManageVO request);
+    void revision(ItemManageVO param);
 
-    void tempSave(ItemManageVO request);
+    void tempSave(ItemManageVO param);
 
-    void firstSave(ItemManageVO request);
+    void firstSave(ItemManageVO param);
 
-    List<MsElnCtRptFileVO> getFileList(String ctrptNo);
+    List<MsElnCtRptFileVO> getFileList(MsElnCtRptFileVO param);
 
-    String savedFile(ItemManageVO request);
+    String savedFile(ItemManageVO param);
 
-    List<ItemManageVO> getBomList(ItemManageVO request);
+    List<ItemManageVO> getBomList(ItemManageVO param);
 }

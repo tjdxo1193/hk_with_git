@@ -119,7 +119,6 @@ const registerForm = {
     title: '정보등록',
     countPerRow: 4,
     buttons: [
-      { name: 'excel', label: 'Excel' },
       { name: 'saveFile', label: '파일등록', disabled: true },
       { name: 'save', label: '등록' },
       { name: 'update', label: '수정', disabled: true },
@@ -130,37 +129,36 @@ const registerForm = {
   forms: () =>
     FormBuilder.builder()
       .Hidden('plntCd')
-      .Hidden('eqmCd', '기기코드')
-      .Input('eqmNm', '기기명')
-      .required()
+      .Hidden('eqmCd')
+      .Hidden('eqmFileIdx')
+      .Input('eqmNm', '기기명', { _required: true, maxLength: 5 })
       .Select('eqmDiv', '기기분류', {
         async: () => api.combo.userCommon.getEqmDivCombo(),
+        _required: true,
       })
-      .required()
       .Select('eqmCrst', '기기현황', {
         async: () => api.combo.userCommon.getEqmCrstCombo(),
+        _required: true,
       })
-      .required()
       .Select('eqmStt', '기기상태', {
         async: () => api.combo.userCommon.getEqmSttCombo(),
+        _required: true,
       })
-      .required()
       .Select('istPla', '설치장소', {
         async: () => api.combo.userCommon.getIstPlaCombo(),
+        _required: true,
       })
-      .required()
-      .Input('makComp', '제조회사')
-      .Input('splComp', '공급회사')
-      .Input('modNm', '모델이름')
-      .Input('srlNo', 'Serial No.')
+      .Input('makComp', '제조회사', { maxLength: 50 })
+      .Input('splComp', '공급회사', { maxLength: 50 })
+      .Input('modNm', '모델이름', { maxLength: 50 })
+      .Input('srlNo', 'Serial No.', { maxLength: 40 })
       .Select('crgUid', '담당자', {
-        async: api.combo.common.getUserList,
+        async: () => api.combo.common.getUserList(),
       })
-      .Input('iq', 'IQ')
-      .Input('oq', 'OQ')
-      .Input('pq', 'PQ')
-      .Input('arpNo', '승인번호')
-      .readonly()
+      .Input('iq', 'IQ', { maxLength: 40 })
+      .Input('oq', 'OQ', { maxLength: 40 })
+      .Input('pq', 'PQ', { maxLength: 40 })
+      .Input('arpNo', '승인번호', { readonly: true })
       .Select('chkCyl', '점검주기', {
         async: () => api.combo.userCommon.getChkCylCombo(),
       })
@@ -170,40 +168,27 @@ const registerForm = {
       .Select('calCyl', 'Calibration주기', {
         async: () => api.combo.userCommon.getChkCylCombo(),
       })
-      .DatepickerWithSwitch('etrDt', '입고일자', { value: todayDate })
-      .DatepickerWithSwitch('istDt', '설치일자', { value: todayDate })
-      .DatepickerWithSwitch('dpsDt', '폐기일자', { value: todayDate })
-      .DatepickerWithSwitch('qualAprDt', 'Qual승인일자', { value: todayDate })
-      .DatepickerWithSwitch('calAprDt', 'Cal승인일자', { value: todayDate })
-      .DatepickerWithSwitch('rglChkAprDt', '정기점검승인일자', { value: todayDate })
-      .Input('useRng', '사용가능범위')
-      .Input('qttRng', '정량범위')
-      .Textarea('rmk', '비고')
-      .Hidden('eqmFileIdx', '기기파일IDX')
-      .Input('sapAstNo', 'SAP자산번호')
-      .readonly()
-      .Input('sapAstNm', 'SAP자산명')
-      .readonly()
-      .Input('sapCrtDt', 'SAP생성일자')
-      .readonly()
-      .Input('sapChgDt', 'SAP변경일자')
-      .readonly()
-      .Input('sapAcqDt', 'SAP취득일자')
-      .readonly()
-      .Input('sapSaleDpsDt', 'SAP매각/폐기일자')
-      .readonly()
-      .Input('sapAddDesc', 'SAP추가설명')
-      .readonly()
-      .Input('sapCrgNmEmid', 'SAP담당자사번')
-      .readonly()
-      .Input('sapCosc', 'SAP코스트센터')
-      .readonly()
-      .Input('sapOrco', 'SAP취득가액')
-      .readonly()
-      .Input('sapAccd', 'SAP감가상각누계액')
-      .readonly()
-      .Input('pmsChkTagtYn', 'PMS점검대상여부')
-      .readonly()
+      .Datepicker('etrDt', '입고일자', { value: todayDate })
+      .Datepicker('istDt', '설치일자', { value: todayDate })
+      .Datepicker('dpsDt', '폐기일자', { value: todayDate })
+      .Datepicker('qualAprDt', 'Qual승인일자', { value: todayDate })
+      .Datepicker('calAprDt', 'Cal승인일자', { value: todayDate })
+      .Datepicker('rglChkAprDt', '정기점검승인일자', { value: todayDate })
+      .Input('useRng', '사용가능범위', { maxLength: 50 })
+      .Input('qttRng', '정량범위', { maxLength: 40 })
+      .Textarea('rmk', '비고', { maxLength: 4000 })
+      .Input('sapAstNo', 'SAP자산번호', { readonly: true })
+      .Input('sapAstNm', 'SAP자산명', { readonly: true })
+      .Input('sapCrtDt', 'SAP생성일자', { readonly: true })
+      .Input('sapChgDt', 'SAP변경일자', { readonly: true })
+      .Input('sapAcqDt', 'SAP취득일자', { readonly: true })
+      .Input('sapSaleDpsDt', 'SAP매각/폐기일자', { readonly: true })
+      .Input('sapAddDesc', 'SAP추가설명', { readonly: true })
+      .Input('sapCrgNmEmid', 'SAP담당자사번', { readonly: true })
+      .Input('sapCosc', 'SAP코스트센터', { readonly: true })
+      .Input('sapOrco', 'SAP취득가액', { readonly: true })
+      .Input('sapAccd', 'SAP감가상각누계액', { readonly: true })
+      .Input('pmsChkTagtYn', 'PMS점검대상여부', { readonly: true })
       .build(),
 };
 

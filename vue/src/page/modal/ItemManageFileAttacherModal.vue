@@ -1,11 +1,14 @@
 <template>
-  <ModalBase :title="title" :show="show" width="700px" :top="50" @close="close">
-    <AUIGridSearch v-bind="list" @grid-created="(proxy) => $setState('list.$grid', proxy)"  
-      @button-click="onClickCommonInfoFormButtons"/>
+  <ModalBase :title="title" :show="show" width ="1000px" :top="50" @close="close">
+    <AUIGridSearch
+      v-bind="list"
+      @grid-created="(proxy) => $setState('list.$grid', proxy)"
+      @button-click="onClickButton"
+    />
 
     <Space :gap="10" />
 
-    <FormWithHeader v-bind="detail" @button-click="onClickCommonInfoFormButtons">
+    <FormWithHeader v-bind="detail" @button-click="onClickButton">
       <template #form-dropzone>
         <Dropzone @created="$setState('detail.dropzone', $event)" :option="{ readonly }" />
       </template>
@@ -15,6 +18,7 @@
 
 <script>
 import { FormUtil } from '@/util';
+
 import values from './values/itemManageFileAttacherModal';
 
 export default {
@@ -37,11 +41,10 @@ export default {
       type: Boolean,
       default: false,
     },
-  },
-  mounted() {
-    if (this.existsCtrptNo()) {
-      this.getFileList();
-    }
+    height: {
+      type: String,
+      default: '1000px',
+    },
   },
   data() {
     const { list, detail } = this.$copy(values);
@@ -59,33 +62,27 @@ export default {
     };
   },
   watch: {
-    ctrptNo() {
-      this.getFileList();
-    },
     show() {
       if (this.$props.show) {
-        FormUtil.setData(this.list.forms, {pitmCd: this.$props.initData.pitmCd});
-        this.getFileList();
+        FormUtil.setData(this.list.forms, { ctId: this.$props.initData.ctId, matnr: this.$props.initData.labNo });
       }
     },
   },
   methods: {
-    existsCtrptNo() {
-      return this.$props.initData.ctrptNo > 0;
-    },
     async getFileList() {
-      const ctrptNo = this.$props.initData.ctrptNo;
+      const param = FormUtil.getData(this.list.forms);
       const { $grid } = this.list;
-
       const data = await $grid
-        ._useLoader(() => this.$axios.get(`/ms/itemManage/getFileList/${ctrptNo}`))
+        ._useLoader(() => this.$axios.get('/ms/itemManage/getFileList', param))
         .then(({ data }) => data);
-
       $grid.setGridData(data);
       this.detail.dropzone.clear();
       this.detail.dropzone.addFiles(data);
     },
     onClickButton({ name }) {
+      if (name === 'search') {
+        this.getFileList();
+      }
       if (name === 'save') {
         this.emitSave();
       }

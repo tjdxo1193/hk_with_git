@@ -48,10 +48,11 @@ const searchGridWithForm = {
     FormBuilder.builder()
       .Select('plntCd', '사업장', { async: api.combo.common.getPlntCd })
       .required()
+      .Select('pitmTyp', '품목구분', { async: () => api.combo.systemCommon.getPitmDivCombo() })
+      .required()
       .Select('specProcCd', '등록여부', { async: () => api.combo.systemCommon.getSpecProcCombo() })
       .Input('pitmCd', '품목코드')
       .Input('pitmNm', '품목명')
-      .Select('pitmTyp', '품목구분', { async: () => api.combo.systemCommon.getPitmDivCombo() })
       .build(),
   columns: () =>
     ColumnBuilder.builder()

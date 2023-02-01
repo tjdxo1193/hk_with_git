@@ -55,7 +55,6 @@ const monitorManage = {
 const monitorSearchResult = {
   static: {
     title: '조회결과',
-    $grid: null,
     props: {
       editable: false,
       showRowCheckColumn: false,
@@ -100,47 +99,42 @@ const monitorManageInfo = {
   },
   forms: () =>
     FormBuilder.builder()
+      .Hidden('mitmCd')
       .Select('mitmPitmUpperDiv', '품목구분', {
         async: () => api.combo.common.getTreeCd('M1000001'),
+        _required: true,
       })
-      .required()
       .Select('mitmPitmDiv', '품목명', {
         async: (param) => api.combo.common.getTreeCd(param),
+        _required: true,
       })
-      .required()
       .Select('crgDptCd', '담당부서', {
         async: () => api.combo.common.getdptByLevel(2),
+        _required: true,
       })
-      .required()
-      .Input('perSpec', '허가규격')
+      .Input('perSpec', '허가규격', { maxLength: 40 })
       .Select('mitmWrkStudioDiv', '작업동', {
         async: () => api.combo.common.getTreeCd('M2000000'),
+        _required: true,
       })
-      .required()
       .Select('mitmWrkPlcUpperDiv', '작업소', {
         async: (param) => api.combo.common.getTreeCd(param),
+        _required: true,
       })
-      .required()
       .Select('mitmWrkPlcDiv', '작업실', {
         async: (param) => api.combo.common.getTreeCd(param),
+        _required: true,
       })
-      .required()
-      .Input('point', '포인트')
-      .readonly()
+      .Input('point', '포인트', { readonly: true })
       .Select('ansCylCd', '시험주기', {
         async: api.combo.common.getAnsCyl,
+        _required: true,
       })
-      .required()
       .Datepicker('ansStrDt', '시험시작일', { value: todayDate })
-      .Input('roomno', 'RoomNo')
-      .readonly()
-      .Input('grade', 'Grade')
-      .readonly()
-      .Input('revwDurTm', '검토소요시간')
-      .Input('aprDurTm', '승인소요시간')
-      .blank()
-      .blank()
-      .Hidden('mitmCd', 'mitmCd')
+      .Input('roomno', 'RoomNo', { readonly: true })
+      .Input('grade', 'Grade', { readonly: true })
+      .Input('revwDurTm', '검토소요시간', { maxLength: 40 })
+      .Input('aprDurTm', '승인소요시간', { maxLength: 40 })
       .build(),
 };
 

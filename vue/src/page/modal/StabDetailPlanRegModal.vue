@@ -21,9 +21,8 @@
 <script>
 import dayjs from 'dayjs';
 
+import { InputReasonModal } from '@/page/modal';
 import { FormUtil } from '@/util/index.js';
-
-import { InputReasonModal, }  from '@/page/modal';
 
 import values from './values/stabDetailPlanRegModal';
 

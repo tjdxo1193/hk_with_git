@@ -7,6 +7,7 @@ const sampleUsageGrid = {
     buttons: [{ name: 'search', label: '조회' }],
     props: {
       editable: false,
+      showRowCheckColumn: false,
     },
   },
   forms: () =>
@@ -20,16 +21,18 @@ const sampleUsageGrid = {
       .build(),
   columns: () =>
     ColumnBuilder.builder()
-      .col('plntCd', false)
-      .col('smpMngIdx', false)
-      .col('useSeq', false)
-      .col('pitmTyp', false)
-      .col('smpDivCd', false)
-      .col('smpUseProc', false)
-      .col('usePps', false)
-      .col('useUid', false)
-      .col('smpUseAprIdx', false)
-      .col('rjtUid', false)
+      .col('plntCd', { visible: false })
+      .col('smpMngIdx', { visible: false })
+      .col('useSeq', { visible: false })
+      .col('pitmTyp', { visible: false })
+      .col('smpDivCd', { visible: false })
+      .col('smpUseProc', { visible: false })
+      .col('usePps', { visible: false })
+      .col('useUid', { visible: false })
+      .col('smpUseAprIdx', { visible: false })
+      .col('rjtUid', { visible: false })
+      .col('smpDpsProc', { visible: false })
+      .col('strgPla', { visible: false })
       .col('pitmNm', '품목명')
       .col('pitmCd', '품목코드')
       .col('pitmTypNm', '품목구분')
@@ -45,9 +48,7 @@ const sampleUsageGrid = {
       .col('useNm', '사용자')
       .col('useDt', '사용일')
       .col('smpDpsNm', '상태')
-      .col('smpDpsProc', false)
       .col('smpUseNm', '사용이력진행상황')
-      .col('strgPla', false)
       .col('rjtNm', '반려자')
       .col('rjtDs', '반려일시')
       .col('rjtRea', '반려사유')
@@ -69,7 +70,7 @@ const inputForm = {
   },
   forms: () =>
     FormBuilder.builder()
-      .Hidden('smpMngIdx', 'smpMngIdx')
+      .Hidden('smpMngIdx')
       .Hidden('useSeq')
       .Hidden('useUid')
       .Hidden('pitmCd')
@@ -83,39 +84,24 @@ const inputForm = {
         'pitm',
         '품목명',
         FormBuilder.builder()
-          .Input('pitmNm')
-          .required()
-          .readonly()
-          .spanCol(10)
+          .Input('pitmNm', { readonly: true, _required: true, _colSpan: 10 })
           .Button('search', '검색', { type: 'search' })
           .build(),
       )
-      .Input('smpDivNm', '검체구분')
-      .readonly()
-      .Input('pitmTypNm', '품목구분')
-      .readonly()
-      .Input('ansNo', '시험번호')
-      .readonly()
-      .Input('lotNo', '제조번호')
-      .readonly()
-      .Input('batchNo', '배치번호')
-      .readonly()
-      .Input('smpDpsNm', '검체상태')
-      .readonly()
-      .Input('useNm', '사용자')
-      .readonly()
-      .Input('mngSmpVol', '보관수량')
-      .readonly()
-      .Input('sumVol', '총사용량')
-      .readonly()
-      .Input('remains', '재고량')
-      .readonly()
-      .Input('inpUnit', '보관단위')
-      .readonly()
+      .Input('smpDivNm', '검체구분', { readonly: true })
+      .Input('pitmTypNm', '품목구분', { readonly: true })
+      .Input('ansNo', '시험번호', { readonly: true })
+      .Input('lotNo', '제조번호', { readonly: true })
+      .Input('batchNo', '배치번호', { readonly: true })
+      .Input('smpDpsNm', '검체상태', { readonly: true })
+      .Input('useNm', '사용자', { readonly: true })
+      .Input('mngSmpVol', '보관수량', { readonly: true })
+      .Input('sumVol', '총사용량', { readonly: true })
+      .Input('remains', '재고량', { readonly: true })
+      .Input('inpUnit', '보관단위', { readonly: true })
       .InputNumber('useSmpVol', '사용검체량')
-      .Input('strgPla', '보관장소')
-      .Textarea('usePps', '사용목적')
-      .spanCol(2)
+      .Input('strgPla', '보관장소', { maxLength: 18 })
+      .Textarea('usePps', '사용목적', { _colSpan: 2, maxLength: 4000 })
       .build(),
 };
 

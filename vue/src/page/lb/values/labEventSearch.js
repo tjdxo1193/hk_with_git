@@ -6,8 +6,23 @@ const searchGridWithForm = {
     title: '조회',
     countPerRow: 4,
     buttons: [{ name: 'search', label: '조회' }],
+    legends: [
+      { value: '승인', className: 'approve' },
+      { value: '승인요청', className: 'approveRequest' },
+      { value: '반려', className: 'return' },
+    ],
     props: {
       editable: false,
+      rowStyleFunction: (rowIndex, item) => {
+        if (item.aprYn === 'Y') {
+          return 'approve';
+        } else if (item.aprYn === 'N' && !item.rjtUid) {
+          return 'approveRequest';
+        } else if (item.aprYn === 'N') {
+          return 'return';
+        }
+        return '';
+      },
     },
   },
   forms: () =>

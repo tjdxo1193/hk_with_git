@@ -29,22 +29,22 @@ const sampleGrid = {
       .build(),
   columns: () =>
     ColumnBuilder.builder()
+      .col('pitmTyp', { visible: false })
+      .col('ansTyp', { visible: false })
+      .col('batchNo', { visible: false })
+      .col('smpReqRea', { visible: false })
+      .col('rjtUid', { visible: false })
       .col('addSmpProcNm', '진행상태')
       .col('pitmCd', '품목코드')
       .col('pitmNm', '품목명')
-      .col('pitmTyp', false)
       .col('pitmTypNm', '품목구분')
       .col('ansNo', '시험번호')
-      .col('ansTyp', false)
       .col('ansTypNm', '시험유형')
       .col('lotNo', '제조번호')
-      .col('batchNo', false)
       .col('reqSmpVol', '요청검체수량')
       .col('inpUnit', '요청검체단위')
-      .col('smpReqRea', false)
       .col('smpReqReaNm', '요청사유')
       .col('smpReqReaDtl', '요청사유상세')
-      .col('rjtUid', false)
       .col('smpReqDt', '요청일자')
       .build(),
 };
@@ -53,6 +53,7 @@ const requestForm = {
   static: {
     title: '추가검체요청정보',
     countPerRow: 4,
+    buttons: [{ name: 'publish', label: '라벨발행' }],
   },
   forms: () =>
     FormBuilder.builder()
@@ -60,29 +61,32 @@ const requestForm = {
       .multiple(
         'pitm',
         '품목정보',
-        FormBuilder.builder().Input('pitmCd').disabled().Input('pitmNm').disabled().build(),
+        FormBuilder.builder()
+          .Input('pitmCd', { readonly: true })
+          .Input('pitmNm', { readonly: true })
+          .build(),
       )
+      .spanCol(2)
       .multiple(
         'number',
         '시험번호 및 제조번호',
-        FormBuilder.builder().Input('ansNo').disabled().Input('lotNo').disabled().build(),
+        FormBuilder.builder()
+          .Input('ansNo', { readonly: true })
+          .Input('lotNo', { readonly: true })
+          .build(),
       )
-      .multiple(
-        'addSample',
-        '요청검체수량',
-        FormBuilder.builder().Input('ansNo').disabled().Input('inpUnit').disabled().build(),
-      )
+      .spanCol(2)
+      .Input('reqSmpVol', '요청검체량', { readonly: true })
+      .Input('inpUnit', '입력단위', { readonly: true })
       .RadioGroup('smpReqRea', '요청사유', {
         groups: [
           { label: '기준일탈', checkedValue: 'U0250001' },
           { label: '기타', checkedValue: 'U0250002' },
         ],
+        disabled: true,
       })
-      .disabled()
-      .Textarea('smpReqReaDtl', '요청사유상세')
-      .disabled()
-      .Input('labelCd', '라벨코드')
-      .disabled()
+      .Textarea('smpReqReaDtl', '요청사유상세', { readonly: true })
+      .Input('labelCd', '라벨코드', { readonly: true })
       .build(),
 };
 
