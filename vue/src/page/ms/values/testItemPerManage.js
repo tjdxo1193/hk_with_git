@@ -1,4 +1,4 @@
-import { ColumnBuilder, FormBuilder } from '@/util';
+import {ColumnBuilder, FormBuilder} from '@/util';
 
 const testItemSearch = {
   static: {
@@ -106,7 +106,7 @@ const testItemPerInfo = {
     FormBuilder.builder()
       .Hidden('aitmCd')
       .Input('amitmCd', '시험방법코드', { maxLength: 8 })
-      .disabled()
+      .readonly()
       .Hidden('aitmCd', '시험항목코드', { maxLength: 6 })
       .Hidden('aitmKn', '항목명 국문', { maxLength: 50 })
       .Hidden('aitmEn', '항목명 영문', { maxLength: 50 })

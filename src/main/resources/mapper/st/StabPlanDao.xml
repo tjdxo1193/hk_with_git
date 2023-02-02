@@ -497,6 +497,7 @@
             STRG_PLA = #{strgPla},
 <!--        ANS_TRM_CD = #{ansTrmCd}, -->
 <!--        ANS_STR_DT = #{ansStrDt}, -->
+            SBT_ANS_PROC = #{sbtAnsProc},
             ANS_PPS = #{ansPps},
             STRG_TERMS = #{strgTerms},
             SBT_SMP_VOL = #{sbtSmpVol},

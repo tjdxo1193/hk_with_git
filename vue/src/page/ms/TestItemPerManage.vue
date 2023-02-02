@@ -36,7 +36,7 @@
 </template>
 
 <script>
-import { FormUtil } from '@/util';
+import {FormUtil} from '@/util';
 
 import values from './values/testItemPerManage';
 
@@ -168,7 +168,6 @@ export default {
 
       const { forms } = this.testItemPerInfo;
       FormUtil.setData(forms, item);
-
       if (FormUtil.existsValue(forms, 'vriaNo')) {
         this.testItemPerDisabled();
       }
@@ -260,6 +259,7 @@ export default {
 
       return parameter;
     },
+
     elnSendTestItemMethodInfo() {
       const parameter = FormUtil.getData(this.testItemPerInfo.forms);
       this.$eSign(() => this.$axios.post('/ms/testItemPerManage/elnSendTestItemMethod', parameter))
@@ -271,6 +271,7 @@ export default {
           this.$error(this.$message.error.createData);
         });
     },
+
   },
   computed: {
     testItemSearchButtons() {

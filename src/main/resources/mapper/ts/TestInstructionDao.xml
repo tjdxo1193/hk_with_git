@@ -190,6 +190,7 @@
             , ASS_DT = TO_CHAR(SYSDATE, 'YYYY-MM-DD')
             , ASS_DS = SYSDATE
             , ASS_NO = #{assNo}
+            , ASS_SPCC = #{assSpcc}
         WHERE ANS_IDX = #{ansIdx}
         AND PLNT_CD = #{plntCd}
     </update>

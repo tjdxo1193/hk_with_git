@@ -15,6 +15,7 @@ export default {
     noSelectDropList: '선택되지 않은 리스트가 있습니다.',
     pleaseSelectPlant: '플랜트를 선택해주세요.',
     pleaseSelectEmgYN: '긴급여부를 선택해주세요.',
+    requireTestSample: '시험검체량은 0 또는 빈값을 입력할 수 없습니다.',
   },
 
   eSign: {

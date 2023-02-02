@@ -121,6 +121,7 @@ const resultInputInfo = {
       { name: 'finalOrder', label: '마감오더', disabled: true },
       { name: 'resultHistory', label: '결과이력', disabled: true },
       { name: 'labEventPublish', label: '실험실이벤트발행', disabled: true },
+      { name: 'hold', label: '보류', disabled: true },
       { name: 'requestReview', label: '검토요청', disabled: true },
       { name: 'save', label: '저장', disabled: true },
       { name: 'init', label: '초기화', disabled: true },

@@ -104,6 +104,7 @@ public class TestInstructionVO implements UpdateDetect {
     private String clltUnm;
     private String clltRmk; //채취비고
     private int assNo; //지시번호
+    private String assSpcc; //지시 특이사항
     /*검체 정보*/
     private String spcmNo; //표준견본 번호
     private String ansFileIdx; //시험 첨부파일 IDX

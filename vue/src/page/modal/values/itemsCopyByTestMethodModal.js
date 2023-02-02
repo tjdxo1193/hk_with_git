@@ -30,8 +30,6 @@ const pItemSpecList = {
   },
   forms: () =>
     FormBuilder.builder()
-      .Input('pitmCd', '품목코드')
-      .Input('pitmNm', '품목명')
       .Select('pitmTyp', '품목유형', {
         async: () =>
           api.combo.systemCommon.getPitmDivCombo().then((res) => {
@@ -47,6 +45,9 @@ const pItemSpecList = {
             return res;
           }),
       })
+      .required()
+      .Input('pitmCd', '품목코드')
+      .Input('pitmNm', '품목명')
       .build(),
   columns: () =>
     ColumnBuilder.builder()

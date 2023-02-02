@@ -33,13 +33,33 @@ const searchForm = {
       .build(),
 };
 
+const legends = [
+  { className: 'approveWating', value: '승인대기' },
+  { className: 'testStop', value: '시험중단 및 중단취소' },
+];
+
+const statusList = {
+  approveRequest: ['S0290200'],
+  stopAndStopCencelRequest: ['S0290400', 'S0290600'],
+};
+
 const gridForSearchResult = {
   static: {
     title: '조회결과',
     $grid: null,
+    legends,
     props: {
       editable: false,
       showRowCheckColumn: true,
+      rowStyleFunction: (rowIndex, item) => {
+        if (statusList.approveRequest.includes(item.sbtAnsProc)) {
+          return 'approveWating';
+        }
+        if (statusList.stopAndStopCencelRequest.includes(item.sbtAnsProc)) {
+          return 'testStop';
+        }
+        return '';
+      },
     },
   },
   columns: () =>

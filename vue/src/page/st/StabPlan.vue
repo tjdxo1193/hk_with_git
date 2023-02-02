@@ -215,10 +215,14 @@ export default {
         enabledBtnName = ['stopRequest', 'init'];
         FormUtil.disable(this.stabInfoRegForm.forms);
         this.stabDetailPlanRegModal.disable = true;
-      } else if (this.isApproved(sbtAnsProc) || this.isStopCancel(sbtAnsProc)) {
+      } else if (this.isApproved(sbtAnsProc)) {
         disabledBtnName = ['stopCancelRequest', 'approveRequest', 'save', 'delete'];
         enabledBtnName = ['stopRequest', 'update', 'init'];
-        FormUtil.disable(this.stabInfoRegForm.forms);
+        // FormUtil.disable(this.stabInfoRegForm.forms);
+        this.stabDetailPlanRegModal.disable = true;
+      } else if (this.isStopCancel(sbtAnsProc)) {
+        disabledBtnName = ['stopRequest', 'stopCancelRequest', 'approveRequest', 'save', 'delete'];
+        enabledBtnName = ['update', 'init'];
         this.stabDetailPlanRegModal.disable = true;
       } else {
         disabledBtnName = [];

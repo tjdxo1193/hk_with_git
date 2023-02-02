@@ -37,7 +37,9 @@ public class TestItemPerManageServiceImpl implements TestItemPerManageService {
 
 	@Override
 	public void elnSendTestItemMethod(TestItemPerManageVO param) {
-
+		if(param.getAmitmCd() == null){
+			throw new RuntimeException("amitmCd is required. amitmCd: " + param.getAmitmCd());
+		}
 		InterfaceSendVO.MethodByItem data = new InterfaceSendVO.MethodByItem(param.getAmitmCd());
 		integrationSender.sendMethodByItem(param.getUseYn().equals("Y") ? ELNCmdType.C : ELNCmdType.D, data);
 

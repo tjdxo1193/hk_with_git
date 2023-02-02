@@ -1,9 +1,11 @@
 package lims.api.ts.controller;
 
 import lims.api.auth.annotation.AuthToken;
+import lims.api.auth.annotation.ESign;
 import lims.api.auth.domain.Token;
 import lims.api.auth.service.impl.HttpHelper;
 import lims.api.auth.service.impl.JwtResolver;
+import lims.api.common.domain.ESignInfo;
 import lims.api.common.model.CommonResponse;
 import lims.api.ts.service.TestInstructionService;
 import lims.api.ts.vo.TestInstructionVO;
@@ -39,7 +41,10 @@ public class TestInstructionController {
     }
 
     @PutMapping("/instruct")
-    public ResponseEntity<CommonResponse> instruct(@AuthToken Token token, @RequestBody List<TestInstructionVO> request) {
+    public ResponseEntity<CommonResponse> instruct(@AuthToken Token token, @RequestBody List<TestInstructionVO> request, @ESign ESignInfo esign) {
+        for(TestInstructionVO item : request) {
+            item.setAssSpcc(esign.getReason());
+        }
         service.instruct(request);
         return ResponseEntity.ok(new CommonResponse());
     }

@@ -156,6 +156,7 @@ const testCollectionInfo = {
         async: () => api.combo.userCommon.getStrgPlaCombo(),
       })
       .InputNumber('smpVolAns', '시험검체량')
+      .required()
       .Select('clltMcn', '채취기구', {
         async: () => api.combo.userCommon.getClltMcnCombo(),
       })

@@ -47,34 +47,31 @@ public class TestCollectionServiceImpl implements TestCollectionService {
 
     public void insertSampleInfo(TestCollectionVO request) {
         int result = 0;
-        List<TestCollectionVO> list = new ArrayList<>();
         if(request.getSmpVolAns() != 0){
             TestCollectionVO item = dao.getSmpInfo(request);
             item.setSmpDivCd(TestSample.TEST_SAMPLE.getSampleCode());
             item.setMngSmpVol(request.getSmpVolAns());
-            list.add(list.size(), item);
-            System.out.println(list.get(list.size()).getSmpDivCd() + " >>>>>>>>>>>>>>>>>>>>>>>> SmpDivCd");
+            int smpMngIdx = dao.getSmpMngIdx(item);
+            item.setSmpMngIdx(smpMngIdx);
+            result += dao.insertSmpInfo(item);
         }
         if(request.getSmpVolEtc() != 0){
             TestCollectionVO item = dao.getSmpInfo(request);
             item.setSmpDivCd(TestSample.ETC_SAMPLE.getSampleCode());
             item.setMngSmpVol(request.getSmpVolEtc());
-            list.add(list.size(), item);
-            System.out.println(list.get(list.size()).getSmpDivCd() + " >>>>>>>>>>>>>>>>>>>>>>>> SmpDivCd");
+            int smpMngIdx = dao.getSmpMngIdx(item);
+            item.setSmpMngIdx(smpMngIdx);
+            result += dao.insertSmpInfo(item);
         }
         if(request.getSmpVolStrg() != 0){
             TestCollectionVO item = dao.getSmpInfo(request);
             item.setSmpDivCd(TestSample.STORAGE_SAMPLE.getSampleCode());
             item.setMngSmpVol(request.getSmpVolStrg());
-            list.add(list.size(), item);
-            System.out.println(list.get(list.size()).getSmpDivCd() + " >>>>>>>>>>>>>>>>>>>>>>>> SmpDivCd");
+            int smpMngIdx = dao.getSmpMngIdx(item);
+            item.setSmpMngIdx(smpMngIdx);
+            result += dao.insertSmpInfo(item);
         }
-        for(TestCollectionVO row : list) {
-            int smpMngIdx = dao.getSmpMngIdx(request);
-            row.setSmpMngIdx(smpMngIdx);
-            result += dao.insertSmpInfo(row);
-        }
-        if (result != list.size()) {
+        if (result == 0) {
             throw new NoUpdatedDataException();
         }
     }

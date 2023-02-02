@@ -33,15 +33,18 @@ const searchForm = {
 };
 
 const legends = [
-  { className: 'return', value: '반려' },
-  { className: 'approveRequest', value: '승인요청' },
+  { className: 'tempSave', value: '저장' },
+  { className: 'approveWating', value: '승인대기' },
   { className: 'testStop', value: '시험중단' },
+  { className: 'return', value: '반려' },
+  { className: '', value: '승인' },
 ];
 
 const statusList = {
   return: ['S0290210', 'S0290410', 'S0290610'],
   request: ['S0290200', 'S0290400', 'S0290600'],
   stop: ['S0290500'],
+  approved: ['S0290300', 'S0290700'],
 };
 
 const gridForSearchResult = {
@@ -57,12 +60,15 @@ const gridForSearchResult = {
           return 'return';
         }
         if (statusList.request.includes(item.sbtAnsProc)) {
-          return 'approveRequest';
+          return 'approveWating';
         }
         if (statusList.stop.includes(item.sbtAnsProc)) {
           return 'testStop';
         }
-        return 'stabilityTest';
+        if (statusList.approved.includes(item.sbtAnsProc)) {
+          return '';
+        }
+        return 'tempSave';
       },
     },
   },

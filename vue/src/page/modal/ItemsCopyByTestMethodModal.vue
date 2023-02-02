@@ -44,12 +44,8 @@ export default {
       if (this.$props.show) {
         this.aItemList.$grid.clearGridData();
         this.pItemSpecList.forms = values.pItemSpecList.forms();
-        this.fetchPItemSpecList();
       }
     },
-  },
-  mounted() {
-    this.fetchPItemSpecList();
   },
   data() {
     const { pItemSpecList, aItemList } = this.$copy(values);
@@ -92,7 +88,10 @@ export default {
     getItems() {},
     onClickButton({ name }) {
       if (name === 'search') {
-        this.fetchPItemSpecList();
+        this.pItemSpecList.forms.validate()
+        .then(() => {
+          this.fetchPItemSpecList();
+        })
       }
       if (name === 'select') {
         this.selectItems();

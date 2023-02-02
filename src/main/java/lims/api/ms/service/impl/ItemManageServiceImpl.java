@@ -132,38 +132,6 @@ public class ItemManageServiceImpl implements ItemManageService {
         return dao.createQmPitmSpec(itemSpecVO);
     }
 
-    public int 개정메서드변경전0201까지(ItemManageVO param){
-        ItemApprSpecVO itemSpecVO = Optional.ofNullable(dao.findOldSpecInfo(param)).orElse(new ItemApprSpecVO());
-        Integer oldPItemSpecIdx = Optional.ofNullable(itemSpecVO.getPitmSpecIdx()).orElse(0);
-        Integer oldAItemSpecIdx = Optional.ofNullable(itemSpecVO.getOldAitmSpecIdx()).orElse(0);
-        String specProcCode = Optional.ofNullable(itemSpecVO.getSpecProcCd()).orElse("");
-
-        itemSpecVO.setDelYn("N");
-        itemSpecVO.setUseVerYn("N");
-        itemSpecVO.setPlntCd(param.getPlntCd());
-        itemSpecVO.setPitmCd(param.getPitmCd());
-        itemSpecVO.setPitmVer(param.getPitmVer() + 1);
-        itemSpecVO.setSpecProcCd(SpecProgress.TEMPORARY_STORAGE.getCode());
-        ItemManageVO newVO = dao.findNewAitmSpecIdx(itemSpecVO);
-        itemSpecVO.setAitmSpecVer(newVO.getAitmSpecVer());
-
-        if (oldAItemSpecIdx == 0 || specProcCode.equals(SpecProgress.TEMPORARY_STORAGE.getCode())){
-            return dao.updateSpecNewPItemVer(itemSpecVO);
-        }
-
-        if (specProcCode.equals(SpecProgress.APPROVED.getCode())){
-            if(!isWrap(param)){
-                itemSpecVO.setAitmSpecIdx(newVO.getAitmSpecIdx());
-                dao.createQmPitmAitmSpec(itemSpecVO);
-                dao.createQmPitmSpecAitm(itemSpecVO);
-            }else{
-                itemSpecVO.setAitmSpecIdx(itemSpecVO.getOldAitmSpecIdx());
-            }
-            dao.updateOldSpecUseVerN(itemSpecVO);
-        }
-        return dao.createQmPitmSpec(itemSpecVO);
-    }
-
     public List<MsElnCtRptFileVO> getFileList(MsElnCtRptFileVO param) {
         return fileService.getMsElnCtRptFileList(param);
     }

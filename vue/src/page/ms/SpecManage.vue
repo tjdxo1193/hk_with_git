@@ -251,6 +251,10 @@ export default {
         this.removeRowTestItem();
         return;
       }
+      if (name == 'elnSpec'){
+        this.showElnSpecCopyForTestMethodModal();
+        return;
+      }
     },
 
     initAll() {
@@ -301,6 +305,7 @@ export default {
         'up',
         'down',
         'requestReview',
+        'elnSpec',
         'updateVersion',
         'temporarySave',
         'addRow',
@@ -359,11 +364,10 @@ export default {
         'down',
       ]);
 
-      if (this.isSelectedUsableVersion()) {
-        FormUtil.enableButtons(buttons, ['updateVersion', 'addRow', 'copyRow', 'removeRow']);
-        return;
+      if (this.isSemiManufactures()){
+        FormUtil.enableButtons(buttons, ['elnSpec']);
       }
-
+        
       if (this.isSelectedTemporaryVersion() || this.isSelectedReviewRejectVersion()) {
         FormUtil.enableButtons(buttons, ['temporarySave', 'addRow', 'copyRow', 'removeRow']);
         if (this.isSelectedItemHasVersion()) {
@@ -406,6 +410,14 @@ export default {
         this.changeButtonDisabledAll();
       }
       return;
+    },
+
+    activateButtonBy(){
+      if (this.isSelectedUsableVersion()) {
+        FormUtil.enableButtons(buttons, ['updateVersion', 'addRow', 'copyRow', 'removeRow']);
+        return;
+      }
+
     },
 
     setPitmInfoToPitmGridValueForm({ pitmCd, pitmVer, pitmTyp }) {
@@ -464,6 +476,14 @@ export default {
 
     hideItemsCopyByTestMethodModal() {
       this.$setState('itemsCopyByTestMethodModal', { show: false });
+    },
+
+    showElnSpecCopyForTestMethodModal(){
+      this.$setState('elnSpecCopyForTestMethodModal', { show: false });
+    },
+
+    hideElnSpecCopyForTestMethodModal(){
+      this.$setState('elnSpecCopyForTestMethodModal', { show: true });
     },
 
     isSelectedTemporaryVersion() {

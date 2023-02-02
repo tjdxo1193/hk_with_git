@@ -13,7 +13,7 @@ const prdDivList = [
 
 const pItemSpecList = {
   static: {
-    title: '품목규격서목록',
+    title: 'ELN규격목록',
     $grid: null,
     props: {
       editable: false,

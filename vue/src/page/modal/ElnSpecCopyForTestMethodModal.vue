@@ -92,7 +92,9 @@ export default {
     getItems() {},
     onClickButton({ name }) {
       if (name === 'search') {
-        this.fetchPItemSpecList();
+        this.pItemSpecList.forms.validate().then(()=> {
+          this.fetchPItemSpecList();
+        })
       }
       if (name === 'select') {
         this.selectItems();

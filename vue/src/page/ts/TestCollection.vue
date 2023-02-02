@@ -176,7 +176,11 @@ export default {
         this.showModal('fileAttacherModal');
       }
       if (name === 'collection') {
-        this.showModal('requestApproverModal');
+        const item = FormUtil.getData(this.testCollectionInfo.forms);
+        if(item.smpVolAns === null || item.smpVolAns === '' || item.smpVolAns === '0'){
+          return this.$warn(this.$message.validate.requireTestSample);
+        }
+        return this.showModal('requestApproverModal');
       }
       if (name === 'save') {
         this.save();
