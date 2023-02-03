@@ -49,11 +49,11 @@
                 <if test="pitmCd != null and pitmCd != ''">
                     AND TRIM(SPSA.PITM_CD) LIKE ('%' || #{pitmCd} || '%')
                 </if>
-                <if test="formEnmDt != null and formEnmDt != ''">
-                    AND SPSA.ENM_DT BETWEEN #{formEnmDt[0]} AND #{formEnmDt[1]}
+                <if test="searchEnmDt != null and searchEnmDt != ''">
+                    AND SPSA.ENM_DT BETWEEN #{searchEnmDt[0]} AND #{searchEnmDt[1]}
                 </if>
-                <if test="formExpirDt != null and formExpirDt != ''">
-                    AND SPSA.EXPIR_DT BETWEEN #{formExpirDt[0]} AND #{formExpirDt[1]}
+                <if test="searchExpirDt != null and searchExpirDt != ''">
+                    AND SPSA.EXPIR_DT BETWEEN #{searchExpirDt[0]} AND #{searchExpirDt[1]}
                 </if>
             GROUP BY SPS.PLNT_CD, SPS.PM_SPCM_IDX
         ) SPSG ON SPS.PLNT_CD  = SPSG.PLNT_CD AND  SPS.PM_SPCM_IDX = SPSG.PM_SPCM_IDX

@@ -94,6 +94,18 @@ public class TestResultApprServiceImpl implements TestResultApprService {
         int result = 0;
         for(TestResultApprVO row : list) {
             result += dao.requestHold(row);
+
+            // 보류 시 진행상태 전송
+            InterfaceSendVO.TestStatus data = InterfaceSendVO.TestStatus.builder()
+                    .lotNo(row.getLotNo())
+                    .batchNo(row.getBatchNo())
+                    .holdReason(row.getHldRea())
+                    .status(TestStatusProcess.TEST_HOLD.getValue())
+                    .ispReqNo(row.getIspReqNo())
+                    .phsOrderNo(row.getPhsOrderNo())
+                    .pdtOrderNo(row.getPdtOrderNo())
+                    .build();
+            sender.sendTestStatus(data);
         }
 
         if(list.size() != result) {

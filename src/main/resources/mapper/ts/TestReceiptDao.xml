@@ -113,6 +113,7 @@
         WHERE QPAR.PLNT_CD = #{plntCd}
         <!--AND QPAP.ANS_IDX IS NULL-->
         AND DECODE(QPAP.ANS_PROC_CD, NULL, 'S0130200', QPAP.ANS_PROC_CD) = #{ansProcCd}
+        AND DECODE(QPAP.HLD_YN, NULL, 'N', QPAP.HLD_YN) = 'N'
         AND QP.PITM_CD IS NOT NULL
         <if test="pitmTyp != '' and pitmTyp != null">
             AND QPI.PITM_TYP = #{pitmTyp}
@@ -132,8 +133,8 @@
         <if test="batchNo != null and batchNo != ''">
             AND TRIM(UPPER(QPAR.BATCH_NO)) LIKE ('%' || TRIM(UPPER(#{batchNo})) || '%')
         </if>
-        <if test="formIspReqDt != null and formIspReqDt != ''">
-            AND QPAR.ISP_REQ_DT BETWEEN #{formIspReqDt[0]} AND #{formIspReqDt[1]}
+        <if test="searchIspReqDt != null and searchIspReqDt != ''">
+            AND QPAR.ISP_REQ_DT BETWEEN #{searchIspReqDt[0]} AND #{searchIspReqDt[1]}
         </if>
         ORDER BY QPAP.ANS_IDX, QPAR.REQ_IDX
     </select>

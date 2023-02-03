@@ -31,11 +31,11 @@
         <if test="useYn != null and useYn != ''">
             AND SPS.USE_YN = #{useYn}
         </if>
-        <if test="formEnmDt != null and formEnmDt != ''">
-            AND SPS.ENM_DT BETWEEN #{formEnmDt[0]} AND #{formEnmDt[1]}
+        <if test="searchEnmDt != null and searchEnmDt != ''">
+            AND SPS.ENM_DT BETWEEN #{searchEnmDt[0]} AND #{searchEnmDt[1]}
         </if>
-        <if test="formExpirDt != null and formExpirDt != ''">
-            AND SPS.EXPIR_DT BETWEEN #{formExpirDt[0]} AND #{formExpirDt[1]}
+        <if test="searchExpirDt != null and searchExpirDt != ''">
+            AND SPS.EXPIR_DT BETWEEN #{searchExpirDt[0]} AND #{searchExpirDt[1]}
         </if>
     </select>
 

@@ -4,6 +4,8 @@ import lims.api.common.domain.UpdateDetect;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 public class MonitorTestRequestVO implements UpdateDetect {
@@ -31,4 +33,6 @@ public class MonitorTestRequestVO implements UpdateDetect {
     private String grade;
     private String crgDptNm; //담당 부서
     private String ansCylRuleNm; //시험주기
+
+    private List<String> searchAnsEdt;
 }

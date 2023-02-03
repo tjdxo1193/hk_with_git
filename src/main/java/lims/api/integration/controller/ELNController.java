@@ -1,21 +1,25 @@
 package lims.api.integration.controller;
 
 import lims.api.auth.annotation.Permit;
+import lims.api.common.enums.UseType;
 import lims.api.integration.enums.ELNCmdType;
 import lims.api.integration.enums.RevInterface;
 import lims.api.integration.model.ELNRequestForCtReport;
 import lims.api.integration.model.ELNRequestForStandardSpec;
 import lims.api.integration.model.ELNResponse;
 import lims.api.integration.service.ELNService;
-import lims.api.integration.service.InterfaceInfoService;
+import lims.api.integration.service.impl.IntegrationSender;
 import lims.api.integration.service.impl.InterfaceControllerTemplate;
 import lims.api.integration.vo.ELNCtReportVO;
-import lims.api.integration.vo.ELNSendVO;
+import lims.api.integration.vo.intergation.InterfaceSendVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("${apiPrefix}/interface/eln")
@@ -24,6 +28,8 @@ public class ELNController {
 
     private final InterfaceControllerTemplate controllerTemplate;
     private final ELNService elnService;
+    private final IntegrationSender sender;
+    private final JdbcTemplate jdbcTemplate;
 
     @Permit
     @PostMapping("report/ct")
@@ -35,7 +41,7 @@ public class ELNController {
                     elnService.saveCtReport(infoIdx, ELNCtReportVO.of(param));
                     return ResponseEntity.ok(ELNResponse.toSuccessResponse());
                 },
-                (e, message) ->  ResponseEntity.ok(ELNResponse.toErrorResponse(e, message))
+                (e, message) -> ResponseEntity.ok(ELNResponse.toErrorResponse(e, message))
         );
     }
 
@@ -56,14 +62,18 @@ public class ELNController {
     @Permit
     @GetMapping("devTest/testMethodByItem")
     public void test() {
-        ELNSendVO.TestMethodByItem vo = new ELNSendVO.TestMethodByItem();
-        vo.setAmitmCd("TM015805");
-        ELNSendVO.TestMethodByItem vo1 = new ELNSendVO.TestMethodByItem();
-        vo1.setAmitmCd("TM026701");
-        ELNSendVO.TestMethodByItem vo2 = new ELNSendVO.TestMethodByItem();
-        vo2.setAmitmCd("TM020402");
+        List<Map<String, Object>> results = jdbcTemplate.queryForList("SELECT AMITM_CD, USE_YN FROM MS_AMITM");
 
-        elnService.publishTestMethodByItem(ELNCmdType.C, List.of(vo, vo1, vo2));
+        List<InterfaceSendVO.MethodByItem> param = new ArrayList<>();
+        for (Map<String, Object> result : results) {
+            String code = String.valueOf(result.get("AMITM_CD"));
+            boolean isCreate = String.valueOf(result.get("USE_YN")).equals(UseType.Y.name());
+            param.add(InterfaceSendVO.MethodByItem.builder()
+                    .amitmCd(code)
+                    .cmdType(isCreate ? ELNCmdType.C : ELNCmdType.D)
+                    .build());
+        }
+        sender.sendMethodByItem(param);
     }
 
 }

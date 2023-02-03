@@ -60,6 +60,7 @@ export default {
               'requestReview',
               'save',
               'init',
+              'hold',
             ]);
           },
         },
@@ -144,6 +145,20 @@ export default {
           });
       }
     },
+    hold() {
+      const parameter = FormUtil.getData(this.itemList.forms);
+      this.$confirm(this.$message.confirm.hold).then(() => {
+        this.$eSignWithReason(() => this.$axios.put('/mt/monitorTestResultInput/hold', parameter))
+          .then(() => {
+            this.$info(this.$message.info.saved);
+            this.init();
+            this.getMonitorTestResultInput();
+          })
+          .catch(() => {
+            this.$error(this.$message.error.updateData);
+          });
+      });
+    },
     searchFormEvent(event) {
       const forms = this.list.forms;
       const value = event.item.value;
@@ -167,6 +182,9 @@ export default {
       if (name === 'init') {
         return this.init();
       }
+      if (name === 'hold') {
+        return this.hold();
+      }
       if (name === 'resultHistory') {
         return this.showModal('resultHistoryModal');
       }
@@ -186,6 +204,7 @@ export default {
         'requestReview',
         'save',
         'init',
+        'hold',
       ]);
     },
 

@@ -155,6 +155,9 @@ export default {
       if (name === 'init') {
         return this.init();
       }
+      if (name === 'hold') {
+        return this.hold();
+      }
       if (name === 'resultHistory') {
         if (this.isSelectedRow()) {
           return this.getResultHistory();
@@ -184,6 +187,20 @@ export default {
       this.resultInputInfo.forms = values.resultInputInfo.forms();
       this.resultInputInfo.$grid.clearGridData();
       this.disableButtons();
+    },
+    hold() {
+      const parameter = FormUtil.getData(this.resultInputInfo.forms);
+      this.$confirm(this.$message.confirm.hold).then(() => {
+        this.$eSignWithReason(() => this.$axios.put('/ts/testResultInput/requestHold', parameter))
+          .then(() => {
+            this.$info(this.$message.info.hold);
+            this.init();
+            this.getResultInputList();
+          })
+          .catch(() => {
+            this.$error(this.$message.error.updateData);
+          });
+      });
     },
     getResultHistory() {
       /**

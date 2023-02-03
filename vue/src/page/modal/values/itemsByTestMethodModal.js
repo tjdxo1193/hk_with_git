@@ -1,4 +1,4 @@
-import { ColumnBuilder, FormBuilder } from '@/util/builder';
+import {ColumnBuilder, FormBuilder} from '@/util/builder';
 
 const searchGrid = {
   static: {
@@ -17,8 +17,8 @@ const searchGrid = {
     FormBuilder.builder().Input('aitmKn', '시험항목명').Input('vriaKn', 'VARIANT').build(),
   columns: () =>
     ColumnBuilder.builder()
-      .col('aitmCd', false)
-      .col('amitmCd', false)
+      .col('aitmCd', '시험항목코드', false)
+      .col('amitmCd', '시험항목별방법코드')
       .col('aitmKn', '시험항목국문')
       .col('vriaNo', 'VARIANT NO')
       .col('vriaKn', 'VARIANT 국문')

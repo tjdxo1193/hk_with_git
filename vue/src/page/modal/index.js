@@ -2,6 +2,7 @@ import BomModal from './BomModal';
 import BusinessCompanyModal from './BusinessCompanyModal';
 import DepartmentModal from './DepartmentModal';
 import DesignateApproversModal from './DesignateApproversModal';
+import ElnSpecCopyForTestMethodModal from './ElnSpecCopyForTestMethodModal.vue';
 import FileAttacherModal from './FileAttacherModal';
 import FinalOrderModal from './FinalOrderModal';
 import InputPerformanceModal from './InputPerformanceModal';
@@ -40,7 +41,6 @@ import TestMaterialOpenItemModal from './TestMaterialOpenItemModal';
 import TestModal from './TestModal';
 import TestSearchModal from './TestSearchModal.vue';
 import TreeCommonCodeModal from './TreeCommonCodeModal';
-import ElnSpecCopyForTestMethodModal from './ElnSpecCopyForTestMethodModal.vue';
 
 export {
   ItemModal,

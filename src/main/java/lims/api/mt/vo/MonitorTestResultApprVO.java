@@ -91,6 +91,6 @@ public class MonitorTestResultApprVO {
     private String userId; //사용자
     private String rea; //사유
 
-    private List<String> formRcpDt; //접수일
-    private List<String> formAssDt; //지시일
+    private List<String> searchRcpDt; //접수일
+    private List<String> searchAssDt; //지시일
 }

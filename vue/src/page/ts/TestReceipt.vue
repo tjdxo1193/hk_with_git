@@ -1,6 +1,7 @@
 <template>
   <AUIGridSearch
     v-bind="list"
+    :columns="computedListColumns"
     @button-click="onClickButton"
     @grid-created="(proxy) => $setState('list.$grid', proxy)"
     @form-event="searchFormEvent"
@@ -289,6 +290,16 @@ export default {
     },
     disableButtons(buttons) {
       FormUtil.disableButtons(this.tabs.buttons, buttons);
+    },
+  },
+  computed: {
+    computedListColumns() {
+      const editableColumns = ['emgYn'];
+
+      return this.list.columns.map((col) => ({
+        ...col,
+        editable: editableColumns.includes(col.dataField) ? true : false,
+      }));
     },
   },
 };

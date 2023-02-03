@@ -617,6 +617,24 @@
     </insert>
 
 
+    <select id="findCalendarAllByDegree" resultType="SAPCalendarVO">
+        SELECT IDX,
+               DEGREE,
+               GUID,
+               SEQ,
+               IDENT,
+               LTEXT,
+               YEAR,
+               MONTH,
+               DAY,
+               DAY AS "DATE",
+               WORK,
+               CRT_DS,
+               IF_INFO_IDX
+        FROM IF_REV_SAP_CALENDAR
+        WHERE DEGREE = #{degree}
+    </select>
+
     <select id="nextIdxInCalendar" resultType="int">
         SELECT NVL(MAX(IDX), 0) + 1
         FROM IF_REV_SAP_CALENDAR

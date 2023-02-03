@@ -27,11 +27,11 @@ const list = {
       .Select('crgDptCd', '담당부서', {
         async: api.combo.common.getDpt,
       })
-      .DatepickerTwinWithSwitch('formReqDt', '의뢰일', {
+      .DatepickerTwinWithSwitch('searchReqDt', '의뢰일', {
         value: [monthAgoDate, todayDate],
       })
       .spanCol(2)
-      .DatepickerTwinWithSwitch('formAssDt', '지시일', {
+      .DatepickerTwinWithSwitch('searchAssDt', '지시일', {
         value: [monthAgoDate, todayDate],
       })
       .spanCol(2)
@@ -77,6 +77,7 @@ const itemList = {
       { name: 'init', label: '초기화', disabled: true },
     ],
   },
+  forms: () => FormBuilder.builder().Hidden('plntCd').Hidden('mitmReqIdx').build(),
   columns: () =>
     ColumnBuilder.builder()
       .col('mitmReqIdx', false)

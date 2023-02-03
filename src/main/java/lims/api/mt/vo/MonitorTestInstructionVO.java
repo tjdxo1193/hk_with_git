@@ -49,7 +49,7 @@ public class MonitorTestInstructionVO implements UpdateDetect {
     private String ansCylRuleNm; //시험주기
 
     private String userId;
-    private List<String> formReqDt; //의뢰일
+    private List<String> searchReqDt; //의뢰일
 
     private int rstSeq; //결과 순번
     private String rstProcNm; //결과진행상태

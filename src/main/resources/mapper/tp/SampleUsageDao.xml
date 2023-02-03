@@ -53,8 +53,10 @@
                  LEFT JOIN QT_PITM_ANS_INFO QPAI on QSM.PLNT_CD = QPAI.PLNT_CD and QSM.ANS_IDX = QPAI.ANS_IDX
                  LEFT JOIN QT_PITM_ANS_PROC QPAP on QPAI.PLNT_CD = QPAP.PLNT_CD and QPAI.ANS_IDX = QPAP.ANS_IDX
         WHERE QSU.PLNT_CD = #{plntCd}
+          AND QSM.SMP_DPS_PROC = 'S0270300'
           AND QSU.DEL_YN = 'N'
           AND QSM.DEL_YN = 'N'
+        ORDER BY QSM.SMP_MNG_IDX DESC
     </select>
 
     <select id="findSample" parameterType="SampleUsageVO" resultType="SampleUsageVO">
@@ -103,6 +105,7 @@
                  LEFT JOIN QT_PITM_ANS_INFO QPAI ON QSM.PLNT_CD = QPAI.PLNT_CD AND QSM.ANS_IDX = QPAI.ANS_IDX
                  LEFT JOIN QT_PITM_ANS_PROC QPAP on QPAI.PLNT_CD = QPAP.PLNT_CD and QPAI.ANS_IDX = QPAP.ANS_IDX
         WHERE QSM.PLNT_CD = #{plntCd}
+          AND QSM.SMP_DPS_PROC = 'S0270300'
           AND QSM.DEL_YN = 'N'
           AND QSM.DPS_YN = 'N'
         ORDER BY QSM.SMP_ETR_DT DESC

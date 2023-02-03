@@ -4,6 +4,7 @@ import api from '@/api';
 import { ColumnBuilder, FormBuilder } from '@/util/builder';
 
 const todayDate = dayjs().format('YYYY-MM-DD');
+const monthAgoDate = dayjs().add(-1, 'M').format('YYYY-MM-DD');
 
 const list = {
   static: {
@@ -56,11 +57,11 @@ const list = {
       .Input('pitmNm', '품목명')
       .Input('ansNo', '시험번호')
       .DatepickerTwinWithSwitch('searchReqDt', '의뢰일', {
-        value: [todayDate, todayDate],
+        value: [monthAgoDate, todayDate],
       })
       .spanCol(2)
       .DatepickerTwinWithSwitch('searchRcpDt', '접수일', {
-        value: [todayDate, todayDate],
+        value: [monthAgoDate, todayDate],
       })
       .spanCol(2)
       .build(),

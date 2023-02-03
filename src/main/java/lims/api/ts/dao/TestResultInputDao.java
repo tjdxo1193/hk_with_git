@@ -48,4 +48,7 @@ public interface TestResultInputDao {
     int updateTestInfo(TestResultInputVO param);
 
     String getSytJdg(TestResultInputVO param);
+
+    @Audit(target = QtPitmAnsProc.class, label = AuditEvent.TestInfo.resultInputHold)
+    int requestHold(TestResultInputVO param);
 }

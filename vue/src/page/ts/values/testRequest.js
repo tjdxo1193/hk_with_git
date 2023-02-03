@@ -6,8 +6,8 @@ const list = {
     title: '조회',
     countPerRow: 4,
     buttons: [
-      { name: 'select', label: '조회' },
       { name: 'request', label: '의뢰' },
+      { name: 'select', label: '조회' },
     ],
     $grid: null,
     props: {
@@ -33,6 +33,7 @@ const list = {
       .col('ansTypNm', '시험유형')
       .col('ansNo', '시험번호')
       .col('reqIdx', '의뢰IDX')
+      .col('pitmTypNm', '품목구분')
       .col('pitmCd', '품목코드')
       .col('pitmNm', '품목명(국문)')
       .col('pitmEn', '품목명(영문)')

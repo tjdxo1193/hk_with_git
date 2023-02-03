@@ -10,6 +10,12 @@ spring:
   output:
     ansi:
       enabled: never
+  mail:
+    protocol: smtp
+    host: mail.kolmar.kr
+    port: 25
+    username: kolmar_lims@kolmar.co.kr
+    password: kkmlims123!@#
 
 report-designer:
   service-name: LIMS

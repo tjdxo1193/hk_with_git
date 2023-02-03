@@ -34,7 +34,9 @@ export default {
   components: {
     FileAttacherModal,
   },
-  mounted() {},
+  mounted() {
+    this.getMonitorTestResultAppr();
+  },
   data() {
     const { list, itemList } = this.$copy(values);
     return {
@@ -109,15 +111,17 @@ export default {
     },
     hold() {
       const [parameter] = this.itemList.$grid.getGridData();
-      this.$eSignWithReason(() => this.$axios.put('/mt/monitorTestResultAppr/hold', parameter))
-        .then(() => {
-          this.$info(this.$message.info.saved);
-          this.init();
-          this.getMonitorTestResultAppr();
-        })
-        .catch(() => {
-          this.$error(this.$message.error.updateData);
-        });
+      this.$confirm(this.$message.confirm.hold).then(() => {
+        this.$eSignWithReason(() => this.$axios.put('/mt/monitorTestResultAppr/hold', parameter))
+          .then(() => {
+            this.$info(this.$message.info.saved);
+            this.init();
+            this.getMonitorTestResultAppr();
+          })
+          .catch(() => {
+            this.$error(this.$message.error.updateData);
+          });
+      });
     },
     searchFormEvent(event) {
       const forms = this.list.forms;

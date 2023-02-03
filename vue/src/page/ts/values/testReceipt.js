@@ -11,12 +11,12 @@ const list = {
     title: '조회',
     countPerRow: 4,
     buttons: [
-      { name: 'select', label: '조회' },
       { name: 'receipt', label: '접수' },
+      { name: 'select', label: '조회' },
     ],
     $grid: null,
     props: {
-      editable: false,
+      //editable: false,
       showRowCheckColumn: true,
       //headerHeight:'40px',
       rowStyleFunction: function (rowIndex, item) {
@@ -39,7 +39,7 @@ const list = {
       .Input('ispReqNo', '검사요청번호')
       .Input('lotNo', '제조번호')
       .Input('batchNo', '배치번호')
-      .DatepickerTwinWithSwitch('formIspReqDt', '검사요청일자', {
+      .DatepickerTwinWithSwitch('searchIspReqDt', '검사요청일자', {
         value: [weekAgoDate, todayDate],
       })
       .spanCol(2)

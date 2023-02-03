@@ -1,7 +1,7 @@
 <template>
   <div class="menu">
     <ul class="menu__list">
-      <li v-for="menu in menus" :key="menu.path" class="menu__item">
+      <li v-for="menu in computedMenus" :key="menu.path" class="menu__item">
         <div
           :class="['menu__label', menu.isOpen && 'open', isMatchedRoute(menu.path) && 'selected']"
           @click="toggle(menu.path)"
@@ -35,7 +35,16 @@ export default {
   },
   created() {
     this.setDefaultOpenMenu();
-    this.loadMenus();
+  },
+  watch: {
+    $route(next, prev) {
+      if (prev) {
+        this.closeMenu(this.getRootPath(prev.path));
+      }
+      if (next) {
+        this.openMenu(this.getRootPath(next.path));
+      }
+    },
   },
   data() {
     return {
@@ -60,7 +69,6 @@ export default {
         this.clearOpenMenus();
         this.openMenu(path);
       }
-      this.loadMenus();
     },
     isOpened(path) {
       return this.openMenus.has(path);
@@ -71,17 +79,22 @@ export default {
     closeMenu(path) {
       this.openMenus.delete(path);
     },
-    loadMenus() {
-      this.menus = this.$props.routes.map((route) => {
-        route.isOpen = this.isOpened(route.path);
-        return route;
-      });
-    },
     isMatchedRoute(path) {
       return this.$route.matched.some((route) => route.path === path);
     },
     clearOpenMenus() {
       this.openMenus.clear();
+    },
+    getRootPath(path) {
+      return `/${path.split('/')[1]}`;
+    },
+  },
+  computed: {
+    computedMenus() {
+      return this.$props.routes.map((route) => {
+        route.isOpen = this.isOpened(route.path);
+        return route;
+      });
     },
   },
 };

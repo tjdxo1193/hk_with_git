@@ -133,8 +133,8 @@
         <if test="ansNo != null and ansNo != ''">
             AND TRIM(UPPER(QPAP.ANS_NO)) LIKE ('%' || TRIM(UPPER(#{ansNo})) || '%')
         </if>
-        <if test="formReqDt != null and formReqDt != ''">
-            AND QPAP.REQ_DT BETWEEN #{formReqDt[0]} AND #{formReqDt[1]}
+        <if test="searchReqDt != null and searchReqDt != ''">
+            AND QPAP.REQ_DT BETWEEN #{searchReqDt[0]} AND #{searchReqDt[1]}
         </if>
         ORDER BY QPAI.EMG_YN DESC, QPAP.ANS_IDX, QPAR.REQ_IDX
     </select>

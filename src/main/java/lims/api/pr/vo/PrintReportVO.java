@@ -55,7 +55,7 @@ public class PrintReportVO implements UpdateDetect {
     private String smpStrgMtd;
     private String smpVolUnit;
     private String smpVolTot;
-    private List<String> formReqDt; //의뢰일자
+    private List<String> searchReqDt; //의뢰일자
 
     private String pkgMtrSpec;
     private String rmtrSpec;

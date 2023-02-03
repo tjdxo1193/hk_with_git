@@ -41,6 +41,12 @@ public class SampleManageVO {
     private Character delYn;        // 삭제 여부
     private Character dpsYn;        // 폐기 여부
     private String smpEtrDt;        // 검체 입고 일자
+    private String crtIp;
+    private String crtDs;
+    private String crtUid;
+    private String udtIp;
+    private String udtDs;
+    private String udtUid;
 
     /* QT 시험 품목 조회 */
     private String reqIdx;
@@ -55,7 +61,6 @@ public class SampleManageVO {
     private String ansTypNm;        // 시험 유형 명칭
     private String mngSmpVolNm;     // 검체 구분 명칭
     private String smpStrgMtdNm;    // 검체 보관 방법 명칭
-    private String smpVolUnitNm;    // 검체량 단위 명칭
     private String rjtNm;           // 반려자 명칭
     private List<String> dpsExpDtList = new ArrayList<>();  // 폐기 예정 일자 리스트
     private List<String> rcpDtList = new ArrayList<>();     // 시험 접수 일자 리스트

@@ -46,7 +46,7 @@
         WHERE QSM.PLNT_CD = #{plntCd}
           AND QSM.DEL_YN = 'N'
           AND QSM.SMP_DPS_PROC NOT IN ('S0270400', 'S0270600')
-        ORDER BY QSM.SMP_ETR_DT DESC
+        ORDER BY QSM.SMP_MNG_IDX DESC
     </select>
 
     <update id="requestDis" parameterType="SampleDisVO">

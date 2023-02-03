@@ -14,12 +14,12 @@
 </template>
 
 <script>
-import { FormUtil } from '@/util';
+import {FormUtil} from '@/util';
 
 import values from './values/elnSpecCopyForTestMethodModal.js';
 
 export default {
-  name: 'ItemsCopyByTestMethodModal',
+  name: 'elnSpecCopyForTestMethodModal',
   emits: ['close', 'select'],
   props: {
     title: {
@@ -92,9 +92,9 @@ export default {
     getItems() {},
     onClickButton({ name }) {
       if (name === 'search') {
-        this.pItemSpecList.forms.validate().then(()=> {
+        this.pItemSpecList.forms.validate().then(() => {
           this.fetchPItemSpecList();
-        })
+        });
       }
       if (name === 'select') {
         this.selectItems();

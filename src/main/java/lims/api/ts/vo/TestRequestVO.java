@@ -109,7 +109,7 @@ public class TestRequestVO implements UpdateDetect {
     private String reqRmk;
     private String reqUid;
     private String reqDptCd;
-    private List<String> searchReqDt;
+    private List<String> searchReqDt; //의뢰일자
     private String rcpDt; //접수일자
     private String rcpUnm; //접수자
     private String assDt;
@@ -118,6 +118,8 @@ public class TestRequestVO implements UpdateDetect {
     private String revwUnm;
     private String rstAprDs;
     private String rstAprUnm;
+    private String rcpRmk;
+    private String clltRmk;
     private String assSpcc;
     private String revwCmmt;
     private String pitmSpcc;
@@ -156,5 +158,4 @@ public class TestRequestVO implements UpdateDetect {
     private String mkrQty; //표시량
     private String aitmRmk; //시험항목 비고
 
-    private List<String> formReqDt; //의뢰일자
 }

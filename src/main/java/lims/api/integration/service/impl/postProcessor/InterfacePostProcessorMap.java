@@ -26,6 +26,7 @@ public class InterfacePostProcessorMap {
     private final SAPMaterialPostProcessor sapMaterialPostProcessor;
     private final SAPTestRequestPostProcessor sapTestRequestPostProcessor;
     private final SAPBOMPostProcessor sapBomPostProcessor;
+    private final SAPCalendarPostProcessor sapCalendarPostProcessor;
     private final SAPCharacteristicPostProcessor sapCharacteristicPostProcessor;
     private final SAPInputPerformancePostProcessor sapInputPerformancePostProcessor;
 
@@ -44,6 +45,7 @@ public class InterfacePostProcessorMap {
         map.put(RevInterface.SAP_MATERIAL, sapMaterialPostProcessor);
         map.put(RevInterface.SAP_TEST_REQUEST, sapTestRequestPostProcessor);
         map.put(RevInterface.SAP_BOM, sapBomPostProcessor);
+        map.put(RevInterface.SAP_CALENDAR, sapCalendarPostProcessor);
         map.put(RevInterface.SAP_CHARACTERISTIC, sapCharacteristicPostProcessor);
         map.put(RevInterface.SAP_INPUT_PERFORMANCE, sapInputPerformancePostProcessor);
 

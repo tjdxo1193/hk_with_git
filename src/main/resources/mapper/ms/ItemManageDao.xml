@@ -5,9 +5,9 @@
         SELECT
             QP.PLNT_CD,
             (SELECT PLNT_NM FROM SY_PLNT WHERE SY_PLNT.PLNT_CD = QP.PLNT_CD ) AS PLNT_NM,
-            (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QPS.SPEC_PROC_CD AND PLNT_CD = #{plntCd}) AS SPEC_PROC_NM,
+            (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QPSSUB.SPEC_PROC_CD AND PLNT_CD = #{plntCd}) AS SPEC_PROC_NM,
             QP.PITM_CD,
-            QPS.SPEC_PROC_CD,
+            QPSSUB.SPEC_PROC_CD,
             QP.SPEC_PROC_CD AS QP_SPEC_PROC_CD,
             QP.USE_VER_YN,
             QP.RVS_NO,
@@ -82,16 +82,18 @@
         FROM QM_PITM QP
         JOIN QM_PITM_INFO QPI ON QP.PLNT_CD = QPI.PLNT_CD AND QP.PITM_CD = QPI.PITM_CD AND QP.PITM_VER = QPI.PITM_VER
         JOIN QM_PITM_INFO_SAP QPIS ON QP.PLNT_CD = QPIS.PLNT_CD AND QP.PITM_VER = QPIS.PITM_VER AND QP.PITM_CD = QPIS.PITM_CD
-        JOIN (
-            SELECT
-                   MAX(PLNT_CD) AS PLNT_CD,
-                   MAX(PITM_CD) AS PITM_CD,
-                   MAX(PITM_VER) AS PITM_VER,
-                   MAX(SPEC_PROC_CD) AS SPEC_PROC_CD,
-                   MAX(PITM_SPEC_IDX)
-            FROM QM_PITM_SPEC
-            GROUP BY PLNT_CD, PITM_CD, PITM_VER
-        ) QPS ON QP.PLNT_CD = QPS.PLNT_CD AND QP.PITM_CD = QPS.PITM_CD AND QP.PITM_VER = QPS.PITM_VER
+        JOIN (SELECT MAX(PITM_SPEC_IDX) AS PITM_SPEC_IDX, PITM_VER, PLNT_CD, PITM_CD
+              FROM QM_PITM_SPEC
+              GROUP BY PLNT_CD,PITM_CD,PITM_VER)
+                              QPS ON QP.PLNT_CD = QPS.PLNT_CD
+                                  AND QP.PITM_CD = QPS.PITM_CD
+                                  AND QP.PITM_VER =QPS.PITM_VER
+        JOIN (SELECT PITM_VER, PLNT_CD, PITM_CD, SPEC_PROC_CD, PITM_SPEC_IDX
+              FROM QM_PITM_SPEC)
+                              QPSSUB ON QP.PLNT_CD = QPSSUB.PLNT_CD
+                                     AND QP.PITM_CD = QPSSUB.PITM_CD
+                                     AND QP.PITM_VER =QPSSUB.PITM_VER
+                                     AND QPS.PITM_SPEC_IDX = QPSSUB.PITM_SPEC_IDX
         <where>
             QP.DEL_YN = 'N'
             AND QP.USE_VER_YN = 'Y'
@@ -108,7 +110,7 @@
                 AND QPI.PITM_NM LIKE '%' || UPPER(#{pitmNm}) || '%'
             </if>
             <if test="specProcCd != null and specProcCd != ''">
-                AND QPS.SPEC_PROC_CD = #{specProcCd}
+                AND QPSSUB.SPEC_PROC_CD = #{specProcCd}
             </if>
         </where>
         ORDER BY QP.CRT_DS DESC
@@ -119,8 +121,8 @@
         SELECT QP.PLNT_CD,
                QP.PITM_CD,
                QP.PITM_VER,
-               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QPS.SPEC_PROC_CD AND PLNT_CD = #{plntCd}) AS SPEC_PROC_NM,
-               QPS.SPEC_PROC_CD,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QPSSUB.SPEC_PROC_CD AND PLNT_CD = #{plntCd}) AS SPEC_PROC_NM,
+               QPSSUB.SPEC_PROC_CD,
                QP.USE_VER_YN,
                QP.RVS_NO,
                QP.DOC_NO,
@@ -198,13 +200,18 @@
                            ON QP.PLNT_CD = QPI.PLNT_CD AND QP.PITM_CD = QPI.PITM_CD AND QP.PITM_VER = QPI.PITM_VER
                  LEFT JOIN QM_PITM_INFO_SAP QPIS
                            ON QP.PLNT_CD = QPIS.PLNT_CD AND QP.PITM_VER = QPIS.PITM_VER AND QP.PITM_CD = QPIS.PITM_CD
-                 LEFT JOIN QM_PITM_SPEC QPS
-                           ON QPS.PLNT_CD = QP.PLNT_CD AND QP.PITM_CD = QPS.PITM_CD AND QP.PITM_VER = QPS.PITM_VER
-                               AND QPS.PITM_SPEC_IDX = (SELECT MAX(PITM_SPEC_IDX)
-                                                        FROM QM_PITM_SPEC QPSSUB
-                                                        WHERE QPS.PLNT_CD = QPSSUB.PLNT_CD
-                                                          AND QP.PITM_CD = QPSSUB.PITM_CD
-                                                          AND QP.PITM_VER = QPSSUB.PITM_VER)
+                 LEFT JOIN (SELECT MAX(PITM_SPEC_IDX) AS PITM_SPEC_IDX, PITM_VER, PLNT_CD, PITM_CD
+                            FROM QM_PITM_SPEC
+                            GROUP BY PLNT_CD,PITM_CD,PITM_VER)
+            QPS ON QP.PLNT_CD = QPS.PLNT_CD
+            AND QP.PITM_CD = QPS.PITM_CD
+            AND QP.PITM_VER =QPS.PITM_VER
+                 LEFT JOIN (SELECT PITM_VER, PLNT_CD, PITM_CD, SPEC_PROC_CD, PITM_SPEC_IDX
+                            FROM QM_PITM_SPEC)
+            QPSSUB ON QP.PLNT_CD = QPSSUB.PLNT_CD
+            AND QP.PITM_CD = QPSSUB.PITM_CD
+            AND QP.PITM_VER =QPSSUB.PITM_VER
+            AND QPS.PITM_SPEC_IDX = QPSSUB.PITM_SPEC_IDX
         WHERE QP.DEL_YN = 'N'
           AND QP.PLNT_CD = #{plntCd}
           AND QP.PITM_CD = #{pitmCd}

@@ -1,6 +1,6 @@
-import api from '@/api';
 import dayjs from 'dayjs';
 
+import api from '@/api';
 import { ColumnBuilder, FormBuilder } from '@/util/builder';
 
 const todayDate = dayjs().format('YYYY-MM-DD');
@@ -29,11 +29,11 @@ const pItemSpecList = {
     FormBuilder.builder()
       .Input('labNo', 'LAB NO')
       .required()
-      .Select('prdDiv', '반완제품구분',{
-        list : prdDivList
+      .Select('prdDiv', '반완제품구분', {
+        list: prdDivList,
       })
       .required()
-      .DatepickerTwin('ifDt', '연계일시', {value: [monthAgoDate, todayDate],})
+      .DatepickerTwin('ifDt', '연계일시', { value: [monthAgoDate, todayDate] })
       .build(),
   columns: () =>
     ColumnBuilder.builder()

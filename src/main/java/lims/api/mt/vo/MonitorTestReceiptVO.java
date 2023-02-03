@@ -69,7 +69,7 @@ public class MonitorTestReceiptVO implements UpdateDetect {
     private String slvJdgNonCfmNm; //기준 부적합 판정
     private String rstUnitNm; //결과 단위 코드
 
-    private List<String> formReqDt; //의뢰일
+    private List<String> searchReqDt; //의뢰일
 
     /*승인정보*/
     private ApproveVO approveInfo;

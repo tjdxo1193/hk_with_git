@@ -139,7 +139,7 @@ public class TestReceiptVO implements UpdateDetect {
     private String specUseVerYn; // 규격사용버전여부
     private String emgYn; //긴급여부
 
-    private List<String> formIspReqDt; //검사요청일자
+    private List<String> searchIspReqDt; //검사요청일자
 
     private String nonCfmSeq;
     private String ispReqNoBlk;

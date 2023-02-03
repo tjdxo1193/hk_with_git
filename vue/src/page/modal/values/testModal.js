@@ -4,6 +4,7 @@ import api from '@/api';
 import { ColumnBuilder, FormBuilder } from '@/util/builder';
 
 const todayDate = dayjs().format('YYYY-MM-DD');
+const monthAgoDate = dayjs().add(-1, 'M').format('YYYY-MM-DD');
 
 const searchForm = {
   static: {
@@ -31,7 +32,7 @@ const searchForm = {
       .Input('batchNo', '배치번호')
       .Input('lotNo', '제조번호')
       .DatepickerTwinWithSwitch('searchReqDt', '의뢰일', {
-        value: [todayDate, todayDate],
+        value: [monthAgoDate, todayDate],
       })
       .spanCol(2)
       .build(),
@@ -47,6 +48,8 @@ const searchForm = {
       .col('rcpDt', '접수일자')
       .col('lotNo', '제조번호')
       .col('sytJdgNm', '결과판정')
+      .col('rcpRmk', '접수비고', { width: 120 })
+      .col('clltRmk', '채취비고', { width: 120 })
       .col('assSpcc', '시험지시특이사항', { width: 120 })
       .col('revwCmmt', '검토의견', { width: 120 })
       .col('pitmSpcc', '품목특이사항', { width: 120 })

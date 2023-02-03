@@ -157,7 +157,7 @@ public class TestInstructionVO implements UpdateDetect {
     private Integer fileIdx; // file Idx
     private String fileCnt;
 
-    private List<String> formReqDt; //의뢰일자
+    private List<String> searchReqDt; //의뢰일자
 
     private Integer assAprReqIdx; //지시자idx
 }

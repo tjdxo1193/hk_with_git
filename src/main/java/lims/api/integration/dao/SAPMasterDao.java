@@ -1,9 +1,6 @@
 package lims.api.integration.dao;
 
-import lims.api.integration.vo.SAPBomVO;
-import lims.api.integration.vo.SAPCharacteristicVO;
-import lims.api.integration.vo.SAPInputPerformanceByBatchVO;
-import lims.api.integration.vo.SAPMaterialVO;
+import lims.api.integration.vo.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
@@ -17,7 +14,7 @@ public interface SAPMasterDao {
 
     SAPMaterialVO.Mara findMaterialMaraById(String matnr);
 
-    List<SAPMaterialVO.Mara> findMaterialMara(List<SAPMaterialVO.Mara> mara);
+    List<SAPMaterialVO.Mara> findMaterialMara(int degree);
 
     int createMaterialMara(SAPMaterialVO.Mara param);
 
@@ -28,7 +25,7 @@ public interface SAPMasterDao {
 
     SAPMaterialVO.Marc findMaterialMarcById(SAPMaterialVO.Marc param);
 
-    List<SAPMaterialVO.Marc> findMaterialMarc(List<SAPMaterialVO.Marc> param);
+    List<SAPMaterialVO.Marc> findMaterialMarc(int degree);
 
     List<SAPMaterialVO.Marc> findMaterialMarcByMatnr(String matnr);
 
@@ -37,7 +34,7 @@ public interface SAPMasterDao {
     int updateMaterialMarc(SAPMaterialVO.Marc param);
 
 
-    List<SAPMaterialVO.Mvke> findMaterialMvke(List<SAPMaterialVO.Mvke> param);
+    List<SAPMaterialVO.Mvke> findMaterialMvke(int degree);
 
     int createMaterialMvke(SAPMaterialVO.Mvke param);
 
@@ -45,14 +42,14 @@ public interface SAPMasterDao {
 
     List<SAPMaterialVO.Zmdv> findMaterialZmdvByMaterialCode(String meterialCode);
 
-    List<SAPMaterialVO.Zmdv> findMaterialZmdv(List<SAPMaterialVO.Zmdv> param);
+    List<SAPMaterialVO.Zmdv> findMaterialZmdv(int degree);
 
     int createMaterialZmdv(SAPMaterialVO.Zmdv param);
 
     int updateMaterialZmdv(SAPMaterialVO.Zmdv param);
 
 
-    List<SAPMaterialVO.Makt> findMaterialMakt(List<SAPMaterialVO.Makt> param);
+    List<SAPMaterialVO.Makt> findMaterialMakt(int degree);
 
     int createMaterialMakt(SAPMaterialVO.Makt param);
 
@@ -90,5 +87,12 @@ public interface SAPMasterDao {
     int createInputPerformDetail(SAPInputPerformanceByBatchVO.InputPerformanceDetail param);
 
     int updateInputPerformDetail(SAPInputPerformanceByBatchVO.InputPerformanceDetail param);
+
+
+    List<SAPCalendarVO> findCalendarAll();
+
+    int createCalendar(SAPCalendarVO param);
+
+    int updateCaledar(SAPCalendarVO param);
 
 }

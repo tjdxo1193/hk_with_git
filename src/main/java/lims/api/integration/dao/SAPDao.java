@@ -88,6 +88,8 @@ public interface SAPDao {
     int createTestRequestDetails(SAPTestRequestVO.RequestDetails vo);
 
 
+    List<SAPCalendarVO> findCalendarAllByDegree(int degree);
+
     int nextIdxInCalendar();
 
     int nextDegreeInCalendar();

@@ -31,11 +31,11 @@ const list = {
           { checkedValue: 'N', label: '사용안함' },
         ],
       })
-      .DatepickerTwinWithSwitch('formEnmDt', '제정일자', {
+      .DatepickerTwinWithSwitch('searchEnmDt', '제정일자', {
         value: [monthAgoDate, todayDate],
       })
       .spanCol(2)
-      .DatepickerTwinWithSwitch('formExpirDt', '유효기한', {
+      .DatepickerTwinWithSwitch('searchExpirDt', '유효기한', {
         value: [monthAgoDate, todayDate],
       })
       .spanCol(2)

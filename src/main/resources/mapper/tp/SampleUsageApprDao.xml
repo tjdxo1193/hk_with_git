@@ -30,7 +30,7 @@
           AND QSU.DEL_YN = 'N'
           AND SMP_USE_PROC = #{smpUseProc}
           AND SAI.APR_UID = #{aprUid}
-        ORDER BY QSU.SMP_MNG_IDX DESC
+        ORDER BY QSM.SMP_MNG_IDX DESC
     </select>
 
     <update id="approve" parameterType="SampleUsageApprVO">

@@ -4,6 +4,9 @@ import lims.api.common.domain.FileKey;
 import lims.api.common.exception.NoCreatedDataException;
 import lims.api.common.exception.NoUpdatedDataException;
 import lims.api.common.service.FileService;
+import lims.api.integration.enums.TestStatusProcess;
+import lims.api.integration.service.impl.IntegrationSender;
+import lims.api.integration.vo.intergation.InterfaceSendVO;
 import lims.api.ts.dao.TestResultInputDao;
 import lims.api.ts.enums.TestProcess;
 import lims.api.ts.service.TestResultInputService;
@@ -20,6 +23,7 @@ public class TestResultInputServiceImpl implements TestResultInputService {
 
     private final TestResultInputDao dao;
     private final FileService fileService;
+    private final IntegrationSender sender;
 
     @Override
     public List<TestResultInputVO> findAll(TestResultInputVO param) {
@@ -124,5 +128,26 @@ public class TestResultInputServiceImpl implements TestResultInputService {
         }
 
         return param.getFileIdx();
+    }
+
+    @Override
+    public void requestHold(TestResultInputVO param) {
+        int result = dao.requestHold(param);
+
+        // 보류 시 진행상태 전송
+        InterfaceSendVO.TestStatus data = InterfaceSendVO.TestStatus.builder()
+                .lotNo(param.getLotNo())
+                .batchNo(param.getBatchNo())
+                .holdReason(param.getHldRea())
+                .status(TestStatusProcess.TEST_HOLD.getValue())
+                .ispReqNo(param.getIspReqNo())
+                .phsOrderNo(param.getPhsOrderNo())
+                .pdtOrderNo(param.getPdtOrderNo())
+                .build();
+        sender.sendTestStatus(data);
+
+        if(result == 0) {
+            throw new NoUpdatedDataException();
+        }
     }
 }

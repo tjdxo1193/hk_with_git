@@ -9,4 +9,5 @@ public interface MonitorTestResultInputService {
     List<MonitorTestResultInputVO> getMonitorTestRst(MonitorTestResultInputVO request);
     void updateRst(MonitorTestResultInputVO request);
     void requestReview(MonitorTestResultInputVO request);
+    void hold(MonitorTestResultInputVO request);
 }

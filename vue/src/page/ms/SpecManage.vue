@@ -49,12 +49,12 @@
 
 <script>
 import {
+  ElnSpecCopyForTestMethodModal,
   ItemsByTestMethodModal,
   ItemsCopyByTestMethodModal,
   RequestReviewerModal,
-  ElnSpecCopyForTestMethodModal,
 } from '@/page/modal';
-import { FormUtil, GridUtil, StringUtil } from '@/util';
+import {FormUtil, GridUtil, StringUtil} from '@/util';
 
 import values from './values/specManage';
 
@@ -96,6 +96,7 @@ export default {
               this.fetchAItemListMatchingByPitmType(e.item);
             }
             this.setVersionInfoToVersionGridValueForm(e.item);
+            this.changeButtonDisabledAll();
             this.changeButtonWhenSelectedVersion();
           },
         },
@@ -125,7 +126,7 @@ export default {
         show: false,
       },
       elnSpecCopyForTestMethodModal: {
-        show: false,  
+        show: false,
       },
       processCode: {
         temporarySave: 'S0080100',
@@ -251,7 +252,7 @@ export default {
         this.removeRowTestItem();
         return;
       }
-      if (name == 'elnSpec'){
+      if (name == 'elnSpec') {
         this.showElnSpecCopyForTestMethodModal();
         return;
       }
@@ -278,26 +279,38 @@ export default {
       this.loadToVersionFormAndTestListGrid(item);
     },
 
+    // loadToVersionFormAndTestListGrid : hiddenform인 version폼에 클릭된 값 세팅 하고 시험항목리스트를 불러온다
     loadToVersionFormAndTestListGrid(item) {
       this.setVersionInfoToVersionGridValueForm(item);
       const { aitmSpecIdx, pitmCd, pitmVer } = FormUtil.getData(this.valueWithVersionGrid.forms);
 
+      // 첫 규격이고, 규격 index 없을때 (아예초기상태)
       if (this.isSelectedItemHasNotVersion()) {
-        this.changeButtonWhenFirstVersion();
-        if (this.isImpossibleToRevisionBecausePackigingAndfinishedProduct()) {
-          this.changeButtonWhenSelectedPackigingAndFinshedProduct();
-          return;
-        }
+        this.actvateButtonWhenFirstVersionAndNoIndex();
+
+        // 반제품 일 경우, Eln규격 버튼 활성화
         if (this.isSemiManufactures()) {
           this.fetchPItemSpecSemiAItemList({ pitmCd, pitmVer });
-          return;
+          this.activateElnSpecButton();
         }
+
+        return;
       }
 
-      if (aitmSpecIdx) {
+      if (aitmSpecIdx != null) {
         this.fetchPItemSpecAItemList({ aitmSpecIdx });
+        this.changeButtonWhenSelectedVersion();
+        return;
       }
-      this.changeButtonWhenSelectedVersion();
+    },
+
+    actvateButtonWhenFirstVersionAndNoIndex() {
+      FormUtil.enableButtons(this.testItemList.buttons, [
+        'temporarySave',
+        'addRow',
+        'copyRow',
+        'removeRow',
+      ]);
     },
 
     changeButtonDisabledAll() {
@@ -314,32 +327,14 @@ export default {
       ]);
     },
 
-    changeButtonWhenFirstVersion() {
-      FormUtil.enableButtons(this.testItemList.buttons, [
-        'temporarySave',
-        'addRow',
-        'copyRow',
-        'removeRow',
-      ]);
-      FormUtil.disableButtons(this.testItemList.buttons, [
-        'up',
-        'down',
-        'requestReview',
-        'updateVersion',
-      ]);
-    },
-
     isSelectedItemHasVersion() {
       return !this.isSelectedItemHasNotVersion();
     },
 
     isSelectedItemHasNotVersion() {
-      const { aitmSpecIdx } = FormUtil.getData(this.valueWithVersionGrid.forms);
-      return (
-        this.versionList.$grid.getItemsByValue('aitmSpecVer', 1).length == 0 &&
-        this.versionList.$grid.getRowCount() == 1 &&
-        aitmSpecIdx == null
-      );
+      const { $grid } = this.versionList;
+      const parameter = FormUtil.getData(this.valueWithVersionGrid.forms);
+      return $grid.getRowCount() == 1 && parameter.aitmSpecVer == null;
     },
 
     isTestListGridEmpty() {
@@ -348,31 +343,34 @@ export default {
 
     changeButtonWhenSelectedVersion() {
       const buttons = this.testItemList.buttons;
+
       if (this.isImpossibleToRevisionBecausePackigingAndfinishedProduct()) {
-        this.changeButtonWhenSelectedPackigingAndFinshedProduct();
+        this.activateRequestReviewButtonWhenTemporarySave();
         return;
       }
 
-      FormUtil.disableButtons(buttons, [
-        'temporarySave',
-        'requestReview',
-        'updateVersion',
-        'addRow',
-        'copyRow',
-        'removeRow',
-        'up',
-        'down',
-      ]);
-
-      if (this.isSemiManufactures()){
-        FormUtil.enableButtons(buttons, ['elnSpec']);
+      if (
+        this.isSemiManufactures() &&
+        (this.isSelectedUsableVersion() ||
+          this.isSelectedTemporaryVersion() ||
+          this.isSelectedReviewRejectVersion())
+      ) {
+        this.activateElnSpecButton();
       }
-        
+
+      if (this.isSelectedUsableVersion()) {
+        FormUtil.enableButtons(buttons, ['updateVersion', 'addRow', 'copyRow', 'removeRow']);
+        return;
+      }
+
+      // 임시저장, 검토반려일때
       if (this.isSelectedTemporaryVersion() || this.isSelectedReviewRejectVersion()) {
         FormUtil.enableButtons(buttons, ['temporarySave', 'addRow', 'copyRow', 'removeRow']);
+
         if (this.isSelectedItemHasVersion()) {
           FormUtil.enableButtons(buttons, ['requestReview']);
         }
+
         return;
       }
     },
@@ -391,33 +389,20 @@ export default {
       }
     },
 
-    changeButtonWhenSelectedPackigingAndFinshedProduct() {
+    activateRequestReviewButtonWhenTemporarySave() {
+      // 검토요청 버튼은 임시저장이나 검토반려 일때만 활성화
       if (
         (this.isSelectedTemporaryVersion() || this.isSelectedReviewRejectVersion()) &&
         this.isSelectedItemHasVersion()
       ) {
         FormUtil.enableButtons(this.testItemList.buttons, ['requestReview']);
-        FormUtil.disableButtons(this.testItemList.buttons, [
-          'temporarySave',
-          'updateVersion',
-          'addRow',
-          'copyRow',
-          'removeRow',
-          'up',
-          'down',
-        ]);
-      } else {
-        this.changeButtonDisabledAll();
       }
+
       return;
     },
 
-    activateButtonBy(){
-      if (this.isSelectedUsableVersion()) {
-        FormUtil.enableButtons(buttons, ['updateVersion', 'addRow', 'copyRow', 'removeRow']);
-        return;
-      }
-
+    activateElnSpecButton() {
+      FormUtil.enableButtons(this.testItemList.buttons, ['elnSpec']);
     },
 
     setPitmInfoToPitmGridValueForm({ pitmCd, pitmVer, pitmTyp }) {
@@ -478,12 +463,12 @@ export default {
       this.$setState('itemsCopyByTestMethodModal', { show: false });
     },
 
-    showElnSpecCopyForTestMethodModal(){
-      this.$setState('elnSpecCopyForTestMethodModal', { show: false });
+    showElnSpecCopyForTestMethodModal() {
+      this.$setState('elnSpecCopyForTestMethodModal', { show: true });
     },
 
-    hideElnSpecCopyForTestMethodModal(){
-      this.$setState('elnSpecCopyForTestMethodModal', { show: true });
+    hideElnSpecCopyForTestMethodModal() {
+      this.$setState('elnSpecCopyForTestMethodModal', { show: false });
     },
 
     isSelectedTemporaryVersion() {

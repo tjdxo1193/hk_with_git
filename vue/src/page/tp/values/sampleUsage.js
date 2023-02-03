@@ -5,16 +5,38 @@ const sampleUsageGrid = {
     title: '조회',
     countPerRow: 4,
     buttons: [{ name: 'search', label: '조회' }],
+    legends: [
+      { value: '임시저장', className: 'tempSave' },
+      { value: '승인대기중', className: 'approveWating' },
+      { value: '반려', className: 'return' },
+      { value: '이상', className: 'weird' },
+      { value: '폐기', className: 'disposal' },
+    ],
     props: {
       editable: false,
       showRowCheckColumn: false,
+      rowStyleFunction: (rowIndex, item) => {
+        if (item.irgYn === 'Y') {
+          return 'weird';
+        }
+        if (item.dpsYn === 'Y') {
+          return 'disposal';
+        }
+        if (item.smpUseProc === 'S0280100') {
+          return 'tempSave';
+        } else if (item.smpUseProc === 'S0280200' || item.smpUseProc === 'S0280400') {
+          return 'approveWating';
+        } else if (item.smpUseProc === 'S0280110' || item.smpUseProc === 'S0280310') {
+          return 'return';
+        }
+      },
     },
   },
   forms: () =>
     FormBuilder.builder()
       .Select('smpDiv', ' 검체구분')
       .Input('pitmCd', '품목코드')
-      .Select('pitmDiv', '품목구분')
+      .Select('pitmDiv', '품목유형')
       .Input('lotNo', '제조번호')
       .Input('batchNo', '배치번호')
       .Input('pitmNm', '품목명')
@@ -35,7 +57,7 @@ const sampleUsageGrid = {
       .col('strgPla', { visible: false })
       .col('pitmNm', '품목명')
       .col('pitmCd', '품목코드')
-      .col('pitmTypNm', '품목구분')
+      .col('pitmTypNm', '품목유형')
       .col('ansNo', '시험번호')
       .col('lotNo', '제조번호')
       .col('batchNo', '배치번호')
@@ -47,7 +69,7 @@ const sampleUsageGrid = {
       .col('inpUnit', '보관수량단위')
       .col('useNm', '사용자')
       .col('useDt', '사용일')
-      .col('smpDpsNm', '상태')
+      .col('smpDpsNm', '검체상태')
       .col('smpUseNm', '사용이력진행상황')
       .col('rjtNm', '반려자')
       .col('rjtDs', '반려일시')
@@ -88,20 +110,21 @@ const inputForm = {
           .Button('search', '검색', { type: 'search' })
           .build(),
       )
-      .Input('smpDivNm', '검체구분', { readonly: true })
-      .Input('pitmTypNm', '품목구분', { readonly: true })
-      .Input('ansNo', '시험번호', { readonly: true })
+      .Input('pitmTypNm', '품목유형', { readonly: true })
       .Input('lotNo', '제조번호', { readonly: true })
       .Input('batchNo', '배치번호', { readonly: true })
+      .Input('smpDivNm', '검체구분', { readonly: true })
+      .Input('ansTypNm', '시험유형', { readonly: true })
+      .Input('ansNo', '시험번호', { readonly: true })
       .Input('smpDpsNm', '검체상태', { readonly: true })
       .Input('useNm', '사용자', { readonly: true })
       .Input('mngSmpVol', '보관수량', { readonly: true })
       .Input('sumVol', '총사용량', { readonly: true })
       .Input('remains', '재고량', { readonly: true })
-      .Input('inpUnit', '보관단위', { readonly: true })
-      .InputNumber('useSmpVol', '사용검체량')
+      .Input('inpUnit', '입력단위', { readonly: true })
+      .InputNumber('useSmpVol', '사용검체량', { _required: true })
       .Input('strgPla', '보관장소', { maxLength: 18 })
-      .Textarea('usePps', '사용목적', { _colSpan: 2, maxLength: 4000 })
+      .Textarea('usePps', '사용목적', { maxLength: 4000 })
       .build(),
 };
 

@@ -44,11 +44,11 @@ const list = {
       .Input('grade', 'Grade')
       .Input('point', '포인트')
       .Input('roomno', 'RoomNo')
-      .DatepickerTwinWithSwitch('formRcpDt', '접수일', {
+      .DatepickerTwinWithSwitch('searchRcpDt', '접수일', {
         value: [monthAgoDate, todayDate],
       })
       .spanCol(2)
-      .DatepickerTwinWithSwitch('formAssDt', '지시일', {
+      .DatepickerTwinWithSwitch('searchAssDt', '지시일', {
         value: [monthAgoDate, todayDate],
       })
       .spanCol(2)

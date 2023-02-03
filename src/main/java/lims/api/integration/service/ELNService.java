@@ -13,6 +13,6 @@ public interface ELNService {
 
     void saveFinishedAndSemiStandard(Integer infoIdx, List<ELNStandardSpecVO> data);
 
-    void publishTestMethodByItem(ELNCmdType cmdType, List<ELNSendVO.TestMethodByItem> ids);
+    void publishTestMethodByItem(List<ELNSendVO.TestMethodByItem> ids);
 
 }

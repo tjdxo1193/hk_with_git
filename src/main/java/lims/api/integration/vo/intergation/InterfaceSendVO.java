@@ -1,10 +1,9 @@
 package lims.api.integration.vo.intergation;
 
 import lims.api.integration.annotation.EnumType;
-import lims.api.integration.enums.ReportDivOfNonCfm;
+import lims.api.integration.enums.ELNCmdType;
 import lims.api.integration.enums.TestResultType;
 import lims.api.integration.enums.TestStatusProcess;
-import lims.api.integration.vo.ELNSendVO;
 import lims.api.integration.vo.MESSendVO;
 import lims.api.integration.vo.SAPSendVO;
 import lims.api.integration.vo.SRMSendVO;
@@ -13,9 +12,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @implNote
@@ -169,24 +165,10 @@ public class InterfaceSendVO {
     }
 
     @Getter
+    @Builder
     public static class MethodByItem {
-        private List<String> amitmCodeList;
-
-        public MethodByItem(String amitmCode) {
-            this.amitmCodeList = List.of(amitmCode);
-        }
-
-        public MethodByItem(List<String> amitmCodeList) {
-            this.amitmCodeList = amitmCodeList;
-        }
-
-        public List<ELNSendVO.TestMethodByItem> toELN() {
-            return amitmCodeList.stream()
-                    .map(amitmCode -> ELNSendVO.TestMethodByItem.builder()
-                            .aitmCd(amitmCode)
-                            .build()
-                    ).collect(Collectors.toList());
-        }
+        private String amitmCd;
+        private ELNCmdType cmdType;
     }
 
 }

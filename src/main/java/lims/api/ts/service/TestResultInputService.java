@@ -12,4 +12,5 @@ public interface TestResultInputService {
     void requestReview(TestResultInputVO param);
     void publishEvent(TestResultInputVO param);
     int savedFile(TestResultInputVO param);
+    void requestHold(TestResultInputVO param);
 }

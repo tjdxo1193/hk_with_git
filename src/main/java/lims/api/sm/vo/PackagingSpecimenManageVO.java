@@ -42,8 +42,8 @@ public class PackagingSpecimenManageVO implements UpdateDetect {
     private String pitmTypNm;
     private String finRcpDt; //최신 접수일자
 
-    private List<String> formEnmDt; //제정일자
-    private List<String> formExpirDt; //유효기한
+    private List<String> searchEnmDt; //제정일자
+    private List<String> searchExpirDt; //유효기한
 
     private List<PackagingSpecimenManageVO> addedRowItems;   // 추가된 데이터
     private List<PackagingSpecimenManageVO> editedRowItems;  // 수정된 데이터

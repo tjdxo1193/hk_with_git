@@ -56,11 +56,11 @@
         <if test="upperMitmPitmDiv != null and upperMitmPitmDiv != ''">
             AND (SELECT HIR_TREE_CD FROM SY_CD_TREE WHERE TREE_CD = MM.MITM_PITM_DIV) = #{upperMitmPitmDiv}
         </if>
-        <if test="formReqDt != null and formReqDt != ''">
-            AND MMAP.REQ_DT BETWEEN #{formReqDt[0]} AND #{formReqDt[1]}
+        <if test="searchReqDt != null and searchReqDt != ''">
+            AND MMAP.REQ_DT BETWEEN #{searchReqDt[0]} AND #{searchReqDt[1]}
         </if>
-        <if test="formAssDt != null and formAssDt != ''">
-            AND MMAP.ASS_DT BETWEEN #{formAssDt[0]} AND #{formAssDt[1]}
+        <if test="searchAssDt != null and searchAssDt != ''">
+            AND MMAP.ASS_DT BETWEEN #{searchAssDt[0]} AND #{searchAssDt[1]}
         </if>
     </select>
 
@@ -146,7 +146,7 @@
             ANS_PROC_CD = #{ansProcCd}
             , REVW_DT = TO_CHAR(SYSDATE, 'YYYY-MM-DD')
             , REVW_DS = SYSDATE
-            <!--, REVW_CMMT-->
+            , REVW_CMMT = #{rea}
             , REVW_UID = #{aprUid}
             , SYT_JDG = #{sytJdg}
         WHERE PLNT_CD = #{plntCd}
@@ -176,5 +176,15 @@
         WHERE PLNT_CD = #{plntCd}
         AND MITM_REQ_IDX = #{mitmReqIdx}
         AND RST_SEQ = #{rstSeq}
+    </update>
+
+    <update id="hold" parameterType="MonitorTestResultInputVO">
+        UPDATE MT_MITM_ANS_PROC SET
+            HLD_YN = 'Y'
+            , HLD_DS = SYSDATE
+            , HLD_UID = #{userId}
+            , HLD_REA = #{rea}
+        WHERE PLNT_CD = #{plntCd}
+        AND MITM_REQ_IDX = #{mitmReqIdx}
     </update>
 </mapper>

@@ -44,9 +44,11 @@ public class TestResultApprController {
     }
 
     @PutMapping("/requestHold")
-    public ResponseEntity<CommonResponse> requestHold(@AuthToken Token token, @RequestBody List<TestResultApprVO> list) {
+    public ResponseEntity<CommonResponse> requestHold(@AuthToken Token token, @RequestBody List<TestResultApprVO> list, @ESign ESignInfo esign) {
         for(TestResultApprVO row : list) {
             row.setPlntCd(getAuthUserPlntCd(token));
+            row.setHldUid(getAuthUserId(token));
+            row.setHldRea(esign.getReason());
         }
         service.requestHold(list);
         return ResponseEntity.ok(new CommonResponse());

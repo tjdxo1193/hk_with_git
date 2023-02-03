@@ -32,6 +32,7 @@
           AND QSM.DEL_YN = 'N'
           AND QSM.SMP_DPS_PROC IN ('S0270400', 'S0270600')
           AND SAI.APR_UID = #{aprUid}
+        ORDER BY QSM.SMP_MNG_IDX DESC
     </select>
 
     <update id="approve" parameterType="SampleDisApprVO">

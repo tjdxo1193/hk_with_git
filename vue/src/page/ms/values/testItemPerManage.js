@@ -1,4 +1,4 @@
-import {ColumnBuilder, FormBuilder} from '@/util';
+import { ColumnBuilder, FormBuilder } from '@/util';
 
 const testItemSearch = {
   static: {

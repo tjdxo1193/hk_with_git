@@ -11,8 +11,8 @@ const list = {
     title: '조회',
     countPerRow: 4,
     buttons: [
-      { name: 'select', label: '조회' },
       { name: 'receipt', label: '접수' },
+      { name: 'select', label: '조회' },
     ],
     props: { editable: false, showRowCheckColumn: true },
   },
@@ -38,7 +38,7 @@ const list = {
       .Select('crgDptCd', '담당부서', {
         async: api.combo.common.getDpt,
       })
-      .DatepickerTwinWithSwitch('formReqDt', '의뢰일', {
+      .DatepickerTwinWithSwitch('searchReqDt', '의뢰일', {
         value: [monthAgoDate, todayDate],
       })
       .spanCol(2)

@@ -131,7 +131,7 @@ public class TestCollectionVO implements UpdateDetect {
     private Integer fileIdx; // file Idx
     private String fileCnt;
 
-    private List<String> formReqDt; //의뢰일자
+    private List<String> searchReqDt; //의뢰일자
 
     /*검체관리 정보*/
     private int smpMngIdx;

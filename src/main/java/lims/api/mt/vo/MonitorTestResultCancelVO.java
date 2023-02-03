@@ -42,6 +42,9 @@ public class MonitorTestResultCancelVO implements UpdateDetect {
     private String ansCylRuleNm; //시험주기
     private String rcpDptCd; //접수부서
     private String rcpUid; //접수자
+    private String rjtDs;
+    private String rjtRea;
+    private String rjtUnm;
     private String hldYn; //보류여부
     private String hldDs; //보류일
     private String hldUnm; //보류자
@@ -99,6 +102,6 @@ public class MonitorTestResultCancelVO implements UpdateDetect {
     private String rea; //사유
     private String testDiv; //시험구분
 
-    private List<String> formRcpDt; //접수일
-    private List<String> formReqDt; //의뢰일
+    private List<String> searchRcpDt; //접수일
+    private List<String> searchReqDt; //의뢰일
 }

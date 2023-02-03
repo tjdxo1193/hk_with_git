@@ -106,7 +106,7 @@ export default {
         })
         .catch(() => this.$error(this.$message.error.updateData));
     },
-    checkTestType(){
+    checkTestType() {
       const item = FormUtil.getData(this.testInfo.forms);
       return item.ansTyp === null || item.ansTyp === '' ? true : false;
     },
@@ -123,7 +123,7 @@ export default {
         this.init();
       }
       if (name === 'requestRegist') {
-        if(this.checkTestType()){
+        if (this.checkTestType()) {
           return this.$warn(this.$message.validate.requiredValueNotInput);
         }
         return this.requestRegist();
@@ -132,7 +132,7 @@ export default {
         this.request();
       }
       if (name === 'save') {
-        if(this.checkTestType()){
+        if (this.checkTestType()) {
           return this.$warn(this.$message.validate.requiredValueNotInput);
         }
         return this.save();

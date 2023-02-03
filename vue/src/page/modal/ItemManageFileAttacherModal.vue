@@ -1,5 +1,5 @@
 <template>
-  <ModalBase :title="title" :show="show" width ="1000px" :top="50" @close="close">
+  <ModalBase :title="title" :show="show" width="1000px" :top="50" @close="close">
     <AUIGridSearch
       v-bind="list"
       @grid-created="(proxy) => $setState('list.$grid', proxy)"
@@ -64,7 +64,10 @@ export default {
   watch: {
     show() {
       if (this.$props.show) {
-        FormUtil.setData(this.list.forms, { ctId: this.$props.initData.ctId, matnr: this.$props.initData.labNo });
+        FormUtil.setData(this.list.forms, {
+          ctId: this.$props.initData.ctId,
+          matnr: this.$props.initData.labNo,
+        });
       }
     },
   },

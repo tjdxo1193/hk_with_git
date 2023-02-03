@@ -183,6 +183,11 @@ public class SAPServiceImpl implements SAPService {
         if (count == 0) {
             throw new IntegrationNoSavedException();
         }
+
+        new Thread(() -> postProcessorMap
+                .get(revInterface)
+                .execute(new RevStateful(degree, infoIdx)))
+                .start();
     }
 
     @Override

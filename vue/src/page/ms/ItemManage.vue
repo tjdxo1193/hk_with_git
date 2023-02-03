@@ -230,7 +230,9 @@ export default {
 
     onClickSearchFormButtons({ name }) {
       if (name === 'search') {
-        this.fetchSearchGrid();
+        this.searchGridWithForm.forms.validate().then(() => {
+          this.fetchSearchGrid();
+        });
       }
     },
 
@@ -482,12 +484,12 @@ export default {
     setItemManageFileAttacherModalInitData() {
       let ctrptNo = null;
       let ctId = null;
-      if(this.getCtrptNo() != null){
+      if (this.getCtrptNo() != null) {
         ctrptNo = Number(this.getCtrptNo());
         ctId = Object.assign(ctrptNo, Number);
       }
       const { labNo } = FormUtil.getData(this.commonInfoForm.forms);
-      this.itemManageFileAttacherModal.initData = { ctId, matnr : labNo };
+      this.itemManageFileAttacherModal.initData = { ctId, matnr: labNo };
     },
 
     setBomModalInitData() {
@@ -496,7 +498,7 @@ export default {
     },
 
     fileSave({ addedFiles, removedFileIds }) {
-      if(this.getCtrptNo() == null){
+      if (this.getCtrptNo() == null) {
         this.$error(this.$message.warn.noCtrptNo);
         return;
       }

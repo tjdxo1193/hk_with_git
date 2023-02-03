@@ -15,6 +15,11 @@ const sampleDisGrid = {
       { name: 'requestCancelDis', label: '폐기취소요청' },
       { name: 'search', label: '조회' },
     ],
+    legends: [
+      { value: '승인대기중', className: 'approveWating' },
+      { value: '반려', className: 'return' },
+      { value: '폐기', className: 'disposal' },
+    ],
     props: {
       editable: false,
       showRowCheckColumn: true,
@@ -37,23 +42,23 @@ const sampleDisGrid = {
       .build(),
   columns: () =>
     ColumnBuilder.builder()
-      .col('plntCd', false)
-      .col('smpMngIdx', false)
-      .col('useSeq', false)
+      .col('plntCd', { visible: false })
+      .col('smpMngIdx', { visible: false })
+      .col('useSeq', { visible: false })
+      .col('pitmTyp', { visible: false })
+      .col('smpDiv', { visible: false })
+      .col('smpDpsProc', { visible: false })
+      .col('usePps', { visible: false })
+      .col('useUid', { visible: false })
+      .col('rjtUid', { visible: false })
       .col('pitmNm', '품목명')
       .col('pitmCd', '품목코드')
       .col('ansNo', '시험번호')
-      .col('pitmTyp', false)
       .col('pitmTypNm', '품목구분')
       .col('lotNo', '제조번호')
       .col('batchNo', '배치번호')
-      .col('smpDiv', false)
       .col('smpDivNm', '검체구분')
-      .col('smpDpsProc', false)
       .col('smpDpsNm', '검체상태')
-      .col('usePps', false)
-      .col('useUid', false)
-      .col('rjtUid', false)
       .col('rjtNm', '반려자')
       .col('rjtDs', '반려일시')
       .build(),

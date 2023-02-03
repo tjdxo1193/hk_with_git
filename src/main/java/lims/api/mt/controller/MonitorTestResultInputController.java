@@ -1,10 +1,13 @@
 package lims.api.mt.controller;
 
 import lims.api.auth.annotation.AuthToken;
+import lims.api.auth.annotation.ESign;
 import lims.api.auth.domain.Token;
 import lims.api.auth.service.impl.JwtResolver;
+import lims.api.common.domain.ESignInfo;
 import lims.api.common.model.CommonResponse;
 import lims.api.mt.service.MonitorTestResultInputService;
+import lims.api.mt.vo.MonitorTestResultApprVO;
 import lims.api.mt.vo.MonitorTestResultInputVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -42,8 +45,19 @@ public class MonitorTestResultInputController {
     }
 
     @PutMapping("/requestReview")
-    public ResponseEntity<CommonResponse> requestReview(@RequestBody MonitorTestResultInputVO request) {
+    public ResponseEntity<CommonResponse> requestReview(@RequestBody MonitorTestResultInputVO request, @ESign ESignInfo esign) {
+        request.setRea(esign.getReason());
         service.requestReview(request);
+        return ResponseEntity.ok(new CommonResponse());
+    }
+
+    @PutMapping("/hold")
+    public ResponseEntity<CommonResponse> hold(@AuthToken Token token, @RequestBody MonitorTestResultInputVO request, @ESign ESignInfo esign) {
+        String jwt = token.getJwt();
+        request.setPlntCd(jwtResolver.getPlantCode(jwt));
+        request.setUserId(jwtResolver.getUserId(jwt));
+        request.setRea(esign.getReason());
+        service.hold(request);
         return ResponseEntity.ok(new CommonResponse());
     }
 

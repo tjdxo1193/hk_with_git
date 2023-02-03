@@ -68,18 +68,18 @@ export default {
     },
   },
   methods: {
-    getSrmFinalOrderList() {
+    async getSrmFinalOrderList() {
       const { $grid, forms } = this.srmOrderList;
       const parameter = FormUtil.getData(forms);
-      const data = $grid
+      const data = await $grid
         ._useLoader(() => this.$axios.get('/ts/testIFModal/getSrmFinalOrderList', parameter))
         .then(({ data }) => data);
       $grid.setGridData(data);
     },
-    getMesFinalOrderList() {
+    async getMesFinalOrderList() {
       const { $grid, forms } = this.mesOrderList;
       const parameter = FormUtil.getData(forms);
-      const data = $grid
+      const data = await $grid
         ._useLoader(() => this.$axios.get('/ts/testIFModal/getMesFinalOrderList', parameter))
         .then(({ data }) => data);
       $grid.setGridData(data);

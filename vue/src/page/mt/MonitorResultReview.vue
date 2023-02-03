@@ -40,7 +40,9 @@ export default {
     FileAttacherModal,
     RequestApproverModal,
   },
-  mounted() {},
+  mounted() {
+    this.getMonitorTestResultReview();
+  },
   data() {
     const { list, itemList } = this.$copy(values);
     return {
@@ -50,6 +52,7 @@ export default {
         columns: list.columns(),
         event: {
           cellDoubleClick: (e) => {
+            FormUtil.setData(this.itemList.forms, e.item);
             this.getMonitorTestRst(e);
             this.enableButtons([
               'stage',
@@ -64,6 +67,7 @@ export default {
       },
       itemList: {
         ...itemList.static,
+        forms: itemList.forms(),
         columns: itemList.columns(),
         event: {},
       },
@@ -99,11 +103,9 @@ export default {
         .then(({ data }) => this.itemList.$grid.setGridData(data));
     },
     approveRequest(approveInfo) {
-      let [parameter] = this.itemList.$grid.getGridData();
-      parameter = {
-        ...parameter,
-        approveInfo,
-      };
+      let parameter = FormUtil.getData(this.itemList.forms);
+      Object.assign(parameter, approveInfo);
+      console.log(parameter, 'parameter');
       this.$eSignWithReason(() =>
         this.$axios.put('/mt/monitorTestResultReview/apprRequest', parameter),
       )
@@ -117,7 +119,7 @@ export default {
         });
     },
     reject() {
-      const [parameter] = this.itemList.$grid.getGridData();
+      const parameter = FormUtil.getData(this.itemList.forms);
       this.$eSignWithReason(() => this.$axios.put('/mt/monitorTestResultReview/reject', parameter))
         .then(() => {
           this.$info(this.$message.info.saved);
@@ -129,16 +131,18 @@ export default {
         });
     },
     hold() {
-      const [parameter] = this.itemList.$grid.getGridData();
-      this.$eSignWithReason(() => this.$axios.put('/mt/monitorTestResultReview/hold', parameter))
-        .then(() => {
-          this.$info(this.$message.info.saved);
-          this.init();
-          this.getMonitorTestResultReview();
-        })
-        .catch(() => {
-          this.$error(this.$message.error.updateData);
-        });
+      const parameter = FormUtil.getData(this.itemList.forms);
+      this.$confirm(this.$message.confirm.hold).then(() => {
+        this.$eSignWithReason(() => this.$axios.put('/mt/monitorTestResultReview/hold', parameter))
+          .then(() => {
+            this.$info(this.$message.info.saved);
+            this.init();
+            this.getMonitorTestResultReview();
+          })
+          .catch(() => {
+            this.$error(this.$message.error.updateData);
+          });
+      });
     },
     enterEvent(event) {
       const forms = this.list.forms;

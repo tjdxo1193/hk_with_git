@@ -2,7 +2,8 @@ package lims.api.common.controller;
 
 import lims.api.auth.annotation.Permit;
 import lims.api.common.domain.mail.TextMailMessage;
-import lims.api.common.service.impl.MailService;
+import lims.api.common.service.MailService;
+import lims.api.common.service.impl.MailServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

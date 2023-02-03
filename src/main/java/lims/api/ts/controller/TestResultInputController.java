@@ -1,10 +1,13 @@
 package lims.api.ts.controller;
 
 import lims.api.auth.annotation.AuthToken;
+import lims.api.auth.annotation.ESign;
 import lims.api.auth.domain.Token;
 import lims.api.auth.service.impl.JwtResolver;
+import lims.api.common.domain.ESignInfo;
 import lims.api.common.model.CommonResponse;
 import lims.api.ts.service.TestResultInputService;
+import lims.api.ts.vo.TestResultApprVO;
 import lims.api.ts.vo.TestResultInputVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -66,6 +69,14 @@ public class TestResultInputController {
     public ResponseEntity<Integer> savedFile(@AuthToken Token token, TestResultInputVO param) {
         param.setPlntCd(getAuthUserPlntCd(token));
         return ResponseEntity.ok(service.savedFile(param));
+    }
+
+    @PutMapping("/requestHold")
+    public ResponseEntity<CommonResponse> requestHold(@AuthToken Token token, @ESign ESignInfo esign, @RequestBody TestResultInputVO param) {
+        param.setHldUid(getAuthUserId(token));
+        param.setHldRea(esign.getReason());
+        service.requestHold(param);
+        return ResponseEntity.ok(new CommonResponse());
     }
 
     private String getAuthUserPlntCd(Token token) {

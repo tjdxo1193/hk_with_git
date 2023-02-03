@@ -39,7 +39,7 @@ const list = {
       .Input('ispReqNo', '검사요청번호')
       .Input('lotNo', '제조번호')
       .Input('batchNo', '배치번호')
-      .DatepickerTwinWithSwitch('formIspReqDt', '검사요청일자', {
+      .DatepickerTwinWithSwitch('searchIspReqDt', '검사요청일자', {
         value: [weekAgoDate, todayDate],
       })
       .spanCol(2)

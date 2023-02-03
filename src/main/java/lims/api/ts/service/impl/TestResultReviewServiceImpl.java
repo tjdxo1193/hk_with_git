@@ -5,6 +5,9 @@ import lims.api.common.exception.NoUpdatedDataException;
 import lims.api.common.service.ApproveService;
 import lims.api.common.service.FileService;
 import lims.api.common.service.UserService;
+import lims.api.integration.enums.TestStatusProcess;
+import lims.api.integration.service.impl.IntegrationSender;
+import lims.api.integration.vo.intergation.InterfaceSendVO;
 import lims.api.ts.dao.TestResultReviewDao;
 import lims.api.ts.enums.TestProcess;
 import lims.api.ts.service.TestResultReviewService;
@@ -23,6 +26,7 @@ public class TestResultReviewServiceImpl implements TestResultReviewService {
     private final ApproveService approveService;
     private final FileService fileService;
     private final UserService userService;
+    private final IntegrationSender sender;
 
     @Override
     public List<TestResultReviewVO> findAll(TestResultReviewVO param) {
@@ -62,6 +66,18 @@ public class TestResultReviewServiceImpl implements TestResultReviewService {
     @Override
     public void requestHold(TestResultReviewVO param) {
         int result = dao.requestHold(param);
+
+        // 보류 시 진행상태 전송
+        InterfaceSendVO.TestStatus data = InterfaceSendVO.TestStatus.builder()
+                .lotNo(param.getLotNo())
+                .batchNo(param.getBatchNo())
+                .holdReason(param.getHldRea())
+                .status(TestStatusProcess.TEST_HOLD.getValue())
+                .ispReqNo(param.getIspReqNo())
+                .phsOrderNo(param.getPhsOrderNo())
+                .pdtOrderNo(param.getPdtOrderNo())
+                .build();
+        sender.sendTestStatus(data);
 
         if(result == 0) {
             throw new NoUpdatedDataException();

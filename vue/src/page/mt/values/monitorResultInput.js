@@ -33,11 +33,11 @@ const list = {
       })
       .Input('ansNo', '시험번호')
       .Input('reqNo', '의뢰번호')
-      .DatepickerTwinWithSwitch('formReqDt', '의뢰일', {
+      .DatepickerTwinWithSwitch('searchReqDt', '의뢰일', {
         value: [monthAgoDate, todayDate],
       })
       .spanCol(2)
-      .DatepickerTwinWithSwitch('formAssDt', '지시일', {
+      .DatepickerTwinWithSwitch('searchAssDt', '지시일', {
         value: [monthAgoDate, todayDate],
       })
       .spanCol(2)
@@ -84,6 +84,7 @@ const itemList = {
     buttons: [
       { name: 'resultHistory', label: '결과이력', disabled: true },
       { name: 'preResultTrend', label: '이전결과동향', disabled: true },
+      { name: 'hold', label: '보류', disabled: true },
       { name: 'requestReview', label: '검토요청', disabled: true },
       { name: 'save', label: '저장', disabled: true },
       { name: 'init', label: '초기화', disabled: true },

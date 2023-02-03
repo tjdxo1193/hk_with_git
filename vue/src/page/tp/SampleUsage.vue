@@ -181,7 +181,7 @@ export default {
               this.$error(this.$message.error.saveData);
             });
         } else {
-          return this.$warn(this.$message.warn.noNegativeNumber);
+          return this.$warn(this.$message.warn.noNegativeNumberSample);
         }
       } else {
         return this.$warn(this.$message.warn.biggerThanRemains);
@@ -269,43 +269,26 @@ export default {
     },
     setButtonsEnable(status) {
       const buttons = this.inputForm.buttons;
-      if (status === TEMP_SAVE) {
-        FormUtil.disableButtons(buttons, ['save']);
-        FormUtil.enableButtons(buttons, [
-          'requestApproveUse',
-          'update',
-          'requestApproveCancelUse',
-          'delete',
-        ]);
-      }
-      if (status === REQUEST_USE || status === REQUEST_CANCEL_USE) {
-        FormUtil.disableButtons(buttons, [
-          'save',
-          'requestApproveUse',
-          'update',
-          'delete',
-          'requestApproveCancelUse',
-        ]);
+      if (status === TEMP_SAVE || status === REJECT_USE) {
+        FormUtil.enableButtons(buttons, ['init', 'requestApproveUse', 'update', 'delete']);
+        FormUtil.disableButtons(buttons, ['save', 'requestApproveCancelUse']);
+      } else if (
+        status === REQUEST_USE ||
+        status === REQUEST_CANCEL_USE ||
+        status === APPROVE_USE_CANCEL
+      ) {
         FormUtil.enableButtons(buttons, ['init']);
-      }
-      if (status === REJECT_USE || status === REJECT_CANCEL_USE) {
-        FormUtil.disableButtons(buttons, ['save']);
-        FormUtil.enableButtons(buttons, [
-          'requestApproveUse',
-          'update',
-          'delete',
-          'requestApproveCancelUse',
-        ]);
-      }
-      if (status === APPROVE_USE || status === APPROVE_USE_CANCEL) {
         FormUtil.disableButtons(buttons, [
-          'save',
+          ,
           'requestApproveUse',
           'update',
           'delete',
+          'save',
           'requestApproveCancelUse',
         ]);
-        FormUtil.enableButtons(buttons, ['init']);
+      } else if (status === APPROVE_USE || status === REJECT_CANCEL_USE) {
+        FormUtil.enableButtons(buttons, ['init', 'requestApproveCancelUse']);
+        FormUtil.disableButtons(buttons, [, 'requestApproveUse', 'update', 'delete', 'save']);
       }
     },
     showModal(name) {

@@ -39,7 +39,9 @@ export default {
     FileAttacherModal,
     ResultHistoryModal,
   },
-  mounted() {},
+  mounted() {
+    this.getMonitorTestResultCancel();
+  },
   data() {
     const { list, itemList } = this.$copy(values);
     return {

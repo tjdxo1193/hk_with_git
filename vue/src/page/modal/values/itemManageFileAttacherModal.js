@@ -9,10 +9,11 @@ const list = {
     height: '150px',
     buttons: [{ name: 'search', label: '조회' }],
   },
-  forms: () => FormBuilder.builder().Input('ctId', 'CT성적서 ID').Input('matnr', 'ERP-LAB NO').build(),
+  forms: () =>
+    FormBuilder.builder().Input('ctId', 'CT성적서 ID').Input('matnr', 'ERP-LAB NO').build(),
   columns: () =>
     ColumnBuilder.builder()
-      .col('ctId', "CT성적서 ID")
+      .col('ctId', 'CT성적서 ID')
       .col('ctSeq', false)
       .col('matnr', 'ERP-LAB NO')
       .col('fileName', '파일명')

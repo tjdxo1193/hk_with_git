@@ -98,10 +98,17 @@ public class ELNServiceImpl implements ELNService {
     }
 
     @Override
-    public void publishTestMethodByItem(ELNCmdType cmdType, List<ELNSendVO.TestMethodByItem> ids) {
-        String idsForInClause = ids.stream().map(ELNSendVO.TestMethodByItem::getAmitmCd).filter(Objects::nonNull).collect(Collectors.joining("', '"));
+    public void publishTestMethodByItem(List<ELNSendVO.TestMethodByItem> items) {
+        String idsForInClause = items.stream().map(ELNSendVO.TestMethodByItem::getAmitmCd).filter(Objects::nonNull).collect(Collectors.joining("', '"));
+        Map<String, ELNCmdType> cmdTypeMap = items.stream().collect(Collectors.toMap(ELNSendVO.TestMethodByItem::getAmitmCd, ELNSendVO.TestMethodByItem::getCmdType, (oldValue, newValue) -> oldValue));
+
         List<ELNSendVO.TestMethodByItem> data = elnDao.findTestMethodByItemIds("'" + idsForInClause + "'");
-        data.forEach(item -> item.setCmdType(cmdType));
+        data.forEach(el -> {
+            if (!cmdTypeMap.containsKey(el.getAmitmCd())) {
+                throw new RuntimeException("No exists create or delete type in test method by item list for ELN interface.");
+            }
+            el.setCmdType(cmdTypeMap.get(el.getAmitmCd()));
+        });
 
         trsService.executeAsync(
                 TrsInterface.ELN_METHOD_BY_ITEM,

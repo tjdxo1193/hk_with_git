@@ -177,7 +177,7 @@ export default {
       }
       if (name === 'collection') {
         const item = FormUtil.getData(this.testCollectionInfo.forms);
-        if(item.smpVolAns === null || item.smpVolAns === '' || item.smpVolAns === '0'){
+        if (item.smpVolAns === null || item.smpVolAns === '' || item.smpVolAns === '0') {
           return this.$warn(this.$message.validate.requireTestSample);
         }
         return this.showModal('requestApproverModal');

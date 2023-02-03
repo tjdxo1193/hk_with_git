@@ -1,5 +1,5 @@
 import api from '@/api';
-import { ColumnBuilder, FormBuilder } from '@/util';
+import {ColumnBuilder, FormBuilder} from '@/util';
 
 const codeWithSearchGrid = {
   forms: () =>
@@ -86,7 +86,7 @@ const searchGridWithForm = {
       .col('sapPrdha', { visible: false })
       .col('ansDurDay', { visible: false })
       .col('crgDptCd', { visible: false })
-      .col('stdSpcmNo', { visible: false })
+      .col('spcmNo', { visible: false })
       .col('micYn', { visible: false })
       .col('clltMtd', { visible: false })
       .col('clltMcn', { visible: false })
@@ -94,7 +94,7 @@ const searchGridWithForm = {
       .col('smpStrgMtd', { visible: false })
       .col('smpVolUnit', { visible: false })
       .col('smpVolAns', { visible: false })
-      .col('smpvolEtc', { visible: false })
+      .col('smpVolEtc', { visible: false })
       .col('smpVolStrg', { visible: false })
       .col('mtrTyp', { visible: false })
       .col('mtrMrp', { visible: false })
@@ -169,7 +169,7 @@ const itemVersionGrid = {
       .col('sapPrdha', { visible: false })
       .col('ansDurDay', { visible: false })
       .col('crgDptCd', { visible: false })
-      .col('stdSpcmNo', { visible: false })
+      .col('spcmNo', { visible: false })
       .col('micYn', { visible: false })
       .col('clltMtd', { visible: false })
       .col('clltMcn', { visible: false })
@@ -177,7 +177,7 @@ const itemVersionGrid = {
       .col('smpStrgMtd', { visible: false })
       .col('smpVolUnit', { visible: false })
       .col('smpVolAns', { visible: false })
-      .col('smpvolEtc', { visible: false })
+      .col('smpVolEtc', { visible: false })
       .col('smpVolStrg', { visible: false })
       .col('mtrTyp', { visible: false })
       .col('mtrMrp', { visible: false })
@@ -365,7 +365,7 @@ const sampleInfoForm = {
   },
   forms: () =>
     FormBuilder.builder()
-      .Input('stdspcmNo', '표준견본번호')
+      .Input('spcmNo', '표준견본번호')
       .InputNumber('ansDurDay', '시험소요일수')
       .Select('clltMtd', '검체채취방법', {
         async: () => api.combo.userCommon.getClltMtdCombo(),
@@ -380,7 +380,7 @@ const sampleInfoForm = {
         async: () => api.combo.userCommon.getSmpStrgMtdCombo(),
       })
       .InputNumber('smpVolAns', '검체량시험')
-      .InputNumber('smpvolEtc', '검체량기타')
+      .InputNumber('smpVolEtc', '검체량기타')
       .InputNumber('smpVolStrg', '검체량보관')
       .build(),
 };

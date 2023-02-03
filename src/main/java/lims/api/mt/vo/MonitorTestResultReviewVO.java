@@ -89,8 +89,8 @@ public class MonitorTestResultReviewVO implements UpdateDetect {
     private String userId;
     private String rea; //사유
 
-    private List<String> formReqDt; //의뢰일
-    private List<String> formAssDt; //지시일
+    private List<String> searchReqDt; //의뢰일
+    private List<String> searchAssDt; //지시일
 
     /*승인정보*/
     private ApproveVO approveInfo;

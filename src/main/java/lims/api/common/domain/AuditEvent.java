@@ -191,6 +191,7 @@ public interface AuditEvent {
         String requestReview = "검토 요청";
         String publishLabEvent = "실험실 이벤트 발행";
         String reviewRejection = "결과검토 반려";
+        String resultInputHold = "결과입력 보류";
         String requestReviewHold = "결과검토 보류";
         String requestApproveHold = "결과승인 보류";
         String completedReview = "결과검토 완료";

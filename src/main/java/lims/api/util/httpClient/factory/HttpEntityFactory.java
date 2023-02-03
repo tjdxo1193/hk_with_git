@@ -54,7 +54,7 @@ public class HttpEntityFactory {
         try {
             json = new Gson().toJson(arg);
         } catch (Exception e) {
-            log.error("[{}] Failed convert to json. arg: {}", ThreadUtil.getCurrentMethodName(), arg.getClass().getName());
+            log.error("[{}] Failed convert to json. arg: {}, message: {}.", ThreadUtil.getCurrentMethodName(), arg.getClass().getName(), e.getMessage());
             throw new IllegalArgumentException("Failed convert parameter to json.");
         }
         return json;

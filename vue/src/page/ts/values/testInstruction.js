@@ -11,8 +11,8 @@ const list = {
     title: '조회',
     countPerRow: 4,
     buttons: [
-      { name: 'select', label: '조회' },
       { name: 'instruct', label: '지시승인' },
+      { name: 'select', label: '조회' },
     ],
     $grid: null,
     props: {
@@ -29,7 +29,7 @@ const list = {
       .Input('ansNo', '시험번호')
       .Input('lotNo', '제조번호')
       .Input('batchNo', '배치번호')
-      .DatepickerTwinWithSwitch('formReqDt', '의뢰일자', {
+      .DatepickerTwinWithSwitch('searchReqDt', '의뢰일자', {
         value: [monthAgoDate, todayDate],
       })
       .spanCol(2)

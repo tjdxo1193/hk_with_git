@@ -119,4 +119,8 @@ public class TestResultReviewVO implements UpdateDetect {
     private String aitmRmk; //시험항목 비고
     private String nonCfmRea; //부적합사유
     private String pitmSpcc; //품목 특이사항
+    private String batchNo; //배치 번호
+    private String ispReqNo; //검사 요청 번호
+    private String phsOrderNo; //구매 오더 번호
+    private String pdtOrderNo; //생산 오더 번호
 }

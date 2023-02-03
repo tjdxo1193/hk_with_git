@@ -13,16 +13,15 @@ import java.util.List;
 public interface MonitorTestResultInputDao {
     List<MonitorTestResultInputVO> getMonitorTestResultInputList(MonitorTestResultInputVO request);
     List<MonitorTestResultInputVO> getMonitorTestRst(MonitorTestResultInputVO request);
+    int getNullCount(MonitorTestResultInputVO request);
+    String getSytJdg(MonitorTestResultInputVO request);
 
     @Audit(target = MtMitmAnsProc.class, label = AuditEvent.TestInfo.resultReview)
     int requestReview(MonitorTestResultInputVO request);
     @Audit(target = MtMitmAnsRst.class, label = AuditEvent.TestInfo.resultInput)
     int updateRst(MonitorTestResultInputVO item);
-
-    int getNullCount(MonitorTestResultInputVO request);
-
     @Audit(target = MtMitmAnsRst.class, label = AuditEvent.TestInfo.inputResult)
     int updateSytJdg(MonitorTestResultInputVO request);
-
-    String getSytJdg(MonitorTestResultInputVO request);
+    @Audit(target = MtMitmAnsProc.class, label = AuditEvent.TestInfo.testHold)
+    int hold(MonitorTestResultInputVO request);
 }

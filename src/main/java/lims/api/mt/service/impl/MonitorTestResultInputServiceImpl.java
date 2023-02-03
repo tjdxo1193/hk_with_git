@@ -66,4 +66,12 @@ public class MonitorTestResultInputServiceImpl implements MonitorTestResultInput
             throw new NoUpdatedDataException();
         }
     }
+
+    @Override
+    public void hold(MonitorTestResultInputVO request) {
+        int result = dao.hold(request);
+        if (result == 0) {
+            throw new NoUpdatedDataException();
+        }
+    }
 }

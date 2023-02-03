@@ -26,6 +26,6 @@ public class ProcessSpecimenManageVO implements UpdateDetect {
     private String pitmEn;
     private String pitmTypNm;
 
-    private List<String> formEnmDt; //제정일자
-    private List<String> formExpirDt; //유효기한
+    private List<String> searchEnmDt; //제정일자
+    private List<String> searchExpirDt; //유효기한
 }

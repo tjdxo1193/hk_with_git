@@ -36,7 +36,7 @@
 </template>
 
 <script>
-import {FormUtil} from '@/util';
+import { FormUtil } from '@/util';
 
 import values from './values/testItemPerManage';
 
@@ -271,7 +271,6 @@ export default {
           this.$error(this.$message.error.createData);
         });
     },
-
   },
   computed: {
     testItemSearchButtons() {

@@ -17,8 +17,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -32,7 +32,6 @@ public class SAPController {
 
     private final InterfacePostProcessorMap postProcessorMap;
 
-    private final SAPMaterialPostProcessor sapMaterialPostProcessor;
     private final SAPTestRequestPostProcessor sapTestRequestPostProcessor;
     private final SAPInputPerformancePostProcessor sapInputPerformancePostProcessor;
 
@@ -134,25 +133,27 @@ public class SAPController {
         return ResponseEntity.ok(SAPResponse.builder().build());
     }
 
-    @Permit
-    @GetMapping("/save-material")
-    public void materialMasterTrigger() {
-        List<RevStateful> params = new ArrayList<>();
-        params.add(new RevStateful(224,716));
-        params.add(new RevStateful(223,715));
-        params.add(new RevStateful(222,714));
-        params.add(new RevStateful(221,713));
-        params.add(new RevStateful(220,712));
-
-        for (RevStateful param : params) {
-            sapMaterialPostProcessor.execute(param);
-        }
-    }
 
     @Permit
     @PostMapping("devTest/bom")
     public void devTestBOM(@RequestBody RevStateful rev) {
         postProcessorMap.get(RevInterface.SAP_BOM).execute(rev);
+    }
+
+    @Permit
+    @PostMapping("devTest/material")
+    public void devTestMaterial(@RequestBody Map<String, Integer> param) {
+        int begin = param.get("begin");
+        int end = param.get("end");
+        for (int i=begin; i <= end; i++) {
+            postProcessorMap.get(RevInterface.SAP_MATERIAL).execute(new RevStateful(i, null));
+        }
+    }
+
+    @Permit
+    @PostMapping("devTest/calendar")
+    public void devTestCalendar(@RequestBody RevStateful rev) {
+        postProcessorMap.get(RevInterface.SAP_CALENDAR).execute(rev);
     }
 
     @Permit

@@ -54,7 +54,8 @@
             (SELECT DPT_NM FROM SY_DPT WHERE DPT_CD = F.CRG_DPT_CD AND PLNT_CD = F.PLNT_CD) AS CRG_DPT_NM,
             A.SYT_JDG,
             B.NON_CFM_REA,
-            B.PITM_SPCC
+            B.PITM_SPCC,
+            G.ISP_REQ_NO
         FROM QT_PITM_ANS_PROC A
         JOIN QT_PITM_ANS_INFO B ON A.PLNT_CD = B.PLNT_CD AND A.ANS_IDX = B.ANS_IDX
         JOIN QM_PITM_SPEC D ON A.PLNT_CD = D.PLNT_CD AND A.PITM_SPEC_IDX = D.PITM_SPEC_IDX
@@ -366,6 +367,18 @@
         UPDATE QT_PITM_ANS_RST SET
             RST_FILE_IDX = #{fileIdx}
         WHERE ANS_IDX = #{ansIdx} AND RST_SEQ = #{rstSeq} AND PLNT_CD = #{plntCd}
+    </update>
+
+    <update id="requestHold" parameterType="TestResultInputVO">
+        UPDATE QT_PITM_ANS_PROC SET
+            HLD_YN = 'Y',
+            HLD_DS = SYSDATE,
+            HLD_UID = #{hldUid},
+            HLD_REA = #{hldRea},
+            HLD_CANL_DS = NULL,
+            HLD_CANL_UID = NULL,
+            HLD_CANL_REA = NULL
+        WHERE PLNT_CD = #{plntCd} AND ANS_IDX = #{ansIdx}
     </update>
 
 </mapper>

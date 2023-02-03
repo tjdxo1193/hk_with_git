@@ -32,11 +32,11 @@ const list = {
       .Select('pkgMtrDiv', '포장재구분', {
         async: () => api.combo.systemCommon.getPkgMtrDivCombo(),
       })
-      .DatepickerTwinWithSwitch('formEnmDt', '제정일자', {
+      .DatepickerTwinWithSwitch('searchEnmDt', '제정일자', {
         value: [monthAgoDate, todayDate],
       })
       .spanCol(2)
-      .DatepickerTwinWithSwitch('formExpirDt', '유효기한', {
+      .DatepickerTwinWithSwitch('searchExpirDt', '유효기한', {
         value: [monthAgoDate, todayDate],
       })
       .spanCol(2)

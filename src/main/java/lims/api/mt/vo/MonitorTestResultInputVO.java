@@ -93,7 +93,10 @@ public class MonitorTestResultInputVO implements UpdateDetect {
     private String aprReqDiv; //검토구분
     private String aprUid; //검토자
 
-    private List<String> formReqDt; //의뢰일
-    private List<String> formAssDt; //지시일
+    private List<String> searchReqDt; //의뢰일
+    private List<String> searchAssDt; //지시일
     private List<MonitorTestResultInputVO> editedRowItems;
+
+    private String userId; //사용자
+    private String rea; //사유
 }

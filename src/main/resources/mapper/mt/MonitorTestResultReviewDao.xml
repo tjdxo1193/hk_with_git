@@ -48,11 +48,11 @@
         <if test="upperMitmPitmDiv != null and upperMitmPitmDiv != ''">
             AND (SELECT HIR_TREE_CD FROM SY_CD_TREE WHERE TREE_CD = MM.MITM_PITM_DIV) = #{upperMitmPitmDiv}
         </if>
-        <if test="formReqDt != null and formReqDt != ''">
-            AND MMAP.REQ_DT BETWEEN #{formReqDt[0]} AND #{formReqDt[1]}
+        <if test="searchReqDt != null and searchReqDt != ''">
+            AND MMAP.REQ_DT BETWEEN #{searchReqDt[0]} AND #{searchReqDt[1]}
         </if>
-        <if test="formAssDt != null and formAssDt != ''">
-            AND MMAP.ASS_DT BETWEEN #{formAssDt[0]} AND #{formAssDt[1]}
+        <if test="searchAssDt != null and searchAssDt != ''">
+            AND MMAP.ASS_DT BETWEEN #{searchAssDt[0]} AND #{searchAssDt[1]}
         </if>
     </select>
 

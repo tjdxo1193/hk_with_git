@@ -49,11 +49,11 @@ public class SAPMaterialPostProcessor implements PostProcessor {
         List<SAPMaterialVO.Mara> maras = sapDao.findMaraAllByDegree(degree);
         count += new SimpleSaveProcess<SAPMaterialVO.Mara>().forEachSave(
                 maras,
-                masterDao.findMaterialMara(maras),
+                masterDao.findMaterialMara(degree),
                 masterDao::createMaterialMara,
                 masterDao::updateMaterialMara,
                 (mara, existsMara) -> {
-                    if (!StringUtils.equals(mara.getZlabno(), existsMara.getZlabno())) {
+                    if (existsMara != null && !StringUtils.equals(mara.getZlabno(), existsMara.getZlabno())) {
                         mara.markingChangeLabNo();
                     }
                     differentVO.getMara().add(mara);
@@ -63,7 +63,7 @@ public class SAPMaterialPostProcessor implements PostProcessor {
         List<SAPMaterialVO.Marc> marcs = sapDao.findMarcAllByDegree(degree);
         count += new SimpleSaveProcess<SAPMaterialVO.Marc>().forEachSave(
                 marcs,
-                masterDao.findMaterialMarc(marcs),
+                masterDao.findMaterialMarc(degree),
                 masterDao::createMaterialMarc,
                 masterDao::updateMaterialMarc,
                 (marc, existsMara) -> differentVO.getMarc().add(marc)
@@ -72,7 +72,7 @@ public class SAPMaterialPostProcessor implements PostProcessor {
         List<SAPMaterialVO.Mvke> mvkes = sapDao.findMvkeAllByDegree(degree);
         count += new SimpleSaveProcess<SAPMaterialVO.Mvke>().forEachSave(
                 mvkes,
-                masterDao.findMaterialMvke(mvkes),
+                masterDao.findMaterialMvke(degree),
                 masterDao::createMaterialMvke,
                 masterDao::updateMaterialMvke,
                 (mvke, existsMvke) -> differentVO.getMvke().add(mvke)
@@ -81,7 +81,7 @@ public class SAPMaterialPostProcessor implements PostProcessor {
         List<SAPMaterialVO.Zmdv> zmdvs = sapDao.findZmdvAllByDegree(degree);
         count += new SimpleSaveProcess<SAPMaterialVO.Zmdv>().forEachSave(
                 zmdvs,
-                masterDao.findMaterialZmdv(zmdvs),
+                masterDao.findMaterialZmdv(degree),
                 masterDao::createMaterialZmdv,
                 masterDao::updateMaterialZmdv,
                 (zmdv, existsZmdv) -> differentVO.getZmdv().add(zmdv)
@@ -90,7 +90,7 @@ public class SAPMaterialPostProcessor implements PostProcessor {
         List<SAPMaterialVO.Makt> makts = sapDao.findMaktAllByDegree(degree);
         count += new SimpleSaveProcess<SAPMaterialVO.Makt>().forEachSave(
                 makts,
-                masterDao.findMaterialMakt(makts),
+                masterDao.findMaterialMakt(degree),
                 masterDao::createMaterialMakt,
                 masterDao::updateMaterialMakt,
                 (makt, existsMakt) -> differentVO.getMakt().add(makt)
@@ -142,7 +142,7 @@ public class SAPMaterialPostProcessor implements PostProcessor {
         for (SAPPostProcessVO.Material.PItemKey pitemKey : pitemKeys) {
             material = materialMap.get(pitemKey.getPitmCd());
 
-            diffMaterial = getDiffMaterial(differentVO, pitemKey);
+            diffMaterial = getDiffMaterial(latestMara, pitemKey);
             material.setChangedLabNo(diffMaterial.isChangedLabNo());
 
             matchedMarc = getMarcByPItemKey(latestMarc, pitemKey);
@@ -216,8 +216,8 @@ public class SAPMaterialPostProcessor implements PostProcessor {
         }
     }
 
-    private SAPMaterialVO.Mara getDiffMaterial(SAPMaterialVO differentVO, SAPPostProcessVO.Material.PItemKey pitemKey) {
-        return differentVO.getMara().stream()
+    private SAPMaterialVO.Mara getDiffMaterial(List<SAPMaterialVO.Mara> materials, SAPPostProcessVO.Material.PItemKey pitemKey) {
+        return materials.stream()
                 .filter(mara -> mara.getMatnr().equals(pitemKey.getPitmCd()))
                 .findAny()
                 .orElseThrow(() -> {

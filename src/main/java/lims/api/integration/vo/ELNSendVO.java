@@ -18,8 +18,6 @@ public class ELNSendVO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class TestMethodByItem extends TrsStateful {
-        private Integer idx;
-        private Integer degree;
         private String amitmCd;
         private String aitmCd;
         private String aitmKn;

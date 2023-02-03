@@ -38,6 +38,7 @@ export default {
         buttons: searchForm.static.buttons,
         event: {
           cellDoubleClick: (e) => {
+            this.init();
             this.$emit('modalReturnDataEvent', e.item);
           },
         },
@@ -73,6 +74,7 @@ export default {
       }
     },
     init() {
+      this.searchForm.$grid.clearGridData();
       this.searchForm.forms = values.searchForm.forms();
     },
     close() {

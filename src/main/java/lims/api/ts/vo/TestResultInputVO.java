@@ -20,6 +20,7 @@ public class TestResultInputVO implements UpdateDetect {
     private String pitmTypNm;
     private String pitmCd;
     private String ansNo;
+    private String ispReqNo; //검사 요청 번호
     private String lotNo;
     private Integer assNo;
     private String pitmNm;
@@ -124,4 +125,7 @@ public class TestResultInputVO implements UpdateDetect {
     private String aitmRmk; //시험항목 비고
     private String nonCfmRea; //부적합사유
     private String pitmSpcc; //품목 특이사항
+    /*보류정보*/
+    private String hldUid;
+    private String hldRea;
 }

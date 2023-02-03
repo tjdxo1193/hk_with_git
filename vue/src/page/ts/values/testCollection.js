@@ -27,7 +27,7 @@ const list = {
       .Input('ansNo', '시험번호')
       .Input('lotNo', '제조번호')
       .Input('batchNo', '배치번호')
-      .DatepickerTwinWithSwitch('formReqDt', '의뢰일자', {
+      .DatepickerTwinWithSwitch('searchReqDt', '의뢰일', {
         value: [monthAgoDate, todayDate],
       })
       .spanCol(2)
@@ -170,7 +170,7 @@ const testCollectionInfo = {
         async: () => api.combo.userCommon.getSmpStrgMtdCombo(),
       })
       .Datepicker('clltDt', '검체채취일', { value: todayDate, disabled: true })
-      .RadioGroup('micYn', '미생물 유무', {
+      .RadioGroup('micYn', '미생물유무', {
         groups: [
           { label: '유', checkedValue: 'Y' },
           { label: '무', checkedValue: 'N' },

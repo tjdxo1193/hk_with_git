@@ -11,8 +11,8 @@ const list = {
     title: '조회',
     countPerRow: 4,
     buttons: [
-      { name: 'select', label: '조회' },
       { name: 'instruct', label: '지시승인' },
+      { name: 'select', label: '조회' },
     ],
     props: { editable: false, showRowCheckColumn: true },
   },
@@ -38,14 +38,14 @@ const list = {
         async: (param) => api.combo.common.getTreeCd(param),
       })
       .Input('grade', 'Grade')
-      .DatepickerTwinWithSwitch('formReqDt', '의뢰일', {
-        value: [monthAgoDate, todayDate],
-      })
-      .spanCol(2)
       .Input('point', '포인트')
       .Select('crgDptCd', '담당부서', {
         async: api.combo.common.getDpt,
       })
+      .DatepickerTwinWithSwitch('searchReqDt', '의뢰일', {
+        value: [monthAgoDate, todayDate],
+      })
+      .spanCol(2)
       .build(),
   columns: () =>
     ColumnBuilder.builder()
