@@ -329,7 +329,6 @@ export default {
     },
 
     setDataToItemVersionForms(item) {
-      item.micYn = item.micYn == 'Y';
       FormUtil.setData(this.commonInfoForm.forms, item);
       FormUtil.setData(this.materialInfoForm.forms, item);
       FormUtil.setData(this.sampleInfoForm.forms, item);
@@ -343,7 +342,6 @@ export default {
         ...commonData,
         ...materialData,
         ...sampleData,
-        micYn: commonData.micYn ? 'Y' : 'N',
       };
       return param;
     },

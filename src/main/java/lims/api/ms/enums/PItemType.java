@@ -35,4 +35,13 @@ public enum PItemType {
         );
     }
 
+    public static Set<String> getCodesElnPItemType() {
+        return Set.of(
+                SEMI_MANUFACTURES_BASE.getCode(),
+                SEMI_MANUFACTURES_BULK.getCode(),
+                SEMI_MANUFACTURES_FILLING_FOAM.getCode(),
+                SEMI_MANUFACTURES_OTHER_PRODUCT.getCode()
+        );
+    }
+
 }

@@ -32,4 +32,6 @@ public interface SpecManageService {
     List<SpecManageAitmVO> getAItemListToModal(SpecManageVO param);
 
     List<SpecManagePitmVO> getPackagingItemListToModal(SpecManageVO param);
+
+    List<SpecManagePitmVO> getSemiPItemListToModal(SpecManageVO param);
 }

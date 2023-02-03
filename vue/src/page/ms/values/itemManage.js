@@ -237,7 +237,12 @@ const commonInfoForm = {
       .Select('crgDptCd', '담당부서', { async: () => api.combo.common.getdptByLevel(2) })
       .required()
       .Hidden('pitmVer', { value: 1 })
-      .Checkbox('micYn', '미생물유무')
+      .RadioGroup('micYn', '미생물유무', {
+        groups: [
+          { label: '유', checkedValue: 'Y' },
+          { label: '무', checkedValue: 'N' },
+        ],
+      })
       .readonly()
       .blank()
       .blank()

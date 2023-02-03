@@ -15,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -129,11 +128,8 @@ public class SpecManageServiceImpl implements SpecManageService {
 
     @Override
     public List<SpecManagePitmVO> getPItemSpecListToModal(SpecManageVO param) {
-//        param.setSpecProcCd(SpecProgress.APPROVED.getCode());
+        param.setSpecProcCd(SpecProgress.APPROVED.getCode());
         param.setQpSpecProcCd(SpecProgress.APPROVED.getCode());
-        Set<String> codes = PItemType.getCodesRelatedToSpec();
-        String pItemTypeInClauseCondition = "'" +String.join("','", codes) + "'";
-        param.setPitmTypList(pItemTypeInClauseCondition);
         return dao.getPItemSpecListToModal(param);
     }
 
@@ -146,6 +142,11 @@ public class SpecManageServiceImpl implements SpecManageService {
     public List<SpecManagePitmVO> getPackagingItemListToModal(SpecManageVO param) {
         param.setQpSpecProcCd(SpecProgress.APPROVED.getCode());
         return dao.getPackagingItemListToModal(param);
+    }
+
+    @Override
+    public List<SpecManagePitmVO> getSemiPItemListToModal(SpecManageVO param) {
+        return dao.getSemiPItemListToModal(param);
     }
 
     public int createAitmSpec(SpecManageVO param){

@@ -70,12 +70,11 @@ export default {
   methods: {
     async fetchPItemSpecList() {
       const { $grid, forms } = this.pItemSpecList;
-      const processApproveCode = 'S0080400';
       const parameter = FormUtil.getData(forms);
       const data = await $grid
         ._useLoader(() => this.$axios.get('ms/specManage/pItemSpecListToModal', parameter))
         .then(({ data }) => data);
-      $grid.setGridData(data.filter((row) => row.specProcCd == processApproveCode));
+      $grid.setGridData(data);
     },
     async fetchAItemList({ aitmSpecIdx }) {
       const { $grid } = this.aItemList;

@@ -24,7 +24,7 @@ export default {
   props: {
     title: {
       type: String,
-      default: '시험항목목록 복사',
+      default: 'ELN규격 복사',
     },
     width: {
       type: String,
@@ -74,18 +74,16 @@ export default {
   methods: {
     async fetchPItemSpecList() {
       const { $grid, forms } = this.pItemSpecList;
-      const processApproveCode = 'S0080400';
-      const parameter = FormUtil.getData(forms);
       const data = await $grid
-        ._useLoader(() => this.$axios.get('ms/specManage/pItemSpecListToModal', parameter))
+        ._useLoader(() => this.$axios.get('ms/specManage/getSemiPItemListToModal'))
         .then(({ data }) => data);
-      $grid.setGridData(data.filter((row) => row.specProcCd == processApproveCode));
+      $grid.setGridData(data);
     },
-    async fetchAItemList({ aitmSpecIdx }) {
+    async fetchAItemList({labNo, prdDiv}) {
       const { $grid } = this.aItemList;
-      const parameter = { aitmSpecIdx };
+      const parameter = {labNo, prdDiv}
       const data = await $grid
-        ._useLoader(() => this.$axios.get('ms/specManage/aItemListToModal', parameter))
+        ._useLoader(() => this.$axios.get('ms/specManage/semiAItem', parameter))
         .then(({ data }) => data);
       $grid.setGridData(data);
     },

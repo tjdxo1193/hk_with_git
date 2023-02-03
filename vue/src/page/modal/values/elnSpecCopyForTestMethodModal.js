@@ -37,20 +37,10 @@ const pItemSpecList = {
       .build(),
   columns: () =>
     ColumnBuilder.builder()
-      .col('plntCd', '공장코드', false)
-      .col('aitmSpecIdx', '시험항목규격IDX', false)
-      .col('pitmCd', '품목코드')
-      .col('pitmTyp', '품목유형코드', false)
-      .col('pitmTypNm', '품목유형')
-      .col('pitmNm', '품목명')
-      .col('pitmEn', '품목영문명')
-      .col('pitmVer', '품목버전')
-      .col('crgDptNm', '담당부서')
-      .col('crgDptCd', '담당부서코드', false)
-      .col('specProcCd', '진행상태', false)
-      .col('specProcNm', '진행상태')
-      .col('qpSpecProcCd', '품목진행상태코드', false)
-      .col('qpSpecProcNm', '품목진행상태')
+      .col('plntCd', '공장코드')
+      .col('labNo', 'LAB NO')
+      .col('prdDiv', '반제품구분')
+      .col('ifDt', '연계일시')
       .build(),
 };
 
@@ -60,7 +50,7 @@ const aItemList = {
     $grid: null,
     props: {
       editable: false,
-      showRowCheckColumn: false,
+      showRowCheckColumn: true,
     },
   },
   columns: () =>

@@ -1,7 +1,6 @@
 package lims.api.ms.dao;
 
 import lims.api.common.domain.AuditEvent;
-import lims.api.common.vo.ComboVO;
 import lims.api.ms.entity.QmPitmAitmSpec;
 import lims.api.ms.entity.QmPitmSpec;
 import lims.api.ms.entity.QmPitmSpecAitm;
@@ -59,4 +58,6 @@ public interface SpecManageDao {
     List<SpecManageAitmVO> getSemiAItemList(SpecManageVO param);
 
     List<SpecManagePitmVO> getPackagingItemListToModal(SpecManageVO param);
+
+    List<SpecManagePitmVO> getSemiPItemListToModal(SpecManageVO param);
 }

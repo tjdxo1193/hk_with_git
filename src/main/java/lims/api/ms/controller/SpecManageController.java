@@ -23,40 +23,40 @@ public class SpecManageController {
     private final JwtResolver jwtResolver;
 
     @GetMapping("/pItem")
-    public ResponseEntity<List<SpecManagePitmVO>> getPItemList(@AuthToken Token token, SpecManageVO param){
+    public ResponseEntity<List<SpecManagePitmVO>> getPItemList(@AuthToken Token token, SpecManageVO param) {
         String jwt = token.getJwt();
         param.setPlntCd(jwtResolver.getPlantCode(jwt));
         return ResponseEntity.ok(service.getPItemList(param));
     }
 
     @GetMapping("/version")
-    public ResponseEntity<List<SpecManageVO>> getVersionList(@AuthToken Token token, SpecManageVO param){
+    public ResponseEntity<List<SpecManageVO>> getVersionList(@AuthToken Token token, SpecManageVO param) {
         String jwt = token.getJwt();
         param.setPlntCd(jwtResolver.getPlantCode(jwt));
         return ResponseEntity.ok(service.getVersionList(param));
     }
 
     @GetMapping("/aItem")
-    public ResponseEntity<List<SpecManageAitmVO>> getAItemList(@AuthToken Token token, SpecManageVO param){
+    public ResponseEntity<List<SpecManageAitmVO>> getAItemList(@AuthToken Token token, SpecManageVO param) {
         String jwt = token.getJwt();
         param.setPlntCd(jwtResolver.getPlantCode(jwt));
         return ResponseEntity.ok(service.getAItemList(param));
     }
 
     @GetMapping("/semiAItem")
-    public ResponseEntity<List<SpecManageAitmVO>> getSemiAItemList(@AuthToken Token token, SpecManageVO param){
+    public ResponseEntity<List<SpecManageAitmVO>> getSemiAItemList(@AuthToken Token token, SpecManageVO param) {
         String jwt = token.getJwt();
         param.setPlntCd(jwtResolver.getPlantCode(jwt));
         return ResponseEntity.ok(service.getSemiAItemList(param));
     }
 
     @GetMapping("/itemsByTestMethodModal")
-    public ResponseEntity<List<SpecManageVO>> getItemMethodList(SpecManageVO param){
+    public ResponseEntity<List<SpecManageVO>> getItemMethodList(SpecManageVO param) {
         return ResponseEntity.ok(service.getItemMethodList(param));
     }
 
     @PostMapping("/updateVersion")
-    public ResponseEntity<CommonResponse> updateVersion(@AuthToken Token token, @RequestBody SpecManageVO param){
+    public ResponseEntity<CommonResponse> updateVersion(@AuthToken Token token, @RequestBody SpecManageVO param) {
         String jwt = token.getJwt();
         param.setPlntCd(jwtResolver.getPlantCode(jwt));
         service.updateVersion(param);
@@ -64,7 +64,7 @@ public class SpecManageController {
     }
 
     @PostMapping("/aItem")
-    public ResponseEntity<CommonResponse> createAItem(@AuthToken Token token, @RequestBody SpecManageVO param){
+    public ResponseEntity<CommonResponse> createAItem(@AuthToken Token token, @RequestBody SpecManageVO param) {
         String jwt = token.getJwt();
         param.setPlntCd(jwtResolver.getPlantCode(jwt));
         service.makeAItem(param);
@@ -72,7 +72,7 @@ public class SpecManageController {
     }
 
     @PutMapping("/requestReview")
-    public ResponseEntity<CommonResponse> updateRequestReview(@AuthToken Token token, @RequestBody SpecManageVO param){
+    public ResponseEntity<CommonResponse> updateRequestReview(@AuthToken Token token, @RequestBody SpecManageVO param) {
         String jwt = token.getJwt();
         param.setPlntCd(jwtResolver.getPlantCode(jwt));
 
@@ -82,31 +82,37 @@ public class SpecManageController {
     }
 
     @GetMapping("/departmentList")
-    public ResponseEntity<List<SpecManageDptVO>> getDepartmentList(@AuthToken Token token, SpecManageVO param){
+    public ResponseEntity<List<SpecManageDptVO>> getDepartmentList(@AuthToken Token token, SpecManageVO param) {
         String jwt = token.getJwt();
         param.setPlntCd(jwtResolver.getPlantCode(jwt));
         return ResponseEntity.ok(service.getDepartmentList(param));
     }
 
     @GetMapping("/pItemSpecListToModal")
-    public ResponseEntity<List<SpecManagePitmVO>> getPItemSpecListToModal(@AuthToken Token token, SpecManageVO param){
+    public ResponseEntity<List<SpecManagePitmVO>> getPItemSpecListToModal(@AuthToken Token token, SpecManageVO param) {
         String jwt = token.getJwt();
         param.setPlntCd(jwtResolver.getPlantCode(jwt));
         return ResponseEntity.ok(service.getPItemSpecListToModal(param));
     }
 
     @GetMapping("/aItemListToModal")
-    public ResponseEntity<List<SpecManageAitmVO>> getAItemListToModal(@AuthToken Token token, SpecManageVO param){
+    public ResponseEntity<List<SpecManageAitmVO>> getAItemListToModal(@AuthToken Token token, SpecManageVO param) {
         String jwt = token.getJwt();
         param.setPlntCd(jwtResolver.getPlantCode(jwt));
         return ResponseEntity.ok(service.getAItemListToModal(param));
     }
 
     @GetMapping("/getPackagingItemListToModal")
-    public ResponseEntity<List<SpecManagePitmVO>> getPackagingItemListToModal(@AuthToken Token token, SpecManageVO param){
+    public ResponseEntity<List<SpecManagePitmVO>> getPackagingItemListToModal(@AuthToken Token token, SpecManageVO param) {
         String jwt = token.getJwt();
         param.setPlntCd(jwtResolver.getPlantCode(jwt));
         return ResponseEntity.ok(service.getPackagingItemListToModal(param));
     }
 
+    @GetMapping("/getSemiPItemListToModal")
+    public ResponseEntity<List<SpecManagePitmVO>> getSemiPItemListToModal(@AuthToken Token token, SpecManageVO param){
+        String jwt = token.getJwt();
+        param.setPlntCd(jwtResolver.getPlantCode(jwt));
+        return ResponseEntity.ok(service.getSemiPItemListToModal(param));
+    }
 }
