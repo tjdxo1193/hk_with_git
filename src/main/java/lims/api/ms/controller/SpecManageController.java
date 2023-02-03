@@ -110,9 +110,16 @@ public class SpecManageController {
     }
 
     @GetMapping("/getSemiPItemListToModal")
-    public ResponseEntity<List<SpecManagePitmVO>> getSemiPItemListToModal(@AuthToken Token token, SpecManageVO param){
+    public ResponseEntity<List<SpecManageVO>> getSemiPItemListToModal(@AuthToken Token token, SpecManageVO param) {
         String jwt = token.getJwt();
         param.setPlntCd(jwtResolver.getPlantCode(jwt));
         return ResponseEntity.ok(service.getSemiPItemListToModal(param));
+    }
+
+    @GetMapping("/getSemiAItemListToModal")
+    public ResponseEntity<List<SpecManageAitmVO>> getSemiAItemListToModal(@AuthToken Token token, SpecManageVO param) {
+        String jwt = token.getJwt();
+        param.setPlntCd(jwtResolver.getPlantCode(jwt));
+        return ResponseEntity.ok(service.getSemiAItemListToModal(param));
     }
 }

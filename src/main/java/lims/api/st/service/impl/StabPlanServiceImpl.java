@@ -2,14 +2,10 @@ package lims.api.st.service.impl;
 
 import lims.api.common.service.ApproveService;
 import lims.api.common.vo.ApproveVO;
-import lims.api.ms.enums.ApproveRequestDivType;
 import lims.api.ms.enums.CycleDivision;
 import lims.api.ms.enums.SpecProgress;
 import lims.api.st.dao.StabPlanDao;
-import lims.api.st.enums.AnsKndCode;
-import lims.api.st.enums.SbtAnsProcess;
-import lims.api.st.enums.SbtAnsSttProcess;
-import lims.api.st.enums.SbtPlnSttProcess;
+import lims.api.st.enums.*;
 import lims.api.st.service.StabPlanService;
 import lims.api.st.vo.StabPlanVO;
 import lims.api.ts.enums.TestProcess;
@@ -403,7 +399,7 @@ public class StabPlanServiceImpl implements StabPlanService {
         approveInfo.setPlntCd(param.getPlntCd());
         approveInfo.setAprReqUid(param.getLoginUserUid());
 //        approveInfo.setAprReqDiv(param.getSbtAnsProc());
-        approveInfo.setAprReqDiv(ApproveRequestDivType.STAB_PLAN_VERSION.getCode());
+        approveInfo.setAprReqDiv(ApproveRequestStDivType.STAB_PLAN_VERSION.getCode());
         if(param.getAprUid() != null) {
             approveInfo.setAprUid(param.getAprUid());
         }

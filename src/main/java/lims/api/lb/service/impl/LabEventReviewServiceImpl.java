@@ -3,9 +3,9 @@ package lims.api.lb.service.impl;
 import lims.api.common.service.ApproveService;
 import lims.api.common.vo.ApproveVO;
 import lims.api.lb.dao.LabEventReviewDao;
+import lims.api.lb.enums.ApproveRequestLbDivType;
 import lims.api.lb.service.LabEventReviewService;
 import lims.api.lb.vo.LabEventReviewVO;
-import lims.api.ms.enums.ApproveRequestDivType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -50,7 +50,7 @@ public class LabEventReviewServiceImpl implements LabEventReviewService {
     public int createApprove(LabEventReviewVO param) {
         ApproveVO approveVO = new ApproveVO();
         approveVO.setPlntCd(param.getPlntCd());
-        approveVO.setAprReqDiv(ApproveRequestDivType.LAB_EVENT_SPEC_VERSION.getCode());
+        approveVO.setAprReqDiv(ApproveRequestLbDivType.LAB_EVENT_SPEC_VERSION.getCode());
         approveVO.setAprReqUid(param.getAnsUid());
         approveVO.setAprReqIp(param.getLoginUserIp());
         approveVO.setAprUid(param.getLoginUserUid());
@@ -62,7 +62,7 @@ public class LabEventReviewServiceImpl implements LabEventReviewService {
 
     public int requestApprove(LabEventReviewVO param) {
         param.getApproveInfo().setAprIdx(param.getLabEvtAprIdx());
-        param.getApproveInfo().setAprReqDiv(ApproveRequestDivType.LAB_EVENT_SPEC_VERSION.getCode());
+        param.getApproveInfo().setAprReqDiv(ApproveRequestLbDivType.LAB_EVENT_SPEC_VERSION.getCode());
         return approveService.requestApprove(param.getApproveInfo());
     }
 }

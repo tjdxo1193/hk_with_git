@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 
 import api from '@/api';
-import { ColumnBuilder, FormBuilder } from '@/util/builder';
+import {ColumnBuilder, FormBuilder} from '@/util/builder';
 
 const todayDate = dayjs().format('YYYY-MM-DD');
 const monthAgoDate = dayjs().add(-1, 'M').format('YYYY-MM-DD');
@@ -22,7 +22,6 @@ const pItemSpecList = {
     countPerRow: 3,
     buttons: [
       { name: 'search', label: '조회' },
-      { name: 'select', label: '선택' },
     ],
   },
   forms: () =>
@@ -30,7 +29,7 @@ const pItemSpecList = {
       .Input('labNo', 'LAB NO')
       .required()
       .Select('prdDiv', '반완제품구분', {
-        list: prdDivList,
+        elements: prdDivList,
       })
       .required()
       .DatepickerTwin('ifDt', '연계일시', { value: [monthAgoDate, todayDate] })
@@ -52,16 +51,16 @@ const aItemList = {
       editable: false,
       showRowCheckColumn: true,
     },
+    buttons: [
+      { name: 'select', label: '선택' },
+    ],
   },
   columns: () =>
     ColumnBuilder.builder()
       .col('plntCd', '사업장코드', false)
       .col('aitmSpecIdx', '시험항목규격IDX', false)
       .col('aitmSeq', '시험항목순번', false)
-      .combo('ansDptCd', '시험파트', {
-        async: api.combo.common.getDpt,
-        width: 150,
-      })
+      .col('ansDptCd', '시험파트', false)
       .col('aitmKn', '시험항목명', {
         width: 120,
       })

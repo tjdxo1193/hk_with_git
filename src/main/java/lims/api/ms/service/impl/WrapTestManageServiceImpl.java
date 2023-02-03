@@ -4,6 +4,7 @@ import lims.api.common.exception.NoUpdatedDataException;
 import lims.api.common.service.ApproveService;
 import lims.api.common.vo.ApproveVO;
 import lims.api.ms.dao.WrapTestManageDao;
+import lims.api.ms.enums.ApproveRequestDivType;
 import lims.api.ms.enums.PItemType;
 import lims.api.ms.enums.SpecProgress;
 import lims.api.ms.service.WrapTestManageService;
@@ -241,7 +242,7 @@ public class WrapTestManageServiceImpl implements WrapTestManageService {
 		ApproveVO approveInfo = new ApproveVO();
 		approveInfo.setPlntCd(param.getPlntCd());
 		approveInfo.setAprIp(param.getAprIp());
-		approveInfo.setAprReqDiv(param.getSpecProcCd());
+		approveInfo.setAprReqDiv(ApproveRequestDivType.PACKAGING_TEST_VERSION.getCode());
 		approveInfo.setAprUid(param.getLoginUserUid());
 		approveInfo.setAprRea(param.getAprRea());
 		return approveInfo;

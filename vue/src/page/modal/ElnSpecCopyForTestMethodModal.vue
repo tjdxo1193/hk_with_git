@@ -8,6 +8,7 @@
 
     <AUIGridWithHeader
       v-bind="aItemList"
+      @button-click="onClickButton"
       @grid-created="(proxy) => $setState('aItemList.$grid', proxy)"
     />
   </ModalBase>
@@ -44,12 +45,8 @@ export default {
       if (this.$props.show) {
         this.aItemList.$grid.clearGridData();
         this.pItemSpecList.forms = values.pItemSpecList.forms();
-        this.fetchPItemSpecList();
       }
     },
-  },
-  mounted() {
-    this.fetchPItemSpecList();
   },
   data() {
     const { pItemSpecList, aItemList } = this.$copy(values);
@@ -74,20 +71,26 @@ export default {
   methods: {
     async fetchPItemSpecList() {
       const { $grid, forms } = this.pItemSpecList;
+      const formData = FormUtil.getData(forms);
+      const parameter = {labNo : formData.labNo , prdDiv : formData.prdDiv, ifDtParam: formData.ifDt};
+      
       const data = await $grid
-        ._useLoader(() => this.$axios.get('ms/specManage/getSemiPItemListToModal'))
+        ._useLoader(() => this.$axios.get('ms/specManage/getSemiPItemListToModal', parameter))
         .then(({ data }) => data);
       $grid.setGridData(data);
     },
+
     async fetchAItemList({labNo, prdDiv}) {
       const { $grid } = this.aItemList;
       const parameter = {labNo, prdDiv}
       const data = await $grid
-        ._useLoader(() => this.$axios.get('ms/specManage/semiAItem', parameter))
+        ._useLoader(() => this.$axios.get('ms/specManage/getSemiAItemListToModal', parameter))
         .then(({ data }) => data);
       $grid.setGridData(data);
     },
+
     getItems() {},
+
     onClickButton({ name }) {
       if (name === 'search') {
         this.pItemSpecList.forms.validate().then(() => {
@@ -103,7 +106,7 @@ export default {
       this.$emit('close');
     },
     selectItems() {
-      const items = this.aItemList.$grid.getGridData();
+      const items = this.aItemList.$grid.getCheckedRowItemsAll();
       this.$emit('select', items);
     },
   },

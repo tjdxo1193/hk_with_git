@@ -43,7 +43,7 @@
   <ElnSpecCopyForTestMethodModal
     :show="elnSpecCopyForTestMethodModal.show"
     @close="hideElnSpecCopyForTestMethodModal()"
-    @select="copyRowTestItem"
+    @select="copyRowElnTestItem"
   />
 </template>
 
@@ -896,6 +896,12 @@ export default {
       if (gridRowCnt != 0) {
         $grid.removeRow(Array.from(Array(gridRowCnt).keys()));
       }
+      $grid.addRow(list, 'last');
+    },
+
+    copyRowElnTestItem(list) {
+      const { $grid } = this.testItemList;
+      
       $grid.addRow(list, 'last');
     },
   },

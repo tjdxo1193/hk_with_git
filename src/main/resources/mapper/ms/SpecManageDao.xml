@@ -531,8 +531,13 @@
     </select>
 
     <select id="getSemiPItemListToModal" parameterType="specManageVO" resultType="specManageVO">
-        SELECT #{plntCd} AS PLNT_CD, LAB_NO, PRD_DIV, '' AS IF_DT
+        SELECT #{plntCd} AS PLNT_CD, LAB_NO, PRD_DIV, IF_DT
         FROM MS_ELN_SPEC
+        WHERE LAB_NO = #{labNo}
+        AND PRD_DIV = #{prdDiv}
+        <if test="ifDtParam != null and ifDtParam != '' ">
+            AND IF_DT BETWEEN #{ifDtParam[0]} AND #{ifDtParam[1]}
+        </if>
     </select>
 
     <select id="getSemiAItemListToModal" resultType="SpecManageAitmVO" parameterType="SpecManageVO">

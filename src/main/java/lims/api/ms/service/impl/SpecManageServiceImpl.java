@@ -145,8 +145,13 @@ public class SpecManageServiceImpl implements SpecManageService {
     }
 
     @Override
-    public List<SpecManagePitmVO> getSemiPItemListToModal(SpecManageVO param) {
+    public List<SpecManageVO> getSemiPItemListToModal(SpecManageVO param) {
         return dao.getSemiPItemListToModal(param);
+    }
+
+    @Override
+    public List<SpecManageAitmVO> getSemiAItemListToModal(SpecManageVO param) {
+        return dao.getSemiAItemListToModal(param);
     }
 
     public int createAitmSpec(SpecManageVO param){
