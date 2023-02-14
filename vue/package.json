@@ -55,7 +55,7 @@
     "cross-env": "^7.0.3",
     "css-loader": "^6.5.1",
     "dayjs": "^1.11.3",
-    "file-attacher": "^1.2.10",
+    "file-attacher": "^1.2.11",
     "html-webpack-plugin": "^5.5.0",
     "mini-css-extract-plugin": "^2.5.2",
     "reset-css": "^5.0.1",

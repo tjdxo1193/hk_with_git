@@ -28,7 +28,7 @@ public class MonitorTestResultCancelServiceImpl implements MonitorTestResultCanc
 
     @Override
     public void cancel(MonitorTestResultCancelVO request) {
-        request.setRstProcCd(MonitorTestProcess.MONITOR_TEST_CANCEL.getProcessCode());
+        request.setAnsProcCd(MonitorTestProcess.MONITOR_TEST_CANCEL.getProcessCode());
         int result = dao.cancel(request);
         if (result == 0) {
             throw new NoUpdatedDataException();

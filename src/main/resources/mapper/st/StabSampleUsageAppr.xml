@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.st.dao.StabSampleUsageApprDao">
+    <select id="find" parameterType="StabSampleUsageApprVO" resultType="StabSampleUsageApprVO">
+        SELECT QSU.PLNT_CD,
+               QSU.SMP_MNG_IDX,
+               QSU.USE_SEQ,
+               QSU.SMP_USE_PROC,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSU.SMP_USE_PROC)                    AS SMP_USE_NM,
+               QSU.USE_SMP_VOL,
+               QSU.USE_PPS,
+               QSU.USE_UID,
+               (SELECT USER_NM FROM SY_USER WHERE PLNT_CD = #{plntCd} AND USER_ID = QSU.USE_UID) AS USE_NM,
+               QSU.USE_DT,
+               QSU.STRG_PLA,
+               QSU.SMP_USE_APR_IDX,
+               SAI.APR_REQ_DIV,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = SAI.APR_REQ_DIV)                     AS APR_REQ_NM,
+               SAI.APR_REQ_UID,
+               SAI.APR_REQ_DS,
+               SAI.APR_REQ_IP,
+               SAI.APR_REQ_REA,
+               SAI.APR_UID,
+               SAI.APR_DS,
+               SAI.APR_IP,
+               SAI.APR_REA,
+               SAI.APR_YN,
+               QSM.PITM_CD,
+               QSM.PITM_NM,
+               QSM.PITM_TYP,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.PITM_TYP)                        AS PITM_TYP_NM,
+               QSM.LOT_NO,
+               QSM.BATCH_NO,
+               QSM.SMP_DPS_PROC,
+               QSM.IRG_YN,
+               QSM.INP_UNIT,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.SMP_DPS_PROC)                    AS SMP_DPS_NM,
+               QSM.ANS_TYP,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.ANS_TYP)                         AS ANS_TYP_NM,
+               QS.REMAINS,
+               QS.SUM_VOL,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = SAI.APR_REQ_DIV) AS APR_REQ_NM,
+               QPAP.ANS_NO
+        FROM QS_SMP_USE QSU
+                 LEFT JOIN (SELECT QSU.PLNT_CD,
+                                   QSU.SMP_MNG_IDX,
+                                   QSM.MNG_SMP_VOL,
+                                   SUM(USE_SMP_VOL)                   AS SUM_VOL,
+                                   QSM.MNG_SMP_VOL - SUM(USE_SMP_VOL) AS REMAINS
+                            FROM QS_SMP_USE QSU
+                                     LEFT JOIN QS_SMP_MNG QSM
+                                               ON QSU.PLNT_CD = QSM.PLNT_CD and QSU.SMP_MNG_IDX = QSM.SMP_MNG_IDX
+                            WHERE QSU.DEL_YN = 'N'
+                              AND QSM.SMP_DIV_CD = 'S0260001'
+                              AND QSM.ANS_TYP = 'S0230004'
+                            GROUP BY QSU.PLNT_CD, QSU.SMP_MNG_IDX, QSM.MNG_SMP_VOL) QS
+                           ON QS.SMP_MNG_IDX = QSU.SMP_MNG_IDX
+                 LEFT JOIN SY_APR_INFO SAI ON QSU.PLNT_CD = SAI.PLNT_CD AND QSU.SMP_USE_APR_IDX = SAI.APR_IDX
+                 LEFT JOIN QS_SMP_MNG QSM ON QSU.PLNT_CD = QSM.PLNT_CD AND QSU.SMP_MNG_IDX = QSM.SMP_MNG_IDX
+                 LEFT JOIN QT_PITM_ANS_INFO QPAI ON QSM.PLNT_CD = QPAI.PLNT_CD AND QSM.ANS_IDX = QPAI.ANS_IDX
+                 LEFT JOIN QT_PITM_ANS_PROC QPAP on QPAI.PLNT_CD = QPAP.PLNT_CD AND QPAI.ANS_IDX = QPAP.ANS_IDX
+        WHERE QSU.PLNT_CD = #{plntCd}
+          AND QSU.DEL_YN = 'N'
+          AND QSU.SMP_USE_PROC IN ('S0280200', 'S0280400')
+          AND SAI.APR_UID = #{aprUid}
+          AND QSM.SMP_DIV_CD = 'S0260001'
+          AND QSM.ANS_TYP = 'S0230004'
+        ORDER BY QSU.SMP_MNG_IDX DESC, QSU.USE_SEQ DESC
+    </select>
+
+    <update id="approve" parameterType="StabSampleUsageApprVO">
+        UPDATE QS_SMP_USE
+        SET SMP_USE_PROC = #{smpUseProc}
+        WHERE PLNT_CD = #{plntCd}
+          AND SMP_MNG_IDX = #{smpMngIdx}
+          AND USE_SEQ = #{useSeq}
+    </update>
+
+    <update id="reject" parameterType="StabSampleUsageApprVO">
+        UPDATE QS_SMP_USE
+        SET SMP_USE_PROC = #{smpUseProc},
+            RJT_UID      = #{rjtUid},
+            RJT_REA      = #{rjtRea},
+            RJT_DS       = SYSDATE
+        WHERE PLNT_CD = #{plntCd}
+          AND SMP_MNG_IDX = #{smpMngIdx}
+          AND USE_SEQ = #{useSeq}
+    </update>
+</mapper>

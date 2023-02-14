@@ -48,6 +48,10 @@ public class StringUtil {
         return URLDecoder.decode(s, StandardCharsets.UTF_8);
     }
 
+    public static String getOrDefault(String value, String defaultValue) {
+        return StringUtils.isNotEmpty(value) ? value : defaultValue;
+    }
+
     public static String substr(String s, int limit) {
         if (StringUtils.isNotEmpty(s) && s.length() > limit) {
             return s.substring(0, limit);

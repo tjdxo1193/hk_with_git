@@ -12,10 +12,12 @@ import lims.api.ms.vo.SpecManageDptVO;
 import lims.api.ms.vo.SpecManagePitmVO;
 import lims.api.ms.vo.SpecManageVO;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SpecManageServiceImpl implements SpecManageService {
@@ -40,11 +42,11 @@ public class SpecManageServiceImpl implements SpecManageService {
 
     @Override
     public List<SpecManageAitmVO> getSemiAItemList(SpecManageVO param) {
-        if(PItemType.SEMI_MANUFACTURES_FILLING_FOAM.getCode().equals(param.getPitmTyp())
-                || PItemType.SEMI_MANUFACTURES_OTHER_PRODUCT.getCode().equals(param.getPitmTyp())){
+        if (PItemType.SEMI_MANUFACTURES_FILLING_FOAM.getCode().equals(param.getPitmTyp())
+                || PItemType.SEMI_MANUFACTURES_OTHER_PRODUCT.getCode().equals(param.getPitmTyp())) {
             param.setPrdDiv(ELNProductDiv.F.name());
-        }else if(PItemType.SEMI_MANUFACTURES_BASE.getCode().equals(param.getPitmTyp())
-                || PItemType.SEMI_MANUFACTURES_BULK.getCode().equals(param.getPitmTyp())){
+        } else if (PItemType.SEMI_MANUFACTURES_BASE.getCode().equals(param.getPitmTyp())
+                || PItemType.SEMI_MANUFACTURES_BULK.getCode().equals(param.getPitmTyp())) {
             param.setPrdDiv(ELNProductDiv.S.name());
         }
         return dao.getSemiAItemList(param);
@@ -63,21 +65,21 @@ public class SpecManageServiceImpl implements SpecManageService {
     @Override
     public void updateVersion(SpecManageVO param) {
         // 시험 항목 규격을 먼저 INSERT
-        Integer aitmSpecIdx = createAitmSpec(param);
-
+        log.info("[bug report] added rows count: {}, edited rows count: {}.", param.getAddedRowItems().size(), param.getEditedRowItems().size());
+        dao.createAitmSpec(param);
         String specProgressCode = param.getSpecProcCd();
 
         // 규격서진행상태 , 시험 항목 규격 IDX 값을 리스트에 넣어주고
         param.setSpecProcCd(SpecProgress.TEMPORARY_STORAGE.getCode());
-        param.setAitmSpecIdx(aitmSpecIdx);
         int result = 1;
 
         // 규격서 이전버전 사용버전 N으로 업데이트 및 만들어진 규격서에 임시저장이면 업데이트, 수정(개정)이면 insert
-        if(specProgressCode.equals(SpecProgress.APPROVED.getCode())){
+        if (specProgressCode.equals(SpecProgress.APPROVED.getCode())) {
+            log.info("[bug report] approved");
             result *= dao.updateUseVerN(param);
             result *= dao.createPItemSpec(param);
-        }
-        else if(specProgressCode.equals(SpecProgress.TEMPORARY_STORAGE.getCode())){
+        } else if (specProgressCode.equals(SpecProgress.TEMPORARY_STORAGE.getCode())) {
+            log.info("[bug report] temporary storage");
             result = dao.updatePItemSpec(param);
         }
 
@@ -90,20 +92,22 @@ public class SpecManageServiceImpl implements SpecManageService {
 
     @Override
     public void makeAItem(SpecManageVO param) {
+        log.info("[bug report] added rows count: {}, edited rows count: {}.", param.getAddedRowItems().size(), param.getEditedRowItems().size());
         int isQueryCompleted = 0;
-        for(SpecManageAitmVO svo : param.getRemovedRowItems()) {
+        for (SpecManageAitmVO svo : param.getRemovedRowItems()) {
             svo.setPlntCd(param.getPlntCd());
             svo.setAitmSpecIdx(param.getAitmSpecIdx());
             isQueryCompleted += dao.deletePItemSpecAItem(svo);
         }
 
-        for(SpecManageAitmVO svo : param.getAddedRowItems()){
+        for (SpecManageAitmVO svo : param.getAddedRowItems()) {
+            log.info("[bug report] create spec aitm. aitmSpecIdx: {}.", svo.getAitmSpecIdx());
             svo.setPlntCd(param.getPlntCd());
             svo.setAitmSpecIdx(param.getAitmSpecIdx());
             isQueryCompleted += dao.createPItemSpecAItem(svo);
         }
 
-        for(SpecManageAitmVO svo : param.getEditedRowItems()){
+        for (SpecManageAitmVO svo : param.getEditedRowItems()) {
             svo.setPlntCd(param.getPlntCd());
             svo.setAitmSpecIdx(param.getAitmSpecIdx());
             isQueryCompleted += dao.updatePItemSpecAItem(svo);
@@ -111,7 +115,7 @@ public class SpecManageServiceImpl implements SpecManageService {
 
         if (isQueryCompleted != param.getRemovedRowItems().size()
                 + param.getAddedRowItems().size()
-                + param.getEditedRowItems().size() ) {
+                + param.getEditedRowItems().size()) {
             throw new NoUpdatedDataException();
         }
     }
@@ -152,10 +156,5 @@ public class SpecManageServiceImpl implements SpecManageService {
     @Override
     public List<SpecManageAitmVO> getSemiAItemListToModal(SpecManageVO param) {
         return dao.getSemiAItemListToModal(param);
-    }
-
-    public int createAitmSpec(SpecManageVO param){
-        dao.createAitmSpec(param);
-        return param.getAitmSpecIdx();
     }
 }

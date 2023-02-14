@@ -1,9 +1,7 @@
 package lims.api.integration.vo.intergation;
 
 import lims.api.integration.annotation.EnumType;
-import lims.api.integration.enums.ELNCmdType;
-import lims.api.integration.enums.TestResultType;
-import lims.api.integration.enums.TestStatusProcess;
+import lims.api.integration.enums.*;
 import lims.api.integration.vo.MESSendVO;
 import lims.api.integration.vo.SAPSendVO;
 import lims.api.integration.vo.SRMSendVO;
@@ -24,16 +22,29 @@ import lombok.Setter;
  */
 public class InterfaceSendVO {
 
-    @Getter
+    /**
+     * SRM에서 오는 의뢰는 구매 입고 건이기 때문에
+     * 다른 시스템과 다르게 제조번호 뿐만 아니라 '공급처 제조번호'라는 것이 있습니다.
+     *
+     * 따라서 SRM 관련 제조번호를 인터페이스 송신할 때,
+     * '공급처 제저번호'가 있다면 '공급처 제조번호'를, 없다면 일반 '제조 번호'를 송신합니다.
+     */
+    private static String getSRMLotNo(String splLotNo, String lotNo) {
+        return StringUtil.getOrDefault(splLotNo, lotNo);
+    }
+
     @Builder
-    public static class TestStatus {
+    public static class TestStatus extends InterfaceSystemDistinguishable {
         private String lotNo;               // 제조번호
+        private String splLotNo;            // 공급사 제조번호
         private String batchNo;             // 배치번호
         private String holdReason;          // 보류사유
         @EnumType(TestStatusProcess.class)
         private Integer status;
         private String ispReqNo;            // 품질검사요청번호
+        @Getter
         private String phsOrderNo;          // 구매오더번호
+        @Getter
         private String pdtOrderNo;          // 생산오더번호
 
         public SAPSendVO.TestStatus toSAP() {
@@ -48,7 +59,7 @@ public class InterfaceSendVO {
             return SRMSendVO.TestStatus.builder()
                     .ifId(StringUtil.generateUUID(22))
                     .phsOrderNo(phsOrderNo)
-                    .lotNo(lotNo)
+                    .lotNo(getSRMLotNo(splLotNo, lotNo))
                     .batchNo(batchNo)
                     .status(status)
                     .holdReason(holdReason)
@@ -66,13 +77,13 @@ public class InterfaceSendVO {
         }
     }
 
-    @Getter
     @Builder
-    public static class TestResult {
+    public static class TestResult extends InterfaceSystemDistinguishable {
         @Setter(AccessLevel.NONE)
         private final Integer status = TestStatusProcess.TEST_COMPLETE.getValue();
         private TestResultType sytJdg;
         private String lotNo;
+        private String splLotNo;            // 공급사 제조번호
         private String batchNo;
         private String specGrv;             // 비중 (반제품 벌크가 아니면 null)
         private String hardness;            // 경도 (반제품 벌크가 아니면 null)
@@ -81,7 +92,9 @@ public class InterfaceSendVO {
         private String ispReqNo;            // 품질검사요청번호
         private String ansNo;               // 품질검사번호
         private String menge;               // 검체량(총검체량 : 시험+기타+관리폼+추가)
+        @Getter
         private String phsOrderNo;          // 구매오더번호
+        @Getter
         private String pdtOrderNo;          // 생산오더번호
 
         public SAPSendVO.TestResult toSAP() {
@@ -101,7 +114,7 @@ public class InterfaceSendVO {
             return SRMSendVO.TestResult.builder()
                     .ifId(StringUtil.generateUUID(22))
                     .phsOrderNo(phsOrderNo)
-                    .lotNo(lotNo)
+                    .lotNo(getSRMLotNo(splLotNo, lotNo))
                     .batchNo(batchNo)
                     .sytJdg(sytJdg)
                     .specGrv(specGrv)
@@ -125,28 +138,31 @@ public class InterfaceSendVO {
         }
     }
 
-    @Getter
     @Builder
-    public static class NonconformityReport {
+    public static class NonconformityReport extends InterfaceSystemDistinguishable {
         private String batchNo;
         private String ispReqNo;
         private String ansNo;
         private String lotNo;
+        private String splLotNo;            // 공급사 제조번호
         private String nonCfmReason;
         private String emId;
+        @Getter
         private String phsOrderNo;
+        @Getter
         private String pdtOrderNo;
         private String orderItm;
 
-        public SRMSendVO.NonCfmReport toSRM() {
+        public SRMSendVO.NonCfmReport toSRM(ReportDivOfNonCfm reportDiv) {
             return SRMSendVO.NonCfmReport.builder()
                     .batchNo(batchNo)
                     .ispReqNo(ispReqNo)
                     .ansNo(ansNo)
                     .phsOrderNo(phsOrderNo)
-                    .lotNo(lotNo)
+                    .lotNo(getSRMLotNo(splLotNo, lotNo))
                     .nonCfmReason(nonCfmReason)
                     .emId(emId)
+                    .reportDiv(reportDiv)
                     .build();
         }
 
@@ -171,4 +187,46 @@ public class InterfaceSendVO {
         private ELNCmdType cmdType;
     }
 
+    @Builder
+    public static class PurchaseInboundTestPerformance {
+        private String plntCd;      // 공장코드
+        private String pitmCd;      // 품목코드
+        private String year;        // 회계연도
+        private String month;       // 기간(월)
+        private String phsOrderNo;  // 구매오더번호
+        private Integer inputQty;      // 입고량
+        private String testCnt;       // 검사횟수
+
+        public SAPSendVO.TestPerformanceOfPurchaseInbound toSAP() {
+            SAPSendVO.TestPerformanceOfPurchaseInbound result = new SAPSendVO.TestPerformanceOfPurchaseInbound();
+            result.setGjahr(year);
+            result.setPoper(month);
+            result.setWerks(plntCd);
+            result.setMatnr(pitmCd);
+            result.setEbeln(phsOrderNo);
+            result.setZpoQty(String.valueOf(inputQty));
+            result.setZqcQty(testCnt);
+            return result;
+        }
+    }
+
+    @Builder
+    public static class ManufactureInboundTestPerformance {
+        private String pitmCd;      // 품목코드
+        private String pdtOrderNo;  // 생산오더번호
+        private String batchNo;     // 배치번호
+        private String testReqDt;   // 품질검사 의뢰일자. 8자리 (YYYYMMDD)
+        private String testCnt;     // 검사횟수
+
+        public SAPSendVO.TestPerformanceOfManufactureInbound toSAP() {
+            SAPSendVO.TestPerformanceOfManufactureInbound result = new SAPSendVO.TestPerformanceOfManufactureInbound();
+            result.setMatnr(pitmCd);
+            result.setWerks(pdtOrderNo);
+            result.setCharg(batchNo);
+            result.setZqidate(testReqDt);
+            result.setZqicount(testCnt);
+            result.setZcancel(TestPerformanceCancel.N);
+            return result;
+        }
+    }
 }

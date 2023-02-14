@@ -91,8 +91,7 @@ const testInfo = {
     $grid: null,
     props: { editable: false },
     buttons: [
-      { name: 'save', label: '저장', disabled: true },
-      { name: 'request', label: '승인요청', disabled: true },
+      { name: 'approve', label: '승인', disabled: true },
       { name: 'init', label: '초기화', disabled: true },
     ],
   },
@@ -102,8 +101,8 @@ const testInfo = {
       .Hidden('ansIdx')
       .Input('pitmTyp', '품목구분', { readonly: true })
       .Input('pitmNm', '품목명', { readonly: true })
-      .Input('pitmNm', '품목코드', { readonly: true })
-      .Input('splLotNo', '자재코드', { readonly: true })
+      .Input('pitmCd', '품목코드', { readonly: true })
+      .Input('mtrCd', '자재코드', { readonly: true })
       .Input('ispReqNo', '검사요청번호', { readonly: true })
       .Input('ansNo', '시험번호', { readonly: true })
       .Input('reqDt', '의뢰일자', { readonly: true })
@@ -126,7 +125,7 @@ const testInfo = {
       .Input('etrDt', '입고일자', { readonly: true })
       .Textarea('nonCfmRea', '부적합사유', { rows: 2, readonly: true })
       .spanCol(2)
-      .Textarea('nonCfmRev', '회신사유', { rows: 2, readonly: true })
+      .Textarea('reoPrevRpyCtt', '회신사유', { rows: 2, readonly: true })
       .spanCol(2)
       .build(),
   columns: () =>

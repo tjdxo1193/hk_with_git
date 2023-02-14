@@ -22,17 +22,23 @@ const list = {
   forms: () =>
     FormBuilder.builder()
       .Select('upperMitmPitmDiv', '품목구분', {
-        async: () => api.combo.common.getTreeCd('M1000000'),
+        async: () => api.combo.common.getTreeCd('M1000001'),
       })
       .Select('mitmPitmDiv', '품목명', {
         async: (param) => api.combo.common.getTreeCd(param),
       })
       .Input('mitmCd', '품목코드')
-      .Select('crgDptCd', '담당부서', {
-        async: api.combo.common.getDpt,
-      })
       .Input('ansNo', '시험번호')
-      .Input('reqNo', '의뢰번호')
+      .Select('mitmWrkStudioDiv', '작업동', {
+        async: () => api.combo.common.getUpperTreeCd('M2000000'),
+      })
+      .Select('upperMitmWrkPlcDiv', '작업소', {
+        async: (param) => api.combo.common.getTreeCd(param),
+      })
+      .Select('mitmWrkPlcDiv', '작업실', {
+        async: (param) => api.combo.common.getTreeCd(param),
+      })
+      .Input('roomno', 'RoomNo')
       .DatepickerTwinWithSwitch('searchReqDt', '의뢰일', {
         value: [monthAgoDate, todayDate],
       })
@@ -45,26 +51,28 @@ const list = {
   columns: () =>
     ColumnBuilder.builder()
       .col('mitmReqIdx', false)
-      .col('ansProcNm', '진행상태')
       .col('reqDt', '의뢰일자')
       .col('reqNo', '의뢰번호')
       .col('ansNo', '시험번호')
       .col('assNo', '지시번호')
       .col('rcpDt', '접수일자')
-      .col('mitmCd', '품목코드')
+      .col('cplRqmDt', '완료요구일')
       .col('upperMitmPitmDivNm', '품목구분')
+      .col('mitmCd', '품목코드')
       .col('mitmPitmDivNm', '품목명')
       .combo('sytJdg', '결과판정', {
-        async: () => api.combo.systemCommon.getSytTypCombo(),
+        async: () => api.combo.systemCommon.getSytJdgCombo(),
       })
+      .col('mitmWrkStudioDivNm', '작업동')
       .col('upperMitmWrkPlcDivNm', '작업소')
       .col('mitmWrkPlcDivNm', '작업실')
       .col('roomno', 'RoomNo')
       .col('grade', 'Grade')
+      .col('wrkDivNm', '작업구분')
       .col('ansCylRuleNm', '시험주기')
-      .col('ansEdt', '시험예정일')
       .col('point', '포인트')
       .col('crgDptNm', '담당부서')
+      .col('ansEdt', '시험예정일')
       .build(),
 };
 
@@ -76,6 +84,9 @@ const itemList = {
       rowStyleFunction: function (rowIndex, item) {
         if (item.rstJdg === 'S0120002') {
           return 'redFont';
+        }
+        if (item.rstJdgEtc === 'S0120002') {
+          return 'boldFont';
         }
         return null;
       },
@@ -98,8 +109,11 @@ const itemList = {
       .Input('mitmPitmDivNm', '품목명', { readonly: true })
       .Input('ansNo', '시험번호', { readonly: true })
       .Select('sytJdg', '결과판정', {
-        async: () => api.combo.systemCommon.getSytTypCombo(),
+        async: () => api.combo.systemCommon.getSytJdgCombo(),
       })
+      .required()
+      .Textarea('assSpcc', '지시특이사항', { rows: 1, readonly: true })
+      .spanCol(4)
       .build(),
   columns: () =>
     ColumnBuilder.builder()
@@ -119,7 +133,6 @@ const itemList = {
           conditionFunction: function (rowIndex, columnIndex, value, item) {
             if (item.jdgTyp === 'S0070001') {
               const list = [
-                //{ value: '', label: '선택' },
                 { value: item.slvJdgCfm, label: item.slvJdgCfmNm },
                 { value: item.slvJdgNonCfm, label: item.slvJdgNonCfmNm },
               ];
@@ -146,7 +159,6 @@ const itemList = {
         },
         labelFunction: function (rowIndex, columnIndex, value, headerText, item) {
           const list = [
-            //{ value: '', label: '선택' },
             { value: item.slvJdgCfm, label: item.slvJdgCfmNm },
             { value: item.slvJdgNonCfm, label: item.slvJdgNonCfmNm },
           ];
@@ -157,7 +169,6 @@ const itemList = {
             return value;
           }
         },
-        headerStyle: 'editableFontColumn',
       })
       .col('markVal', '표기값', {
         headerStyle: 'editableFontColumn',
@@ -204,16 +215,17 @@ const itemList = {
           }
         },
       })
+      .col('rstJdgEtc', false)
+      .combo('rstJdg', '결과판정', {
+        async: () => api.combo.systemCommon.getRstJdgCombo(),
+        headerStyle: 'editableFontColumn',
+      })
       .col('rstRmk', '결과비고', {
         width: 200,
         editRendrer: {
           type: 'InputEditRenderer',
           maxlength: 100,
         },
-        headerStyle: 'editableFontColumn',
-      })
-      .combo('rstJdg', '결과판정', {
-        async: () => api.combo.systemCommon.getRstJdgCombo(),
         headerStyle: 'editableFontColumn',
       })
       .col('permitCriteria', '허가기준', {

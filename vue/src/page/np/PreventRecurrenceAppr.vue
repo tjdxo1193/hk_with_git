@@ -14,13 +14,6 @@
     @grid-button-click="gridButtonClick"
   />
 
-  <RequestApproverModal
-    :title="requestApproverModal.title"
-    :show="requestApproverModal.show"
-    :aprReqDiv="requestApproverModal.aprReqDiv"
-    @close="hideModal('requestApproverModal')"
-    @modalReturnDataEvent="request"
-  />
   <FileAttacherModal
     :fileIdx="fileAttacherModal.fileIdx"
     :show="fileAttacherModal.show"
@@ -30,7 +23,7 @@
 </template>
 
 <script>
-import { RequestApproverModal, FileAttacherModal } from '@/page/modal';
+import { FileAttacherModal } from '@/page/modal';
 import { FormUtil } from '@/util';
 
 import values from './values/preventRecurrenceAppr';
@@ -38,7 +31,6 @@ import values from './values/preventRecurrenceAppr';
 export default {
   name: 'PreventRecurrenceAppr',
   components: {
-    RequestApproverModal,
     FileAttacherModal,
   },
   mounted() {
@@ -54,7 +46,7 @@ export default {
         event: {
           cellDoubleClick: (e) => {
             this.getResultDetail(e);
-            this.enableButtons(['save', 'request', 'init']);
+            this.enableButtons(['approve', 'init']);
           },
         },
       },
@@ -62,11 +54,6 @@ export default {
         ...testInfo.static,
         forms: testInfo.forms(),
         columns: testInfo.columns(),
-      },
-      requestApproverModal: {
-        show: false,
-        aprReqDiv: 'S0050015',
-        title: '승인요청',
       },
       fileAttacherModal: {
         show: false,
@@ -100,10 +87,12 @@ export default {
       $grid.setGridData(data);
       FormUtil.setData(this.testInfo.forms, event.item);
     },
-    save() {
+    approve() {
       const parameter = FormUtil.getData(this.testInfo.forms);
-      this.$confirm(this.$message.confirm.saveData).then(() => {
-        this.$eSign(() => this.$axios.put('/np/preventRecurrenceReview/save', parameter))
+      this.$confirm(this.$message.confirm.approved).then(() => {
+        this.$eSignWithReason(() =>
+          this.$axios.put('/np/preventRecurrenceAppr/approve', parameter),
+        )
           .then(() => {
             this.$info(this.$message.info.saved);
             this.init();
@@ -114,20 +103,6 @@ export default {
           });
       });
     },
-    request(approveInfo) {
-      let parameter = FormUtil.getData(this.testInfo.forms);
-      parameter = {
-        ...parameter,
-        approveInfo,
-      };
-      this.$eSignWithReason(() => this.$axios.put('/np/preventRecurrenceReview/request', parameter))
-        .then(() => {
-          this.$info(this.$message.info.saved);
-          this.init();
-          this.getNonconformityTestList();
-        })
-        .catch(() => this.$error(this.$message.error.updateData));
-    },
     searchFormEvent(event) {
       if (event.type === 'keydown' && event.originEvent.key === 'Enter') {
         this.getNonconformityTestList();
@@ -137,11 +112,8 @@ export default {
       if (name === 'select') {
         return this.getNonconformityTestList();
       }
-      if (name === 'save') {
-        return this.save(name);
-      }
-      if (name === 'request') {
-        return this.showModal('requestApproverModal');
+      if (name === 'approve') {
+        this.approve();
       }
       if (name === 'init') {
         this.init();
@@ -150,7 +122,7 @@ export default {
     init() {
       this.testInfo.forms = values.testInfo.forms();
       this.testInfo.$grid.clearGridData();
-      this.disableButtons(['save', 'request', 'init']);
+      this.disableButtons(['approve', 'init']);
     },
     gridButtonClick(event) {
       if (event.dataField === 'fileAttacher') {
@@ -160,18 +132,12 @@ export default {
       }
     },
     showModal(name, parameter = {}) {
-      if (name === 'requestApproverModal') {
-        return (this.requestApproverModal.show = true);
-      }
       if (name === 'fileAttacherModal') {
         this.fileAttacherModal.fileIdx = this.getFildIdx(parameter);
         return (this.fileAttacherModal.show = true);
       }
     },
     hideModal(name) {
-      if (name === 'requestApproverModal') {
-        return (this.requestApproverModal.show = false);
-      }
       if (name === 'fileAttacherModal') {
         return (this.fileAttacherModal.show = false);
       }

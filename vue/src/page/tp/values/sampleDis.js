@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
 
 import { ColumnBuilder, FormBuilder } from '@/util';
+import api from '@/api';
 
 const monthAgoDate = dayjs().add(-1, 'month').format('YYYY-MM-DD');
 
@@ -27,14 +28,14 @@ const sampleDisGrid = {
   },
   forms: () =>
     FormBuilder.builder()
-      .Select('smpDiv', '검체구분')
+      .Select('smpDivCd', '검체구분', { async: () => api.combo.systemCommon.getSmpDivCombo() })
       .Input('pitmNm', '품목명')
       .Input('ansNo', '시험번호')
       .Input('lotNo', '제조번호')
       .Input('batchNo', '배치번호')
       .Input('pitmCd', '품목코드')
-      .Select('smpProcCd', '검체상태')
-      .Select('pitmDiv', '품목구분')
+      .Select('smpProcCd', '검체상태', { async: () => api.combo.systemCommon.getSmpProcCombo() })
+      .Select('pitmTyp', '품목구분', { async: () => api.combo.systemCommon.getPitmDivCombo() })
       .DatepickerTwinWithSwitch('dpsExpDtList', '폐기예정일', { value: [monthAgoDate, todayDate] })
       .DatepickerTwinWithSwitch('smpEtrDtList', '검체입고일자', {
         value: [monthAgoDate, todayDate],

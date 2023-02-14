@@ -8,7 +8,9 @@ import lims.api.common.domain.ESignInfo;
 import lims.api.common.model.CommonResponse;
 import lims.api.mt.service.MonitorTestRequestService;
 import lims.api.mt.vo.MonitorTestRequestVO;
+import lims.api.schedule.service.impl.MonitorTestScheduler;
 import lombok.RequiredArgsConstructor;
+import oracle.jdbc.proxy.annotation.Post;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,6 +23,7 @@ public class MonitorTestRequestController {
 
     private final MonitorTestRequestService service;
     private final JwtResolver jwtResolver;
+    private final MonitorTestScheduler scheduler;
 
     @GetMapping
     public ResponseEntity<List<MonitorTestRequestVO>> getMonitorTestRequestList(@AuthToken Token token, MonitorTestRequestVO request){
@@ -50,5 +53,10 @@ public class MonitorTestRequestController {
         }
         service.requestCancel(request);
         return ResponseEntity.ok(new CommonResponse());
+    }
+
+    @PostMapping("/test")
+    public void test(){
+        scheduler.run();
     }
 }

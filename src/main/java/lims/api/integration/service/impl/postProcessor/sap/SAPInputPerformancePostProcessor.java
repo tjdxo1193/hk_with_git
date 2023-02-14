@@ -10,7 +10,9 @@ import lims.api.integration.vo.SAPInputPerformanceByBatchVO;
 import lims.api.util.process.KeyObject;
 import lims.api.util.process.SimpleSaveProcess;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
+import spring.audit.util.CollectionUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -35,16 +37,18 @@ public class SAPInputPerformancePostProcessor implements PostProcessor {
                 interfaceHeaderData,
                 masterDao.findInputPerformHeader(),
                 masterDao::createInputPerformHeader,
-                masterDao::updateInputPerformHeader
+                header -> {
+                    masterDao.deleteInputPerformDetail(header);
+                    return masterDao.updateInputPerformHeader(header);
+                }
         ).getTotalCount();
 
         List<SAPInputPerformanceByBatchVO.InputPerformanceDetail> interfaceDetailData = getDetailListWithLotNo(degree, interfaceHeaderData);
-        count += new SimpleSaveProcess<SAPInputPerformanceByBatchVO.InputPerformanceDetail>().forEachSave(
-                interfaceDetailData,
-                masterDao.findInputPerformDetail(),
-                masterDao::createInputPerformDetail,
-                masterDao::updateInputPerformDetail
-        ).getTotalCount();
+        if (CollectionUtils.isNotEmpty(interfaceDetailData)) {
+            for (SAPInputPerformanceByBatchVO.InputPerformanceDetail detail: interfaceDetailData) {
+                count += masterDao.createInputPerformDetail(detail);
+            }
+        }
 
         if (count == 0) {
             throw new IntegrationNoSavedException();

@@ -142,10 +142,7 @@ export default {
           .catch(() => {});
       }
       if (name === 'delete') {
-        this.inputInfoForm.forms
-          .validate()
-          .then(() => this.delete())
-          .catch(() => {});
+        this.delete();
       }
       if (name === 'init') {
         this.init();

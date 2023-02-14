@@ -1,8 +1,10 @@
 package lims.api.mt.controller;
 
 import lims.api.auth.annotation.AuthToken;
+import lims.api.auth.annotation.ESign;
 import lims.api.auth.domain.Token;
 import lims.api.auth.service.impl.JwtResolver;
+import lims.api.common.domain.ESignInfo;
 import lims.api.common.model.CommonResponse;
 import lims.api.mt.service.MonitorTestReceiptService;
 import lims.api.mt.vo.MonitorTestReceiptVO;
@@ -37,12 +39,13 @@ public class MonitorTestReceiptController {
     }
 
     @PutMapping("/receipt")
-    public ResponseEntity<CommonResponse> receipt(@AuthToken Token token, @RequestBody List<MonitorTestReceiptVO> request) {
+    public ResponseEntity<CommonResponse> receipt(@AuthToken Token token, @RequestBody List<MonitorTestReceiptVO> request, @ESign ESignInfo esign) {
         String jwt = token.getJwt();
         for(MonitorTestReceiptVO item : request) {
             item.setPlntCd(jwtResolver.getPlantCode(jwt));
             item.setRcpUid(jwtResolver.getUserId(jwt));
             item.setRcpDptCd(jwtResolver.getDptCd(jwt));
+            item.setRcpRmk(esign.getReason());
         }
         service.receipt(request);
         return ResponseEntity.ok(new CommonResponse());

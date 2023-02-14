@@ -1,5 +1,6 @@
 package lims.api.np.service.impl;
 
+import lims.api.common.exception.NoUpdatedDataException;
 import lims.api.common.service.ApproveService;
 import lims.api.np.dao.PreventRecurrenceApprDao;
 import lims.api.np.enums.NonCfmProcess;
@@ -24,7 +25,7 @@ public class PreventRecurrenceApprServiceImpl implements PreventRecurrenceApprSe
     public List<PreventRecurrenceApprVO> findAll(PreventRecurrenceApprVO param) {
         param.setAnsProcCd(TestProcess.TEST_FINISH.getProcessCode());
         param.setSytJdg(TestJudgement.UNSUITABLE.getJudgementCode());
-        param.setNonCfmProcCd(NonCfmProcess.PRV_RCR_REPORT_APPROVE.getProcessCode());
+        param.setNonCfmProcCd(NonCfmProcess.PRV_RCR_REPORT_REQUEST.getProcessCode());
         return dao.findAll(param);
     }
 
@@ -32,5 +33,15 @@ public class PreventRecurrenceApprServiceImpl implements PreventRecurrenceApprSe
     public List<PreventRecurrenceApprVO> findResultItem(PreventRecurrenceApprVO param) {
         param.setAnsProcCd(TestProcess.TEST_FINISH.getProcessCode());
         return dao.findResultItem(param);
+    }
+
+    @Override
+    public void approve(PreventRecurrenceApprVO param) {
+        param.setNonCfmProcCd(NonCfmProcess.PRV_RCR_REPORT_APPROVE.getProcessCode());
+        int result = dao.approve(param);
+
+        if (result == 0) {
+            throw new NoUpdatedDataException();
+        }
     }
 }

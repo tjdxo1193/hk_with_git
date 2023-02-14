@@ -61,7 +61,6 @@
             , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = QPI.PITM_TYP) AS PITM_TYP_NM
             , QPI.PKG_MTR_SPEC
             , QP.USE_VER_YN
-            , QP.PITM_VER
             , QPIS.LAB_NO
             , QPIS.BRD_ABBR
             , QPIS.ETR_CTN_QTY

@@ -64,7 +64,7 @@ const list = {
       .col('pitmNm', '품목명')
       .col('lotNo', '제조번호')
       .combo('sytJdg', '결과판정', {
-        async: () => api.combo.systemCommon.getSytTypCombo(),
+        async: () => api.combo.systemCommon.getSytJdgCombo(),
       })
       .col('revwCmmt', '검토의견')
       .col('assSpcc', '시험지시특이사항', { width: 120 })
@@ -111,7 +111,7 @@ const requestInfo = {
       .spanCol(2)
       .Input('ansNo', '시험번호', { readonly: true })
       .Select('sytJdg', '결과판정', {
-        async: () => api.combo.systemCommon.getSytTypCombo(),
+        async: () => api.combo.systemCommon.getSytJdgCombo(),
       })
       .required()
       .Textarea('pitmSpcc', '품목특이사항', { rows: 1, readonly: true })

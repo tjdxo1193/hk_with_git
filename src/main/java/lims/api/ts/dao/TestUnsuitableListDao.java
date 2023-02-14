@@ -14,6 +14,4 @@ public interface TestUnsuitableListDao {
 
     List<TestUnsuitableListVO> findResultItem(TestUnsuitableListVO param);
 
-    //TODO AUDIT
-    int save(TestUnsuitableListVO param);
 }

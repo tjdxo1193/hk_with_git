@@ -30,12 +30,11 @@ public class PostProcessorRevExceptionHandlerAspect {
             String message = MessageUtil.getMessage("error.notNull");
             Integer errorLogId = errorService.recordByPostProcess(e, rev, message);
             log.error(createFailMessage(rev, errorLogId));
-            throw new FailedPostProcessException(e, rev);
         } catch (Exception e) {
             Integer errorLogId = errorService.recordByPostProcess(e, rev);
             log.error(createFailMessage(rev, errorLogId));
-            throw new FailedPostProcessException(e, rev);
         }
+        return null;
     }
 
     private RevStateful getRevStatefulArgument(ProceedingJoinPoint joinPoint) {

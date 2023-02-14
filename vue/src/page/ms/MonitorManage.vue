@@ -7,10 +7,12 @@
           @button-click="onClickMonitorManageButton"
           @form-event="searchFormEvent"
         />
+
         <AUIGridWithHeader
           v-bind="monitorSearchResult"
           @grid-created="(proxy) => $setState('monitorSearchResult.$grid', proxy)"
         />
+
         <FormWithHeader
           v-bind="monitorManageInfo"
           @form-event="infoFormEvent"
@@ -18,8 +20,9 @@
         />
       </template>
       <template #tab-itemSe>
-        <TreeCommonCodeManage title="모니터링 품목 구분 목록" code="M1000000" />
+        <TreeCommonCodeManage title="모니터링 품목 구분 목록" code="M1000001" />
       </template>
+
       <template #tab-workplaceSe>
         <TreeCommonCodeManage title="모니터링 작업실 구분 목록" code="M2000000" />
       </template>
@@ -104,6 +107,10 @@ export default {
         'mitmWrkStudioDiv',
         'mitmWrkPlcUpperDiv',
         'ansCylCd',
+        'roomno',
+        'point',
+        'grade',
+        'wrkDiv',
       ]);
       FormUtil.setData(this.monitorManageInfo.forms, selectedItem);
       FormUtil.enableButtons(this.monitorManageInfo.buttons, ['update', 'delete']);

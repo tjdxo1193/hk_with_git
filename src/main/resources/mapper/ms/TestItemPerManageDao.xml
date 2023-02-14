@@ -75,6 +75,7 @@
 			<if test="useYn != null and useYn != ''">
 				AND USE_YN = #{useYn}
 			</if>
+		ORDER BY A.VRIA_NO
 	</select>
 	
 	<insert id="putTestItemPer" parameterType="TestItemPerManageVO">

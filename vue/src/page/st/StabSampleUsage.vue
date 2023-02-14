@@ -1,280 +1,283 @@
 <template>
-  <FormWithHeader v-bind="searchForm" @button-click="onClickSearchBtn" />
-  <AUIGridWithHeader
-    v-bind="gridForSearchResult"
-    @grid-created="(proxy) => $setState('gridForSearchResult.$grid', proxy)"
+  <AUIGridSearch
+    v-bind="sampleUsageGrid"
+    @button-click="fetchSampleUsageGrid"
+    @grid-created="(proxy) => $setState('sampleUsageGrid.$grid', proxy)"
   />
-  <FormWithHeader v-bind="inputInfoForm" @form-event="onEventsButtonInform" />
-
+  <FormWithHeader v-bind="inputForm" @button-click="onClickFormButtons" @form-event="onFormEvent" />
   <StabSampleItemSearchModal
+    v-bind="stabSampleItemSearchModal"
+    @close="hideModal('stabSampleItemSearchModal')"
+    @select="onSelectSample"
     :show="stabSampleItemSearchModal.show"
-    @close="hideStabSampleItemSearchModal()"
-    @select="setItemNmInDetailForm"
   />
-
-  <InputReasonModal :show="inputReasonModal.show" @close="hideInputReasonModal()" />
-  <DesignateApproversModal
-    :show="designateApproversModal.show"
-    @close="hideDesignateApproversModal()"
+  <RequestApproverModal
+    :show="requestApproveUse.show"
+    :aprReqDiv="requestApproveUse.aprReqDiv"
+    @close="hideModal('requestApproveUse')"
+    @modalReturnDataEvent="approveUseModalReturnDataEvent"
   />
-  <ActionBar :buttons="buttonGroups.buttons" @button-click="onEventsButton" />
+  <RequestApproverModal
+    :show="requestCancelUse.show"
+    :aprReqDiv="requestCancelUse.aprReqDiv"
+    @close="hideModal('requestCancelUse')"
+    @modalReturnDataEvent="requestCancelUseModalReturnDataEvent"
+  />
 </template>
 
 <script>
-import { StabSampleItemSearchModal, InputReasonModal, DesignateApproversModal } from '@/page/modal';
-import { FormUtil } from '@/util';
+import dayjs from 'dayjs';
 
-import values from './values/stabSampleUsage';
+import { StabSampleItemSearchModal, RequestApproverModal } from '@/page/modal';
+import { FormUtil, TokenUtil } from '@/util/index.js';
+
+import values from './values/stabSampleUsage.js';
+
+const TEMP_SAVE = 'S0280100';
+const REQUEST_USE = 'S0280200';
+const REJECT_USE = 'S0280110';
+const APPROVE_USE = 'S0280300';
+const REQUEST_CANCEL_USE = 'S0280400';
+const REJECT_CANCEL_USE = 'S0280310';
+const APPROVE_USE_CANCEL = 'S0280500';
 
 export default {
-  name: 'StabSampleUsagePage',
+  name: 'stabSampleUsage',
   components: {
     StabSampleItemSearchModal,
-    InputReasonModal,
-    DesignateApproversModal,
-  },
-  mounted() {
-    this.gridForSearchResult.$grid.setGridData(this.gridForSearchResult.data);
+    RequestApproverModal,
   },
   data() {
-    const { searchForm, gridForSearchResult, inputInfoForm, buttonGroups } = this.$copy(values);
+    const { sampleUsageGrid, inputForm } = this.$copy(values);
     return {
-      searchForm: {
-        ...searchForm.static,
-        forms: searchForm.forms(),
-      },
-
-      gridForSearchResult: {
-        ...gridForSearchResult.static,
-        columns: gridForSearchResult.columns(),
+      sampleUsageGrid: {
+        ...sampleUsageGrid.static,
+        forms: sampleUsageGrid.forms(),
+        columns: sampleUsageGrid.columns(),
         event: {
-          cellDoubleClick: (e) => this.getItemInfoForInputForm(e),
+          cellDoubleClick: (event) => {
+            this.onDoubleClickCell(event.item);
+          },
         },
       },
-
-      inputInfoForm: {
-        ...inputInfoForm.static,
-        forms: inputInfoForm.forms(),
+      inputForm: {
+        ...inputForm.static,
+        forms: inputForm.forms(),
       },
-
-      buttonGroups: {
-        buttons: buttonGroups.buttons,
-      },
-
       stabSampleItemSearchModal: {
         show: false,
       },
-
-      inputReasonModal: {
+      requestApproveUse: {
         show: false,
+        aprReqDiv: 'S0050018',
       },
-      designateApproversModal: {
+      requestCancelUse: {
         show: false,
+        aprReqDiv: 'S0050018',
       },
     };
   },
   methods: {
-    //조회폼
-    async fetchSearchResult() {
-      const { $grid } = this.gridForSearchResult;
-      const { forms } = this.searchForm;
-      const parameter = FormUtil.getData(forms);
-      await $grid
-        ._useLoader(() => this.$axios.get('st/stabSampleUsage', parameter))
+    init() {
+      this.inputForm.forms = values.inputForm.forms();
+      const buttons = this.inputForm.buttons;
+      FormUtil.disableButtons(buttons, [
+        'requestApproveUse',
+        'update',
+        'delete',
+        'requestCancelUse',
+      ]);
+      FormUtil.enableButtons(buttons, ['save', 'init']);
+      this.setDefaultInfo();
+    },
+    setDefaultInfo() {
+      const { forms } = this.inputForm;
+      const todayDate = dayjs().format('YYYY-MM-DD');
+      const defaultInfo = {
+        useUid: TokenUtil.myId(),
+        useNm: TokenUtil.myName(),
+        useDt: todayDate,
+      };
+      FormUtil.setData(forms, defaultInfo);
+    },
+    async fetchSampleUsageGrid() {
+      const { forms, $grid } = this.sampleUsageGrid;
+      const param = FormUtil.getData(forms);
+      const data = await $grid
+        ._useLoader(() => this.$axios.get('/st/stabSampleUsage', param))
         .then(({ data }) => data);
+      $grid.setGridData(data);
     },
-
-    getItemInfoForInputForm({ item }) {
-      FormUtil.setData(this.inputInfoForm.forms, item);
-      if (item.div == '1') {
-        this.changeButtonTypeToEdit();
-        return;
-      }
-      if (item.div == '2') {
-        this.changeButtonTypeToCancel();
-        return;
-      }
-      if (item.div == '3') {
-        this.changeButtonTypeToSave();
-        return;
-      }
-      if (item.div == '4') {
-        this.changeButtonTypeToDisposal();
-        return;
-      }
-    },
-    changeButtonTypeToEdit() {
-      FormUtil.enableButtons(this.buttonGroups.buttons, ['update', 'delete', 'useapproveReq']);
-      FormUtil.disableButtons(this.buttonGroups.buttons, ['save', 'useCancelReq']);
-    },
-    changeButtonTypeToCancel() {
-      FormUtil.enableButtons(this.buttonGroups.buttons, ['useCancelReq']);
-      FormUtil.disableButtons(this.buttonGroups.buttons, [
-        'save',
-        'update',
-        'delete',
-        'useapproveReq',
-      ]);
-    },
-    changeButtonTypeToSave() {
-      FormUtil.enableButtons(this.buttonGroups.buttons, ['save']);
-      FormUtil.disableButtons(this.buttonGroups.buttons, ['update', 'delete', 'useapproveReq']);
-    },
-    changeButtonTypeToDisposal() {
-      FormUtil.disableButtons(this.buttonGroups.buttons, [
-        'save',
-        'update',
-        'delete',
-        'useapproveReq',
-        'useCancelReq',
-      ]);
-    },
-    onClickSearchBtn({ name }) {
-      if (name == 'search') {
-        this.searchForm.forms
-          .validate()
-          .then(() => {
-            this.fetchSearchResult();
-          })
-          .catch(() => {
-            this.$error(this.$message.validate.requiredValueNotInput);
-          });
-      }
-    },
-    onEventsButtonInform(event) {
-      if (event.originEvent === 'search') {
-        this.showStabSampleItemSearchModal();
-      }
-    },
-    showStabSampleItemSearchModal() {
-      this.$setState('stabSampleItemSearchModal', { show: true });
-    },
-    hideStabSampleItemSearchModal() {
-      this.$setState('stabSampleItemSearchModal', { show: false });
-    },
-    showInputReasonModal() {
-      this.$setState('inputReasonModal', { show: true });
-    },
-    hideInputReasonModal() {
-      this.$setState('inputReasonModal', { show: false });
-    },
-    showDesignateApproversModal() {
-      this.$setState('designateApproversModal', { show: true });
-    },
-    hideDesignateApproversModal() {
-      this.$setState('designateApproversModal', { show: false });
-    },
-    //조회결과 그리드
-    onEventsButton({ name }) {
-      if (name == 'useapproveReq') {
-        this.useapproveReq();
-        return;
-      }
-      if (name == 'save') {
-        this.inputInfoForm.forms
-          .validate()
-          .then(() => {
-            this.save();
-          })
-          .catch(() => {
-            this.$error(this.$message.validate.requiredValueNotInput);
-          });
-        return;
-      }
-      if (name == 'update') {
-        this.inputInfoForm.forms
-          .validate()
-          .then(() => {
-            this.update();
-          })
-          .catch(() => {
-            this.$error(this.$message.validate.requiredValueNotInput);
-          });
-        return;
-      }
-      if (name == 'delete') {
-        this.delete();
-        return;
-      }
-      if (name == 'useCancelReq') {
-        this.useCancelReq();
-        return;
-      }
-      if (name == 'init') {
-        this.init();
-        return;
-      }
-    },
-    useapproveReq() {
-      this.showDesignateApproversModal();
-      const { forms } = this.inputInfoForm;
-      const parameter = FormUtil.getData(forms);
-      this.$eSign(() => this.$axios.put('/st/stabSampleUsage', parameter))
+    async save() {
+      const { forms } = this.inputForm;
+      const param = FormUtil.getData(forms);
+      await this.$eSign(() => this.$axios.post('/st/stabSampleUsage', param))
         .then(() => {
           this.$info(this.$message.info.saved);
-          this.fetchSearchResult();
+          this.fetchSampleUsageGrid();
+          this.init();
         })
         .catch(() => {
-          this.$error(this.$message.error.createData);
+          this.$error(this.$message.error.saveData);
         });
     },
-    useCancelReq() {
-      this.showDesignateApproversModal();
-      const { forms } = this.inputInfoForm;
-      const parameter = FormUtil.getData(forms);
-      this.$eSign(() => this.$axios.put('/st/stabSampleUsage', parameter))
+    async update() {
+      const { forms } = this.inputForm;
+      const param = FormUtil.getData(forms);
+      await this.$eSign(() => this.$axios.put('/st/stabSampleUsage', param))
         .then(() => {
           this.$info(this.$message.info.saved);
-          this.fetchSearchResult();
+          this.fetchSampleUsageGrid();
+          this.init();
         })
         .catch(() => {
-          this.$error(this.$message.error.createData);
+          this.$error(this.$message.error.saveData);
         });
     },
-    save() {
-      const { forms } = this.inputInfoForm;
-      const parameter = FormUtil.getData(forms);
-      this.$eSign(() => this.$axios.put('/st/stabSampleUsage', parameter))
+    async delete() {
+      const { forms } = this.inputForm;
+      const param = FormUtil.getData(forms);
+      await this.$eSign(() => this.$axios.put('/st/stabSampleUsage/delete', param))
         .then(() => {
           this.$info(this.$message.info.saved);
-          this.fetchSearchResult();
+          this.fetchSampleUsageGrid();
+          this.init();
         })
         .catch(() => {
-          this.$error(this.$message.error.createData);
+          this.$error(this.$message.error.saveData);
         });
     },
-    update() {
-      const { forms } = this.inputInfoForm;
-      const parameter = FormUtil.getData(forms);
-      this.$eSignWithReason(() => this.$axios.put('/st/stabSampleUsage', parameter))
+    async approveUseModalReturnDataEvent(data) {
+      const param = FormUtil.getData(this.inputForm.forms);
+      await this.$eSign(() =>
+        this.$axios.put('/st/stabSampleUsage/requestApproveUse', { ...data, ...param }),
+      )
         .then(() => {
-          this.$info(this.$message.info.updated);
-          this.fetchSearchResult();
+          this.$info(this.$message.info.approveRequest);
+          this.fetchSampleUsageGrid();
+          this.init();
+        })
+        .catch(() => {
+          this.$error(this.$message.error.saveData);
+        });
+    },
+    async requestCancelUseModalReturnDataEvent(data) {
+      const param = FormUtil.getData(this.inputForm.forms);
+      await this.$eSign(() =>
+        this.$axios.put('/st/stabSampleUsage/requestCancelUse', { ...data, ...param }),
+      )
+        .then(() => {
+          this.$info(this.$message.info.approveRequest);
+          this.fetchSampleUsageGrid();
+          this.init();
         })
         .catch(() => {
           this.$error(this.$message.error.updateData);
         });
     },
-    delete() {
-      const { forms } = this.inputInfoForm;
-      const parameter = FormUtil.getData(forms);
-      this.$eSignWithReason(() => this.$axios.put('/st/stabSampleUsage', parameter))
-        .then(() => {
-          this.$info(this.$message.info.deleted);
-          this.fetchSearchResult();
-        })
-        .catch(() => {
-          this.$error(this.$message.error.deleteData);
-        });
+    onSelectSample(event) {
+      const { forms } = this.inputForm;
+      FormUtil.setData(forms, event[0]);
+      this.setDefaultInfo();
     },
-    init() {
-      this.inputInfoForm.forms = values.inputInfoForm.forms();
-      this.gridForSearchResult.$grid.clearGridData();
-      this.changeButtonTypeToSave();
+    onDoubleClickCell(data) {
+      const { forms } = this.inputForm;
+      FormUtil.setData(forms, data);
+      this.setButtonsEnable(data.smpUseProc);
     },
-    setItemNmInDetailForm(item) {
-      FormUtil.setData(this.inputInfoForm.forms, item);
+    setButtonsEnable(status) {
+      const buttons = this.inputForm.buttons;
+      if (status === TEMP_SAVE || status === REJECT_USE) {
+        FormUtil.enableButtons(buttons, ['init', 'requestApproveUse', 'update', 'delete']);
+        FormUtil.disableButtons(buttons, ['save', 'requestCancelUse']);
+      } else if (
+        status === REQUEST_USE ||
+        status === REQUEST_CANCEL_USE ||
+        status === APPROVE_USE_CANCEL
+      ) {
+        FormUtil.enableButtons(buttons, ['init']);
+        FormUtil.disableButtons(buttons, [
+          'requestApproveUse',
+          'update',
+          'delete',
+          'save',
+          'requestCancelUse',
+        ]);
+      } else if (status === APPROVE_USE || status === REJECT_CANCEL_USE) {
+        FormUtil.enableButtons(buttons, ['init', 'requestCancelUse']);
+        FormUtil.disableButtons(buttons, ['requestApproveUse', 'update', 'delete', 'save']);
+      }
     },
+    onClickFormButtons({ name }) {
+      if (name === 'requestApproveUse') {
+        this.inputForm.forms
+          .validate()
+          .then(() => {
+            this.showModal('requestApproveUse');
+          })
+          .catch(() => {});
+      }
+      if (name === 'save') {
+        this.inputForm.forms
+          .validate()
+          .then(() => this.save())
+          .catch(() => {});
+      }
+      if (name === 'update') {
+        this.inputForm.forms
+          .validate()
+          .then(() => this.update())
+          .catch(() => {});
+      }
+      if (name === 'delete') {
+        this.inputForm.forms
+          .validate()
+          .then(() => this.delete())
+          .catch(() => {});
+      }
+      if (name === 'requestCancelUse') {
+        this.inputForm.forms
+          .validate()
+          .then(() => {
+            this.showModal('requestCancelUse');
+          })
+          .catch(() => {});
+      }
+      if (name === 'init') {
+        this.init();
+      }
+    },
+    onFormEvent(event) {
+      if (event.originEvent === 'sampleSearch') {
+        this.showModal('stabSampleItemSearchModal');
+      }
+    },
+    showModal(name) {
+      if (name === 'stabSampleItemSearchModal') {
+        return (this.stabSampleItemSearchModal.show = true);
+      }
+      if (name === 'requestApproveUse') {
+        return (this.requestApproveUse.show = true);
+      }
+      if (name === 'requestCancelUse') {
+        return (this.requestCancelUse.show = true);
+      }
+    },
+    hideModal(name) {
+      if (name === 'stabSampleItemSearchModal') {
+        return (this.stabSampleItemSearchModal.show = false);
+      }
+      if (name === 'requestApproveUse') {
+        return (this.requestApproveUse.show = false);
+      }
+      if (name === 'requestCancelUse') {
+        return (this.requestCancelUse.show = false);
+      }
+    },
+  },
+  mounted() {
+    this.fetchSampleUsageGrid();
+    this.init();
   },
 };
 </script>

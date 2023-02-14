@@ -19,6 +19,9 @@ export default {
   getSmpVolUnitCombo() {
     return this.getDetailUserCommonCd('U005');
   },
+  getGradeCombo() {
+    return this.getDetailUserCommonCd('U006');
+  },
   getRvsReaCombo() {
     return this.getDetailUserCommonCd('U007');
   },
@@ -72,5 +75,8 @@ export default {
   },
   getSmpReqReaCombo() {
     return this.getDetailUserCommonCd('U025');
+  },
+  getWorkDivCombo() {
+    return this.getDetailUserCommonCd('U026');
   },
 };

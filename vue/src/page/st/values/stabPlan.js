@@ -74,9 +74,11 @@ const gridForSearchResult = {
   },
   columns: () =>
     ColumnBuilder.builder()
+      .col('fileIdx', false)
       .button('fileAttacher', '첨부')
       .col('pitmNm', '품목명')
       .col('pitmCd', '품목코드')
+      .col('ansNo', '시험번호')
       // .col('3', '공정명')
       .col('lotNo', '제조번호')
       .col('makDt', '제조일자')
@@ -251,6 +253,7 @@ const stabInfoRegForm = {
       .Hidden('sbtPlnIdx', '안정성 계획 IDX')
       .Hidden('ansIdx', '시험 IDX')
       .Hidden('sbtAnsPlnAprIdx', '안정성 시험 계획 승인 IDX')
+      .Hidden('aprUid', '승인 UID')
       .build(),
 };
 

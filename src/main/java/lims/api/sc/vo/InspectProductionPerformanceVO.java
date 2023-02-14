@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -62,8 +63,24 @@ public class InspectProductionPerformanceVO {
     private String addCol5;
     private String udtDs;
     private String revDs;
+    private String ansProcCd;
+    private String sytJdg;
+    private String reqDt;
+    private String rcpDt;
+    private String ansNo;
+    private Integer ispPdtPfaIdx;
+    private Integer srlNo;
+    private String ispPfaCanlYn;
+    private String ifMtdDiv;
+    private String ifStt;
+    private String hoprIfUid;
+    private Date ifDs;
+    private String ifDate;
+    private Integer ifInfoIdx;
+    private Integer degree;
 
     /* 별칭 */
+    private String plntNm;
     private String pitmCd;
     private String pitmNm;
     private List<String> etrDtList = new ArrayList<>();
@@ -71,6 +88,7 @@ public class InspectProductionPerformanceVO {
     private String month;
     private String pitmTypNm;
     private String ispScr;
-    private String ispPfaCanlYn;
-    private String ispPfaIfDs;
+    private String ifSttNm;
+    private String ifMtdDivNm;
+    private String hoprIfNm;
 }

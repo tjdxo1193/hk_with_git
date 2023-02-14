@@ -3,6 +3,8 @@ package lims.api.kp.vo;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 public class AddSampleLabelPubVO {
@@ -11,7 +13,8 @@ public class AddSampleLabelPubVO {
     private Integer addSmpIdx;
     private Integer ansIdx;
     private Integer smpMngIdx;
-    private String addSmpProc;
+    private String addSmpProc;              // S032, 추가 검체 프로세스
+    private String addSmpProcNm;            // 추가 검체 프로세스명(임의추가)
     private String pitmTyp;
     private String pitmCd;
     private String pitmNm;
@@ -32,9 +35,12 @@ public class AddSampleLabelPubVO {
     private String rjtDs;
     private String rjtRea;
 
-    /* 별칭 */
-    private String addSmpNm;
+    /* QT_PITM_ANS_PROC, QT 품목 시험 프로세스 */
+    private String ansNo;               // 시험 번호
+
+    /* Etc. */
     private String pitmTypNm;
     private String ansTypNm;
     private String smpReqReaNm;
+    private List<String> searchSmpReqDt;
 }

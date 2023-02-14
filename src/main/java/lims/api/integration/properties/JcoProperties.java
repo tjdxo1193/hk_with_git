@@ -83,7 +83,7 @@ public class JcoProperties {
     private void createDestinationDataFile(Properties properties) throws IOException {
         File destCfg = new File(getJcoDestinationFileFullName());
         FileOutputStream fos = new FileOutputStream(destCfg, false);
-        properties.store(fos, "for test");
+        properties.store(fos, "jco_destination_data_file");
         fos.close();
     }
 

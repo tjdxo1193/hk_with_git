@@ -27,6 +27,7 @@ const stabEachTestInfo = {
     buttons: [
       { name: 'add', label: '추가', disabled: false },
       { name: 'update', label: '수정', disabled: true },
+      { name: 'reset', label: '초기화', disabled: false },
       { name: 'delete', label: '삭제', disabled: true, type: 'danger' },
     ],
   },
@@ -72,10 +73,7 @@ const itemSettingList = {
 };
 
 const buttonGroups = {
-  buttons: [
-    { name: 'save', label: '저장' },
-    { name: 'reset', label: '초기화', type: 'default' },
-  ],
+  buttons: [{ name: 'save', label: '저장' }],
 };
 
 export default {

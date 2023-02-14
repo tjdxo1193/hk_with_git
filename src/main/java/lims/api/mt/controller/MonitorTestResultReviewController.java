@@ -40,9 +40,10 @@ public class MonitorTestResultReviewController {
     }
 
     @PutMapping("/apprRequest")
-    public ResponseEntity<CommonResponse> apprRequest(@AuthToken Token token, @RequestBody MonitorTestResultReviewVO request) {
+    public ResponseEntity<CommonResponse> apprRequest(@AuthToken Token token, @RequestBody MonitorTestResultReviewVO request, @ESign ESignInfo esign) {
         String jwt = token.getJwt();
         request.setPlntCd(jwtResolver.getPlantCode(jwt));
+        request.setRea(esign.getReason());
         service.apprRequest(request);
         return ResponseEntity.ok(new CommonResponse());
     }

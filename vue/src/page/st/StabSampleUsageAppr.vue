@@ -1,130 +1,117 @@
 <template>
-  <FormWithHeader v-bind="searchForm" @button-click="onClickSearchBtn" />
-  <AUIGridWithHeader
-    v-bind="gridForSearchResult"
-    @grid-created="(proxy) => $setState('gridForSearchResult.$grid', proxy)"
+  <AUIGridSearch
+    v-bind="sampleGrid"
+    @grid-created="(proxy) => $setState('sampleGrid.$grid', proxy)"
   />
-  <DesignateApproversModal
-    :show="designateApproversModal.show"
-    @close="hideDesignateApproversModal()"
+  <FormWithHeader v-bind="inputForm" @button-click="onClickFormButtons" />
+  <RejectionReasonModal
+    :show="rejectionReasonModal.show"
+    @close="hideModal('rejectionReasonModal')"
+    @check="reject"
   />
-  <FormWithHeader v-bind="inputInfoForm" />
-  <ActionBar :buttons="buttonGroups.buttons" @button-click="onEventsButton" />
 </template>
 
 <script>
-import { DesignateApproversModal } from '@/page/modal';
-import { FormUtil } from '@/util';
+import { RejectionReasonModal } from '@/page/modal';
+import { FormUtil } from '@/util/index.js';
 
-import values from './values/stabSampleUsageAppr';
+import values from './values/stabSampleUsageAppr.js';
 
 export default {
-  name: 'StabSampleUsageApprPage',
+  name: 'StabSampleUsageAppr',
   components: {
-    DesignateApproversModal,
-  },
-  mounted() {
-    this.gridForSearchResult.$grid.setGridData(this.gridForSearchResult.data);
+    RejectionReasonModal,
   },
   data() {
-    const { searchForm, gridForSearchResult, inputInfoForm, buttonGroups } = this.$copy(values);
+    const { sampleGrid, inputForm } = this.$copy(values);
     return {
-      searchForm: {
-        ...searchForm.static,
-        forms: searchForm.forms(),
-      },
-
-      gridForSearchResult: {
-        ...gridForSearchResult.static,
-        columns: gridForSearchResult.columns(),
+      sampleGrid: {
+        ...sampleGrid.static,
+        forms: sampleGrid.forms(),
+        columns: sampleGrid.columns(),
         event: {
-          cellDoubleClick: (e) => this.getItemInfoForInputForm(e),
+          cellDoubleClick: (event) => {
+            this.onCellDoubleClick(event.item);
+          },
         },
       },
-      //동적그리드..
-      inputInfoForm: {
-        ...inputInfoForm.static,
-        forms: inputInfoForm.forms(),
+      inputForm: {
+        ...inputForm.static,
+        forms: inputForm.forms(),
       },
-
-      buttonGroups: {
-        buttons: buttonGroups.buttons,
-      },
-
-      designateApproversModal: {
+      rejectionReasonModal: {
         show: false,
       },
     };
   },
   methods: {
-    //조회폼
-    async fetchSearchResult() {
-      const { $grid } = this.gridForSearchResult;
-      const { forms } = this.searchForm;
-      const parameter = FormUtil.getData(forms);
-      await $grid
-        ._useLoader(() => this.$axios.get('st/stabSampleUsage', parameter))
-        .then(({ data }) => data);
+    init() {
+      this.inputForm.forms = values.inputForm.forms();
+      const { buttons } = this.inputForm;
+      FormUtil.enableButtons(buttons, ['init']);
+      FormUtil.disableButtons(buttons, ['approve', 'reject']);
     },
-
-    onClickSearchBtn({ name }) {
-      if (name == 'search') {
-        this.fetchSearchResult();
-      }
+    async fetchSampleGrid() {
+      const { forms, $grid } = this.sampleGrid;
+      const param = FormUtil.getData(forms);
+      const data = await $grid
+        ._useLoader(() => this.$axios.get('/st/stabSampleUsageAppr', param))
+        .then(({ data }) => data)
+        .catch(() => this.$error(this.$message.error.fetchData));
+      $grid.setGridData(data);
     },
-    //조회결과 그리드
-    onEventsButton({ name }) {
-      if (name == 'approve') {
-        this.approve();
-      }
-      if (name == 'reject') {
-        this.reject();
-      }
-      if (name == 'init') {
+    async approve() {
+      const param = FormUtil.getData(this.inputForm.forms);
+      await this.$eSign(() => this.$axios.put('/st/stabSampleUsageAppr/approve', param))
+        .then(() => {
+          this.$info(this.$message.info.approve);
+          this.fetchSampleGrid();
+          this.init();
+        })
+        .catch(() => this.$error(this.$message.error.updateData));
+    },
+    async reject({ rjtRea }) {
+      const param = { ...FormUtil.getData(this.inputForm.forms), rjtRea };
+      await this.$eSign(() => this.$axios.put('/st/stabSampleUsageAppr/reject', param))
+        .then(() => {
+          this.$info(this.$message.info.reject);
+          this.fetchSampleGrid();
+          this.init();
+        })
+        .catch(() => {
+          this.$error(this.$message.error.updateData);
+        });
+    },
+    onCellDoubleClick(data) {
+      const { forms, buttons } = this.inputForm;
+      FormUtil.setData(forms, data);
+      FormUtil.enableButtons(buttons, ['approve', 'reject', 'init']);
+    },
+    onClickFormButtons({ name }) {
+      if (name === 'init') {
         this.init();
       }
+      if (name === 'approve') {
+        this.approve();
+      }
+      if (name === 'reject') {
+        this.showModal('rejectionReasonModal');
+      }
     },
-    getItemInfoForInputForm({ item }) {
-      FormUtil.setData(this.inputInfoForm.forms, item);
-      FormUtil.enableButtons(this.buttonGroups.buttons, ['approve', 'reject']);
+    showModal(name) {
+      if (name === 'rejectionReasonModal') {
+        return (this.rejectionReasonModal.show = true);
+      }
     },
-    showDesignateApproversModal() {
-      this.$setState('designateApproversModal', { show: true });
+    hideModal(name) {
+      if (name === 'rejectionReasonModal') {
+        return (this.rejectionReasonModal.show = false);
+      }
     },
-    hideDesignateApproversModal() {
-      this.$setState('designateApproversModal', { show: false });
-    },
-    approve() {
-      this.showDesignateApproversModal();
-      const { forms } = this.inputInfoForm;
-      const parameter = FormUtil.getData(forms);
-      this.$eSign(() => this.$axios.put('/st/stabSampleUsageAppr', parameter))
-        .then(() => {
-          this.$info(this.$message.info.saved);
-          this.fetchSearchResult();
-        })
-        .catch(() => {
-          this.$error(this.$message.error.createData);
-        });
-    },
-    reject() {
-      this.showDesignateApproversModal();
-      const { forms } = this.inputInfoForm;
-      const parameter = FormUtil.getData(forms);
-      this.$eSign(() => this.$axios.put('/st/stabSampleUsageAppr', parameter))
-        .then(() => {
-          this.$info(this.$message.info.saved);
-          this.fetchSearchResult();
-        })
-        .catch(() => {
-          this.$error(this.$message.error.createData);
-        });
-    },
-    init() {
-      this.inputInfoForm.forms = values.inputInfoForm.forms();
-      this.gridForSearchResult.$grid.clearGridData();
-      FormUtil.disableButtons(this.buttonGroups.buttons, ['approve', 'reject']);
-    },
+  },
+  mounted() {
+    this.init();
+    this.fetchSampleGrid();
   },
 };
 </script>

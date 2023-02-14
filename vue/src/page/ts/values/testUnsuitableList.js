@@ -156,8 +156,8 @@ const unsuitableInfo = {
     title: '상세정보',
     countPerRow: 4,
     buttons: [
-      { name: 'save', label: '저장' },
-      { name: 'publishReport', label: '부적합보고서발행' },
+      //{ name: 'save', label: '저장' },
+      //{ name: 'publishReport', label: '부적합보고서발행' },
     ],
   },
   forms: () =>
@@ -174,8 +174,7 @@ const unsuitableInfo = {
       .Input('assNo', '지시번호', { readonly: true })
       .Input('batchNo', '배치번호', { readonly: true })
       .Input('orderNo', '오더번호', { readonly: true })
-      .Input('nonCfmRea', '부적합사유')
-      .required()
+      .Input('nonCfmRea', '부적합사유', { readonly: true })
       .spanCol(2)
       .build(),
 };

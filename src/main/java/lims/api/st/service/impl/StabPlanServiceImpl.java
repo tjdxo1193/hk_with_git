@@ -96,7 +96,7 @@ public class StabPlanServiceImpl implements StabPlanService {
         param.setSbtPlnStt(SbtPlnSttProcess.SAVE.getProcessCode());
 
         ApproveVO approveVO = this.setApproveVO(param);
-        approveService.create(approveVO);
+        approveService.requestApprove(approveVO);
 
         param.setSbtAnsPlnAprIdx(approveVO.getAprIdx());
 
@@ -319,9 +319,16 @@ public class StabPlanServiceImpl implements StabPlanService {
         // 안정성계획 삭제
         result += stabPlanDao.delete(param);
         // 안정성시험 삭제
-        result += stabPlanDao.deleteAllAns(param);
+        List<StabPlanVO> ansListForDelete = stabPlanDao.getAnsForDelete(param);
+        for(StabPlanVO itemForDeleteAns : ansListForDelete) {
+            result += stabPlanDao.deleteAns(itemForDeleteAns);
+        }
+
         // 안정성시험 항목 삭제
-        result += stabPlanDao.deleteAitm(param);
+        List<StabPlanVO> aitmListForDelete = stabPlanDao.getAitmForDelete(param);
+        for(StabPlanVO itemForDeleteAitm : aitmListForDelete) {
+            result += stabPlanDao.deleteAitm(itemForDeleteAitm);
+        }
 
         return result;
     }
@@ -330,6 +337,10 @@ public class StabPlanServiceImpl implements StabPlanService {
     public int stopRequest(StabPlanVO param) {
         param.setSbtAnsProc(SbtAnsProcess.STOP_REQUEST.getSbtAnsProc());
         param.setSbtPlnStt(SbtPlnSttProcess.PLN_APPROVE_REQUEST.getProcessCode());
+        ApproveVO approveVO = this.setApproveVO(param);
+        approveVO.setAprIdx(param.getSbtAnsPlnAprIdx());
+        approveVO.setAprReqRea(param.getAprReqRea());
+        approveService.requestApprove(approveVO);
         return stabPlanDao.stopRequest(param);
     }
 
@@ -340,7 +351,7 @@ public class StabPlanServiceImpl implements StabPlanService {
         ApproveVO approveVO = this.setApproveVO(param);
         approveVO.setAprIdx(param.getSbtAnsPlnAprIdx());
         // SY_APR_INFO의 APR_REQ_DIV(승인 요청 구분, S005)을 바인딩은 하지만, 쿼리 상, 해당 값을 수정하지 않는다.
-        approveService.update(approveVO);
+        approveService.requestApprove(approveVO);
         return stabPlanDao.stopCancelRequest(param);
     }
 
@@ -352,7 +363,7 @@ public class StabPlanServiceImpl implements StabPlanService {
         ApproveVO approveVO = this.setApproveVO(param);
         approveVO.setAprIdx(param.getSbtAnsPlnAprIdx());
         // SY_APR_INFO의 APR_REQ_DIV(승인 요청 구분, S005)을 바인딩은 하지만, 쿼리 상, 해당 값을 수정하지 않는다.
-        approveService.update(approveVO);
+        approveService.requestApprove(approveVO);
 
         return stabPlanDao.approveRequest(param);
     }
@@ -399,6 +410,7 @@ public class StabPlanServiceImpl implements StabPlanService {
         approveInfo.setPlntCd(param.getPlntCd());
         approveInfo.setAprReqUid(param.getLoginUserUid());
 //        approveInfo.setAprReqDiv(param.getSbtAnsProc());
+
         approveInfo.setAprReqDiv(ApproveRequestStDivType.STAB_PLAN_VERSION.getCode());
         if(param.getAprUid() != null) {
             approveInfo.setAprUid(param.getAprUid());

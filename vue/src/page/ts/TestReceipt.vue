@@ -91,7 +91,8 @@ export default {
         event: {
           cellDoubleClick: (e) => {
             this.nonconformityTestModal.reqIdx = e.item.reqIdx;
-            this.getTestAitm(e);
+            FormUtil.setData(this.requestInfo.forms, e.item);
+            this.getTestAitm();
             this.enableButtons([
               'init',
               'specimen',
@@ -149,9 +150,8 @@ export default {
         ._useLoader(() => this.$axios.get('/ts/testReceipt', parameter))
         .then(({ data }) => this.list.$grid.setGridData(data));
     },
-    getTestAitm(event) {
-      const parameter = event.item;
-      FormUtil.setData(this.requestInfo.forms, parameter);
+    getTestAitm() {
+      const parameter = FormUtil.getData(this.requestInfo.forms);
       this.itemList.$grid
         ._useLoader(() => this.$axios.get('/ts/testReceipt/getTestAitm', parameter))
         .then(({ data }) => this.itemList.$grid.setGridData(data));

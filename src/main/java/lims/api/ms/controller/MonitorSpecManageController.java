@@ -70,7 +70,7 @@ public class MonitorSpecManageController {
     public ResponseEntity<CommonResponse> updateRequestReview(@AuthToken Token token, @RequestBody MonitorSpecManageVO param) {
         String jwt = token.getJwt();
         param.setPlntCd(jwtResolver.getPlantCode(jwt));
-        param.setRevwUid(param.getAprReqUid());
+        param.setRevwUid(param.getAprUid());
         service.updateRequestReview(param);
         return ResponseEntity.ok(new CommonResponse());
     }

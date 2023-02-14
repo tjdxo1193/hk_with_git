@@ -11,17 +11,16 @@
     <ActionBar :buttons="buttonGroups.buttons" @button-click="onClickButtonGroups" />
   </ModalBase>
 
-  <InputReasonModal
+  <!-- <InputReasonModal
     :show="inputReasonModal.show"
     @modalReturnDataEvent="modalReturnDataEvent"
     @close="hideModal('inputReasonModal')"
-  />
+  /> -->
 </template>
 
 <script>
 import dayjs from 'dayjs';
 
-import { InputReasonModal } from '@/page/modal';
 import { FormUtil } from '@/util/index.js';
 
 import values from './values/stabDetailPlanRegModal';
@@ -29,7 +28,7 @@ import values from './values/stabDetailPlanRegModal';
 export default {
   name: 'StabDetailPlanRegModal',
   emits: ['close'],
-  components: { InputReasonModal },
+  components: {},
   props: {
     show: Boolean,
     title: {
@@ -62,7 +61,6 @@ export default {
       },
       stabEachTestInfo: {
         ...stabEachTestInfo.static,
-
         forms: stabEachTestInfo.forms(),
       },
       itemSettingList: {
@@ -72,10 +70,10 @@ export default {
       buttonGroups: {
         buttons: buttonGroups.buttons,
       },
-      inputReasonModal: {
-        show: false,
-        updateType: null,
-      },
+      // inputReasonModal: {
+      //   show: false,
+      //   updateType: null,
+      // },
     };
   },
   methods: {
@@ -147,10 +145,13 @@ export default {
       }
       if (name === 'update') {
         //수정
-        this.preUpdate('inputReasonModal', 'update');
+        this.update();
       }
       if (name === 'delete') {
-        this.preUpdate('inputReasonModal', 'delete');
+        this.delete();
+      }
+      if (name == 'reset') {
+        this.doInit();
       }
     },
     // 동적 그리드 컨트롤러
@@ -223,6 +224,7 @@ export default {
             ? data[i].accMarkNm + (data[i].accMarkNm != 'Initial' ? ' ' + ansCylDivNm : '')
             : '',
           ansSmpVol: data[i]?.ansSmpVol ? data[i].ansSmpVol : '',
+          accMarkNm: data[i]?.accMarkNm ? data[i].accMarkNm : '',
           sbtAnsIdx: data[i]?.sbtAnsIdx ? data[i].sbtAnsIdx : '',
           ansDt: data[i]?.ansDt ? data[i].ansDt : '',
           width: '120',
@@ -354,6 +356,24 @@ export default {
       }
 
       this.setGirdColumnSizeExlude($grid, columns, 120, false);
+
+      $grid.bind('headerClick', (event) => {
+        const { columnIndex } = event;
+        const gridHeader = $grid.getColumnLayout();
+        const choosedHeader = gridHeader[columnIndex];
+        const { ansDt, accMarkNm, ansSmpVol, sbtAnsIdx } = choosedHeader;
+
+        FormUtil.setData(forms, { ansDt, accMarkNm, ansSmpVol, sbtAnsIdx });
+
+        this.disableStabEachTestInfoAddBtn();
+        if (!this.$props.disable) {
+          this.enableStabEachTestInfoModifyBtn();
+          this.enableStabEachTestInfoDeleteBtn();
+        } else {
+          this.disableStabEachTestInfoModifyBtn();
+          this.disableStabEachTestInfoDeleteBtn();
+        }
+      });
 
       $grid.bind('cellClick', (event) => {
         if (event.columnIndex == 0) {
@@ -512,28 +532,23 @@ export default {
     hideModal(modalName) {
       this.$setState(modalName, { show: false });
     },
-    // 수정, 삭제 시 사유 모달
-    modalReturnDataEvent({ rjtReaDiv, rjtRea }) {
-      const updateType = this.inputReasonModal.updateType;
-      if (!updateType || !rjtReaDiv || !rjtRea) {
-        return;
-      }
+    // // 수정, 삭제 시 사유 모달
+    // modalReturnDataEvent({ rjtReaDiv, rjtRea }) {
+    //   const updateType = this.inputReasonModal.updateType;
+    //   if (!updateType || !rjtReaDiv || !rjtRea) {
+    //     return;
+    //   }
 
-      if (updateType === 'update') {
-        this.update({ rjtReaDiv, rjtRea });
-      } else if (updateType === 'delete') {
-        this.delete({ rjtReaDiv, rjtRea });
-      }
-    },
-    // 수정 전, 사유 받기
-    preUpdate(modalName, updateType) {
-      this.inputReasonModal.updateType = updateType;
-      this.showModal(modalName);
-    },
+    //   if (updateType === 'update') {
+    //     this.update({ rjtReaDiv, rjtRea });
+    //   } else if (updateType === 'delete') {
+    //     this.delete({ rjtReaDiv, rjtRea });
+    //   }
+    // },
     // 수정
-    update({ rjtReaDiv, rjtRea }) {
+    update() {
       const { forms } = this.stabEachTestInfo;
-      const parameter = { rjtReaDiv, rjtRea, ...FormUtil.getData(forms) };
+      const parameter = FormUtil.getData(forms);
 
       if (this.checkAnsSmpVol()) {
         this.$warn(this.$message.warn.noExceedAnsSmpVol);
@@ -543,7 +558,7 @@ export default {
       forms.validate().then(() => {
         this.$eSign(() => this.$axios.put('st/stabPlan/detail', parameter))
           .then(() => {
-            this.$info(this.$message.info.saved);
+            this.$info(this.$message.info.updated);
             this.doInit();
           })
           .catch(() => {
@@ -552,13 +567,13 @@ export default {
       });
     },
     // 삭제
-    delete({ rjtReaDiv, rjtRea }) {
+    delete() {
       const { forms } = this.stabEachTestInfo;
-      const parameter = { rjtReaDiv, rjtRea, ...FormUtil.getData(forms) };
+      const parameter = FormUtil.getData(forms);
 
       this.$eSign(() => this.$axios.post('st/stabPlan/detail', parameter))
         .then(() => {
-          this.$info(this.$message.info.saved);
+          this.$info(this.$message.info.deleted);
           this.doInit();
         })
         .catch(() => {
@@ -569,9 +584,6 @@ export default {
     onClickButtonGroups({ name }) {
       if (name == 'save') {
         this.save();
-      }
-      if (name == 'reset') {
-        this.doInit();
       }
     },
 

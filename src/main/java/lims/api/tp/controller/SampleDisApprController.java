@@ -26,14 +26,14 @@ public class SampleDisApprController {
         return ResponseEntity.ok(service.find(request));
     }
 
-    @PutMapping("approve")
+    @PutMapping("/approve")
     public ResponseEntity<CommonResponse> approve(@AuthToken Token token, @RequestBody List<SampleDisApprVO> requests) {
         setUserInfo(token, requests);
         service.approve(requests);
         return ResponseEntity.ok(new CommonResponse());
     }
 
-    @PutMapping("reject")
+    @PutMapping("/reject")
     public ResponseEntity<CommonResponse> reject(@AuthToken Token token, @RequestBody List<SampleDisApprVO> requests) {
         setUserInfo(token, requests);
         service.reject(requests);
@@ -44,6 +44,7 @@ public class SampleDisApprController {
         String plntCd = jwtResolver.getPlantCode(token.getJwt());
         String userId = jwtResolver.getUserId(token.getJwt());
         requests.forEach(request -> {
+            request.setRjtUid(userId);
             request.setPlntCd(plntCd);
             request.setAprUid(userId);
         });

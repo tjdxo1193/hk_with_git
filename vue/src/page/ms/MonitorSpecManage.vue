@@ -64,11 +64,12 @@ export default {
         forms: mItemSpecList.forms(),
         columns: mItemSpecList.columns(),
         event: {
-          cellClick: (e) => {
+          cellDoubleClick: (e) => {
             this.init();
             this.fetchVersionList(e.item);
             this.settingDepartmentList(e.item);
             this.setValueWithMItemSpecListHiddenForm(e.item);
+            this.bottomGridSetting($grid);
           },
         },
       },
@@ -76,7 +77,7 @@ export default {
         ...versionList.static,
         columns: versionList.columns(),
         event: {
-          cellClick: (e) => {
+          cellDoubleClick: (e) => {
             this.fetchMItemSpecAItemList(e);
             this.changeButtonWhenSelectedVersion();
           },
@@ -86,7 +87,7 @@ export default {
         ...testItemList.static,
         columns: testItemList.columns(),
         event: {
-          cellClick: () => {
+          cellDoubleClick: () => {
             this.changeButtonWhenSelectedTestItem();
           },
           cellEditBegin: (e) => {
@@ -135,8 +136,6 @@ export default {
         .then(({ data }) => data);
 
       $grid.setGridData(data);
-
-      this.bottomGridSetting($grid);
     },
     setValueWithMItemSpecListHiddenForm(item) {
       FormUtil.setData(this.valueWithMItemSpecList.forms, item);

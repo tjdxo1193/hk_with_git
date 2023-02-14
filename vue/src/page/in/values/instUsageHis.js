@@ -52,7 +52,6 @@ const registerForm = {
     title: '정보등록',
     countPerRow: 4,
     buttons: [
-      { name: 'excel', label: 'Excel' },
       { name: 'saveFile', label: '파일등록', disabled: true },
       { name: 'save', label: '등록' },
       { name: 'update', label: '수정', disabled: true },

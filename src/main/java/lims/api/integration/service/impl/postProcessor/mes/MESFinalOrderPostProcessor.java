@@ -5,7 +5,7 @@ import lims.api.integration.annotation.PostProcessorRevExceptionHandler;
 import lims.api.integration.dao.MESDao;
 import lims.api.integration.dao.MESMasterDao;
 import lims.api.integration.domain.eai.RevStateful;
-import lims.api.integration.enums.SRMFinalOrderStatus;
+import lims.api.integration.enums.FinalOrderStatus;
 import lims.api.integration.service.impl.postProcessor.PostProcessor;
 import lims.api.integration.vo.MESFinalOrderVO;
 import lims.api.util.process.SimpleSaveProcess;
@@ -36,7 +36,7 @@ public class MESFinalOrderPostProcessor implements PostProcessor {
                  * MES에서는 '마감 상태'라는 값이 없지만 SRM과 동일하게 처리하기 위해 
                  * 마스터 테이블에 '마감' 값을 고정적으로 넣어줍니다
                  */
-                vo.setStatus(SRMFinalOrderStatus.FINISH.getValue());
+                vo.setStatus(FinalOrderStatus.FINISH.getValue());
                 return masterDao.createFinalOrder(vo);
             }
         ).getTotalCount();

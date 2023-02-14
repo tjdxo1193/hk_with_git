@@ -37,10 +37,12 @@ public interface StabPlanDao {
     int update(StabPlanVO param);
     @Audit(target = StSbtPln.class, label = AuditEvent.StabPln.delete)
     int delete(StabPlanVO param);
+    List<StabPlanVO> getAnsForDelete(StabPlanVO param);
     @Audit(target = StSbtAns.class, label = AuditEvent.StabPln.deleteAns)
     int deleteAllAns(StabPlanVO param);
     @Audit(target = StSbtAns.class, label = AuditEvent.StabPln.deleteAns)
     int deleteAns(StabPlanVO param);
+    List<StabPlanVO> getAitmForDelete(StabPlanVO param);
     @Audit(target = StSbtAnsAitm.class, label = AuditEvent.StabPln.deleteAitm)
     int deleteAitm(StabPlanVO param);
     @Audit(target = StSbtPln.class, label = AuditEvent.StabPln.stopRequest)

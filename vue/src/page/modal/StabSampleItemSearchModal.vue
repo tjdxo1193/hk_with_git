@@ -1,11 +1,11 @@
 <template>
   <ModalBase v-bind="$props" @close="close">
-    <FormWithHeader v-bind="inquireForm" @button-click="onClickSearchBtn" />
-
-    <AUIGridWithHeader
-      v-bind="gridForSearchResult"
-      @grid-created="(proxy) => $setState('gridForSearchResult.$grid', proxy)"
+    <AUIGridSearch
+      v-bind="sampleGrid"
+      @button-click="fetchSampleGrid"
+      @grid-created="(proxy) => $setState('sampleGrid.$grid', proxy)"
     />
+    <ActionBar @button-click="onClickBottomButtons" :buttons="bottomButtons.buttons"> </ActionBar>
   </ModalBase>
 </template>
 
@@ -28,50 +28,63 @@ export default {
     },
     height: {
       type: String,
-      default: '650px',
+      default: '50%',
     },
   },
   data() {
-    const { inquireForm, gridForSearchResult } = this.$copy(values);
+    const { sampleGrid, bottomButtons } = this.$copy(values);
     return {
-      inquireForm: {
-        ...inquireForm.static,
-        forms: inquireForm.forms(),
+      sampleGrid: {
+        ...sampleGrid.static,
+        forms: sampleGrid.forms(),
+        columns: sampleGrid.columns(),
       },
-      gridForSearchResult: {
-        ...gridForSearchResult.static,
-        columns: gridForSearchResult.columns(),
-        event: {
-          cellDoubleClick: (e) => this.getStabItemByItemCode(e),
-        },
+      bottomButtons: {
+        ...bottomButtons.static,
       },
     };
   },
   methods: {
-    async fetchSearchResult() {
-      const { forms } = this.inquireForm;
-      const { $grid } = this.gridForSearchResult;
-      const parameter = FormUtil.getData(forms);
-      await $grid
-        ._useLoader(() => this.$axios.get('st/stabSampleItemSearchModal', parameter))
+    init() {
+      const { $grid } = this.sampleGrid;
+      this.sampleGrid.forms = values.sampleGrid.forms();
+      $grid.sampleGrid;
+    },
+    async fetchSampleGrid() {
+      const { forms, $grid } = this.sampleGrid;
+      const param = FormUtil.getData(forms);
+      const data = await $grid
+        ._useLoader(() => this.$axios.get('/st/stabSampleUsage/sample', param))
         .then(({ data }) => data);
+      $grid.setGridData(data);
     },
-
-    onClickSearchBtn({ name }) {
-      if (name === 'search') {
-        // test
-        this.gridForSearchResult.$grid.setGridData(this.gridForSearchResult.data);
-        this.fetchSearchResult();
+    onClickBottomButtons({ name }) {
+      if (name === 'select') {
+        const { $grid } = this.sampleGrid;
+        const selectedRowItem = $grid.getSelectedRows();
+        this.$emit('select', selectedRowItem);
+        this.close();
       }
-    },
-    getStabItemByItemCode({ item }) {
-      this.$emit('select', item);
-      this.close();
+      if (name === 'close') {
+        this.init();
+        this.close();
+      }
     },
     close() {
       this.$emit('close');
+      this.fetchSampleGrid();
     },
   },
+  mounted() {
+    this.fetchSampleGrid();
+  },
+  watch: {
+    show() {
+      if (this.$props.show) {
+        this.fetchSampleGrid();
+      }
+    },
+  }
 };
 </script>
 

@@ -41,22 +41,42 @@ public class SAPTestRequestPostProcessor implements PostProcessor {
         }
     }
 
+    private boolean isCancel(String nullOrX) {
+        return "X".equals(nullOrX);
+    }
+
     private void cancelPItemProcess(SAPTestRequestVO.RequestHeader header) {
+        int count = 0;
+
+        count += cancelTestRequest(header);
+        count += cancelTestRequestProcess(header);
+
+        if (count == 0) {
+            throw new IntegrationNoSavedException();
+        }
+    }
+
+    private int cancelTestRequest(SAPTestRequestVO.RequestHeader header) {
+        SAPPostProcessVO.TestRequest.PItemReq pItemReq = convertTo(header);
+        return postProcessDao.cancelTestRequestToCancel(pItemReq);
+    }
+
+    private int cancelTestRequestProcess(SAPTestRequestVO.RequestHeader header) {
         List<Integer> cancelReqIdxes = postProcessDao.findReqIdxByIspReqNo(header.getZqcreqno());
 
         if (CollectionUtils.isEmpty(cancelReqIdxes)) {
-            return;
+            return 0;
         }
 
         String cancelIdxesInClause = cancelReqIdxes.stream().map(String::valueOf).collect(Collectors.joining(","));
         List<SAPPostProcessVO.TestRequest.PItemReqProcess> notCanceledProcesses = postProcessDao.findNotCanceledTestReqProcessAllByReqIdx(cancelIdxesInClause);
 
         if (CollectionUtils.isEmpty(notCanceledProcesses)) {
-            return;
+            return 0;
         }
 
         int count = 0;
-        for (SAPPostProcessVO.TestRequest.PItemReqProcess notCanceledProcess : notCanceledProcesses){
+        for (SAPPostProcessVO.TestRequest.PItemReqProcess notCanceledProcess : notCanceledProcesses) {
             SAPPostProcessVO.TestRequest.PItemReqProcess holdProcess = SAPPostProcessVO.TestRequest.PItemReqProcess.builder()
                     .plntCd(header.getWerks())
                     .ansIdx(notCanceledProcess.getAnsIdx())
@@ -66,10 +86,7 @@ public class SAPTestRequestPostProcessor implements PostProcessor {
                     .build();
             count += postProcessDao.cancelTestRequestProcessToCancel(holdProcess);
         }
-
-        if (count == 0) {
-            throw new IntegrationNoSavedException();
-        }
+        return count;
     }
 
     private void createPItemRequest(SAPTestRequestVO.RequestHeader header, int degree) {
@@ -77,9 +94,51 @@ public class SAPTestRequestPostProcessor implements PostProcessor {
         String plantCode = header.getWerks();
         Integer reqIdx = postProcessDao.nextIdxInPItemReq();
 
-        SAPPostProcessVO.TestRequest.PItemReq pItemReq = SAPPostProcessVO.TestRequest.PItemReq.builder()
-                .plntCd(plantCode)
-                .reqIdx(reqIdx)
+        SAPPostProcessVO.TestRequest.PItemReq pItemReq = convertTo(header);
+        pItemReq.setReqIdx(reqIdx);
+
+        count += postProcessDao.createPItemRequest(pItemReq);
+        count += createPItemRequestNonCfm(plantCode, reqIdx, degree);
+
+        if (count == 0) {
+            throw new IntegrationNoSavedException();
+        }
+    }
+
+    private int createPItemRequestNonCfm(String plantCode, Integer reqIdx, int degree) {
+        int count = 0;
+        List<SAPTestRequestVO.RequestDetails> details = sapDao.findAllTestReqDetailsByDegree(degree);
+
+        if (CollectionUtils.isNotEmpty(details)) {
+            for (SAPTestRequestVO.RequestDetails detail : details) {
+                SAPPostProcessVO.TestRequest.PItemReqNonCfm param = SAPPostProcessVO.TestRequest.PItemReqNonCfm.builder()
+                        .plntCd(plantCode)
+                        .reqIdx(reqIdx)
+                        .build();
+                Integer seq = postProcessDao.nextSeqInPItemRequestNonCfm(param);
+
+                SAPPostProcessVO.TestRequest.PItemReqNonCfm pItemReqNonCfm = SAPPostProcessVO.TestRequest.PItemReqNonCfm.builder()
+                        .plntCd(plantCode)
+                        .reqIdx(reqIdx)
+                        .nonCfmSeq(seq)
+                        .ispReqNo(detail.getZqcreqno())
+                        .ispReqNoBlk(detail.getZqcnoBlk())
+                        .zexfield1(detail.getZexfield1())
+                        .zexfield2(detail.getZexfield2())
+                        .zexfield3(detail.getZexfield3())
+                        .zexfield4(detail.getZexfield4())
+                        .zexfield5(detail.getZexfield5())
+                        .ifInfoIdx(detail.getIfInfoIdx())
+                        .build();
+                count += postProcessDao.createPItemRequestNonCfm(pItemReqNonCfm);
+            }
+        }
+        return count;
+    }
+
+    private SAPPostProcessVO.TestRequest.PItemReq convertTo(SAPTestRequestVO.RequestHeader header) {
+        return SAPPostProcessVO.TestRequest.PItemReq.builder()
+                .plntCd(header.getWerks())
                 .ispReqNo(header.getZqcreqno())
                 .mtrCd(header.getMatnr())
                 .mtrNm(header.getMaktx())
@@ -129,48 +188,5 @@ public class SAPTestRequestPostProcessor implements PostProcessor {
                 .addCol5(header.getZexfield5())
                 .revDs(header.getCrtDs())
                 .build();
-        count += postProcessDao.createPItemRequest(pItemReq);
-
-        count += createPItemRequestNonCfm(plantCode, reqIdx, degree);
-
-        if (count == 0) {
-            throw new IntegrationNoSavedException();
-        }
     }
-
-    private boolean isCancel(String nullOrX) {
-        return "X".equals(nullOrX);
-    }
-
-    private int createPItemRequestNonCfm(String plantCode, Integer reqIdx, int degree) {
-        int count = 0;
-        List<SAPTestRequestVO.RequestDetails> details = sapDao.findAllTestReqDetailsByDegree(degree);
-
-        if (CollectionUtils.isNotEmpty(details)) {
-            for (SAPTestRequestVO.RequestDetails detail : details) {
-                SAPPostProcessVO.TestRequest.PItemReqNonCfm param = SAPPostProcessVO.TestRequest.PItemReqNonCfm.builder()
-                        .plntCd(plantCode)
-                        .reqIdx(reqIdx)
-                        .build();
-                Integer seq = postProcessDao.nextSeqInPItemRequestNonCfm(param);
-
-                SAPPostProcessVO.TestRequest.PItemReqNonCfm pItemReqNonCfm = SAPPostProcessVO.TestRequest.PItemReqNonCfm.builder()
-                        .plntCd(plantCode)
-                        .reqIdx(reqIdx)
-                        .nonCfmSeq(seq)
-                        .ispReqNo(detail.getZqcreqno())
-                        .ispReqNoBlk(detail.getZqcnoBlk())
-                        .zexfield1(detail.getZexfield1())
-                        .zexfield2(detail.getZexfield2())
-                        .zexfield3(detail.getZexfield3())
-                        .zexfield4(detail.getZexfield4())
-                        .zexfield5(detail.getZexfield5())
-                        .ifInfoIdx(detail.getIfInfoIdx())
-                        .build();
-                count += postProcessDao.createPItemRequestNonCfm(pItemReqNonCfm);
-            }
-        }
-        return count;
-    }
-
 }

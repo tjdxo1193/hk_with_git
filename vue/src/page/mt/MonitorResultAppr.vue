@@ -7,7 +7,7 @@
     @form-event="searchFormEvent"
   />
 
-  <AUIGridWithHeader
+  <AUIGridSearch
     v-bind="itemList"
     @grid-created="(proxy) => $setState('itemList.$grid', proxy)"
     @button-click="onClickButton"
@@ -25,7 +25,7 @@
 
 <script>
 import { FileAttacherModal } from '@/page/modal';
-import { FormUtil } from '@/util';
+import { FormUtil, StringUtil } from '@/util';
 
 import values from './values/monitorResultAppr';
 
@@ -46,6 +46,7 @@ export default {
         columns: list.columns(),
         event: {
           cellDoubleClick: (e) => {
+            FormUtil.setData(this.itemList.forms, e.item);
             this.getMonitorTestRst(e);
             this.enableButtons(['preResultTrend', 'hold', 'reject', 'approve', 'init']);
           },
@@ -53,12 +54,8 @@ export default {
       },
       itemList: {
         ...itemList.static,
+        forms: itemList.forms(),
         columns: itemList.columns(),
-        event: {
-          cellDoubleClick: (event) => {
-            this.getMonitorTestRstSpec(event);
-          },
-        },
       },
       fileAttacherModal: {
         show: false,
@@ -86,8 +83,8 @@ export default {
         .then(({ data }) => this.itemList.$grid.setGridData(data));
     },
     approve() {
-      const [parameter] = this.itemList.$grid.getGridData();
-      this.$eSign(() => this.$axios.put('/mt/monitorTestResultAppr/approve', parameter))
+      const parameter = FormUtil.getData(this.itemList.forms);
+      this.$eSignWithReason(() => this.$axios.put('/mt/monitorTestResultAppr/approve', parameter))
         .then(() => {
           this.$info(this.$message.info.saved);
           this.init();
@@ -98,7 +95,7 @@ export default {
         });
     },
     reject() {
-      const [parameter] = this.itemList.$grid.getGridData();
+      const parameter = FormUtil.getData(this.itemList.forms);
       this.$eSignWithReason(() => this.$axios.put('/mt/monitorTestResultAppr/reject', parameter))
         .then(() => {
           this.$info(this.$message.info.saved);
@@ -110,7 +107,7 @@ export default {
         });
     },
     hold() {
-      const [parameter] = this.itemList.$grid.getGridData();
+      const parameter = FormUtil.getData(this.itemList.forms);
       this.$confirm(this.$message.confirm.hold).then(() => {
         this.$eSignWithReason(() => this.$axios.put('/mt/monitorTestResultAppr/hold', parameter))
           .then(() => {
@@ -122,6 +119,10 @@ export default {
             this.$error(this.$message.error.updateData);
           });
       });
+    },
+    hasNonResultJudge() {
+      const item = FormUtil.getData(this.itemList.forms);
+      return StringUtil.isNotEmpty(item.sytJdg);
     },
     searchFormEvent(event) {
       const forms = this.list.forms;
@@ -153,7 +154,10 @@ export default {
         alert('이전결과동향');
       }
       if (name === 'approve') {
-        this.approve();
+        if (!this.hasNonResultJudge()) {
+          return this.$warn(this.$message.warn.noResultJudge);
+        }
+        return this.approve();
       }
       if (name === 'reject') {
         this.reject();
@@ -181,7 +185,7 @@ export default {
   },
   computed: {
     computedListColumns() {
-      const editableColumns = ['sytJdg'];
+      const editableColumns = [];
 
       return this.list.columns.map((col) => ({
         ...col,

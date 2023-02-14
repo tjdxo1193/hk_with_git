@@ -93,6 +93,7 @@ public class AuditRecorder {
         detailParam.setCudDiv(convertCUDType(recordData.getCommandType()));
         detailParam.setChgBef(toJson(recordData.getBeforeData()));
         detailParam.setChgAft(toJson(recordData.getAfterData()));
+        detailParam.setCrtDs(recordData.getUpdatedDate());
         return detailParam;
     }
 

@@ -94,4 +94,9 @@ public class ComboServiceImpl implements ComboService {
     public List<ComboVO> getTestTerm(String plntCd) {
         return dao.getTestTerm(plntCd);
     }
+
+    @Override
+    public List<ComboVO> getEquipment(String plntCd) {
+        return dao.getEquipment(plntCd);
+    }
 }

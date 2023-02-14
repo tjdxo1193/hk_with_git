@@ -2,10 +2,7 @@ package lims.api.integration.vo;
 
 import lims.api.integration.annotation.EnumType;
 import lims.api.integration.domain.eai.TrsStateful;
-import lims.api.integration.enums.CompanyType;
-import lims.api.integration.enums.InterfaceSystemType;
-import lims.api.integration.enums.TestResultType;
-import lims.api.integration.enums.TestStatusProcess;
+import lims.api.integration.enums.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -76,11 +73,11 @@ public class SAPSendVO {
         private String guid;
         private Integer seq;
         private String matnr;
-        private String werks;
+        private String werks;   // 생산오더번호 필드입니다. 공장코드 아님.
         private String charg;
         private String zqidate;
         private String zqicount;
-        private String zcancel;
+        private TestPerformanceCancel zcancel;
     }
 
     /**

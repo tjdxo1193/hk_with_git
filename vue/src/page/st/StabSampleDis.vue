@@ -1,124 +1,142 @@
 <template>
-  <FormWithHeader v-bind="searchForm" @button-click="onClickSearchBtn" />
-  <AUIGridWithHeader
-    v-bind="gridForSearchResult"
-    @grid-created="(proxy) => $setState('gridForSearchResult.$grid', proxy)"
+  <AUIGridSearch
+    v-bind="sampleGrid"
+    @grid-created="(proxy) => $setState('sampleGrid.$grid', proxy)"
+    @button-click="onClickGridButtons"
   />
-  <ActionBar :buttons="buttonGroups.buttons" @button-click="onEventsButton" />
+  <RequestApproverModal
+    :show="requestDispose.show"
+    :aprReqDiv="requestDispose.aprReqDiv"
+    @close="hideModal('requestDispose')"
+    @modalReturnDataEvent="onReturnRequestDispose"
+  />
+  <RequestApproverModal
+    :show="requestCancelDispose.show"
+    :aprReqDiv="requestCancelDispose.aprReqDiv"
+    @close="hideModal('requestCancelDispose')"
+    @modalReturnDataEvent="onReturnRequestCancelDispose"
+  />
 </template>
 
 <script>
-import { FormUtil } from '@/util';
+import { RequestApproverModal } from '@/page/modal';
+import { FormUtil } from '@/util/index.js';
 
-import values from './values/stabSampleDis';
+import values from './values/stabSampleDis.js';
+
+const REQUEST_DISPOSE = 'S0270400';
+const REQUEST_CANCEL_DISPOSE = 'S0270600';
 
 export default {
   name: 'StabSampleDis',
-  mounted() {},
+  components: {
+    RequestApproverModal,
+  },
   data() {
-    const { searchForm, gridForSearchResult, buttonGroups } = this.$copy(values);
+    const { sampleGrid } = this.$copy(values);
     return {
-      searchForm: {
-        ...searchForm.static,
-        forms: searchForm.forms(),
+      sampleGrid: {
+        ...sampleGrid.static,
+        forms: sampleGrid.forms(),
+        columns: sampleGrid.columns(),
       },
-
-      gridForSearchResult: {
-        ...gridForSearchResult.static,
-        columns: gridForSearchResult.columns(),
-        event: { cellDoubleClick: (e) => this.changeButtonEnabled(e) },
+      requestDispose: {
+        show: false,
+        aprReqDiv: REQUEST_DISPOSE,
       },
-      buttonGroups: {
-        buttons: buttonGroups.buttons,
+      requestCancelDispose: {
+        show: false,
+        aprReqDiv: REQUEST_CANCEL_DISPOSE,
       },
     };
   },
   methods: {
-    //조회폼
-    async fetchSearchResult() {
-      const { $grid } = this.gridForSearchResult;
-      const { forms } = this.searchForm;
-      const parameter = FormUtil.getData(forms);
-      await $grid
-        ._useLoader(() => this.$axios.get('st/stabSampleDis', parameter))
-        .then(({ data }) => data);
-    },
-
-    onClickSearchBtn({ name }) {
-      if (name == 'search') {
-        this.fetchSearchResult();
-      }
-    },
-    changeButtonAllEnabled() {
-      FormUtil.enableButtons(this.buttonGroups.buttons, [
-        'disposalRequest',
-        'disposalCancelRequest',
-        'excel',
-      ]);
-    },
-    changeButtonAllDisabled() {
-      FormUtil.disableButtons(this.buttonGroups.buttons, [
-        'disposalRequest',
-        'disposalCancelRequest',
-        'excel',
-      ]);
-    },
-    //조회결과 그리드
-    onEventsButton({ name }) {
-      if (name == 'disposalRequest') {
-        this.disposalRequest();
-        return;
-      }
-      if (name == 'disposalCancelRequest') {
-        this.disposalCancelRequest();
-        return;
-      }
-      if (name == 'excel') {
-        this.excel();
-        return;
-      }
-      if (name == 'init') {
-        this.init();
-        return;
-      }
-    },
-    isSelectedItemInGrid() {
-      return this.gridForSearchResult.$grid.getSelectedItems().length !== 0;
-    },
-    disposalRequest() {
-      this.showDesignateApproversModal();
-      const { forms } = this.inputInfoForm;
-      const parameter = FormUtil.getData(forms);
-      this.$eSign(() => this.$axios.put('/st/stabSampleUsage', parameter))
-        .then(() => {
-          this.$info(this.$message.info.saved);
-          this.fetchSearchResult();
-        })
-        .catch(() => {
-          this.$error(this.$message.error.createData);
-        });
-    },
-    disposalCancelRequest() {
-      this.showDesignateApproversModal();
-      const { forms } = this.inputInfoForm;
-      const parameter = FormUtil.getData(forms);
-      this.$eSign(() => this.$axios.put('/st/stabSampleUsage', parameter))
-        .then(() => {
-          this.$info(this.$message.info.saved);
-          this.fetchSearchResult();
-        })
-        .catch(() => {
-          this.$error(this.$message.error.createData);
-        });
-    },
-    excel() {
-      //엑셀
-    },
     init() {
-      this.inputInfoForm.forms = values.inputInfoForm.forms();
-      this.gridForSearchResult.$grid.clearGridData();
-      this.changeButtonAllDisabled();
+      this.sampleGrid.forms = values.sampleGrid.forms();
+      const { $grid } = this.sampleGrid;
+      $grid.clearGridData();
     },
+    async fetchSampleGrid() {
+      const { forms, $grid } = this.sampleGrid;
+      const param = FormUtil.getData(forms);
+      const data = await $grid
+        ._useLoader(() => this.$axios.get('/st/stabSampleDis', param))
+        .then(({ data }) => data)
+        .catch();
+      $grid.setGridData(data);
+    },
+    async onReturnRequestDispose(data) {
+      const { $grid } = this.sampleGrid;
+      const checkedRows = $grid.getCheckedRowItems();
+      const param = checkedRows.map((row) => ({
+        ...row.item,
+        ...data,
+      }));
+      await this.$eSign(() => this.$axios.put('/st/stabSampleDis/requestDispose', param))
+        .then(() => {
+          this.fetchSampleGrid();
+          this.$info(this.$message.info.approveRequest);
+        })
+        .catch(() => {
+          this.$error(this.$message.error.updateData);
+        });
+    },
+    async onReturnRequestCancelDispose(data) {
+      const { $grid } = this.sampleGrid;
+      const checkedRows = $grid.getCheckedRowItems();
+      const param = checkedRows.map((row) => ({
+        ...row.item,
+        ...data,
+      }));
+      await this.$eSign(() => this.$axios.put('/st/stabSampleDis/requestCancelDispose', param))
+        .then(() => {
+          this.fetchSampleGrid();
+          this.$info(this.$message.info.approveRequest);
+        })
+        .catch(() => {
+          this.$error(this.$message.error.updateData);
+        });
+    },
+    onClickGridButtons({ name }) {
+      const { $grid } = this.sampleGrid;
+      const checkedRows = $grid.getCheckedRowItems();
+      if (name === 'requestDispose') {
+        if (checkedRows.length > 0) {
+          this.showModal('requestDispose');
+        } else {
+          return this.$warn(this.$message.warn.unSelectedData);
+        }
+      }
+      if (name === 'requestCancelDispose') {
+        if (checkedRows.length > 0) {
+          this.showModal('requestCancelDispose');
+        } else {
+          return this.$warn(this.$message.warn.unSelectedData);
+        }
+      }
+      if (name === 'search') {
+        this.fetchSampleGrid();
+      }
+    },
+    showModal(name) {
+      if (name === 'requestDispose') {
+        return (this.requestDispose.show = true);
+      }
+      if (name === 'requestCancelDispose') {
+        return (this.requestCancelDispose.show = true);
+      }
+    },
+    hideModal(name) {
+      if (name === 'requestDispose') {
+        return (this.requestDispose.show = false);
+      }
+      if (name === 'requestCancelDispose') {
+        return (this.requestCancelDispose.show = false);
+      }
+    },
+  },
+  mounted() {
+    this.fetchSampleGrid();
   },
 };
 </script>

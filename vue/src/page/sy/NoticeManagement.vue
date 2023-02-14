@@ -104,7 +104,7 @@ export default {
       const param = FormUtil.getData(this.noticeManagementInfo.forms);
 
       this.$axios
-        .putByForm('/sy/noticeManagement', param)
+        .postByForm('/sy/noticeManagement', param)
         .then(({ data }) => {
           this.$info(this.$message.info.saved);
           this.fetchNoticeManagement();

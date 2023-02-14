@@ -69,6 +69,17 @@ export default [
         },
       },
       {
+        path: 'labelSearch',
+        name: 'labelSearch',
+        component: PrintManage.LabelSearch,
+        meta: {
+          menu: {
+            code: 'M158',
+            title: '라벨출력조회',
+          },
+        },
+      },
+      {
         path: 'reportMaster',
         name: 'reportMaster',
         component: PrintManage.ReportMaster,

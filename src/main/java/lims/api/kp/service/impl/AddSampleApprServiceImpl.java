@@ -7,6 +7,7 @@ import lims.api.kp.dao.AddSampleApprDao;
 import lims.api.kp.enums.AddSampleProgress;
 import lims.api.kp.service.AddSampleApprService;
 import lims.api.kp.vo.AddSampleApprVO;
+import lims.api.tp.enums.SampleDisposalProgress;
 import lims.api.tp.enums.SampleDivision;
 import lims.api.tp.enums.SampleUsageProgress;
 import lombok.RequiredArgsConstructor;
@@ -50,7 +51,7 @@ public class AddSampleApprServiceImpl implements AddSampleApprService {
 
     private void createSample(AddSampleApprVO param) {
         int result = 0;
-        param.setSmpDpsProc(SampleUsageProgress.TEMP_SAVE.getCode());
+        param.setSmpDpsProc(SampleDisposalProgress.SAMPLE_STORED.getCode());
         param.setSmpDivCd(SampleDivision.ADDED_SAMPLE.getCode());
         result += dao.createSample(param);
         if (result < 1) {

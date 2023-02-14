@@ -21,7 +21,7 @@
         INSERT INTO SY_AUDIT_DTL
         ( PLNT_CD, AUDIT_IDX, AUDIT_SRLNO, EVT_NM, CHG_BEF, CHG_AFT, CRT_DS, CUD_DIV )
         VALUES
-        ( #{plntCd}, #{auditIdx}, #{auditSrlno}, #{eventNm}, #{chgBef}, #{chgAft}, SYSDATE, #{cudDiv} )
+        ( #{plntCd}, #{auditIdx}, #{auditSrlno}, #{eventNm}, #{chgBef}, #{chgAft}, #{crtDs}, #{cudDiv} )
     </insert>
 
 </mapper>

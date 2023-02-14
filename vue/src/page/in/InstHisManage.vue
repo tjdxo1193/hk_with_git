@@ -208,7 +208,7 @@ export default {
     },
     update() {
       this.$confirm(this.$message.confirm.updated).then(() => {
-        this.$eSignWithReason(() => this.$axios.putByForm('/in/instHisManage', this.getFormData()))
+        this.$eSignWithReason(() => this.$axios.postByForm('/in/instHisManage', this.getFormData()))
           .then(({ data }) => {
             this.$info(this.$message.info.updated);
             this.getInstHisManageList();
@@ -240,6 +240,7 @@ export default {
       FormUtil.enableButtons(this.detail.buttons, ['requestApproval', 'save', 'delete']);
     },
     disableButtons() {
+      FormUtil.enableButtons(this.detail.buttons, ['save']);
       FormUtil.disableButtons(this.detail.buttons, ['requestApproval', 'delete']);
     },
     disableAllButtons() {

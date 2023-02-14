@@ -17,20 +17,27 @@ const list = {
   forms: () =>
     FormBuilder.builder()
       .RadioGroup('testDiv', '시험구분', {
-        value: '',
+        value: 'Y',
         groups: [
-          { checkedValue: '', label: '전체' },
-          { checkedValue: 'hold', label: '시험보류' },
-          { checkedValue: 'testCancel', label: '시험취소' },
+          { checkedValue: 'Y', label: '시험보류중' },
+          { checkedValue: 'N', label: '시험진행중' },
         ],
         gap: 100,
       })
       .spanCol(2)
+      .Select('ansProcCd', '진행상태', {
+        async: () => api.combo.systemCommon.getAnsProcCombo(),
+      })
+      .Input('ansNo', '시험번호')
       .Select('upperMitmPitmDiv', '품목구분', {
-        async: () => api.combo.common.getTreeCd('M1000000'),
+        async: () => api.combo.common.getTreeCd('M1000001'),
       })
       .Select('mitmPitmDiv', '품목명', {
         async: (param) => api.combo.common.getTreeCd(param),
+      })
+      .Input('mitmCd', '품목코드')
+      .Select('crgDptCd', '담당부서', {
+        async: api.combo.common.getDpt,
       })
       .Select('mitmWrkStudioDiv', '작업동', {
         async: () => api.combo.common.getUpperTreeCd('M2000000'),
@@ -41,11 +48,7 @@ const list = {
       .Select('mitmWrkPlcDiv', '작업실', {
         async: (param) => api.combo.common.getTreeCd(param),
       })
-      .Input('mitmCd', '품목코드')
-      .Input('ansNo', '시험번호')
       .Input('roomno', 'RoomNo')
-      .Input('grade', 'Grade')
-      .Input('point', '포인트')
       .DatepickerTwinWithSwitch('searchReqDt', '의뢰일', {
         value: [todayDate, todayDate],
       })
@@ -59,6 +62,9 @@ const list = {
     ColumnBuilder.builder()
       .col('mitmReqIdx', false)
       .col('ansProcNm', '진행상태')
+      .combo('sytJdg', '결과판정', {
+        async: () => api.combo.systemCommon.getSytJdgCombo(),
+      })
       .col('reqNo', '의뢰번호')
       .col('ansNo', '시험번호')
       .col('assNo', '지시번호')
@@ -69,11 +75,13 @@ const list = {
       .col('mitmWrkPlcDivNm', '작업실')
       .col('roomno', 'RoomNo')
       .col('grade', 'Grade')
+      .col('wrkDivNm', '작업구분')
       .col('point', '포인트')
       .col('crgDptNm', '담당부서')
       .col('reqDt', '의뢰일자')
       .col('rcpDt', '접수일자')
       .col('assDt', '지시일자')
+      .col('cplRqmDt', '완료요구일')
       .col('rjtUnm', '반려자')
       .col('rjtDs', '반려일')
       .col('rjtRea', '반려사유')
@@ -86,7 +94,6 @@ const list = {
       .col('ansCanlDs', '시험취소일')
       .col('ansCanlUid', '시험취소자')
       .col('ansCanlRea', '시험취소사유')
-      .col('cplRqmDt', '완료요구일')
       .build(),
 };
 

@@ -3,13 +3,12 @@ package lims.api.np.controller;
 import lims.api.auth.annotation.AuthToken;
 import lims.api.auth.domain.Token;
 import lims.api.auth.service.impl.JwtResolver;
+import lims.api.common.model.CommonResponse;
 import lims.api.np.service.PreventRecurrenceApprService;
 import lims.api.np.vo.PreventRecurrenceApprVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -34,5 +33,11 @@ public class PreventRecurrenceApprController {
         String jwt = token.getJwt();
         param.setPlntCd(jwtResolver.getPlantCode(jwt));
         return ResponseEntity.ok(service.findResultItem(param));
+    }
+
+    @PutMapping("/approve")
+    public ResponseEntity<CommonResponse> approve(@RequestBody PreventRecurrenceApprVO param) {
+        service.approve(param);
+        return ResponseEntity.ok(new CommonResponse());
     }
 }

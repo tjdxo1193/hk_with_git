@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import {FormUtil} from '@/util';
+import { FormUtil } from '@/util';
 
 import values from './values/elnSpecCopyForTestMethodModal.js';
 
@@ -43,6 +43,7 @@ export default {
   watch: {
     show: function () {
       if (this.$props.show) {
+        this.pItemSpecList.$grid.clearGridData();
         this.aItemList.$grid.clearGridData();
         this.pItemSpecList.forms = values.pItemSpecList.forms();
       }
@@ -72,17 +73,21 @@ export default {
     async fetchPItemSpecList() {
       const { $grid, forms } = this.pItemSpecList;
       const formData = FormUtil.getData(forms);
-      const parameter = {labNo : formData.labNo , prdDiv : formData.prdDiv, ifDtParam: formData.ifDt};
-      
+      const parameter = {
+        labNo: formData.labNo,
+        prdDiv: formData.prdDiv,
+        ifDtParam: formData.ifDt,
+      };
+
       const data = await $grid
         ._useLoader(() => this.$axios.get('ms/specManage/getSemiPItemListToModal', parameter))
         .then(({ data }) => data);
       $grid.setGridData(data);
     },
 
-    async fetchAItemList({labNo, prdDiv}) {
+    async fetchAItemList({ labNo, prdDiv }) {
       const { $grid } = this.aItemList;
-      const parameter = {labNo, prdDiv}
+      const parameter = { labNo, prdDiv };
       const data = await $grid
         ._useLoader(() => this.$axios.get('ms/specManage/getSemiAItemListToModal', parameter))
         .then(({ data }) => data);

@@ -2,44 +2,325 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="lims.api.integration.dao.QMSDao">
 
-    <select id="findShiptBaseByBatchNo" resultType="lims.api.integration.vo.QMSSendVO$ShiptBase">
-        SELECT LOT_NO,
-               PDT_ORDER_NO,
-               PHS_ORDER_NO,
-               PHS_ORDER_ITM
-        FROM QT_PITM_ANS_REQ
-        WHERE BATCH_NO = #{batchNo}
+    <select id="findShiptReqByBatchNo" resultType="lims.api.integration.vo.QMSSendVO$ShiptReq">
+        SELECT A.PLNT_CD,
+               A.REQ_IDX,
+               A.LOT_NO,
+               A.SPL_LOT_NO,
+               A.PHS_ORDER_TYP,
+               A.PHS_ORDER_NO,
+               A.PHS_ORDER_ITM,
+               A.PDT_ORDER_TYP,
+               A.PDT_ORDER_NO
+        FROM QT_PITM_ANS_REQ A
+        WHERE A.BATCH_NO = #{batchNo}
     </select>
 
+    <select id="findShiptTestByKey" resultType="lims.api.integration.vo.QMSSendVO$ShiptTest"
+            parameterType="lims.api.integration.vo.QMSSendVO$ShiptReq">
+        SELECT DISTINCT A.PLNT_CD,
+                        A.REQ_IDX,
+                        A.PLNT_CD,
+                        A.ISP_REQ_NO,
+                        A.MTR_CD,
+                        QPI.PITM_NM AS MTR_NM,
+                        A.LOT_NO,
+                        A.SPL_LOT_NO,
+                        A.BATCH_NO,
+                        A.PDT_ORDER_NO,
+                        A.PDT_ORDER_TYP,
+                        A.PHS_ORDER_NO,
+                        A.PHS_ORDER_ITM,
+                        A.PHS_ORDER_TYP,
+                        A.CSM_NM,
+                        B.ANS_NO
+        FROM QT_PITM_ANS_REQ A
+                 JOIN QT_PITM_ANS_PROC B ON A.PLNT_CD = B.PLNT_CD AND A.REQ_IDX = B.REQ_IDX
+                 -- 자재명 가져오기 위한 JOIN
+                 LEFT JOIN QT_PITM_ANS_PROC QPAP ON A.REQ_IDX = QPAP.REQ_IDX AND A.PLNT_CD = QPAP.PLNT_CD
+                 LEFT JOIN QM_PITM_SPEC QPS ON QPAP.PITM_SPEC_IDX = QPS.PITM_SPEC_IDX AND A.MTR_CD = QPS.PITM_CD AND
+                                               QPAP.PLNT_CD = QPS.PLNT_CD
+                 LEFT JOIN QM_PITM QP
+                           ON QPS.PITM_CD = QP.PITM_CD AND QPS.PITM_VER = QP.PITM_VER AND QPS.PLNT_CD = QP.PLNT_CD
+                 LEFT JOIN QM_PITM_INFO QPI
+                           ON QP.PITM_CD = QPI.PITM_CD AND QP.PITM_VER = QPI.PITM_VER AND QP.PLNT_CD = QPI.PLNT_CD
+        WHERE A.PLNT_CD = #{plntCd}
+          AND A.REQ_IDX = #{reqIdx}
+    </select>
+
+    <select id="findMESShiptPerformByKey" resultType="lims.api.integration.vo.QMSSendVO$ShiptPerform"
+            parameterType="lims.api.integration.vo.QMSSendVO$ShiptTest">
+        SELECT DISTINCT B.MTR_CD,
+                        QPI.PITM_NM AS MTR_NM,
+                        B.PHS_ORDER_NO,
+                        B.PHS_ORDER_ITM,
+                        B.PDT_ORDER_NO,
+                        B.BATCH_NO,
+                        B.LOT_NO,
+                        Q.REQ_IDX,
+                        Q.ISP_REQ_NO,
+                        Q.SPL_LOT_NO,
+                        Q.PDT_ORDER_TYP,
+                        Q.PHS_ORDER_TYP,
+                        P.ANS_NO
+        FROM MS_SAP_INP_PFA A
+                 LEFT JOIN MS_SAP_INP_PFA_DTL B
+                           ON A.PLNT_CD = B.PLNT_CD AND A.MTR_CD = B.MTR_CD AND A.BATCH_NO = B.BATCH_NO
+                 LEFT JOIN QT_PITM_ANS_REQ Q ON B.PLNT_CD = Q.PLNT_CD
+            AND B.MTR_CD = Q.MTR_CD
+            AND B.LOT_NO = Q.LOT_NO
+            AND B.BATCH_NO = Q.BATCH_NO
+            AND B.PDT_ORDER_NO = Q.PDT_ORDER_NO
+                 LEFT JOIN QT_PITM_ANS_PROC P ON Q.PLNT_CD = P.PLNT_CD AND Q.REQ_IDX = P.REQ_IDX
+            -- 자재명 가져오기 위한 JOIN
+                 LEFT JOIN QT_PITM_ANS_PROC QPAP ON Q.REQ_IDX = QPAP.REQ_IDX AND Q.PLNT_CD = QPAP.PLNT_CD
+                 LEFT JOIN QM_PITM_SPEC QPS ON QPAP.PITM_SPEC_IDX = QPS.PITM_SPEC_IDX AND Q.MTR_CD = QPS.PITM_CD AND
+                                               QPAP.PLNT_CD = QPS.PLNT_CD
+                 LEFT JOIN QM_PITM QP
+                           ON QPS.PITM_CD = QP.PITM_CD AND QPS.PITM_VER = QP.PITM_VER AND QPS.PLNT_CD = QP.PLNT_CD
+                 LEFT JOIN QM_PITM_INFO QPI
+                           ON QP.PITM_CD = QPI.PITM_CD AND QP.PITM_VER = QPI.PITM_VER AND QP.PLNT_CD = QPI.PLNT_CD
+        WHERE A.PLNT_CD = #{plntCd}
+          AND A.MTR_CD = #{mtrCd}
+          AND A.BATCH_NO = #{batchNo}
+    </select>
+
+    <select id="findSRMShiptPerformByKey" resultType="lims.api.integration.vo.QMSSendVO$ShiptPerform"
+            parameterType="lims.api.integration.vo.QMSSendVO$ShiptTest">
+        SELECT DISTINCT B.MTR_CD,
+                        QPI.PITM_NM AS MTR_NM,
+                        B.PHS_ORDER_NO,
+                        B.PHS_ORDER_ITM,
+                        B.PDT_ORDER_NO,
+                        B.BATCH_NO,
+                        B.LOT_NO,
+                        Q.REQ_IDX,
+                        Q.ISP_REQ_NO,
+                        Q.SPL_LOT_NO,
+                        Q.PDT_ORDER_TYP,
+                        Q.PHS_ORDER_TYP,
+                        P.ANS_NO
+        FROM MS_SAP_INP_PFA A
+                 LEFT JOIN MS_SAP_INP_PFA_DTL B
+                           ON A.PLNT_CD = B.PLNT_CD AND A.MTR_CD = B.MTR_CD AND A.BATCH_NO = B.BATCH_NO
+                 LEFT JOIN QT_PITM_ANS_REQ Q ON B.PLNT_CD = Q.PLNT_CD
+            AND B.MTR_CD = Q.MTR_CD
+            AND B.LOT_NO = Q.LOT_NO
+            AND B.BATCH_NO = Q.BATCH_NO
+            AND B.PHS_ORDER_NO = Q.PHS_ORDER_NO
+            AND B.PHS_ORDER_ITM = Q.PHS_ORDER_ITM
+                 LEFT JOIN QT_PITM_ANS_PROC P ON Q.PLNT_CD = P.PLNT_CD AND Q.REQ_IDX = P.REQ_IDX
+            -- 자재명 가져오기 위한 JOIN
+                 LEFT JOIN QT_PITM_ANS_PROC QPAP ON Q.REQ_IDX = QPAP.REQ_IDX AND Q.PLNT_CD = QPAP.PLNT_CD
+                 LEFT JOIN QM_PITM_SPEC QPS ON QPAP.PITM_SPEC_IDX = QPS.PITM_SPEC_IDX AND Q.MTR_CD = QPS.PITM_CD AND
+                                               QPAP.PLNT_CD = QPS.PLNT_CD
+                 LEFT JOIN QM_PITM QP
+                           ON QPS.PITM_CD = QP.PITM_CD AND QPS.PITM_VER = QP.PITM_VER AND QPS.PLNT_CD = QP.PLNT_CD
+                 LEFT JOIN QM_PITM_INFO QPI
+                           ON QP.PITM_CD = QPI.PITM_CD AND QP.PITM_VER = QPI.PITM_VER AND QP.PLNT_CD = QPI.PLNT_CD
+        WHERE A.PLNT_CD = #{plntCd}
+          AND A.MTR_CD = #{mtrCd}
+          AND A.BATCH_NO = #{batchNo}
+    </select>
+
+
+    <select id="nextDegreeInShipt" resultType="int">
+        SELECT NVL(MAX(DEGREE), 0) + 1
+        FROM IF_TRS_QMS_SHIPT
+    </select>
+
+    <select id="nextIdxInShipt" resultType="int">
+        SELECT NVL(MAX(IDX), 0) + 1
+        FROM IF_TRS_QMS_SHIPT
+    </select>
+
+    <insert id="createShipt" parameterType="lims.api.integration.vo.QMSSendVO$ShiptReq">
+        INSERT INTO IF_TRS_QMS_SHIPT
+        (IDX,
+         DEGREE,
+         PLNT_CD,
+         REQ_IDX,
+         LOT_NO,
+         SPL_LOT_NO,
+         PDT_ORDER_NO,
+         PDT_ORDER_TYP,
+         PHS_ORDER_NO,
+         PHS_ORDER_TYP,
+         PHS_ORDER_ITM)
+        VALUES (#{idx},
+                #{degree},
+                #{degree},
+                #{reqIdx},
+                #{lotNo},
+                #{splLotNo},
+                #{pdtOrderNo},
+                #{pdtOrderTyp},
+                #{phsOrderNo},
+                #{phsOrderTyp},
+                #{phsOrderItm})
+    </insert>
+
+    <update id="updateShipt" parameterType="lims.api.integration.vo.QMSSendVO$ShiptReq">
+        UPDATE IF_TRS_QMS_SHIPT
+        SET
+        TRS_STATUS = #{trsStatus}
+        <if test="ifInfoIdx != null and ifInfoIdx != ''">
+            ,IF_INFO_IDX = #{ifInfoIdx}
+        </if>
+        <if test="errorlogId != null and errorlogId != ''">
+            ,ERRORLOG_ID = #{errorlogId}
+        </if>
+        WHERE
+        IDX = #{idx}
+    </update>
+
+
+    <insert id="createShiptTest" parameterType="lims.api.integration.vo.QMSSendVO$ShiptReq">
+        <selectKey resultType="Integer" keyProperty="seq" order="BEFORE">
+            SELECT NVL(MAX(SEQ), 0) + 1
+            FROM IF_TRS_QMS_SHIPT_TEST
+            WHERE SHIPT_IDX = #{shiptIdx}
+        </selectKey>
+
+        INSERT INTO IF_TRS_QMS_SHIPT_TEST
+        (SHIPT_IDX,
+        SEQ,
+        REQ_IDX,
+        ISP_REQ_NO,
+        MTR_CD,
+        MTR_NM,
+        BATCH_NO,
+        CSM_NM,
+        ANS_NO)
+        VALUES (#{shiptIdx},
+        #{seq},
+        #{reqIdx},
+        #{ispReqNo},
+        #{mtrCd},
+        #{mtrNm},
+        #{batchNo},
+        #{csmNm},
+        #{ansNo})
+    </insert>
+
+    <insert id="createShiptPerform" parameterType="lims.api.integration.vo.QMSSendVO$ShiptPerform">
+        <selectKey resultType="Integer" keyProperty="seq" order="BEFORE">
+            SELECT NVL(MAX(SEQ), 0) + 1
+            FROM IF_TRS_QMS_SHIPT_PERFORM
+            WHERE SHIPT_TEST_IDX = #{shiptTestIdx}
+        </selectKey>
+
+        INSERT INTO IF_TRS_QMS_SHIPT_PERFORM
+        (SHIPT_TEST_IDX,
+        SEQ,
+        REQ_IDX,
+        ISP_REQ_NO,
+        MTR_CD,
+        MTR_NM,
+        LOT_NO,
+        SPL_LOT_NO,
+        BATCH_NO,
+        PDT_ORDER_NO,
+        PDT_ORDER_TYP,
+        PHS_ORDER_NO,
+        PHS_ORDER_TYP,
+        PHS_ORDER_ITM,
+        ANS_NO)
+        VALUES (#{shiptTestIdx},
+        #{seq},
+        #{reqIdx},
+        #{ispReqNo},
+        #{mtrCd},
+        #{mtrNm},
+        #{lotNo},
+        #{splLotNo},
+        #{batchNo},
+        #{pdtOrderNo},
+        #{pdtOrderTyp},
+        #{phsOrderNo},
+        #{phsOrderTyp},
+        #{phsOrderItm},
+        #{ansNo})
+    </insert>
+
+
     <select id="findMESTestAllByOrderNoAndLotNo" resultType="lims.api.integration.vo.QMSSendVO$ShiptTest"
-            parameterType="lims.api.integration.vo.QMSSendVO$ShiptBase">
-        SELECT REQ.PLNT_CD,
-               REQ.REQ_IDX,
-               REQ.LOT_NO,
-               REQ.PDT_ORDER_NO,
-               REQ.PHS_ORDER_NO,
-               REQ.PHS_ORDER_ITM,
-               MS.MTART
+            parameterType="lims.api.integration.vo.QMSSendVO$ShiptReq">
+        SELECT DISTINCT REQ.PLNT_CD,
+                        REQ.REQ_IDX,
+                        REQ.ISP_REQ_NO,
+                        REQ.BATCH_NO,
+                        REQ.MTR_CD,
+                        QPI.PITM_NM AS MTR_NM,
+                        REQ.CSM_NM,
+                        PROC.ANS_NO,
+
+                        PROC.ANS_TYP,
+                        PROC.ANS_PROC_CD,
+                        MS.MTART
         FROM QT_PITM_ANS_REQ REQ
-        LEFT JOIN QT_PITM_ANS_PROC PROC ON REQ.PLNT_CD = PROC.PLNT_CD AND REQ.REQ_IDX = PROC.REQ_IDX
-        LEFT JOIN MS_SAP_MTR_MARA MS ON REQ.MTR_CD = MS.MATNR
+                 LEFT JOIN QT_PITM_ANS_PROC PROC ON REQ.PLNT_CD = PROC.PLNT_CD AND REQ.REQ_IDX = PROC.REQ_IDX
+                 LEFT JOIN MS_SAP_MTR_MARA MS ON REQ.MTR_CD = MS.MATNR
+            -- 자재명 가져오기 위한 JOIN
+                 LEFT JOIN QT_PITM_ANS_PROC QPAP ON REQ.REQ_IDX = QPAP.REQ_IDX AND REQ.PLNT_CD = QPAP.PLNT_CD
+                 LEFT JOIN QM_PITM_SPEC QPS ON QPAP.PITM_SPEC_IDX = QPS.PITM_SPEC_IDX AND REQ.MTR_CD = QPS.PITM_CD AND
+                                               QPAP.PLNT_CD = QPS.PLNT_CD
+                 LEFT JOIN QM_PITM QP
+                           ON QPS.PITM_CD = QP.PITM_CD AND QPS.PITM_VER = QP.PITM_VER AND QPS.PLNT_CD = QP.PLNT_CD
+                 LEFT JOIN QM_PITM_INFO QPI
+                           ON QP.PITM_CD = QPI.PITM_CD AND QP.PITM_VER = QPI.PITM_VER AND QP.PLNT_CD = QPI.PLNT_CD
         WHERE REQ.LOT_NO = #{lotNo}
           AND REQ.PDT_ORDER_NO = #{pdtOrderNo}
     </select>
 
 
     <select id="findSRMTestAllByOrderNoAndLotNo" resultType="lims.api.integration.vo.QMSSendVO$ShiptTest"
-            parameterType="lims.api.integration.vo.QMSSendVO$ShiptBase">
-        SELECT REQ.PLNT_CD,
-               REQ.REQ_IDX,
-               REQ.LOT_NO,
-               REQ.PDT_ORDER_NO,
-               REQ.PHS_ORDER_NO,
-               REQ.PHS_ORDER_ITM
+            parameterType="lims.api.integration.vo.QMSSendVO$ShiptReq">
+        SELECT DISTINCT REQ.REQ_IDX,
+                        REQ.ISP_REQ_NO,
+                        REQ.BATCH_NO,
+                        REQ.MTR_CD,
+                        QPI.PITM_NM AS MTR_NM,
+                        REQ.CSM_NM,
+                        PROC.ANS_NO,
+
+                        PROC.ANS_TYP,
+                        PROC.ANS_PROC_CD,
+                        MS.MTART
         FROM QT_PITM_ANS_REQ REQ
                  LEFT JOIN QT_PITM_ANS_PROC PROC ON REQ.PLNT_CD = PROC.PLNT_CD AND REQ.REQ_IDX = PROC.REQ_IDX
+                 LEFT JOIN MS_SAP_MTR_MARA MS ON REQ.MTR_CD = MS.MATNR
+            -- 자재명 가져오기 위한 JOIN
+                 LEFT JOIN QT_PITM_ANS_PROC QPAP ON REQ.REQ_IDX = QPAP.REQ_IDX AND REQ.PLNT_CD = QPAP.PLNT_CD
+                 LEFT JOIN QM_PITM_SPEC QPS ON QPAP.PITM_SPEC_IDX = QPS.PITM_SPEC_IDX AND REQ.MTR_CD = QPS.PITM_CD AND
+                                               QPAP.PLNT_CD = QPS.PLNT_CD
+                 LEFT JOIN QM_PITM QP
+                           ON QPS.PITM_CD = QP.PITM_CD AND QPS.PITM_VER = QP.PITM_VER AND QPS.PLNT_CD = QP.PLNT_CD
+                 LEFT JOIN QM_PITM_INFO QPI
+                           ON QP.PITM_CD = QPI.PITM_CD AND QP.PITM_VER = QPI.PITM_VER AND QP.PLNT_CD = QPI.PLNT_CD
         WHERE LOT_NO = #{lotNo}
           AND PHS_ORDER_NO = #{phsOrderNo}
+    </select>
+
+    <select id="findMESFinalOrdersByOrderNoAndLotNo" resultType="lims.api.integration.vo.QMSSendVO$ShiptValidate"
+            parameterType="lims.api.integration.vo.QMSSendVO$ShiptReq">
+        SELECT LOT_NO,
+               PDT_ORDER_NO,
+               FINL_STT
+        FROM MS_MES_FINL_ORDER
+        WHERE LOT_NO = #{lotNo}
+          AND PDT_ORDER_NO = #{pdtOrderNo}
+    </select>
+
+    <select id="findSRMFinalOrdersByOrderNoAndLotNo" resultType="lims.api.integration.vo.QMSSendVO$ShiptValidate"
+            parameterType="lims.api.integration.vo.QMSSendVO$ShiptReq">
+        SELECT LOT_NO,
+               PHS_ORDER_NO,
+               FINL_STT
+        FROM MS_SRM_FINL_ORDER
+        WHERE LOT_NO = #{lotNo}
+          AND PHS_ORDER_NO = #{phsOrderNo}
+          AND ORDER_ITM = #{phsOrderItm}
     </select>
 
 </mapper>

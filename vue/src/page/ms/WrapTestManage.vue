@@ -3,7 +3,7 @@
     <Vertical>
       <AUIGridSearch
         v-bind="qmPkgaList"
-        :height="'470px'"
+        :height="'495px'"
         @button-click="onClickBtnEvent"
         @enter="qmPkgaListEnter"
         @grid-created="(proxy) => $setState('qmPkgaList.$grid', proxy)"
@@ -87,8 +87,8 @@ export default {
             this.resetSubGridList();
             await this.fetchVersionList(event.item);
             this.setPkgaInfoToPkgaGridValueForm(event.item);
-            this.focusFirstRowItemOfVersionGrid();
             await this.fetchSpecList(event.item);
+            this.focusFirstRowItemOfVersionGrid();
           },
         },
       },
@@ -190,9 +190,7 @@ export default {
         ._useLoader(() => this.$axios.get('ms/wrapTestManage/getSpec', parameter))
         .then(({ data }) => data);
 
-      specListGrid.setGridData(
-        data.filter((row) => row.specProcCd != this.processCode.temporarySave),
-      );
+      specListGrid.setGridData(data);
     },
 
     setPkgaInfoToPkgaGridValueForm(item) {
@@ -211,16 +209,19 @@ export default {
       // 버튼 제어
       // 버전 리스트 fetch
       if (item) {
-        this.checkSpecListSpecProcCd();
         this.fetchTestItemList(item);
+        this.changeButtonWhenSelectedVersion();
       }
+
+      // this.checkSpecListSpecProcCd();
     },
 
     versionListClicked(event) {
       this.fetchSpecList();
       this.fetchTestItemList(event.item);
       this.setVersionForm(event);
-      this.checkSpecListSpecProcCd();
+      this.changeButtonWhenSelectedVersion();
+      // this.checkSpecListSpecProcCd();
     },
     setVersionForm({ item = null }) {
       if (item) {
@@ -652,9 +653,27 @@ export default {
       this.testItemList.$grid.removeRow('selectedIndex');
     },
     upOrd() {
+      const { $grid } = this.testItemList;
+      const rowIndex = $grid.getSelectedIndex()[0];
+      if (rowIndex == 0) {
+        return;
+      }
+      $grid.updateRows(
+        [{ aitmOrd: rowIndex }, { aitmOrd: rowIndex + 1 }],
+        [rowIndex, rowIndex - 1],
+      );
       this.testItemList.$grid.moveRowsToUp();
     },
     downOrd() {
+      const { $grid } = this.testItemList;
+      const rowIndex = $grid.getSelectedIndex()[0];
+      if (rowIndex == $grid.getRowCount() - 1) {
+        return;
+      }
+      $grid.updateRows(
+        [{ aitmOrd: rowIndex + 2 }, { aitmOrd: rowIndex + 1 }],
+        [rowIndex, rowIndex + 1],
+      );
       this.testItemList.$grid.moveRowsToDown();
     },
     changeModifiableColumn({ value, rowIndex, dataField, item }) {

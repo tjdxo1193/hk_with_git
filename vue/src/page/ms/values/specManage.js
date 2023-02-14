@@ -1,5 +1,5 @@
 import api from '@/api';
-import { ColumnBuilder, FormBuilder } from '@/util';
+import {ColumnBuilder, FormBuilder} from '@/util';
 
 const rvsDivPsComboList = [
   { value: 'P', label: '품목' },
@@ -96,11 +96,10 @@ const pitmList = {
       .col('ansDurDay', '시험소요일수')
       .col('stdspcmNo', '표준견본번호')
       .col('micYn', '미생물여부')
-      .col('clltMtd', '채취방법')
-      .col('clltMcn', '채취기구')
-      .col('clltPla', '채취장소')
-      .col('smpStrgMtd', '검체보관방법')
-      .col('smpVolUnit', '검체량단위')
+      .combo('clltMtd', '채취방법', { async: () => api.combo.userCommon.getClltMtdCombo() })
+      .combo('clltMcn', '채취기구', { async: () => api.combo.userCommon.getClltMcnCombo() })
+      .combo('clltPla', '채취장소', { async: () => api.combo.userCommon.getClltPlaCombo() })
+      .combo('smpStrgMtd', '검체보관방법', { async: () => api.combo.userCommon.getSmpStrgMtdCombo() })
       .col('specProcNm', '규격진행상태')
       .col('specProcCd', '규격진행상태코드', false)
       .col('qpSpecProcNm', '품목진행상태', false)

@@ -24,7 +24,11 @@ public class MonitorTestResultInputVO implements UpdateDetect {
     private String ansNo; //시험번호
     private String assNo; //지시번호
     private String assDt; //지시일자
+    private String assSpcc;
+    private String cplRqmDt; //완료요구일자
     private String mitmCd; //모니터링항목
+    private String mitmWrkStudioDiv; //모니터링항목 작업동
+    private String mitmWrkStudioDivNm;
     private String upperMitmWrkPlcDivNm; //모니터링항목 작업소 구분명
     private String upperMitmWrkPlcDiv; //모니터링항목 작업소 구분
     private String mitmWrkPlcDivNm; //모니터링항목 작업실 구분명
@@ -40,6 +44,7 @@ public class MonitorTestResultInputVO implements UpdateDetect {
     private String crgDptCd; //담당 부서
     private String ansCylCd; //시험주기코드
     private String ansCylRuleNm; //시험주기
+    private String wrkDivNm; //작업구분
 
     private String sytJdg; //
     private int rstSeq; //결과 순번

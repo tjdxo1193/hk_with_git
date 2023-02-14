@@ -57,7 +57,7 @@ const list = {
       .col('sytJdgNm', '결과판정')
       .col('lotNo', '제조번호')
       .col('makDt', '제조일자')
-      .col('lotNo', '자재코드')
+      .col('mtrCd', '자재코드')
       .col('batchNo', '배치번호')
       .col('ispReqNo', '검사요청번호')
       .col('etrQty', '입고수량')
@@ -90,7 +90,7 @@ const testInfo = {
       .Input('pitmCd', '품목코드', { readonly: true })
       .Input('lotNo', '제조번호', { readonly: true })
       .Input('makDt', '제조일자', { readonly: true })
-      .Input('splLotNo', '자재코드', { readonly: true })
+      .Input('mtrCd', '자재코드', { readonly: true })
       .Input('csmNm', '고객처명', { readonly: true })
       .Input('splNm', '공급사', { readonly: true })
       .multiple(

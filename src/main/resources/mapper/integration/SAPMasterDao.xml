@@ -684,6 +684,15 @@
         FROM MS_SAP_INP_PFA_DTL
     </select>
 
+    <delete id="deleteInputPerformDetail"
+            parameterType="lims.api.integration.vo.SAPInputPerformanceByBatchVO$InputPerformanceHeader">
+        DELETE
+        FROM MS_SAP_INP_PFA_DTL
+        WHERE PLNT_CD = #{werks}
+          AND MTR_CD = #{matnr}
+          AND BATCH_NO = #{charg}
+    </delete>
+
     <insert id="createInputPerformDetail"
             parameterType="lims.api.integration.vo.SAPInputPerformanceByBatchVO$InputPerformanceDetail">
         INSERT INTO MS_SAP_INP_PFA_DTL
@@ -742,9 +751,9 @@
                YEAR,
                MONTH,
                DAY,
-               DAY AS "DATE",
+               DAY       AS "DATE",
                CALD_DESC AS LTEXT,
-               WORK_YN AS WORK
+               WORK_YN   AS WORK
         FROM SY_CALD
     </select>
 

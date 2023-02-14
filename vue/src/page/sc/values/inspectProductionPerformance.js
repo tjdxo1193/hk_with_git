@@ -10,29 +10,56 @@ const performanceGrid = {
   static: {
     title: '조회',
     countPerRow: 4,
-    buttons: [{ name: 'search', label: '조회' }],
+    buttons: [
+      { name: 'search', label: '조회' },
+      { name: 'send', label: '연계전송' },
+    ],
     props: {
       editable: false,
-      showRowCheckColumn: false,
+      showRowCheckColumn: true,
+      independentAllCheckBox: true,
+      rowCheckDisabledFunction: function (rowIndex, isChecked, item) {
+        const succeedSend = 'S0340002';
+        if (item.ifDate != null && item.ifStt == succeedSend) {
+          return false;
+        }
+        return true;
+      },
     },
   },
   forms: () =>
     FormBuilder.builder()
-      .Input('pdtOrderNo', '생산오더번호')
-      .Input('pitmCd', '품목코드')
-      .Input('mtrNm', '품목명')
-      .Input('batchNo', '배치번호')
       .DatepickerTwin('etrDtList', '입고일자', { value: [weekAgoDate, todayDate] })
-
+      .spanCol(2)
+      .blank()
+      .spanCol(2)
       .build(),
   columns: () =>
     ColumnBuilder.builder()
-      .col('reqIdx')
+      .col('ispPdtPfaIdx', false)
       .col('pdtOrderNo', '생산오더번호')
-      .col('pitmCd', '품목코드')
+      .col('pitmTypNm', '품목유형')
+      .col('mtrCd', '자재코드')
       .col('pitmNm', '품목명')
-      .col('etrDt', '입고일')
       .col('batchNo', '배치번호')
+      .col('etrDt', '입고일')
+      .col('ispScr', '검사실적')
+      .col('ifStt', false)
+      .col('ifSttNm', '연계여부', {
+        styleFunction: function (rowIndex, columnIndex, value, headerText, item) {
+          const succeedSend = 'S0340002';
+          const fail = 'S0340003';
+          if (item.ifStt == succeedSend) {
+            return 'success';
+          }
+          if (item.ifStt == fail) {
+            return 'fail';
+          }
+          return null;
+        },
+      })
+      .col('ifDate', '연계일시')
+      .col('ispPfaCanlYn', '검사실적 취소여부')
       .build(),
 };
 
@@ -40,30 +67,23 @@ const detailGrid = {
   static: {
     props: {
       editable: false,
-      showRowCheckColumn: false,
     },
   },
   columns: () =>
     ColumnBuilder.builder()
-      .col('plntCd', '플랜트')
-      .col('reqIdx', false)
-      .col('ispReqNo', false)
-      .col('ispReqDt', false)
-      .col('mtrNm', '품목명')
-      .col('batchNo', '배치번호')
-      .col('etrQty', false)
-      .col('inpUnit', false)
-      .col('savePla', false)
-      .col('etrDt', '입고일자')
-      .col('amtUnit', false)
-      .col('lotNo', '제조번호')
-      .col('pdtOrderTyp', false)
       .col('pdtOrderNo', '생산오더번호')
-      .col('udtDs', false)
-      .col('revDs', false)
-      .col('pitmCd', '품목코드')
-      .col('pitmTyp', '품목유형')
+      .col('pitmTypNm', '품목유형')
+      .col('mtrCd', '자재코드')
       .col('pitmNm', '품목명')
+      .col('batchNo', '배치번호')
+      .col('etrDt', '입고일')
+      .col('ispScr', '검사실적')
+      .col('ispReqNo', '검사요청번호')
+      .col('ispReqDt', '검사요청일자')
+      .col('sytJdg', '적부판정')
+      .col('ansProcCd', '진행상태')
+      .col('plntCd', false)
+      .col('plntNm', '사업장')
       .build(),
 };
 

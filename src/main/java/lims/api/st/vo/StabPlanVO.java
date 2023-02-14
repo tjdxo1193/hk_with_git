@@ -1,5 +1,6 @@
 package lims.api.st.vo;
 
+import lims.api.common.domain.UpdateDetect;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -7,7 +8,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class StabPlanVO {
+public class StabPlanVO implements UpdateDetect {
     // ST_SBT_PLN
     private String plntCd;                  // 사업장 코드
     private Integer sbtPlnIdx;              // 안정성 계획 IDX
@@ -121,7 +122,9 @@ public class StabPlanVO {
     // SY_APR_INFO
     private String aprReqDiv;                   // 요청 코드(S029)
     private String aprReqUid;                   // 요청자 UID
+    private String aprReqIp;                    // 요청자 IP
     private String aprUid;                      // 승인자 UID
+    private String aprReqRea;                   // 승인요청 사유
 
     // MS_AITM
     private String aitmCd;                      // 시험항목 코드

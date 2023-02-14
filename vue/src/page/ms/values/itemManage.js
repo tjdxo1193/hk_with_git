@@ -1,5 +1,5 @@
 import api from '@/api';
-import {ColumnBuilder, FormBuilder} from '@/util';
+import { ColumnBuilder, FormBuilder } from '@/util';
 
 const codeWithSearchGrid = {
   forms: () =>
@@ -50,7 +50,7 @@ const searchGridWithForm = {
       .required()
       .Select('pitmTyp', '품목구분', { async: () => api.combo.systemCommon.getPitmDivCombo() })
       .required()
-      .Select('specProcCd', '등록여부', { async: () => api.combo.systemCommon.getSpecProcCombo() })
+      .Select('specProcCd', '진행상태', { async: () => api.combo.systemCommon.getSpecProcCombo() })
       .Input('pitmCd', '품목코드')
       .Input('pitmNm', '품목명')
       .build(),

@@ -19,12 +19,14 @@ const list = {
   forms: () =>
     FormBuilder.builder()
       .Select('upperMitmPitmDiv', '품목구분', {
-        async: () => api.combo.common.getTreeCd('M1000000'),
+        async: () => api.combo.common.getTreeCd('M1000001'),
       })
-      .Input('point', '포인트')
-      .Input('roomno', 'RoomNo')
-      .Select('ansCylCd', '시험주기', {
-        async: api.combo.common.getAnsCyl,
+      .Select('mitmPitmDiv', '품목명', {
+        async: (param) => api.combo.common.getTreeCd(param),
+      })
+      .Input('mitmCd', '품목코드')
+      .Select('crgDptCd', '담당부서', {
+        async: api.combo.common.getDpt,
       })
       .Select('mitmWrkStudioDiv', '작업동', {
         async: () => api.combo.common.getUpperTreeCd('M2000000'),
@@ -35,9 +37,7 @@ const list = {
       .Select('mitmWrkPlcDiv', '작업실', {
         async: (param) => api.combo.common.getTreeCd(param),
       })
-      .Select('crgDptCd', '담당부서', {
-        async: api.combo.common.getDpt,
-      })
+      .Input('roomno', 'RoomNo')
       .DatepickerTwinWithSwitch('searchReqDt', '의뢰일', {
         value: [monthAgoDate, todayDate],
       })
@@ -46,13 +46,12 @@ const list = {
   columns: () =>
     ColumnBuilder.builder()
       .col('mitmReqIdx', false)
-      .col('ansProcNm', '진행상태')
-      .col('reqDt', '의뢰일자')
       .col('reqNo', '의뢰번호')
-      .col('rcpDt', '접수일자')
-      .col('mitmCd', '품목코드')
+      .col('reqDt', '의뢰일자')
       .col('upperMitmPitmDivNm', '품목구분')
+      .col('mitmCd', '품목코드')
       .col('mitmPitmDivNm', '품목명')
+      .col('mitmWrkStudioDivNm', '작업동')
       .col('upperMitmWrkPlcDivNm', '작업소')
       .col('mitmWrkPlcDivNm', '작업실')
       .col('roomno', 'RoomNo')
@@ -61,6 +60,7 @@ const list = {
       .col('ansEdt', '시험예정일')
       .col('point', '포인트')
       .col('crgDptNm', '담당부서')
+      .col('wrkDivNm', '작업구분')
       .build(),
 };
 
@@ -83,6 +83,8 @@ const requestInfo = {
       .Input('upperMitmWrkPlcDivNm', '작업소')
       .Input('mitmWrkPlcDivNm', '작업실')
       .Input('crgDptNm', '담당부서')
+      .Textarea('reqRmk', '의뢰비고', { rows: 1 })
+      .spanCol(4)
       .build()
       .map((col) => ({
         ...col,

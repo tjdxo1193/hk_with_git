@@ -157,10 +157,4 @@
         ORDER BY C.RST_SEQ
     </select>
 
-    <update id="save" parameterType="TestUnsuitableListVO">
-        UPDATE QT_PITM_ANS_PROC SET
-            NON_CFM_REA = #{nonCfmRea}
-        WHERE PLNT_CD = #{plntCd} AND ANS_IDX = #{ansIdx}
-    </update>
-
 </mapper>

@@ -4,6 +4,8 @@ import lims.api.common.enums.CUDType;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 public class AuditRecordDetailVO {
@@ -15,5 +17,6 @@ public class AuditRecordDetailVO {
     private String chgBef;
     private String chgAft;
     private CUDType cudDiv;
+    private LocalDateTime crtDs;
 
 }

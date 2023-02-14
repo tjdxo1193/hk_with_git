@@ -18,12 +18,22 @@ const list = {
   forms: () =>
     FormBuilder.builder()
       .Select('upperMitmPitmDiv', '품목구분', {
-        async: () => api.combo.common.getTreeCd('M1000000'),
+        async: () => api.combo.common.getTreeCd('M1000001'),
       })
       .Select('mitmPitmDiv', '품목명', {
         async: (param) => api.combo.common.getTreeCd(param),
       })
       .Input('mitmCd', '품목코드')
+      .Input('ansNo', '시험번호')
+      .Select('mitmWrkStudioDiv', '작업동', {
+        async: () => api.combo.common.getUpperTreeCd('M2000000'),
+      })
+      .Select('upperMitmWrkPlcDiv', '작업소', {
+        async: (param) => api.combo.common.getTreeCd(param),
+      })
+      .Select('mitmWrkPlcDiv', '작업실', {
+        async: (param) => api.combo.common.getTreeCd(param),
+      })
       .Select('crgDptCd', '담당부서', {
         async: api.combo.common.getDpt,
       })
@@ -39,26 +49,31 @@ const list = {
   columns: () =>
     ColumnBuilder.builder()
       .col('mitmReqIdx', false)
-      .col('ansProcNm', '진행상태')
+      .combo('sytJdg', '결과판정', {
+        async: () => api.combo.systemCommon.getSytJdgCombo(),
+      })
       .col('reqNo', '의뢰번호')
       .col('ansNo', '시험번호')
       .col('assNo', '지시번호')
+      .col('assSpcc', '지시특이사항', { width: 150 })
       .col('upperMitmPitmDivNm', '품목구분')
-      .col('mitmPitmDivNm', '품목명')
       .col('mitmCd', '품목코드')
+      .col('mitmPitmDivNm', '품목명')
+      .col('mitmWrkStudioDivNm', '작업동')
       .col('upperMitmWrkPlcDivNm', '작업소')
       .col('mitmWrkPlcDivNm', '작업실')
       .col('roomno', 'RoomNo')
       .col('grade', 'Grade')
+      .col('wrkDivNm', '작업구분')
       .col('point', '포인트')
       .col('crgDptNm', '담당부서')
       .col('reqDt', '의뢰일자')
       .col('rcpDt', '접수일자')
       .col('assDt', '지시일자')
+      .col('cplRqmDt', '완료요구일')
       .col('rjtUnm', '반려자')
       .col('rjtDs', '반려일')
       .col('rjtRea', '반려사유')
-      .col('cplRqmDt', '완료요구일')
       .build(),
 };
 
@@ -70,14 +85,24 @@ const itemList = {
     height: '300px',
     buttons: [
       { name: 'preResultTrend', label: '이전결과동향', disabled: true },
-      { name: 'stage', label: 'STAGE', disabled: true },
       { name: 'hold', label: '시험보류', disabled: true },
       { name: 'reject', label: '검토반려', disabled: true },
       { name: 'approveRequest', label: '승인요청', disabled: true },
       { name: 'init', label: '초기화', disabled: true },
     ],
   },
-  forms: () => FormBuilder.builder().Hidden('plntCd').Hidden('mitmReqIdx').build(),
+  forms: () => 
+    FormBuilder.builder()
+      .Hidden('plntCd')
+      .Hidden('mitmReqIdx')
+      .Input('upperMitmPitmDivNm', '품목구분', { readonly: true })
+      .Input('mitmPitmDivNm', '품목명', { readonly: true })
+      .Input('ansNo', '시험번호', { readonly: true })
+      .Select('sytJdg', '결과판정', {
+        async: () => api.combo.systemCommon.getSytJdgCombo(),
+      })
+      .required()
+      .build(),
   columns: () =>
     ColumnBuilder.builder()
       .col('mitmReqIdx', false)

@@ -158,13 +158,13 @@ public class SAPController {
 
     @Permit
     @PostMapping("devTest/testPerformance")
-    public void purchaseInboundPerformance(@RequestBody List<SAPSendVO.TestPerformanceOfPurchaseInbound> param) {
+    public void purchaseInboundPerformance(@RequestBody SAPSendVO.TestPerformanceOfPurchaseInbound param) {
         sapService.publishTestPerformanceOfPurchaseInbound(param);
     }
 
     @Permit
     @PostMapping("devTest/testPerformanceManufactureInbound")
-    public void manufactureInboundPerformance(@RequestBody List<SAPSendVO.TestPerformanceOfManufactureInbound> param) {
+    public void manufactureInboundPerformance(@RequestBody SAPSendVO.TestPerformanceOfManufactureInbound param) {
         sapService.publishTestPerformanceOfManufactureInbound(param);
     }
 

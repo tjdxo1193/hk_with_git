@@ -15,7 +15,9 @@ public enum TrsInterface {
     MES_TEST_RESULT(InterfaceSystemType.MES, "IF_MES_0013", "/RESTAdapter/PIF_MES_0013", InterfaceSendType.SYNC),
     MES_NON_CFM_REPORT(InterfaceSystemType.MES, "IF_MES_0006", "/RESTAdapter/PIF_MES_0006", InterfaceSendType.SYNC),
 
-    ELN_METHOD_BY_ITEM(InterfaceSystemType.ELN, "IF_ELN_0008", "/RESTAdapter/PIF_ELN_0008", InterfaceSendType.ASYNC);
+    ELN_METHOD_BY_ITEM(InterfaceSystemType.ELN, "IF_ELN_0008", "/RESTAdapter/PIF_ELN_0008", InterfaceSendType.ASYNC),
+
+    QMS_SHIPT(InterfaceSystemType.QMS, null, null, InterfaceSendType.SYNC);
 
     private final InterfaceSystemType systemType;
     private final String interfaceId;

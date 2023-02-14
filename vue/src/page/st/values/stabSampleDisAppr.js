@@ -1,67 +1,55 @@
 import dayjs from 'dayjs';
 
+import api from '@/api';
 import { ColumnBuilder, FormBuilder } from '@/util';
 
 const todayDate = dayjs().format('YYYY-MM-DD');
 
-const searchForm = {
+const yesterdayDate = dayjs().add(-1, 'day').format('YYYY-MM-DD');
+
+const sampleGrid = {
   static: {
     title: '조회',
-    countPerRow: 2,
-    buttons: [{ name: 'search', label: '조회' }],
+    buttons: [
+      { name: 'approve', label: '승인' },
+      { name: 'reject', label: '반려' },
+      { name: 'search', label: '조회' },
+    ],
+    props: {
+      showRowCheckColumn: true,
+      editable: false,
+    },
   },
   forms: () =>
     FormBuilder.builder()
-      .Select('1', '품목구분')
-      .Input('2', '제조번호')
-      .Input('3', '품목코드')
-      .Select('4', '보관장소')
-      .Input('5', '품목명')
-      .DatepickerTwinWithSwitch('6', '사용(유효)기한', { value: [todayDate, todayDate] })
+      .Select('pitmTyp', '품목유형', {
+        async: () => api.combo.systemCommon.getPitmDivCombo(),
+      })
+      .Input('lotNo', '제조번호')
+      .Input('batchNo', '배치번호')
+      .Input('pitmCd', '품목코드')
+      .Select('strgPla', '보관장소', {
+        api: () => api.combo.userCommon.getSmpStrgMtdCombo(),
+      })
+      .Input('pitmNm', '품목명')
+      .DatepickerTwinWithSwitch('useLmt', '사용기한', {
+        value: [yesterdayDate, todayDate],
+        _colSpan: 2,
+      })
       .build(),
-};
-
-const gridForSearchResult = {
-  static: {
-    title: '조회결과',
-    $grid: null,
-    props: {
-      editable: false,
-      showRowCheckColumn: true,
-    },
-  },
   columns: () =>
     ColumnBuilder.builder()
-      .col('1', '승인구분')
-      .col('1', '품목구분')
-      .col('2', '품목코드')
-      .col('3', '공정명')
-      .col('4', '품목명')
-      .col('5', '제조번호')
-      .col('6', '제조일')
-      .col('7', '사용(유효)기한')
-      .col('8', '시험목적')
-      .col('9', '상세시험목적')
-      .col('10', '시험종류')
-      .col('11', '보관장소')
-      .col('12', '보관조건')
-      .col('13', '포장형태')
-      .col('14', '재고량')
-      .col('15', '안정성검체량')
-      .col('16', '안정성검체량단위')
+      .col('pitmTypNm', '품목유형')
+      .col('pitmCd', '품목코드')
+      .col('pitmNm', '품목명')
+      .col('lotNo', '제조번호')
+      .col('useLmt', '사용기한')
+      .col('remains', '재고량')
+      .col('mngSmpVol', '안정성검체량')
+      .col('inpUnit', '안정성검체량단위')
       .build(),
-};
-
-const buttonGroups = {
-  buttons: [
-    { name: 'approve', label: '승인' },
-    { name: 'reject', label: '반려' },
-    { name: 'init', label: '초기화' },
-  ],
 };
 
 export default {
-  searchForm,
-  gridForSearchResult,
-  buttonGroups,
+  sampleGrid,
 };

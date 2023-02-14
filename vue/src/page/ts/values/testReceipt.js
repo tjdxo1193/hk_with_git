@@ -118,9 +118,10 @@ const requestInfo = {
   },
   forms: () =>
     FormBuilder.builder()
-      .Hidden('pitmVer')
       .Hidden('reqIdx')
       .Hidden('batchNo')
+      .Hidden('pitmVer')
+      .Hidden('aitmSpecIdx')
       .Input('ispReqNo', '검사요청번호', { readonly: true })
       .Input('pitmNm', '품목명(국문)', { readonly: true })
       .Input('pitmEn', '품목명(영문)', { readonly: true })

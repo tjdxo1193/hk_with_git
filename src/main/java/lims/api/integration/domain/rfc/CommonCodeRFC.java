@@ -21,7 +21,7 @@ public class CommonCodeRFC implements RFC {
     }
 
     @Override
-    public JCoTable getResultJson(JCoFunction function) {
-        return function.getTableParameterList().getTable("ET_CODELIST");
+    public String getResultJson(JCoFunction function) {
+        return function.getTableParameterList().getTable("ET_CODELIST").toJSON();
     }
 }

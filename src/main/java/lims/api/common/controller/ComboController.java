@@ -130,4 +130,11 @@ public class ComboController {
         String plntCd = jwtResolver.getPlantCode(jwt);
         return ResponseEntity.ok(service.getTestTerm(plntCd));
     }
+
+    @GetMapping("/equipment")
+    public ResponseEntity<List<ComboVO>> equipment(@AuthToken Token token) {
+        String jwt = token.getJwt();
+        String plntCd = jwtResolver.getPlantCode(jwt);
+        return ResponseEntity.ok(service.getEquipment(plntCd));
+    }
 }

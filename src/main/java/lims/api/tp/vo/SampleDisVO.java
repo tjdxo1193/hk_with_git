@@ -3,6 +3,9 @@ package lims.api.tp.vo;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
 public class SampleDisVO {
@@ -63,4 +66,6 @@ public class SampleDisVO {
     private String ansProcCd;       // S013 시험 진행 상태 코드
     private Integer reqIdx;         // 의뢰 IDX
     private String rcpDt;           // 시험 접수 날짜
+    private List<String> dpsExpDtList = new ArrayList<>();
+    private List<String> smpEtrDtList = new ArrayList<>();
 }

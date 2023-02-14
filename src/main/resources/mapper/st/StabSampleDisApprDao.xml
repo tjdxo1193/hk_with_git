@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.st.dao.StabSampleDisApprDao">
+    <select id="find" parameterType="StabSampleDisApprVO" resultType="StabSampleDisApprVO">
+        SELECT QSM.PLNT_CD,
+               QSM.SMP_MNG_IDX,
+               QSM.SMP_DPS_PROC,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.SMP_DPS_PROC) AS SMP_DPS_PROC_NM,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.PITM_TYP)     AS PITM_TYP_NM,
+               QSM.PITM_CD,
+               QSM.PITM_NM,
+               QSM.ANS_IDX,
+               QSM.SMP_DIV_CD,
+               QSM.MNG_SMP_VOL,
+               QSM.SMP_STRG_MTD,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.SMP_STRG_MTD) AS SMP_STRG_MTD_NM,
+               QSM.LOT_NO,
+               QSM.BATCH_NO,
+               QSM.INP_UNIT,
+               QSM.MAK_DT,
+               QSM.STRG_LMT,
+               QSM.USE_LMT,
+               QSM.IRG_YN,
+               QSM.SMP_RMK,
+               QSM.DPS_EXP_DT,
+               QSM.SMP_DPS_APR_IDX,
+               QSM.DPS_REA,
+               QSM.DPS_CANL_REA,
+               QSM.SMP_ETR_DT
+        FROM QS_SMP_MNG QSM
+                 JOIN SY_APR_INFO SAI on QSM.PLNT_CD = SAI.PLNT_CD AND QSM.SMP_DPS_APR_IDX = SAI.APR_IDX
+        WHERE QSM.PLNT_CD = #{plntCd}
+          AND QSM.SMP_DPS_PROC IN ('S0270400', 'S0270600')
+          AND QSM.ANS_TYP = 'S0230004'
+          AND SAI.APR_YN = 'N'
+          AND SMP_DIV_CD = 'S0260001'
+          AND SAI.APR_UID = #{aprUid}
+        ORDER BY QSM.SMP_MNG_IDX DESC
+    </select>
+
+    <update id="approve">
+        UPDATE QS_SMP_MNG
+        SET SMP_DPS_PROC = #{smpDpsProc}
+        WHERE PLNT_CD = #{plntCd}
+          AND SMP_MNG_IDX = #{smpMngIdx}
+    </update>
+
+    <update id="reject">
+        UPDATE QS_SMP_MNG
+        SET SMP_DPS_PROC = #{smpDpsProc},
+            RJT_UID      = #{rjtUid},
+            RJT_REA      = #{rjtRea},
+            RJT_DS       = SYSDATE
+        WHERE PLNT_CD = #{plntCd}
+          AND SMP_MNG_IDX = #{smpMngIdx}
+    </update>
+</mapper>

@@ -1,5 +1,6 @@
 package lims.api.integration.service;
 
+import lims.api.integration.domain.eai.TrsResult;
 import lims.api.integration.vo.*;
 
 import java.util.List;
@@ -26,9 +27,9 @@ public interface SAPService {
 
     void publishTestStatus(SAPSendVO.TestStatus data);
 
-    void publishTestPerformanceOfPurchaseInbound(List<SAPSendVO.TestPerformanceOfPurchaseInbound> data);
+    TrsResult publishTestPerformanceOfPurchaseInbound(SAPSendVO.TestPerformanceOfPurchaseInbound data);
 
-    void publishTestPerformanceOfManufactureInbound(List<SAPSendVO.TestPerformanceOfManufactureInbound> data);
+    TrsResult publishTestPerformanceOfManufactureInbound(SAPSendVO.TestPerformanceOfManufactureInbound data);
 
     void publishAssetsMovementHistory(List<SAPSendVO.AssetsMovementHistory> data);
 

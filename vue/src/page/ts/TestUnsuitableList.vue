@@ -93,43 +93,6 @@ export default {
       if (name === 'select') {
         return this.getTestUnsuitableList();
       }
-      if (name === 'save') {
-        return this.dataCheckBeforePublish(name);
-      }
-      if (name === 'publishReport') {
-        return this.dataCheckBeforePublish(name);
-      }
-    },
-    dataCheckBeforePublish(name) {
-      this.unsuitableInfo.forms.validate().then(() => {
-        return name === 'save' ? this.save() : this.publishReport();
-      });
-    },
-    save() {
-      const parameter = FormUtil.getData(this.unsuitableInfo.forms);
-      this.$confirm(this.$message.confirm.saveData).then(() => {
-        this.$eSign(() => this.$axios.put('/ts/testUnsuitableList', parameter))
-          .then(() => {
-            this.$info(this.$message.info.saved);
-          })
-          .catch(() => {
-            this.$error(this.$message.error.updateData);
-          });
-      });
-    },
-    publishReport() {
-      alert('부적합 보고서 발행 RD');
-      //TODO 부적합 사유 컬럼 추가되면 컬럼명 수정
-      // const parameter = FormUtil.getData(this.unsuitableInfo.forms);
-      // this.$confirm(this.$message.confirm.published).then(() => {
-      //   this.$eSign(() => this.$axios.put('/ts/testUnsuitableList/publish', parameter))
-      //     .then(() => {
-      //       this.$info(this.$message.info.published);
-      //     })
-      //     .catch(() => {
-      //       this.$error(this.$message.error.published);
-      //     });
-      // });
     },
     init() {
       this.resultInputInfo.$grid.clearGridData();

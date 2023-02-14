@@ -8,4 +8,6 @@ public interface PreventRecurrenceApprService {
     List<PreventRecurrenceApprVO> findAll(PreventRecurrenceApprVO param);
 
     List<PreventRecurrenceApprVO> findResultItem(PreventRecurrenceApprVO param);
+
+    void approve(PreventRecurrenceApprVO param);
 }

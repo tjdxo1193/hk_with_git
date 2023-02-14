@@ -6,7 +6,7 @@
     @form-event="onDoubleClickSampleGridCell"
   />
   <FormWithHeader v-bind="inputForm" @button-click="onClickInputFormButtons" />
-  <RejectionReasonModal :show="rejectionReasonModal.show" />
+  <RejectionReasonModal :show="rejectionReasonModal.show"  @check="reject" @close="hideModal('rejectionReasonModal')"/>
 </template>
 
 <script>
@@ -43,7 +43,9 @@ export default {
     };
   },
   methods: {
-    init() {},
+    init() {
+      this.inputForm.forms = values.inputForm.forms();
+    },
     async fetchSampleGrid() {
       const { forms, $grid } = this.sampleGrid;
       const param = FormUtil.getData(forms);
@@ -77,7 +79,7 @@ export default {
       }));
       await this.$eSign(() => this.$axios.put('/tp/sampleDisAppr/reject', param))
         .then(() => {
-          this.$info(this.$message.info.message.reject);
+          this.$info(this.$message.info.reject);
           this.fetchSampleGrid();
           this.init();
         })
@@ -96,28 +98,33 @@ export default {
       }
     },
     onDoubleClickSampleGridCell(event) {
-      if (event.type === 'cellDoubleClick') {
-        const forms = this.inputForm.forms;
-        FormUtil.setData(forms, event.item);
-      }
+      const forms = this.inputForm.forms;
+      FormUtil.setData(forms, event.item);
     },
     onClickSampleGridButtons({ name }) {
+      const { $grid } = this.sampleGrid;
+      const checkedRows = $grid.getCheckedRowItems();
       if (name === 'search') {
         this.fetchSampleGrid();
       }
+      if (name === 'approve') {
+        if (checkedRows.length > 0) {
+          this.approve();
+        } else {
+          return this.$warn(this.$message.warn.unSelectedData);
+        }
+      }
+      if (name === 'reject') {
+        if (checkedRows.length > 0) {
+            this.showModal('rejectionReasonModal');
+          } else {
+            return this.$warn(this.$message.warn.unSelectedData);
+          }
+      }
     },
     onClickInputFormButtons({ name }) {
-      const { $grid } = this.sampleGrid;
-      const checkedRows = $grid.getCheckedRowItems();
-      if (checkedRows.length > 0) {
-        if (name === 'approve') {
-          this.approve();
-        }
-        if (name === 'reject') {
-          this.reject();
-        }
-      } else {
-        return this.$warn(this.$message.warn.unSelectedData);
+      if (name === 'init') {
+        this.init();
       }
     },
   },

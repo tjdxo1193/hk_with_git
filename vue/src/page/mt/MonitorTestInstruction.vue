@@ -1,6 +1,7 @@
 <template>
   <AUIGridSearch
     v-bind="list"
+    :columns="computedListColumns"
     @button-click="onClickButton"
     @grid-created="(proxy) => $setState('list.$grid', proxy)"
     @form-event="searchFormEvent"
@@ -67,11 +68,29 @@ export default {
         )
         .then(({ data }) => this.itemList.$grid.setGridData(data));
     },
+    instruct() {
+      const checkedRows = this.list.$grid.getCheckedRowItems();
+      if (checkedRows.length > 0) {
+        const parameter = checkedRows.map((row) => ({
+          ...row.item,
+        }));
+        this.$eSignWithReason(() => this.$axios.put('/mt/monitorTestInstruction/instruct', parameter))
+          .then(() => {
+            this.$info(this.$message.info.saved);
+            this.getMonitorTestInstruction();
+          })
+          .catch(() => {
+            this.$error(this.$message.error.updateData);
+          });
+      } else {
+        this.$warn(this.$message.warn.unSelectedData);
+      }
+    },
     deleteResult(checkedRows) {
       const parameter = checkedRows.map((row) => ({
         ...row.item,
       }));
-      this.$eSign(() => this.$axios.put('/mt/monitorTestInstruction/deleteRst', parameter))
+      this.$eSignWithReason(() => this.$axios.put('/mt/monitorTestInstruction/deleteRst', parameter))
         .then(() => {
           this.$info(this.$message.info.deleted);
           this.getMonitorTestRst(checkedRows[0]);
@@ -113,24 +132,6 @@ export default {
         }
       }
     },
-    instruct() {
-      const checkedRows = this.list.$grid.getCheckedRowItems();
-      if (checkedRows.length > 0) {
-        const parameter = checkedRows.map((row) => ({
-          ...row.item,
-        }));
-        this.$eSign(() => this.$axios.put('/mt/monitorTestInstruction/instruct', parameter))
-          .then(() => {
-            this.$info(this.$message.info.saved);
-            this.getMonitorTestInstruction();
-          })
-          .catch(() => {
-            this.$error(this.$message.error.updateData);
-          });
-      } else {
-        this.$warn(this.$message.warn.unSelectedData);
-      }
-    },
     init() {
       this.list.forms = values.list.forms();
       this.list.$grid.clearGridData();
@@ -141,6 +142,16 @@ export default {
     },
     disableButtons(buttons) {
       FormUtil.disableButtons(this.itemList.buttons, buttons);
+    },
+  },
+  computed: {
+    computedListColumns() {
+      const editableColumns = ['cplRqmDt'];
+
+      return this.list.columns.map((col) => ({
+        ...col,
+        editable: editableColumns.includes(col.dataField) ? true : false,
+      }));
     },
   },
 };

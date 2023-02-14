@@ -59,6 +59,7 @@ public class AddSampleRequestVO {
     private String smpReqReaNm;     // 요청 사유 명칭
     private String addSmpProcNm;    // 추가 검체 프로세스 명칭
     private String ansTypNm;        // 시험 유형 명칭
+    private String pitmTypNm;
     private String rjtNm;
     private List<String> smpReqDtList = new ArrayList<>();
 }

@@ -54,12 +54,11 @@ public class ReportDesignerHelper {
     private String downloadToServerAndGetCreatedFilePath(String mrdName, String param, String targetFileName) throws InvokerException {
         String mrdPath = getMrdPath(mrdName);
         String targetFileExtension = FileUtil.getExtension(targetFileName);
-        String currentDirName = StringUtil.generateUUID();
 
         String temporaryDirPath = getTemporaryDirPath();
         createDirectory(temporaryDirPath);
 
-        String targetFilePath = FileUtil.concat(temporaryDirPath, currentDirName + targetFileName);
+        String targetFilePath = FileUtil.concat(temporaryDirPath, targetFileName + "-" + StringUtil.generateUUID(10));
 
         ReportingServerInvoker invoker = new ReportingServerInvoker(getReportingServerUrl());
         invoker.setCharacterEncoding("utf-8");

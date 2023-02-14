@@ -22,7 +22,7 @@ export default {
   getPackageDivCombo() {
     return this.getDetailSystemCommonCd('S010');
   },
-  getSytTypCombo() {
+  getSytJdgCombo() {
     return this.getDetailSystemCommonCd('S011');
   },
   getRstJdgCombo() {
@@ -48,6 +48,9 @@ export default {
   },
   getRptDivCombo() {
     return this.getDetailSystemCommonCd('S024');
+  },
+  getNonCfmProcCombo() {
+    return this.getDetailSystemCommonCd('S025');
   },
   getSmpDivCombo() {
     return this.getDetailSystemCommonCd('S026');

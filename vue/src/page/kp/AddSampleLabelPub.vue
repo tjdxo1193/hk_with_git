@@ -2,24 +2,35 @@
   <AUIGridSearch
     v-bind="sampleGrid"
     @grid-created="(proxy) => $setState('sampleGrid.$grid', proxy)"
+    @button-click="onSampleGridButtonClick"
+    @form-event="sampleGridEvent"
   />
-  <FormWithHeader v-bind="requestForm" />
+  <FormWithHeader 
+    v-bind="requestForm" 
+    @button-click="onRequestFormsButtonClick"
+  />
 </template>
 
 <script>
-import { FormUtil } from '@/util/index.js';
+import { FormUtil, RdUtil } from '@/util/index.js';
 
 import values from './values/addSampleLabelPub.js';
 
 export default {
   name: 'AddSampleLAbelPub',
   data() {
-    const { sampleGrid, requestForm } = values;
+    const { pitmTypList, sampleGrid, requestForm } = values;
     return {
+      pitmTypList,
       sampleGrid: {
         ...sampleGrid.static,
         forms: sampleGrid.forms(),
         columns: sampleGrid.columns(),
+        event: {
+          cellDoubleClick: (event) => {
+            this.sampleGridDoubleClicked(event);
+          },
+        },
       },
       requestForm: {
         ...requestForm.static,
@@ -27,9 +38,13 @@ export default {
       },
     };
   },
+  mounted() {
+    this.fetchSampleGrid();
+  },
   methods: {
-    init() {
-      this.requestForm.forms = values.requestForm.forms();
+    doInit() {
+      this.resetRequestForm();
+      this.fetchSampleGrid();
     },
     async fetchSampleGrid() {
       const { forms, $grid } = this.sampleGrid;
@@ -41,12 +56,46 @@ export default {
           this.$error(this.$message.error.fetchData);
         });
       $grid.setGridData(data);
-      this.init();
     },
-    setDataToform() {},
-  },
-  mounted() {
-    this.fetchSampleGrid();
+    resetRequestForm() {
+      this.requestForm.forms = values.requestForm.forms();
+    },
+    sampleGridDoubleClicked(event) {
+      const { forms } = this.requestForm;
+      const { item } = event;
+      FormUtil.setData(forms, item);
+    },
+    onSampleGridButtonClick({ name }) {
+      if (name === 'search') {
+        this.doInit();
+      }
+    },
+    sampleGridEvent(event) {
+      if (event.type === 'keydown' && event.originEvent.key === 'Enter') {
+        this.doInit();
+      }
+    },
+    onRequestFormsButtonClick({ name }) {
+      if (name === 'printLabel') {
+        this.printLabel();
+      } else if (name === 'reset') {
+        this.resetRequestForm();
+      }
+    },
+    printLabel() {
+      const { forms } = this.requestForm;
+      const parameter = FormUtil.getData(forms);
+
+      if(!parameter || !parameter.plntCd || !parameter.addSmpIdx || !this.pitmTypList.rawMaterial) {
+        this.$warn(this.$message.warn.unSelectedData);
+        return;
+      }
+
+      RdUtil.openReport(
+        '/LABEL_PRINT.mrd',
+        `/rp [${parameter.plntCd}] [${parameter.addSmpIdx}] [${this.pitmTypList.rawMaterial}]`,
+      );
+    },
   },
 };
 </script>

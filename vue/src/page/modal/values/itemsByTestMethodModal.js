@@ -1,4 +1,4 @@
-import {ColumnBuilder, FormBuilder} from '@/util/builder';
+import { ColumnBuilder, FormBuilder } from '@/util/builder';
 
 const searchGrid = {
   static: {

@@ -15,6 +15,6 @@ public interface RFC {
     void setSearchParameter(JCoFunction function, RFCParam param);
 
     // RFC 후 function 객체에 저장된 결과값을 JSON으로 꺼냄.
-    JCoTable getResultJson(JCoFunction function);
+    String getResultJson(JCoFunction function);
 
 }

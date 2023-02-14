@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -71,8 +72,8 @@ public class SpecManageVO implements UpdateDetect {
     private String ifDt;
     private String labNo;
     private List<String> ifDtParam;
-    private List<SpecManageAitmVO> addedRowItems;
-    private List<SpecManageAitmVO> editedRowItems;
-    private List<SpecManageAitmVO> removedRowItems;
+    private List<SpecManageAitmVO> addedRowItems = new ArrayList<>();
+    private List<SpecManageAitmVO> editedRowItems = new ArrayList<>();
+    private List<SpecManageAitmVO> removedRowItems = new ArrayList<>();
 
 }

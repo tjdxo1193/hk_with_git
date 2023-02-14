@@ -57,7 +57,6 @@
             G.ISP_REQ_NO,
             G.PHS_ORDER_NO,
             G.PDT_ORDER_NO,
-            A.PITM_SPCC,
             B.NON_CFM_REA,
             B.PITM_SPCC,
             (NVL(B.SMP_VOL_ANS, 0) + NVL(B.SMP_VOL_ETC, 0) + NVL(B.SMP_VOL_STRG, 0)) AS SMP_VOL_TOT

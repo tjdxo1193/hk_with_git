@@ -3,6 +3,7 @@ package lims.api.st.service.impl;
 import lims.api.common.service.ApproveService;
 import lims.api.st.dao.StabPlanDetailApprDao;
 import lims.api.st.enums.SbtAnsProcess;
+import lims.api.st.enums.SbtPlnSttProcess;
 import lims.api.st.service.StabPlanDetailApprService;
 import lims.api.st.vo.StabPlanDetailApprVO;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +37,8 @@ public class StabPlanDetailApprServiceImpl implements StabPlanDetailApprService 
             String sbtAnsProc = sbtAnsProcess.getSbtAnsProc();
             item.setSbtAnsProc(sbtAnsProc);
 
+            item.setSbtPlnStt(SbtPlnSttProcess.PLN_BEFORE.getProcessCode());
+
             if(sbtAnsProcess.equals(SbtAnsProcess.APPROVED)) {
                 approveService.approve(item.getSbtAnsPlnAprIdx());
             }
@@ -57,6 +60,8 @@ public class StabPlanDetailApprServiceImpl implements StabPlanDetailApprService 
             SbtAnsProcess sbtAnsProcess = SbtAnsProcess.getRejectCode(preSbtAnsProc);
             String sbtAnsProc = sbtAnsProcess.getSbtAnsProc();
             item.setSbtAnsProc(sbtAnsProc);
+
+            item.setSbtPlnStt(SbtPlnSttProcess.PLN_BEFORE.getProcessCode());
         });
 
         param.forEach(this::reject);

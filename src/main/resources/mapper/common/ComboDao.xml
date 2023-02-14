@@ -150,4 +150,13 @@
             AND ST.USE_YN = 'Y'
         ORDER BY ST.TRM_ORD
     </select>
+
+    <select id="getEquipment" resultType="ComboVO">
+        SELECT
+            EQM_CD AS VALUE
+            ,EQM_NM AS LABEL
+        FROM EM_EQM_INFO
+        WHERE PLNT_CD = #{plntCd}
+    </select>
+
 </mapper>

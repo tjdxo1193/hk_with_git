@@ -98,7 +98,7 @@ public class InstHisManageServiceImpl implements InstHisManageService {
 	}
 
 	private int savedFile(InstHisManageVO param) {
-		if (param.getHisFileIdx() == 0) {
+		if (param.getHisFileIdx() == null) {
 			FileKey fileKey = fileService.save(param.getAddedFiles());
 			param.setHisFileIdx(fileKey.getFileIdx());
 		} else {

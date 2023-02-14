@@ -269,6 +269,7 @@
 		WHERE
 			QPS.PLNT_CD = #{plntCd}
 			AND QPS.AITM_SPEC_IDX IN(SELECT AITM_SPEC_IDX FROM QM_PKGA WHERE PLNT_CD = #{plntCd} AND PKGA_CD = #{pkgaCd})
+		  	AND QPS.SPEC_PROC_CD != #{specProcCd}
 			AND (QPS.PLNT_CD, QPS.AITM_SPEC_IDX, QPAS.AITM_SPEC_VER) IN
 				(SELECT A.PLNT_CD
 					  , A.AITM_SPEC_IDX
@@ -606,7 +607,7 @@
 
 	<update id="updateAitmIdxByTemporaryStorage" parameterType="SpecManageVO">
 		UPDATE QM_PITM_SPEC
-			SET AITM_SPEC_IDX = #{aitmSpecIdx}
+			SET AITM_SPEC_IDX = #{newAitmSpecIdx}
 		WHERE PITM_CD = #{pitmCd}
 	    AND PLNT_CD = #{plntCd}
 		AND PITM_VER = #{pitmVer}
@@ -683,6 +684,7 @@
 
 	<select id="getItemListBySapPrdha" parameterType="WrapTestManageVO" resultType="ItemManageVO">
 			SELECT
+			    QPI.PLNT_CD,
 				QPI.PITM_CD,
 				QPI.PITM_VER,
 			    #{aitmSpecIdx} AS AITM_SPEC_IDX

@@ -211,15 +211,14 @@
                 #{brdAbbr},
                 null,
                 (SELECT BISMT FROM MS_SAP_MTR_MARA WHERE MATNR = #{pitmCd}),
-                #{etrCtnQty},
+                null,
                 #{rmtrSpec},
                 #{nbr},
                 #{ftnYn},
                 #{pcs01},
                 #{pcs02},
                 #{pcs03},
-                   -- // {useTrm} 사용 기간.
-                null,
+                #{useTrm},
                 #{otcPrd},
                 #{dmsEptYn},
                 #{pearDiv},
@@ -256,7 +255,7 @@
             PCS02         = NVL(#{pcs02}, PCS02),
             PCS03         = NVL(#{pcs03}, PCS03),
             PCS04         = null,
-            USE_TRM       = null,
+            USE_TRM       = NVL(#{useTrm}, USE_TRM),
             OTC_PRD       = NVL(#{otcPrd}, OTC_PRD),
             DMS_EPT_YN    = null,
             PEAR_DIV      = NVL(#{pearDiv}, PEAR_DIV),
@@ -429,6 +428,14 @@
                 SYSDATE,
                 TO_DATE(#{revDs}, 'YYYY-MM-DD HH24:mi:ss'))
     </insert>
+
+    <update id="cancelTestRequestToCancel"
+            parameterType="lims.api.integration.vo.SAPPostProcessVO$TestRequest$PItemReq">
+        UPDATE QT_PITM_ANS_REQ
+        SET
+            ADD_COL2 = #{addCol2}
+        WHERE ISP_REQ_NO = #{ispReqNo}
+    </update>
 
     <update id="cancelTestRequestProcessToCancel"
             parameterType="lims.api.integration.vo.SAPPostProcessVO$TestRequest$PItemReqProcess">

@@ -165,7 +165,7 @@
         WHERE PLNT_CD = #{plntCd} AND ANS_IDX = #{ansIdx}
     </update>
 
-    <update id="requestAppr" parameterType="PreventRecurrenceReviewVO">
+    <update id="request" parameterType="PreventRecurrenceReviewVO">
         UPDATE QT_PITM_ANS_INFO SET
         REO_PREV_APR_REQ_IDX = #{reoPrevAprReqIdx}
         , REO_PREV_RPY_CTT = #{reoPrevRpyCtt}

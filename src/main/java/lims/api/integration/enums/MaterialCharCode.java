@@ -2,7 +2,7 @@ package lims.api.integration.enums;
 
 public enum MaterialCharCode {
     BRD_ABBR("ZMDE_BRANDCD"),               // 브랜드 약어
-    ETR_CTN_QTY("ZMDE_TOTAL_SHELF_LIFE"),   // 제품에 표기하는 유통기한
+    USE_TRM("ZMDE_TOTAL_SHELF_LIFE"),   // 제품에 표기하는 유통기한
     RMTR_SPEC("ZMDE_PHARMACOPOEIA"),        // 원료 규격
     NBR("ZMDE_COLOR_NUMBER"),               // 호수
     FTN_YN("ZMDE_FUNCTIONAL_GOODS"),        // 특성구분(기능성)

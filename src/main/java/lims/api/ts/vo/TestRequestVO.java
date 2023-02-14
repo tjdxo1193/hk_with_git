@@ -61,6 +61,7 @@ public class TestRequestVO implements UpdateDetect {
     private String udtDs; //수정 일시
     private String revDs; //수신 일시
     /*품목정보*/
+    private String pkgMtrSpec; // 포장재 규격
     private String pitmCd; // 품목 코드
     private String pitmNm; // 품목 명 국문
     private String pitmEn; // 품목 명 영문
@@ -71,8 +72,10 @@ public class TestRequestVO implements UpdateDetect {
     /*SAP품목정보*/
     private String labNo; //LAB NO
     private String brdAbbr; // 브랜드 약어
+    private String nomMtr; //기본자재
     private String etrCtnQty; // 입고 용기 수량
     private String rmtrSpec; // 원료 규격
+    private String nbr; //호수
     private String ftnYn; // 기능성 유무
     private String pcs01; // 공정01
     private String pcs02; // 공정02
@@ -98,6 +101,7 @@ public class TestRequestVO implements UpdateDetect {
     private int ansIdx; //시험 IDX
     private String ansNo; //시험번호
     private int assNo; //지시번호
+    private String ansEdt; //시험예정일자
     private String ansTypNm;
     private String ansTyp;
     private String sytJdg;

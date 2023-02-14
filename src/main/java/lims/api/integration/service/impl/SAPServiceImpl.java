@@ -9,6 +9,7 @@ import lims.api.integration.enums.RevInterface;
 import lims.api.integration.enums.TrsInterface;
 import lims.api.integration.exception.IntegrationNoSavedException;
 import lims.api.integration.model.InterfaceTrsResponse;
+import lims.api.integration.model.interfaceTrsSAPPurchasePerformResponse;
 import lims.api.integration.service.SAPService;
 import lims.api.integration.service.TrsService;
 import lims.api.integration.service.impl.postProcessor.InterfacePostProcessorMap;
@@ -331,8 +332,8 @@ public class SAPServiceImpl implements SAPService {
     }
 
     @Override
-    public void publishTestPerformanceOfPurchaseInbound(List<SAPSendVO.TestPerformanceOfPurchaseInbound> data) {
-        trsService.execute(
+    public TrsResult publishTestPerformanceOfPurchaseInbound(SAPSendVO.TestPerformanceOfPurchaseInbound data) {
+        return trsService.execute(
                 TrsInterface.SAP_TEST_PERFORM_OF_INBOUND_PURCHASE,
                 data,
                 sapDao::nextDegreeInTestPerformanceOfPurchaseInbound,
@@ -344,10 +345,11 @@ public class SAPServiceImpl implements SAPService {
 
                     @Override
                     public InterfaceTrsResponse send() {
-                        return publisher.postEAI(
+                        interfaceTrsSAPPurchasePerformResponse response = publisher.postEAI(
                                 TrsInterface.SAP_TEST_PERFORM_OF_INBOUND_PURCHASE.getEaiServicePath(),
-                                Map.of("dataList", data)
-                        );
+                                Map.of("dataList", data),
+                                interfaceTrsSAPPurchasePerformResponse.class);
+                        return response.toTrsResponse();
                     }
 
                     @Override
@@ -369,16 +371,11 @@ public class SAPServiceImpl implements SAPService {
     }
 
     @Override
-    public void publishTestPerformanceOfManufactureInbound(List<SAPSendVO.TestPerformanceOfManufactureInbound> data) {
-        String uuid = StringUtil.generateUUID(22);
+    public TrsResult publishTestPerformanceOfManufactureInbound(SAPSendVO.TestPerformanceOfManufactureInbound data) {
+        data.setGuid(StringUtil.generateUUID(22));
+        data.setSeq(1);
 
-        for (int i = 0; i < data.size(); i++) {
-            SAPSendVO.TestPerformanceOfManufactureInbound vo = data.get(i);
-            vo.setGuid(uuid);
-            vo.setSeq(i + 1);
-        }
-
-        trsService.execute(
+        return trsService.execute(
                 TrsInterface.SAP_TEST_PERFORM_OF_INBOUND_MANUFACTURE,
                 data,
                 sapDao::nextDegreeInTestPerformanceOfManufactureInbound,

@@ -31,24 +31,4 @@ public class TestUnsuitableListServiceImpl implements TestUnsuitableListService 
         param.setAnsProcCd(TestProcess.TEST_FINISH.getProcessCode());
         return dao.findResultItem(param);
     }
-
-    @Override
-    public void save(TestUnsuitableListVO param) {
-        //TODO 부적합사유 UPDATE
-        int result = dao.save(param);
-
-        if(result == 0) {
-            throw new NoUpdatedDataException();
-        }
-    }
-
-    @Override
-    public void publish(TestUnsuitableListVO param) {
-        //TODO 부적합사유 UPDATE
-        int result = dao.save(param);
-
-        if(result == 0) {
-            throw new NoUpdatedDataException();
-        }
-    }
 }

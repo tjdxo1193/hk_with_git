@@ -64,6 +64,7 @@
              , QPAP.CLLT_DT
              , QPAP.CLLT_UID
              , QPAP.ANS_EDT
+             , (SELECT SAI.APR_UID FROM SY_APR_INFO SAI WHERE SAI.PLNT_CD = SSP.PLNT_CD AND SAI.APR_IDX = SSP.SBT_ANS_PLN_APR_IDX) AS APR_UID
              , (SELECT USER_NM FROM SY_USER SU WHERE SU.USER_ID = QPAP.CLLT_UID) AS CLLT_UID_NM
              , (SELECT TO_CHAR(MAX(TO_DATE(SSA.ANS_DT)), 'YYYY-MM-DD') FROM ST_SBT_ANS SSA WHERE SSP.PLNT_CD = SSA.PLNT_CD AND SSP.SBT_PLN_IDX = SSA.SBT_PLN_IDX) AS ANS_END_DT
         FROM ST_SBT_PLN SSP
@@ -226,7 +227,7 @@
             AND SSA.ANS_DEL_YN = 'N'
             AND SSA.SBT_PLN_IDX = #{sbtPlnIdx}
         ORDER BY
-            SSA.SBT_ANS_IDX
+            CASE WHEN SSA.ACC_MARK_NM = 'Initial' THEN 0 END, SSA.ANS_DT, SSA.SBT_ANS_IDX
     </select>
 
     <sql id="findAitmBaseData">
@@ -521,6 +522,16 @@
             AND SBT_PLN_IDX = #{sbtPlnIdx}
     </update>
 
+    <!-- 안정성시험 삭제를 위한 조회 -->
+    <select id="getAnsForDelete" parameterType="StabPlanVO" resultType="StabPlanVO">
+        SELECT SSA.PLNT_CD,
+               SSA.SBT_ANS_IDX
+        FROM ST_SBT_ANS SSA
+        WHERE 1 = 1
+            AND SSA.PLNT_CD = #{plntCd}
+            AND SSA.SBT_PLN_IDX = #{sbtPlnIdx}
+    </select>
+
     <!-- 안정성시험 전부 삭제 -->
     <update id="deleteAllAns" parameterType="StabPlanVO">
         UPDATE ST_SBT_ANS
@@ -539,12 +550,24 @@
             AND SBT_ANS_IDX = #{sbtAnsIdx}
     </update>
 
+    <!-- 안정성시험항목 삭제를 위한 조회 -->
+    <select id="getAitmForDelete" parameterType="StabPlanVO" resultType="StabPlanVO">
+        SELECT SSAA.PLNT_CD,
+               SSAA.SBT_ANS_IDX,
+               SSAA.AITM_SEQ
+        FROM ST_SBT_ANS_AITM SSAA
+        WHERE 1 = 1
+            AND PLNT_CD = #{plntCd}
+            AND SBT_ANS_IDX IN (SELECT SBT_ANS_IDX FROM ST_SBT_ANS WHERE PLNT_CD = #{plntCd} AND SBT_PLN_IDX = #{sbtPlnIdx})
+    </select>
+
     <!-- 안정성시험항목 삭제 -->
     <delete id="deleteAitm" parameterType="StabPlanVO">
         DELETE FROM ST_SBT_ANS_AITM
         WHERE 1 = 1
             AND PLNT_CD = #{plntCd}
             AND SBT_ANS_IDX = #{sbtAnsIdx}
+            AND AITM_SEQ = #{aitmSeq}
     </delete>
 
     <!-- 안정성시험 중단 요청-->

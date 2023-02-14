@@ -75,6 +75,7 @@ public interface SAPMasterDao {
     int updateCharacteristicKsml(SAPCharacteristicVO.Ksml param);
 
 
+
     List<SAPInputPerformanceByBatchVO.InputPerformanceHeader> findInputPerformHeader();
 
     int createInputPerformHeader(SAPInputPerformanceByBatchVO.InputPerformanceHeader param);
@@ -83,6 +84,8 @@ public interface SAPMasterDao {
 
 
     List<SAPInputPerformanceByBatchVO.InputPerformanceDetail> findInputPerformDetail();
+
+    int deleteInputPerformDetail(SAPInputPerformanceByBatchVO.InputPerformanceHeader param);
 
     int createInputPerformDetail(SAPInputPerformanceByBatchVO.InputPerformanceDetail param);
 

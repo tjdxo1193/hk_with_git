@@ -14,7 +14,8 @@ spring:
     password: HK_LIMS_APP
   mail:
     protocol: smtp
-    host: mail.kolmar.kr
+#    host: mail.kolmar.kr
+    host: 218.238.95.15
     port: 25
     username: kolmar_lims@kolmar.co.kr
     password: kkmlims123!@#

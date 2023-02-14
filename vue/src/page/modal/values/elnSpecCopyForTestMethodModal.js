@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 
 import api from '@/api';
-import {ColumnBuilder, FormBuilder} from '@/util/builder';
+import { ColumnBuilder, FormBuilder } from '@/util/builder';
 
 const todayDate = dayjs().format('YYYY-MM-DD');
 const monthAgoDate = dayjs().add(-1, 'M').format('YYYY-MM-DD');
@@ -20,9 +20,7 @@ const pItemSpecList = {
       showRowCheckColumn: false,
     },
     countPerRow: 3,
-    buttons: [
-      { name: 'search', label: '조회' },
-    ],
+    buttons: [{ name: 'search', label: '조회' }],
   },
   forms: () =>
     FormBuilder.builder()
@@ -51,9 +49,7 @@ const aItemList = {
       editable: false,
       showRowCheckColumn: true,
     },
-    buttons: [
-      { name: 'select', label: '선택' },
-    ],
+    buttons: [{ name: 'select', label: '선택' }],
   },
   columns: () =>
     ColumnBuilder.builder()

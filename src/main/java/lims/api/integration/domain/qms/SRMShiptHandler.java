@@ -1,32 +1,70 @@
 package lims.api.integration.domain.qms;
 
 import lims.api.integration.dao.QMSDao;
+import lims.api.integration.enums.FinalOrderStatus;
 import lims.api.integration.vo.QMSSendVO;
-import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections.CollectionUtils;
 
 import java.util.List;
 
-public class SRMShiptHandler implements ShiptHandler {
+public class SRMShiptHandler extends ShiptAbstractHandler {
 
     private final QMSDao qmsDao;
-    private final List<QMSSendVO.ShiptBase> bases;
+    private final List<QMSSendVO.ShiptReq> data;
 
-    private boolean allComplete = false;
+    private boolean ready = false;
 
-    public SRMShiptHandler(QMSDao qmsDao, List<QMSSendVO.ShiptBase> bases) {
+    public SRMShiptHandler(QMSDao qmsDao, List<QMSSendVO.ShiptReq> data) {
         this.qmsDao = qmsDao;
-        this.bases = bases;
-
-        validate();
+        this.data = data;
     }
 
     @Override
-    public boolean isAllComplete() {
-        return allComplete;
+    public boolean isReady() {
+        return ready;
     }
 
-    private void validate() {
+    @Override
+    public void fetch() {
+        if (CollectionUtils.isEmpty(data)) {
+            return;
+        }
+        for (QMSSendVO.ShiptReq base : data) {
+            List<QMSSendVO.ShiptTest> tests = qmsDao.findSRMTestAllByOrderNoAndLotNo(base);
+            base.setTests(tests);
 
+            for (QMSSendVO.ShiptTest test : tests) {
+                List<QMSSendVO.ShiptPerform> performs = qmsDao.findSRMShiptPerformByKey(test);
+                test.setPerforms(performs);
+            }
+        }
     }
 
+    @Override
+    public void runValidation() {
+        if (CollectionUtils.isEmpty(data)) {
+            return;
+        }
+
+        for (QMSSendVO.ShiptReq base : data) {
+            List<QMSSendVO.ShiptTest> tests = base.getTests();
+
+            if (isNoTarget(tests)) {
+                return;
+            }
+
+            boolean noAllCompleteTest = qmsDao.findSRMFinalOrdersByOrderNoAndLotNo(base).stream()
+                    .anyMatch(test -> FinalOrderStatus.FINISH.getValue() != test.getFinlStt());
+            if (noAllCompleteTest) {
+                return;
+            }
+            // 오더 마감이 전부 완료됐으면 QMS로 전송이 가능하도록 한다.
+            ready = true;
+        }
+    }
+
+    @Override
+    public List<QMSSendVO.ShiptReq> getData() {
+        return data;
+    }
 }

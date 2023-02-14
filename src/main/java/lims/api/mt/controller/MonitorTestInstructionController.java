@@ -1,9 +1,11 @@
 package lims.api.mt.controller;
 
 import lims.api.auth.annotation.AuthToken;
+import lims.api.auth.annotation.ESign;
 import lims.api.auth.domain.Token;
 import lims.api.auth.service.impl.HttpHelper;
 import lims.api.auth.service.impl.JwtResolver;
+import lims.api.common.domain.ESignInfo;
 import lims.api.common.model.CommonResponse;
 import lims.api.mt.service.MonitorTestInstructionService;
 import lims.api.mt.vo.MonitorTestInstructionVO;
@@ -37,10 +39,11 @@ public class MonitorTestInstructionController {
     }
 
     @PutMapping("/instruct")
-    public ResponseEntity<CommonResponse> instruct(@AuthToken Token token, @RequestBody List<MonitorTestInstructionVO> request) {
+    public ResponseEntity<CommonResponse> instruct(@AuthToken Token token, @RequestBody List<MonitorTestInstructionVO> request, @ESign ESignInfo esign) {
         for(MonitorTestInstructionVO item : request) {
             String jwt = token.getJwt();
             item.setPlntCd(jwtResolver.getPlantCode(jwt));
+            item.setAssSpcc(esign.getReason());
         }
         service.instruct(request);
         return ResponseEntity.ok(new CommonResponse());

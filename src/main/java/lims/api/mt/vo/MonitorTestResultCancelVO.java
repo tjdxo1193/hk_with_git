@@ -26,6 +26,8 @@ public class MonitorTestResultCancelVO implements UpdateDetect {
     private String assNo; //지시번호
     private String assDt; //지시일자
     private String mitmCd; //모니터링항목
+    private String mitmWrkStudioDiv; //모니터링항목 작업동
+    private String mitmWrkStudioDivNm;
     private String upperMitmWrkPlcDivNm; //모니터링항목 작업소 구분명
     private String upperMitmWrkPlcDiv; //모니터링항목 작업소 구분
     private String mitmWrkPlcDivNm; //모니터링항목 작업실 구분명
@@ -55,7 +57,9 @@ public class MonitorTestResultCancelVO implements UpdateDetect {
     private String ansCanlDs; //시험취소일
     private String ansCanlUnm; //시험취소자
     private String ansCanlRea; //시험취소사유
+    private String wrkDivNm; //작업구분
 
+    private String sytJdg;
     private int rstSeq; //결과 순번
     private String rstJdgNm; //결과 판정
     private String rstJdg; //결과 판정

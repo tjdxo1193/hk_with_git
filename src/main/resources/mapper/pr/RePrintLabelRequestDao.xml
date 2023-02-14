@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.pr.dao.RePrintLabelRequestDao">
+
+    <!-- 라벨재출력요청 조회 -->
+    <select id="findAll" parameterType="RePrintLabelRequestVO" resultType="RePrintLabelRequestVO">
+<!--        SELECT QASM.PLNT_CD,-->
+<!--               QASM.ADD_SMP_IDX,-->
+<!--               QASM.ANS_IDX,-->
+<!--               QASM.SMP_MNG_IDX,-->
+<!--               QASM.ADD_SMP_PROC,-->
+<!--               (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = QASM.PLNT_CD AND DTL_CD = QASM.ADD_SMP_PROC) AS ADD_SMP_PROC_NM,-->
+<!--               QASM.PITM_TYP,-->
+<!--               (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = QASM.PLNT_CD AND DTL_CD = QASM.PITM_TYP) AS PITM_TYP_NM,-->
+<!--               DECODE(QASM.PITM_TYP, #{pitmCdForDecode}, QPAR.SPL_LOT_NO, QASM.LOT_NO) AS CRT_NO,-->
+<!--               QASM.PITM_CD,-->
+<!--               QASM.PITM_NM,-->
+<!--               QASM.ANS_TYP,-->
+<!--               (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = QASM.PLNT_CD AND DTL_CD = QASM.ANS_TYP) AS ANS_TYP_NM,-->
+<!--               QASM.LOT_NO,-->
+<!--               QASM.BATCH_NO,-->
+<!--               QASM.INP_UNIT,-->
+<!--               QASM.SMP_VOL_UNIT,-->
+<!--               (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = QASM.PLNT_CD AND DTL_CD = QASM.SMP_VOL_UNIT) AS SMP_VOL_UNIT_NM,-->
+<!--               QASM.REQ_SMP_VOL,-->
+<!--               QASM.SMP_REQ_REA,-->
+<!--               (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = QASM.PLNT_CD AND DTL_CD = QASM.SMP_REQ_REA) AS SMP_REQ_REA_NM,-->
+<!--               QASM.SMP_REQ_REA_DTL,-->
+<!--               QASM.LABEL_CD,-->
+<!--               QASM.SMP_REQ_DT,-->
+<!--               QSM.SMP_DPS_PROC,-->
+<!--               (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = QASM.PLNT_CD AND DTL_CD = QSM.SMP_DPS_PROC) AS SMP_DPS_PROC_NM,-->
+<!--               QSM.SMP_DIV_CD,-->
+<!--               (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = QASM.PLNT_CD AND DTL_CD = QSM.SMP_DIV_CD) AS SMP_DIV_CD_NM,-->
+<!--               QSM.MNG_SMP_VOL,-->
+<!--               QSM.SMP_STRG_MTD,-->
+<!--               (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = QASM.PLNT_CD AND DTL_CD = QSM.SMP_STRG_MTD) AS SMP_STRG_MTD_NM,-->
+<!--               QSM.MAK_DT,-->
+<!--               QSM.USE_LMT,-->
+<!--               QSM.SMP_RMK,-->
+<!--               (NVL(QPAI.SMP_VOL_ANS, 0) + NVL(QPAI.SMP_VOL_ETC, 0) + NVL(QPAI.SMP_VOL_STRG, 0)) AS SMP_VOL_TOT,-->
+<!--               QPAP.ANS_NO,-->
+<!--               QPAP.REQ_DT,-->
+<!--               QPAP.RCP_DT,-->
+<!--               QPAP.CLLT_DT,-->
+<!--               QPAP.CLLT_UID,-->
+<!--               (SELECT UN.USER_NM FROM SY_USER UN WHERE UN.PLNT_CD = QPAP.PLNT_CD AND UN.USER_ID = QPAP.CLLT_UID) AS CLLT_UID_NM,-->
+<!--               QPAP.ASS_DT,-->
+<!--               QPAP.ANS_PROC_CD,-->
+<!--               (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = QASM.PLNT_CD AND DTL_CD = QPAP.ANS_PROC_CD) AS ANS_PROC_CD_NM,-->
+<!--               QPAR.MTR_CD,-->
+<!--               QPAR.SPL_CD,-->
+<!--               QPAR.SPL_NM,-->
+<!--               QPAR.SPL_LOT_NO,-->
+<!--               QPAR.CSM_NM,-->
+<!--               QPAR.ETR_DT,-->
+<!--               QPAR.ETR_QTY,-->
+<!--               QPAI.SMP_LABEL_PRT_IDX,-->
+<!--               QSLP.LABEL_PRT_IDX,-->
+<!--               QSLP.PRT_SEQ,-->
+<!--               QSLP.LABEL_RPT_IDX,-->
+<!--               QSLP.LABEL_PRT_PROC,-->
+<!--               (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = QASM.PLNT_CD AND DTL_CD = QSLP.LABEL_PRT_PROC) AS LABEL_PRT_PROC_NM,-->
+<!--               SRM.RPT_DIV,-->
+<!--               (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = QASM.PLNT_CD AND DTL_CD = SRM.RPT_DIV) AS RPT_DIV_NM-->
+<!--        FROM QS_ADD_SMP_MNG QASM-->
+<!--            INNER JOIN QS_SMP_MNG QSM-->
+<!--                ON QASM.PLNT_CD = QSM.PLNT_CD AND QASM.SMP_MNG_IDX = QSM.SMP_MNG_IDX-->
+<!--            INNER JOIN QT_PITM_ANS_PROC QPAP-->
+<!--                ON QASM.PLNT_CD = QPAP.PLNT_CD AND QASM.ANS_IDX = QPAP.ANS_IDX-->
+<!--            LEFT OUTER JOIN QT_PITM_ANS_INFO QPAI-->
+<!--                ON QPAP.PLNT_CD = QPAI.PLNT_CD AND QPAP.ANS_IDX = QPAI.ANS_IDX-->
+<!--            INNER JOIN QT_PITM_ANS_REQ QPAR-->
+<!--                ON QASM.PLNT_CD = QPAR.PLNT_CD AND QPAP.REQ_IDX = QPAR.REQ_IDX-->
+<!--            LEFT OUTER JOIN QS_SMP_LABEL_PRT QSLP-->
+<!--                ON QPAI.SMP_LABEL_PRT_IDX = QSLP.LABEL_PRT_IDX-->
+<!--            LEFT OUTER JOIN SY_RPT_MST SRM-->
+<!--                ON QSLP.LABEL_RPT_IDX = SRM.RPT_IDX-->
+<!--        WHERE 1 = 1-->
+<!--            AND QASM.PLNT_CD = #{plntCd}-->
+<!--            AND QASM.ADD_SMP_PROC = #{addSmpProc}-->
+<!--            AND QASM.DEL_YN = 'N'-->
+<!--            AND QSLP.LABEL_PRT_PROC IN-->
+<!--            <foreach item="item" index="index" collection="labelPrtProcList" separator="," open="(" close=")">-->
+<!--                #{item}-->
+<!--            </foreach>-->
+<!--        ORDER BY QASM.ADD_SMP_IDX DESC-->
+        SELECT QPAI.PLNT_CD,
+               QPAI.ANS_IDX,
+               QPAP.ANS_NO,
+               QPAP.REQ_DT,
+               QPAP.RCP_DT,
+               QPAP.CLLT_DT,
+               QPAP.CLLT_UID,
+               (SELECT UN.USER_NM FROM SY_USER UN WHERE UN.PLNT_CD = QPAP.PLNT_CD AND UN.USER_ID = QPAP.CLLT_UID) AS CLLT_UID_NM,
+               QPAP.ASS_DT,
+               QPAP.ANS_PROC_CD,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = QASM.PLNT_CD AND DTL_CD = QPAP.ANS_PROC_CD) AS ANS_PROC_CD_NM,
+               QPAI.CRG_DPT_CD,
+               (SELECT DPT_NM FROM SY_DPT WHERE DPT_CD = QPAI.CRG_DPT_CD AND PLNT_CD = QPAI.PLNT_CD) AS CRG_DPT_CD_NM,
+               QPAI.SPCM_NO,
+               QPAI.ANS_FILE_IDX,
+               QPAI.CLLT_MTD,
+               QPAI.CLLT_MCN,
+               QPAI.CLLT_PLA,
+               QPAI.SMP_STRG_MTD,
+               QPAI.SMP_VOL_UNIT,
+               QPAI.SMP_VOL_ANS,
+               QPAI.SMP_VOL_ETC,
+               QPAI.SMP_VOL_STRG,
+               QPAI.SMP_VOL_ADD,
+               QPAI.SMP_VOL_MNG,
+               QPAI.ANS_NEW_YN,
+               QPAI.MIC_YN,
+               QPAI.RTST_YN,
+               QPAI.ANS_ORG_REQ_IDX,
+               QPAI.EMG_YN,
+               QPAI.ARPT_RPT_IDX,
+               QPAI.PKG_MTR_SPEC,
+               QPAI.RMTR_SPEC,
+               QPAI.RMTR_CFMUL,
+               QPAI.RPT_SPCC,
+               QPAI.ARPT_SPCC,
+               QPAI.FTN_YN,
+               QPAI.QDRUG_YN,
+               QPAI.PITM_SPCC,
+               QPAI.NON_CFM_PROC_CD,
+               QPAI.NON_CFM_APR_REQ_IDX,
+               QPAI.NON_CFM_REA,
+               QPAI.NON_CFM_REV,
+               QPAI.NON_CFM_REF,
+               QPAI.NON_CFM_ETC,
+               QPAI.REO_PREV_APR_REQ_IDX,
+               QPAI.REO_PREV_RPY_CTT,
+               QPAI.ISP_PDT_PFA_IDX,
+               QPAI.ISP_PHS_PFA_IDX,
+               QPAI.SMP_LABEL_PRT_IDX,
+               QSLP.LABEL_PRT_IDX,
+               QSLP.PRT_SEQ,
+               QSLP.LABEL_RPT_IDX
+        FROM QT_PITM_ANS_INFO QPAI
+            INNER JOIN QT_PITM_ANS_PROC QPAP
+            ON QPAI.PLNT_CD = QPAP.PLNT_CD AND QPAI.ANS_IDX = QPAP.ANS_IDX
+            INNER JOIN QS_SMP_LABEL_PRT QSLP
+            ON QPAI.SMP_LABEL_PRT_IDX = QSLP.LABEL_PRT_IDX AND QSLP.LABEL_PRT_PROC IN
+                <foreach item="item" index="index" collection="labelPrtProcList" separator="," open="(" close=")">
+                    #{item}
+                </foreach>
+            INNER JOIN SY_RPT_MST SRM
+            ON QSLP.LABEL_RPT_IDX = SRM.RPT_IDX
+        WHERE 1 = 1
+            AND QPAI.PLNT_CD = #{plntCd}
+    </select>
+
+    <!-- 라벨재출력요청 모달 조회 -->
+    <select id="findLabelList" parameterType="RePrintLabelRequestVO" resultType="RePrintLabelRequestVO">
+        SELECT QASM.PLNT_CD,
+               QASM.ADD_SMP_IDX,
+               QASM.ANS_IDX,
+               QASM.SMP_MNG_IDX,
+               QASM.ADD_SMP_PROC,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = QASM.PLNT_CD AND DTL_CD = QASM.ADD_SMP_PROC) AS ADD_SMP_PROC_NM,
+               QASM.PITM_TYP,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = QASM.PLNT_CD AND DTL_CD = QASM.PITM_TYP) AS PITM_TYP_NM,
+               DECODE(QASM.PITM_TYP, #{pitmCdForDecode}, QPAR.SPL_LOT_NO, QASM.LOT_NO) AS CRT_NO,
+               QASM.PITM_CD,
+               QASM.PITM_NM,
+               QASM.ANS_TYP,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = QASM.PLNT_CD AND DTL_CD = QASM.ANS_TYP) AS ANS_TYP_NM,
+               QASM.LOT_NO,
+               QASM.BATCH_NO,
+               QASM.INP_UNIT,
+               QASM.SMP_VOL_UNIT,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = QASM.PLNT_CD AND DTL_CD = QASM.SMP_VOL_UNIT) AS SMP_VOL_UNIT_NM,
+               QASM.REQ_SMP_VOL,
+               QASM.SMP_REQ_REA,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = QASM.PLNT_CD AND DTL_CD = QASM.SMP_REQ_REA) AS SMP_REQ_REA_NM,
+               QASM.SMP_REQ_REA_DTL,
+               QASM.LABEL_CD,
+               QASM.SMP_REQ_DT,
+               QSM.SMP_DPS_PROC,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = QASM.PLNT_CD AND DTL_CD = QSM.SMP_DPS_PROC) AS SMP_DPS_PROC_NM,
+               QSM.SMP_DIV_CD,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = QASM.PLNT_CD AND DTL_CD = QSM.SMP_DIV_CD) AS SMP_DIV_CD_NM,
+               QSM.MNG_SMP_VOL,
+               QSM.SMP_STRG_MTD,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = QASM.PLNT_CD AND DTL_CD = QSM.SMP_STRG_MTD) AS SMP_STRG_MTD_NM,
+               QSM.MAK_DT,
+               QSM.USE_LMT,
+               QSM.SMP_RMK,
+               (NVL(QPAI.SMP_VOL_ANS, 0) + NVL(QPAI.SMP_VOL_ETC, 0) + NVL(QPAI.SMP_VOL_STRG, 0)) AS SMP_VOL_TOT,
+               QPAP.ANS_NO,
+               QPAP.REQ_DT,
+               QPAP.RCP_DT,
+               QPAP.CLLT_DT,
+               QPAP.CLLT_UID,
+               (SELECT UN.USER_NM FROM SY_USER UN WHERE UN.PLNT_CD = QPAP.PLNT_CD AND UN.USER_ID = QPAP.CLLT_UID) AS CLLT_UID_NM,
+               QPAP.ASS_DT,
+               QPAP.ANS_PROC_CD,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = QASM.PLNT_CD AND DTL_CD = QPAP.ANS_PROC_CD) AS ANS_PROC_CD_NM,
+               QPAR.MTR_CD,
+               QPAR.SPL_CD,
+               QPAR.SPL_NM,
+               QPAR.SPL_LOT_NO,
+               QPAR.CSM_NM,
+               QPAR.ETR_DT,
+               QPAR.ETR_QTY,
+               QPAI.SMP_LABEL_PRT_IDX,
+               QSLP.LABEL_PRT_IDX,
+               QSLP.PRT_SEQ,
+               QSLP.LABEL_RPT_IDX,
+               QSLP.LABEL_PRT_PROC,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = QASM.PLNT_CD AND DTL_CD = QSLP.LABEL_PRT_PROC) AS LABEL_PRT_PROC_NM,
+               SRM.RPT_DIV,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = QASM.PLNT_CD AND DTL_CD = SRM.RPT_DIV) AS RPT_DIV_NM
+        FROM QS_ADD_SMP_MNG QASM
+            INNER JOIN QS_SMP_MNG QSM
+                ON QASM.PLNT_CD = QSM.PLNT_CD AND QASM.SMP_MNG_IDX = QSM.SMP_MNG_IDX
+            INNER JOIN QT_PITM_ANS_PROC QPAP
+                ON QASM.PLNT_CD = QPAP.PLNT_CD AND QASM.ANS_IDX = QPAP.ANS_IDX
+            LEFT OUTER JOIN QT_PITM_ANS_INFO QPAI
+                ON QPAP.PLNT_CD = QPAI.PLNT_CD AND QPAP.ANS_IDX = QPAI.ANS_IDX
+            INNER JOIN QT_PITM_ANS_REQ QPAR
+                ON QASM.PLNT_CD = QPAR.PLNT_CD AND QPAP.REQ_IDX = QPAR.REQ_IDX
+            INNER JOIN QS_SMP_LABEL_PRT QSLP
+                ON QPAI.SMP_LABEL_PRT_IDX = QSLP.LABEL_PRT_IDX
+            LEFT OUTER JOIN SY_RPT_MST SRM
+                ON QSLP.LABEL_RPT_IDX = SRM.RPT_IDX
+        WHERE 1 = 1
+            AND QASM.PLNT_CD = #{plntCd}
+            AND QASM.ADD_SMP_PROC = #{addSmpProc}
+            AND QASM.ANS_IDX = #{ansIdx}
+            AND QASM.DEL_YN = 'N'
+        ORDER BY QASM.ADD_SMP_IDX DESC
+    </select>
+
+    <!--  -->
+    <update id="rePrintLabelRequest" parameterType="RePrintLabelRequestVO">
+
+    </update>
+
+    <!-- 라벨재출력취소 -->
+    <update id="rePrintLabelCancel" parameterType="RePrintLabelRequestVO">
+        UPDATE QS_SMP_LABEL_PRT SET
+            LABEL_PRT_PROC = #{labelPrtProc}
+        WHERE 1 = 1
+            AND LABEL_PRT_IDX = #{labelPrtIdx}
+            AND PRT_SEQ = #{prtSeq}
+    </update>
+</mapper>

@@ -17,7 +17,12 @@
     @select="setStabItemSearchForm"
   />
 
-  <FileAttacherModal :show="fileAttacherModal.show" @close="hideModal('fileAttacherModal')" />
+  <FileAttacherModal
+    :fileIdx="fileAttacherModal.fileIdx"
+    :show="fileAttacherModal.show"
+    :readonly="fileAttacherModal.readonly"
+    @close="hideModal('fileAttacherModal')"
+  />
 
   <InputReasonModal
     :show="inputReasonModal.show"
@@ -107,7 +112,9 @@ export default {
         show: false,
       },
       fileAttacherModal: {
+        fileIdx: null,
         show: false,
+        readonly: true,
       },
       inputReasonModal: {
         show: false,
@@ -385,7 +392,7 @@ export default {
       // 시험중단 요청
       const { forms } = this.stabInfoRegForm;
       const data = FormUtil.getData(forms);
-      const parameter = { ...data, rjtReaDiv, rjtRea };
+      const parameter = { ...data, rjtReaDiv, aprReqRea: rjtRea };
 
       this.$eSign(() => this.$axios.put('st/stabPlan/stopRequest', parameter))
         .then(() => {

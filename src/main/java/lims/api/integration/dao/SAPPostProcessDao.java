@@ -63,6 +63,8 @@ public interface SAPPostProcessDao {
 
     int createPItemRequestNonCfm(SAPPostProcessVO.TestRequest.PItemReqNonCfm param);
 
+    int cancelTestRequestToCancel(SAPPostProcessVO.TestRequest.PItemReq param);
+
     int cancelTestRequestProcessToCancel(SAPPostProcessVO.TestRequest.PItemReqProcess param);
 
     List<SAPTestRequestVO.RequestHeader> findAllForReqTest();

@@ -51,6 +51,7 @@ public class TransactionAuditConverter {
         AuditRecordData vo = new AuditRecordData();
         vo.setLabel(auditTrail.getLabel());
         vo.setCommandType(auditTrail.getCommandType());
+        vo.setUpdatedDate(auditTrail.getUpdatedDate());
         return vo;
     }
 

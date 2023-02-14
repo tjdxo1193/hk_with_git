@@ -3,49 +3,73 @@
 <mapper namespace="lims.api.tp.dao.SampleDisDao">
     <select id="find" parameterType="SampleDisVO" resultType="SampleDisVO">
         SELECT QSM.PLNT_CD,
-               QSM.SMP_MNG_IDX,
-               QSM.SMP_DPS_PROC,
-               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.SMP_DPS_PROC)                    AS SMP_DPS_NM,
-               QSM.PITM_TYP,
-               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.PITM_TYP)                        AS PITM_TYP_NM,
-               QSM.PITM_CD,
-               QSM.PITM_NM,
-               QSM.ANS_TYP,
-               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.ANS_TYP)                         AS ANS_TYP_NM,
-               QSM.ANS_IDX,
-               QSM.SMP_DIV_CD,
-               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.SMP_DIV_CD)                      AS SMP_DIV_NM,
-               QSM.MNG_SMP_VOL,
-               QSM.SMP_STRG_MTD,
-               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.SMP_STRG_MTD)                    AS SMP_STRG_MTD_NM,
-               QSM.SMP_VOL_UNIT,
-               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.SMP_VOL_UNIT)                    AS SMP_VOL_UNIT_NM,
-               QSM.LOT_NO,
-               QSM.BATCH_NO,
-               QSM.INP_UNIT,
-               QSM.MAK_DT,
-               QSM.STRG_LMT,
-               QSM.USE_LMT,
-               QSM.IRG_YN,
-               QSM.SMP_RMK,
-               QSM.DPS_EXP_DT,
-               QSM.DPS_FIX_DT,
-               QSM.RJT_UID,
-               (SELECT USER_NM FROM SY_USER WHERE PLNT_CD = #{plntCd} AND USER_ID = QSM.RJT_UID) AS RJT_NM,
-               QSM.RJT_DS,
-               QSM.RJT_REA,
-               QSM.SMP_ETR_DT,
-               QPAP.REQ_IDX,
-               QPAP.ANS_PROC_CD,
-               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QPAP.ANS_PROC_CD)                    AS ANS_PROC_NM,
-               QPAP.ANS_NO,
-               QPAP.RCP_DT
+        QSM.SMP_MNG_IDX,
+        QSM.SMP_DPS_PROC,
+        (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.SMP_DPS_PROC) AS SMP_DPS_NM,
+        QSM.PITM_TYP,
+        (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.PITM_TYP) AS PITM_TYP_NM,
+        QSM.PITM_CD,
+        QSM.PITM_NM,
+        QSM.ANS_TYP,
+        (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.ANS_TYP) AS ANS_TYP_NM,
+        QSM.ANS_IDX,
+        QSM.SMP_DIV_CD,
+        (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.SMP_DIV_CD) AS SMP_DIV_NM,
+        QSM.MNG_SMP_VOL,
+        QSM.SMP_STRG_MTD,
+        (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.SMP_STRG_MTD) AS SMP_STRG_MTD_NM,
+        QSM.SMP_VOL_UNIT,
+        (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.SMP_VOL_UNIT) AS SMP_VOL_UNIT_NM,
+        QSM.LOT_NO,
+        QSM.BATCH_NO,
+        QSM.INP_UNIT,
+        QSM.MAK_DT,
+        QSM.STRG_LMT,
+        QSM.USE_LMT,
+        QSM.IRG_YN,
+        QSM.SMP_RMK,
+        QSM.DPS_EXP_DT,
+        QSM.DPS_FIX_DT,
+        QSM.RJT_UID,
+        (SELECT USER_NM FROM SY_USER WHERE PLNT_CD = #{plntCd} AND USER_ID = QSM.RJT_UID) AS RJT_NM,
+        QSM.RJT_DS,
+        QSM.RJT_REA,
+        QSM.SMP_ETR_DT,
+        QPAP.REQ_IDX,
+        QPAP.ANS_PROC_CD,
+        (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QPAP.ANS_PROC_CD) AS ANS_PROC_NM,
+        QPAP.ANS_NO,
+        QPAP.RCP_DT
         FROM QS_SMP_MNG QSM
-                 LEFT JOIN QT_PITM_ANS_INFO QPAI ON QSM.PLNT_CD = QPAI.PLNT_CD AND QSM.ANS_IDX = QPAI.ANS_IDX
-                 LEFT JOIN QT_PITM_ANS_PROC QPAP on QPAI.PLNT_CD = QPAP.PLNT_CD AND QPAI.ANS_IDX = QPAP.ANS_IDX
+        LEFT JOIN QT_PITM_ANS_INFO QPAI ON QSM.PLNT_CD = QPAI.PLNT_CD AND QSM.ANS_IDX = QPAI.ANS_IDX
+        LEFT JOIN QT_PITM_ANS_PROC QPAP on QPAI.PLNT_CD = QPAP.PLNT_CD AND QPAI.ANS_IDX = QPAP.ANS_IDX
         WHERE QSM.PLNT_CD = #{plntCd}
-          AND QSM.DEL_YN = 'N'
-          AND QSM.SMP_DPS_PROC NOT IN ('S0270400', 'S0270600')
+        AND QSM.DEL_YN = 'N'
+        AND QSM.SMP_DPS_PROC NOT IN ('S0270400', 'S0270600')
+        <if test="smpDivCd != ''">
+            AND QSM.SMP_DIV_CD = #{smpDivCd}
+        </if>
+        <if test="pitmCd != ''">
+            AND QSM.PITM_CD LIKE '%' || UPPER(#{pitmCd}) || '%'
+        </if>
+        <if test="pitmTyp != ''">
+            AND QSM.PITM_TYP = #{pitmTyp}
+        </if>
+        <if test="lotNo != ''">
+            AND QSM.LOT_NO LIKE '%' || UPPER(#{lotNo}) || '%'
+        </if>
+        <if test="batchNo != ''">
+            AND QSM.BATCH_NO LIKE '%' || UPPER(#{batchNo}) || '%'
+        </if>
+        <if test="pitmNm != ''">
+            AND QSM.PITM_NM LIKE '%' || UPPER(#{pitmNm}) || '%'
+        </if>
+        <if test="dpsExpDtList.size() > 0">
+            AND QSM.DPS_EXP_DT BETWEEN TO_DATE(#{dpsExpDtList[0]}) AND TO_DATE(#{dpsExpDtList[1]})
+        </if>
+        <if test="smpEtrDtList.size() > 0">
+            AND QSM.SMP_ETR_DT BETWEEN TO_DATE(#{smpEtrDtList[0]}) AND TO_DATE(#{smpEtrDtList[1]})
+        </if>
         ORDER BY QSM.SMP_MNG_IDX DESC
     </select>
 

@@ -72,6 +72,7 @@ public class TestResultApprServiceImpl implements TestResultApprService {
             InterfaceSendVO.TestResult data = InterfaceSendVO.TestResult.builder()
                     .sytJdg(sytJdg)
                     .lotNo(row.getLotNo())
+                    .splLotNo(row.getSplLotNo())
                     .batchNo(row.getBatchNo())
                     .rmk(row.getPitmSpcc())
                     .nonCfmReason(row.getNonCfmRea())
@@ -98,6 +99,7 @@ public class TestResultApprServiceImpl implements TestResultApprService {
             // 보류 시 진행상태 전송
             InterfaceSendVO.TestStatus data = InterfaceSendVO.TestStatus.builder()
                     .lotNo(row.getLotNo())
+                    .splLotNo(row.getSplLotNo())
                     .batchNo(row.getBatchNo())
                     .holdReason(row.getHldRea())
                     .status(TestStatusProcess.TEST_HOLD.getValue())

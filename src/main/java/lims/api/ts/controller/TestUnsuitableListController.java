@@ -14,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("${apiPrefix}//ts/testUnsuitableList")
+@RequestMapping("${apiPrefix}/ts/testUnsuitableList")
 public class TestUnsuitableListController {
 
     private final TestUnsuitableListService service;
@@ -29,18 +29,6 @@ public class TestUnsuitableListController {
     @GetMapping("/{ansIdx}")
     public ResponseEntity<List<TestUnsuitableListVO>> findResultItem(@PathVariable Integer ansIdx) {
         return ResponseEntity.ok(service.findResultItem(ansIdx));
-    }
-
-    @PutMapping
-    public ResponseEntity<CommonResponse> save(@RequestBody TestUnsuitableListVO param) {
-        service.save(param);
-        return ResponseEntity.ok(new CommonResponse());
-    }
-
-    @PutMapping("/publish")
-    public ResponseEntity<CommonResponse> publish(@RequestBody TestUnsuitableListVO param) {
-        service.publish(param);
-        return ResponseEntity.ok(new CommonResponse());
     }
 
     private String getAuthUserPlntCd(Token token) {

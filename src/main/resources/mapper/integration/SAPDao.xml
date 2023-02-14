@@ -632,7 +632,7 @@
                CRT_DS,
                IF_INFO_IDX
         FROM IF_REV_SAP_CALENDAR
-        WHERE DEGREE = #{degree}
+        WHERE DEGREE = #{value}
     </select>
 
     <select id="nextIdxInCalendar" resultType="int">

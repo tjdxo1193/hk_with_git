@@ -23,15 +23,13 @@ const list = {
   forms: () =>
     FormBuilder.builder()
       .Select('upperMitmPitmDiv', '품목구분', {
-        async: () => api.combo.common.getTreeCd('M1000000'),
+        async: () => api.combo.common.getTreeCd('M1000001'),
       })
       .Select('mitmPitmDiv', '품목명', {
         async: (param) => api.combo.common.getTreeCd(param),
       })
       .Input('mitmCd', '품목코드')
-      .Select('ansCylCd', '시험주기', {
-        async: api.combo.common.getAnsCyl,
-      })
+      .Input('ansNo', '시험번호')
       .Select('mitmWrkStudioDiv', '작업동', {
         async: () => api.combo.common.getUpperTreeCd('M2000000'),
       })
@@ -41,8 +39,6 @@ const list = {
       .Select('mitmWrkPlcDiv', '작업실', {
         async: (param) => api.combo.common.getTreeCd(param),
       })
-      .Input('grade', 'Grade')
-      .Input('point', '포인트')
       .Input('roomno', 'RoomNo')
       .DatepickerTwinWithSwitch('searchRcpDt', '접수일', {
         value: [monthAgoDate, todayDate],
@@ -56,10 +52,8 @@ const list = {
   columns: () =>
     ColumnBuilder.builder()
       .col('mitmReqIdx', false)
-      .col('ansProcNm', '진행상태')
       .combo('sytJdg', '결과판정', {
-        async: () => api.combo.systemCommon.getRstJdgCombo(),
-        headerStyle: 'editableFontColumn',
+        async: () => api.combo.systemCommon.getSytJdgCombo(),
       })
       .col('reqNo', '의뢰번호')
       .col('ansNo', '시험번호')
@@ -76,11 +70,12 @@ const list = {
       .col('reqDt', '의뢰일자')
       .col('rcpDt', '접수일자')
       .col('assDt', '지시일자')
+      .col('cplRqmDt', '완료요구일')
       .col('rcpUnm', '접수자')
       .col('rjtUnm', '반려자')
       .col('rjtDs', '반려일')
       .col('rjtRea', '반려사유')
-      .col('cplRqmDt', '완료요구일')
+      .col('wrkDivNm', '작업구분')
       .build(),
 };
 
@@ -97,6 +92,21 @@ const itemList = {
       { name: 'init', label: '초기화', disabled: true },
     ],
   },
+  forms: () => 
+    FormBuilder.builder()
+      .Hidden('plntCd')
+      .Hidden('mitmReqIdx')
+      .Hidden('rstAprReqIdx')
+      .Input('upperMitmPitmDivNm', '품목구분', { readonly: true })
+      .Input('mitmPitmDivNm', '품목명', { readonly: true })
+      .Input('ansNo', '시험번호', { readonly: true })
+      .Select('sytJdg', '결과판정', {
+        async: () => api.combo.systemCommon.getSytJdgCombo(),
+      })
+      .required()
+      .Textarea('revwCmmt', '검토의견', { rows: 1, readonly: true })
+      .spanCol(4)
+      .build(),
   columns: () =>
     ColumnBuilder.builder()
       .col('mitmReqIdx', false)

@@ -10,10 +10,33 @@ import java.util.List;
 @Repository
 public interface QMSDao {
 
-    List<QMSSendVO.ShiptBase> findShiptBaseByBatchNo(String batchNo);
+    List<QMSSendVO.ShiptReq> findShiptReqByBatchNo(String batchNo);
 
-    List<QMSSendVO.ShiptTest> findMESTestAllByOrderNoAndLotNo(QMSSendVO.ShiptBase param);
+    List<QMSSendVO.ShiptTest> findShiptTestByKey(QMSSendVO.ShiptReq param);
 
-    List<QMSSendVO.ShiptTest> findSRMTestAllByOrderNoAndLotNo(QMSSendVO.ShiptBase param);
+    List<QMSSendVO.ShiptPerform> findMESShiptPerformByKey(QMSSendVO.ShiptTest param);
+
+    List<QMSSendVO.ShiptPerform> findSRMShiptPerformByKey(QMSSendVO.ShiptTest param);
+
+    Integer nextDegreeInShipt();
+
+    Integer nextIdxInShipt();
+
+    int createShipt(QMSSendVO.ShiptReq param);
+
+    int updateShipt(QMSSendVO.ShiptReq param);
+
+    int createShiptTest(QMSSendVO.ShiptTest param);
+
+    int createShiptPerform(QMSSendVO.ShiptPerform param);
+
+
+    List<QMSSendVO.ShiptTest> findMESTestAllByOrderNoAndLotNo(QMSSendVO.ShiptReq param);
+
+    List<QMSSendVO.ShiptTest> findSRMTestAllByOrderNoAndLotNo(QMSSendVO.ShiptReq param);
+
+    List<QMSSendVO.ShiptValidate> findMESFinalOrdersByOrderNoAndLotNo(QMSSendVO.ShiptReq param);
+
+    List<QMSSendVO.ShiptValidate> findSRMFinalOrdersByOrderNoAndLotNo(QMSSendVO.ShiptReq param);
 
 }

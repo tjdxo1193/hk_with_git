@@ -22,9 +22,8 @@ public class MailServiceImpl implements MailService {
 
     public void send(MailMessage mailTarget) {
         mailSender.setHost(mailProperties.getHost());
-        log.info("----- send mail info -----");
-        log.info(mailSender.toString());
-        mailSender.send(makeMessage(mailTarget));
+        MimeMessage message = makeMessage(mailTarget);
+        mailSender.send(message);
     }
 
     private MimeMessage makeMessage(MailMessage mailTarget) {

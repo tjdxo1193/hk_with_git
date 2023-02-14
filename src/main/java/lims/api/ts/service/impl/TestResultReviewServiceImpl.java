@@ -70,6 +70,7 @@ public class TestResultReviewServiceImpl implements TestResultReviewService {
         // 보류 시 진행상태 전송
         InterfaceSendVO.TestStatus data = InterfaceSendVO.TestStatus.builder()
                 .lotNo(param.getLotNo())
+                .splLotNo(param.getSplLotNo())
                 .batchNo(param.getBatchNo())
                 .holdReason(param.getHldRea())
                 .status(TestStatusProcess.TEST_HOLD.getValue())

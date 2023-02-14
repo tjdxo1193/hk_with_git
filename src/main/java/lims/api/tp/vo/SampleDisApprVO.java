@@ -3,6 +3,9 @@ package lims.api.tp.vo;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
 public class SampleDisApprVO {
@@ -63,4 +66,17 @@ public class SampleDisApprVO {
     private String aprYn;       // 승인 여부
 
     /* 별칭 */
+    private String ansNo;           // 시험 번호
+    private String smpDpsNm;        // 검체 폐기 프로세스 명칭
+    private String pitmTypNm;       // 품목 분류 명칭
+    private String ansTypNm;        // 시험 분류 명칭
+    private String smpDivNm;        // 검체 분류 명칭
+    private String smpStrgMtdNm;    // 검체 보관 방법 명칭
+    private String smpVolUnitNm;    // 검체량 단위 명칭
+    private String ansProcNm;       // 시험 진행 상태 명칭
+    private String ansProcCd;       // S013 시험 진행 상태 코드
+    private Integer reqIdx;         // 의뢰 IDX
+    private String rcpDt;           // 시험 접수 날짜
+    private List<String> dpsExpDtList = new ArrayList<>();
+    private List<String> smpEtrDtList = new ArrayList<>();
 }

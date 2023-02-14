@@ -96,10 +96,7 @@ const searchGridWithForm = {
 const historyGrid = {
   static: {
     title: '기기이력',
-    buttons: [
-      { name: 'excel', label: 'Excel' },
-      { name: 'init', label: '초기화' },
-    ],
+    buttons: [{ name: 'init', label: '초기화' }],
     props: {
       editable: false,
     },

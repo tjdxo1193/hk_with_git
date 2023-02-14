@@ -186,6 +186,10 @@ export default {
       const { $grid } = this.testItemList;
       const parameter = { aitmSpecIdx };
 
+      if (parameter.aitmSpecIdx == null) {
+        return;
+      }
+
       const data = await $grid
         ._useLoader(() => this.$axios.get('ms/specManage/aItem', parameter))
         .then(({ data }) => data);
@@ -229,7 +233,7 @@ export default {
         return;
       }
       if (name == 'requestReview') {
-        if (!this.isNotUpdateTestItemList()) {
+        if (!this.isNotUpdateTestItemList() || this.isTestListGridEmpty()) {
           return this.$warn(this.$message.warn.afterSaveRequestReview);
         }
         this.showRequestReviewerModal();
@@ -334,7 +338,8 @@ export default {
     isSelectedItemHasNotVersion() {
       const { $grid } = this.versionList;
       const parameter = FormUtil.getData(this.valueWithVersionGrid.forms);
-      return $grid.getRowCount() == 1 && parameter.aitmSpecVer == null;
+
+      return $grid.getRowCount() == 1 && !parameter.aitmSpecVer;
     },
 
     isTestListGridEmpty() {
@@ -415,7 +420,9 @@ export default {
 
     requestReview(popupParam) {
       const { pitmSpecIdx } = FormUtil.getData(this.valueWithVersionGrid.forms);
-
+      const { aitmSpecIdx } = FormUtil.getData(this.valueWithVersionGrid.forms);
+      if (aitmSpecIdx) {
+      }
       popupParam.pitmSpecIdx = pitmSpecIdx;
       popupParam.revwUid = popupParam.aprUid;
 
@@ -554,8 +561,9 @@ export default {
       };
 
       if (this.isSemiManufactures()) {
-        parameter.addedRowItems = parameter.editedRowItems;
+        parameter.addedRowItems = $grid.getGridData();
         parameter.editedRowItems = [];
+        parameter.removedRowItems = [];
       } else if (this.isNotUpdateTestItemList()) {
         return this.$warn(this.$message.warn.noSaveGridData);
       }
@@ -660,6 +668,10 @@ export default {
     suitableTypeJdg(item) {
       if (StringUtil.isEmpty(item.slvJdgCfm) || StringUtil.isEmpty(item.slvJdgNonCfm)) {
         this.$warn(this.$message.warn.noSlvJdgCfm);
+        return true;
+      }
+      if (item.slvJdgCfm == item.slvJdgNonCfm) {
+        this.$warn(this.$message.warn.sameSlvJdg);
         return true;
       }
       return false;
@@ -901,8 +913,16 @@ export default {
 
     copyRowElnTestItem(list) {
       const { $grid } = this.testItemList;
-      
-      $grid.addRow(list, 'last');
+      const preGirdRowCnt = $grid.getRowCount();
+      const checkedDuplicateAitmCopyList = list.filter((element) => {
+        return !$grid.getGridData().some((row) => {
+          if (row.amitmCd == element.amitmCd) {
+            return true;
+          }
+        });
+      });
+      checkedDuplicateAitmCopyList.map((element, index)=>{element.aitmOrd = preGirdRowCnt + index + 1});
+      $grid.addRow(checkedDuplicateAitmCopyList, 'last');
     },
   },
 };

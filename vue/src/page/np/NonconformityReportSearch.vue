@@ -67,7 +67,7 @@ export default {
       const { $grid, forms } = this.list;
       const parameter = FormUtil.getData(forms);
       const data = await $grid
-        ._useLoader(() => this.$axios.get('/np/nonconformityReportWrt', parameter))
+        ._useLoader(() => this.$axios.get('/np/nonconformityReportSearch', parameter))
         .then(({ data }) => data);
       $grid.setGridData(data);
 
@@ -79,7 +79,7 @@ export default {
       const parameter = event.item;
       const data = await $grid
         ._useLoader(() =>
-          this.$axios.get('/np/nonconformityReportWrt/findResultItem', {
+          this.$axios.get('/np/nonconformityReportSearch/findResultItem', {
             ansIdx: parameter.ansIdx,
           }),
         )

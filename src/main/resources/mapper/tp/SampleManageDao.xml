@@ -41,26 +41,25 @@
         LEFT JOIN QT_PITM_ANS_PROC QPAP on QPAI.PLNT_CD = QPAP.PLNT_CD AND QPAI.ANS_IDX = QPAP.ANS_IDX
         WHERE QSM.PLNT_CD = #{plntCd}
         AND QSM.DEL_YN = 'N'
-        AND QSM.DPS_YN = 'N'
-        <if test="smpDivCd != ''">
+        <if test="smpDivCd != null and smpDivCd != ''">
             AND QSM.SMP_DIV_CD = #{smpDivCd}
         </if>
-        <if test="smpDpsProc != ''">
+        <if test="smpDpsProc != null and smpDpsProc != ''">
             AND QSM.SMP_DPS_PROC = #{smpDpsProc}
         </if>
-        <if test="ansTyp != ''">
+        <if test="ansTyp != null and ansTyp != ''">
             AND QSM.ANS_TYP = #{ansTyp}
         </if>
-        <if test="pitmTyp != ''">
+        <if test="pitmTyp != null and pitmTyp != ''">
             AND QSM.PITM_TYP = #{pitmTyp}
         </if>
-        <if test="lotNo != ''">
+        <if test="lotNo != null and lotNo != ''">
             AND QSM.LOT_NO LIKE '%' || UPPER(#{lotNo}) '%'
         </if>
-        <if test="batchNo != ''">
+        <if test="batchNo != null and batchNo != ''">
             AND QSM.BATCH_NO LIKE '%' || UPPER(#{batchNo}) '%'
         </if>
-        <if test="ansNo != ''">
+        <if test="ansNo != null and ansNo != ''">
             AND QPAP.ANS_NO LIKE '%' || UPPER(#{lotNo}) '%'
         </if>
         ORDER BY QSM.SMP_MNG_IDX DESC
@@ -100,39 +99,59 @@
 
     <select id="findTest" parameterType="SampleManageVO" resultType="SampleManageVO">
         SELECT QPAI.PLNT_CD,
-               QPAI.ANS_IDX,
-               QPAP.ANS_NO,
-               QPAR.MTR_CD                            AS PITM_CD,
-               QPAR.MTR_NM                            AS PITM_NM,
-               QPAI.CRG_DPT_CD,
-               (SELECT DPT_NM
-                FROM SY_DPT SD
-                WHERE SD.PLNT_CD = #{plntCd}
-                  AND SD.DPT_CD = QPAI.CRG_DPT_CD)    AS CRG_DPT_NM,
-               QPAR.LOT_NO,
-               QPAR.BATCH_NO,
-               QPAP.ANS_TYP,
-               (SELECT DTL_NM
-                FROM SY_CD_DTL SCD
-                WHERE SCD.PLNT_CD = #{plntCd}
-                  AND SCD.DTL_CD = QPAP.ANS_TYP)      AS ANS_TYP_NM,
-               QPAP.REQ_IDX,
-               QPAP.RCP_DT,
-               QPAP.ANS_PROC_CD,
-               (SELECT DTL_NM
-                FROM SY_CD_DTL SCD2
-                WHERE SCD2.PLNT_CD = #{plntCd}
-                  AND SCD2.DTL_CD = QPAP.ANS_PROC_CD) AS ANS_PROC_NM,
-               QSM.SMP_MNG_IDX,
-               QSM.PITM_TYP
+        QPAI.ANS_IDX,
+        QPAP.ANS_NO,
+        QPAR.MTR_CD AS PITM_CD,
+        QPAR.MTR_NM AS PITM_NM,
+        QPAI.CRG_DPT_CD,
+        (SELECT DPT_NM
+        FROM SY_DPT SD
+        WHERE SD.PLNT_CD = #{plntCd}
+        AND SD.DPT_CD = QPAI.CRG_DPT_CD) AS CRG_DPT_NM,
+        QPAR.LOT_NO,
+        QPAR.BATCH_NO,
+        QPAP.ANS_TYP,
+        (SELECT DTL_NM
+        FROM SY_CD_DTL SCD
+        WHERE SCD.PLNT_CD = #{plntCd}
+        AND SCD.DTL_CD = QPAP.ANS_TYP) AS ANS_TYP_NM,
+        QPAP.REQ_IDX,
+        QPAP.RCP_DT,
+        QPAP.ANS_PROC_CD,
+        (SELECT DTL_NM
+        FROM SY_CD_DTL SCD2
+        WHERE SCD2.PLNT_CD = #{plntCd}
+        AND SCD2.DTL_CD = QPAP.ANS_PROC_CD) AS ANS_PROC_NM,
+        QSM.SMP_MNG_IDX,
+        QPI.PITM_TYP AS PITM_TYP,
+        (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QPI.PITM_TYP) AS PITM_TYP_NM
         FROM QT_PITM_ANS_INFO QPAI
-                 LEFT JOIN QT_PITM_ANS_PROC QPAP ON QPAI.PLNT_CD = QPAP.PLNT_CD AND QPAI.ANS_IDX = QPAP.ANS_IDX
-                 LEFT JOIN QT_PITM_ANS_REQ QPAR on QPAI.PLNT_CD = QPAR.PLNT_CD AND QPAP.REQ_IDX = QPAR.REQ_IDX
-                 LEFT JOIN QS_SMP_MNG QSM on QPAI.PLNT_CD = QSM.PLNT_CD and QPAI.ANS_IDX = QSM.ANS_IDX
+        LEFT JOIN QT_PITM_ANS_PROC QPAP ON QPAI.PLNT_CD = QPAP.PLNT_CD AND QPAI.ANS_IDX = QPAP.ANS_IDX
+        LEFT JOIN QT_PITM_ANS_REQ QPAR on QPAI.PLNT_CD = QPAR.PLNT_CD AND QPAP.REQ_IDX = QPAR.REQ_IDX
+        LEFT JOIN QS_SMP_MNG QSM on QPAI.PLNT_CD = QSM.PLNT_CD and QPAI.ANS_IDX = QSM.ANS_IDX
+        LEFT JOIN QM_PITM_INFO QPI ON QPAI.PLNT_CD = QSM.PLNT_CD AND QPAR.MTR_CD = QPI.PITM_CD
         WHERE QPAI.PLNT_CD = #{plntCd}
-          AND QPAP.ANS_PROC_CD IN
-              ('S0130400', 'S0130500', 'S0130600', 'S0130610', 'S0130700', 'S0130710', 'S0130800', 'S0130900',
-               'S0131000')
+        AND QPAP.ANS_PROC_CD IN
+        ('S0130400', 'S0130500', 'S0130600', 'S0130610', 'S0130700', 'S0130710', 'S0130800', 'S0130900',
+        'S0131000')
+        <if test="smpDivCd != null and smpDivCd != ''">
+            AND QSM.SMP_DIV_CD = #{smpDivCd}
+        </if>
+        <if test="ansTyp != null and ansTyp != ''">
+            AND QSM.ANS_TYP = #{ansTyp}
+        </if>
+        <if test="pitmNm != null and pitmNm != ''">
+            AND QSM.PITM_NM LIKE '%' ||UPPER(#{pitmNm}) || '%'
+        </if>
+        <if test="ansNo != null and ansNo != ''">
+            AND QPAP.ANS_NO LIKE '%' || UPPER(#{ansNo}) || '%'
+        </if>
+        <if test="batchNo != null and ansNo != ''">
+            AND QSM.BATCH_NO LIKE '%' || UPPER(#{batchNo}) || '%'
+        </if>
+        <if test="lotNo != null and lotNo != ''">
+            AND QSM.LOT_NO LIKE '%' || UPPER(#{lotNo}) || '%'
+        </if>
         ORDER BY QPAP.RCP_DT DESC
     </select>
 </mapper>

@@ -109,7 +109,8 @@
     <!-- 안정성시험계획 승인 -->
     <update id="approve" parameterType="StabPlanDetailApprVO">
         UPDATE ST_SBT_PLN
-        SET SBT_ANS_PROC = #{sbtAnsProc}
+        SET SBT_ANS_PROC = #{sbtAnsProc},
+            SBT_PLN_STT = #{sbtPlnStt}
         WHERE 1 = 1
             AND PLNT_CD = #{plntCd}
             AND SBT_PLN_IDX = #{sbtPlnIdx}
@@ -119,6 +120,7 @@
     <update id="reject" parameterType="StabPlanDetailApprVO">
         UPDATE ST_SBT_PLN
             SET SBT_ANS_PROC = #{sbtAnsProc},
+                SBT_PLN_STT = #{sbtPlnStt},
                 PLN_RJT_UID = #{loginUserUid},
                 PLN_RJT_DS = SYSDATE,
                 PLN_RJT_REA = #{plnRjtRea}

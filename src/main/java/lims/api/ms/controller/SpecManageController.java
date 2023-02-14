@@ -10,11 +10,13 @@ import lims.api.ms.vo.SpecManageDptVO;
 import lims.api.ms.vo.SpecManagePitmVO;
 import lims.api.ms.vo.SpecManageVO;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("${apiPrefix}/ms/specManage")
@@ -67,6 +69,7 @@ public class SpecManageController {
     public ResponseEntity<CommonResponse> createAItem(@AuthToken Token token, @RequestBody SpecManageVO param) {
         String jwt = token.getJwt();
         param.setPlntCd(jwtResolver.getPlantCode(jwt));
+        log.info("[bug report] create A item. rows count: {}, edited rows count: {}.", param.getAddedRowItems().size(), param.getEditedRowItems().size());
         service.makeAItem(param);
         return ResponseEntity.ok(new CommonResponse());
     }

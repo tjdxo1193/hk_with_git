@@ -1,3 +1,4 @@
+import api from '@/api';
 import { ColumnBuilder, FormBuilder } from '@/util';
 
 const sampleUsageGrid = {
@@ -34,9 +35,9 @@ const sampleUsageGrid = {
   },
   forms: () =>
     FormBuilder.builder()
-      .Select('smpDiv', ' 검체구분')
+      .Select('smpDivCd', '검체구분', { async: () => api.combo.systemCommon.getSmpDivCombo() })
       .Input('pitmCd', '품목코드')
-      .Select('pitmDiv', '품목유형')
+      .Select('pitmDiv', '품목유형', { async: () => api.combo.systemCommon.getPitmDivCombo() })
       .Input('lotNo', '제조번호')
       .Input('batchNo', '배치번호')
       .Input('pitmNm', '품목명')

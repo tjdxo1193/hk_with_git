@@ -1,6 +1,7 @@
 package lims.api.integration.service.impl;
 
 import lims.api.integration.domain.eai.TrsEventHandler;
+import lims.api.integration.domain.eai.TrsResult;
 import lims.api.integration.domain.eai.TrsStateful;
 import lims.api.integration.enums.InterfaceInfoDiv;
 import lims.api.integration.enums.InterfaceResponseStatus;
@@ -18,6 +19,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
@@ -31,29 +34,32 @@ public class TrsServiceImpl implements TrsService {
     private final InterfaceErrorService errorService;
 
     @Override
-    public <T extends TrsStateful> void execute(TrsInterface trsInterface, T recordData, Supplier<Integer> degreeSupplier, Supplier<Integer> idxSupplier, TrsEventHandler<T> process) {
-        execute(trsInterface, List.of(recordData), degreeSupplier, idxSupplier, process);
+    public <T extends TrsStateful> TrsResult execute(TrsInterface trsInterface, T recordData, Supplier<Integer> degreeSupplier, Supplier<Integer> idxSupplier, TrsEventHandler<T> process) {
+        return execute(trsInterface, List.of(recordData), degreeSupplier, idxSupplier, process);
     }
 
     @Override
-    public <T extends TrsStateful> void execute(TrsInterface trsInterface, List<T> recordData, Supplier<Integer> degreeSupplier, Supplier<Integer> idxSupplier, TrsEventHandler<T> process) {
+    public <T extends TrsStateful> TrsResult execute(TrsInterface trsInterface, List<T> recordData, Supplier<Integer> degreeSupplier, Supplier<Integer> idxSupplier, TrsEventHandler<T> process) {
         List<T> copiedData = copyList(recordData);
         Integer infoIdx = createTrsInfo(trsInterface);
+        int degree = 0;
 
         try {
-            int degree = degreeSupplier.get();
+            degree = degreeSupplier.get();
 
             executeOnPending(process, copiedData, degree, idxSupplier);
 
             InterfaceTrsResponse response = process.send();
-            log.info("@@@ Trs Response @@@");
+            log.info("--- Trs Response ---");
             log.info(response.toString());
 
             assertNotErrorResponse(response);
             executeOnSuccess(infoIdx, process, copiedData, response);
             updateSuccessStatusInfoBySync(infoIdx, response.getTrsInfoVO());
+
+            return createTrsSuccessResult(infoIdx, degree);
         } catch (IntegrationResponseException e) {
-            log.error("[{}] Receive response with Error status of interface request. {}", ThreadUtil.getCurrentMethodName(), e.getMessage());
+            log.error("[{} - {}] Receive response with Error status of interface request. {}", trsInterface.name(), trsInterface.getId(), e.getMessage());
 
             /**
              * IntegrationResponseException 예외는
@@ -63,12 +69,14 @@ public class TrsServiceImpl implements TrsService {
             String message = StringUtil.substr(e.getMessage(), 120);
             Integer errorLogId = executeOnError(infoIdx, process, copiedData, e);
             updateErrorStatusInfo(infoIdx, errorLogId, message);
+            return createTrsErrorResult(infoIdx, degree);
         } catch (Exception e) {
-            log.error("[{}] Failed send integration interface request. {}", ThreadUtil.getCurrentMethodName(), e.getMessage());
+            log.error("[{} - {}] Failed send integration interface request. {}", trsInterface.name(), trsInterface.getId(), e.getMessage());
 
             String message = StringUtil.substr(e.getMessage(), 120);
             Integer errorLogId = executeOnError(infoIdx, process, copiedData, e);
             updateErrorStatusInfo(infoIdx, errorLogId, message);
+            return createTrsErrorResult(infoIdx, degree);
         }
     }
 
@@ -85,7 +93,7 @@ public class TrsServiceImpl implements TrsService {
             process.send();
 
             executeOnSuccess(infoIdx, process, copiedData);
-            updateSuccessStatusInfoByASync(infoIdx);
+            updateSuccessStatusInfoByAsync(infoIdx);
         } catch (Exception e) {
             log.error("[{}] Failed send integration interface request. {}", ThreadUtil.getCurrentMethodName(), e.getMessage());
             executeOnError(infoIdx, process, copiedData, e);
@@ -164,7 +172,7 @@ public class TrsServiceImpl implements TrsService {
         infoService.updateStatusInfo(info);
     }
 
-    private void updateSuccessStatusInfoByASync(Integer infoIdx) {
+    private void updateSuccessStatusInfoByAsync(Integer infoIdx) {
         IfInfoVO info = IfInfoVO.builder()
                 .idx(infoIdx)
                 .xstat(InterfaceResponseStatus.S)
@@ -184,6 +192,26 @@ public class TrsServiceImpl implements TrsService {
                 .errorLogId(errorLogId)
                 .build();
         infoService.updateStatusInfo(info);
+    }
+
+    private TrsResult createTrsSuccessResult(Integer infoIdx, int degree) {
+        return TrsResult.builder()
+                .ifInfoIdx(infoIdx)
+                .degree(degree)
+                .trsStatus(InterfaceTrsStatus.SUCCESS)
+                .responseStatus(InterfaceResponseStatus.S)
+                .trsDate(LocalDateTime.now())
+                .build();
+    }
+
+    private TrsResult createTrsErrorResult(Integer infoIdx, int degree) {
+        return TrsResult.builder()
+                .ifInfoIdx(infoIdx)
+                .degree(degree)
+                .trsStatus(InterfaceTrsStatus.FAILED)
+                .responseStatus(InterfaceResponseStatus.E)
+                .trsDate(LocalDateTime.now())
+                .build();
     }
 
 }

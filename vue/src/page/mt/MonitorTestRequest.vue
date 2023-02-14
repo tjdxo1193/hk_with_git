@@ -3,8 +3,9 @@
     v-bind="list"
     @button-click="onClickButton"
     @grid-created="(proxy) => $setState('list.$grid', proxy)"
-    @form-event="formEvent"
+    @form-event="searchFormEvent"
   />
+  
 </template>
 
 <script>
@@ -35,6 +36,13 @@ export default {
         ._useLoader(() => this.$axios.get('/mt/monitorTestRequest', parameter))
         .then(({ data }) => data);
       $grid.setGridData(data);
+    },
+    async setSelectByUpperCd(forms, upperCd, targetName) {
+      let targetForm = FormUtil.findItem(forms, targetName);
+      let result = await targetForm.async(upperCd).then(({ data }) => (result = data));
+      const resultForm = forms.find((item) => item.name === targetName);
+      resultForm.value = '';
+      resultForm.elements = result;
     },
     request() {
       const checkedRows = this.list.$grid.getCheckedRowItems();
@@ -70,9 +78,27 @@ export default {
         this.$warn(this.$message.warn.unSelectedData);
       }
     },
-    formEvent(event) {
+    requestCreate(){
+      this.$confirm(this.$message.confirm.created).then(() => {
+        this.$axios.post('/mt/monitorTestRequest/test');
+        this.$info(this.$message.info.createdRequest);
+        this.getMonitorTestRequest();
+      });
+    },
+    searchFormEvent(event) {
+      const forms = this.list.forms;
+      const value = event.item.value;
       if (event.type === 'keydown' && event.originEvent.key === 'Enter') {
         this.getMonitorTestRequest();
+      }
+      if (event.type === 'change' && event.item.name === 'upperMitmPitmDiv') {
+        this.setSelectByUpperCd(forms, value, 'mitmPitmDiv');
+      }
+      if (event.type === 'change' && event.item.name === 'mitmWrkStudioDiv') {
+        this.setSelectByUpperCd(forms, value, 'upperMitmWrkPlcDiv');
+      }
+      if (event.type === 'change' && event.item.name === 'upperMitmWrkPlcDiv') {
+        this.setSelectByUpperCd(forms, value, 'mitmWrkPlcDiv');
       }
     },
     onClickButton({ name }) {
@@ -84,6 +110,9 @@ export default {
       }
       if (name === 'requestCancel') {
         this.requestCancel();
+      }
+      if (name === 'requestCreate') {
+        this.requestCreate();
       }
     },
   },

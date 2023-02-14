@@ -14,20 +14,18 @@ const list = {
       { name: 'instruct', label: '지시승인' },
       { name: 'select', label: '조회' },
     ],
-    props: { editable: false, showRowCheckColumn: true },
+    props: { showRowCheckColumn: true },
   },
   forms: () =>
     FormBuilder.builder()
       .Select('upperMitmPitmDiv', '품목구분', {
-        async: () => api.combo.common.getTreeCd('M1000000'),
+        async: () => api.combo.common.getTreeCd('M1000001'),
       })
       .Select('mitmPitmDiv', '품목명', {
         async: (param) => api.combo.common.getTreeCd(param),
       })
-      .Input('reqNo', '의뢰번호')
-      .Select('ansCylCd', '시험주기', {
-        async: api.combo.common.getAnsCyl,
-      })
+      .Input('mitmCd', '품목코드')
+      .Input('ansNo', '시험번호')
       .Select('mitmWrkStudioDiv', '작업동', {
         async: () => api.combo.common.getUpperTreeCd('M2000000'),
       })
@@ -37,12 +35,12 @@ const list = {
       .Select('mitmWrkPlcDiv', '작업실', {
         async: (param) => api.combo.common.getTreeCd(param),
       })
-      .Input('grade', 'Grade')
+      .Input('roomno', 'RoomNo')
       .Input('point', '포인트')
       .Select('crgDptCd', '담당부서', {
         async: api.combo.common.getDpt,
       })
-      .DatepickerTwinWithSwitch('searchReqDt', '의뢰일', {
+      .DatepickerTwinWithSwitch('searchRcpDt', '접수일', {
         value: [monthAgoDate, todayDate],
       })
       .spanCol(2)
@@ -52,14 +50,23 @@ const list = {
       .col('mitmReqIdx', false)
       .col('aitmSpecIdx', false)
       .col('ansProcNm', '진행상태')
-      .col('cplRqmDt', '완료요구일')
+      .col('cplRqmDt', '완료요구일', {
+        editRenderer: {
+          type: 'CalendarRenderer',
+          maxlength: 10,
+          defaultFormat: 'yyyy-mm-dd',
+        },
+        headerStyle: 'editableBgColumn',
+      })
       .col('rcpDt', '접수일자')
       .col('reqDt', '의뢰일자')
       .col('reqNo', '의뢰번호')
       .col('ansNo', '시험번호')
-      .col('mitmCd', '품목코드')
+      .col('rcpRmk', '접수비고', { width: 150 })
       .col('upperMitmPitmDivNm', '품목구분')
+      .col('mitmCd', '품목코드')
       .col('mitmPitmDivNm', '품목명')
+      .col('mitmWrkStudioDivNm', '작업동')
       .col('upperMitmWrkPlcDivNm', '작업소')
       .col('mitmWrkPlcDivNm', '작업실')
       .col('roomno', 'RoomNo')

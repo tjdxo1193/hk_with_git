@@ -258,9 +258,9 @@
         <dependency>
             <groupId>spring</groupId>
             <artifactId>audit</artifactId>
-            <version>1.0.15</version>
+            <version>1.0.16</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}${file.separator}lib${file.separator}audit-1.0.15.jar</systemPath>
+            <systemPath>${project.basedir}${file.separator}lib${file.separator}audit-1.0.16.jar</systemPath>
         </dependency>
 
         <dependency>
@@ -277,6 +277,11 @@
             <version>7.2.3.324</version>
             <scope>system</scope>
             <systemPath>${project.basedir}${file.separator}lib${file.separator}ers-invoker.jar</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.session</groupId>
+            <artifactId>spring-session-jdbc</artifactId>
         </dependency>
     </dependencies>
 

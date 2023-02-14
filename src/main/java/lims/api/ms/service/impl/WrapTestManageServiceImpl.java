@@ -52,6 +52,7 @@ public class WrapTestManageServiceImpl implements WrapTestManageService {
 	
 	@Override
 	public List<WrapTestManageVO> getSpec(WrapTestManageVO param) {
+		param.setSpecProcCd(SpecProgress.TEMPORARY_STORAGE.getCode());
 		return wrapTestManageDao.getSpec(param);
 	}
 	
@@ -189,13 +190,11 @@ public class WrapTestManageServiceImpl implements WrapTestManageService {
 				continue;
 			}
 
-			specInfo.setSpecProcCd(SpecProgress.TEMPORARY_STORAGE.getCode());
-
 			if(SpecProgress.REQUEST_REVIEW.equals(specInfo.getSpecProcCd())
 					||SpecProgress.APPROVAL_REJECTION.equals(specInfo.getSpecProcCd())
 					||SpecProgress.APPROVAL_REQUEST.equals(specInfo.getSpecProcCd())){
-
 				// TODO 버전업 규격 새로 임시저장에 aitmIdx 새거 넣고 기존거 규격삭제
+				specInfo.setSpecProcCd(SpecProgress.SPEC_REMOVE.getCode());
 				wrapTestManageDao.updateProcessCodeToSpecRemove(specInfo); // 기존거 규격삭제
 
 			}else if(SpecProgress.APPROVED.equals(specInfo.getSpecProcCd())){
@@ -205,6 +204,7 @@ public class WrapTestManageServiceImpl implements WrapTestManageService {
 
 			}
 
+			specInfo.setSpecProcCd(SpecProgress.TEMPORARY_STORAGE.getCode());
 			wrapTestManageDao.insertVersionUpBySapPrdha(specInfo); // 새로 임시저장, N , N, max+1
 		}
 
@@ -221,7 +221,7 @@ public class WrapTestManageServiceImpl implements WrapTestManageService {
 		param.setUseVerYn("Y");
 		param.setDelYn("N");
 		int result = wrapTestManageDao.approval(param);
-	
+
 		List<WrapTestManageVO> beforeVersionList = wrapTestManageDao.getBeforeVersionList(param);
 
 		for(WrapTestManageVO beforeVersion : beforeVersionList) {

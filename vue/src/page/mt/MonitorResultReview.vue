@@ -6,7 +6,7 @@
     @form-event="searchFormEvent"
   />
 
-  <AUIGridWithHeader
+  <AUIGridSearch
     v-bind="itemList"
     @grid-created="(proxy) => $setState('itemList.$grid', proxy)"
     @button-click="onClickButton"
@@ -30,7 +30,7 @@
 
 <script>
 import { FileAttacherModal, RequestApproverModal } from '@/page/modal';
-import { FormUtil } from '@/util';
+import { FormUtil, StringUtil } from '@/util';
 
 import values from './values/monitorResultReview';
 
@@ -55,7 +55,6 @@ export default {
             FormUtil.setData(this.itemList.forms, e.item);
             this.getMonitorTestRst(e);
             this.enableButtons([
-              'stage',
               'preResultTrend',
               'hold',
               'reject',
@@ -104,8 +103,10 @@ export default {
     },
     approveRequest(approveInfo) {
       let parameter = FormUtil.getData(this.itemList.forms);
-      Object.assign(parameter, approveInfo);
-      console.log(parameter, 'parameter');
+      parameter = {
+        ...parameter,
+        approveInfo,
+      };
       this.$eSignWithReason(() =>
         this.$axios.put('/mt/monitorTestResultReview/apprRequest', parameter),
       )
@@ -144,7 +145,20 @@ export default {
           });
       });
     },
-    enterEvent(event) {
+    beforeCheckCompletedReview() {
+      /**
+       * ? 선행조건: 1. 결과판정은 필수값임
+       */
+      if (!this.hasNonResultJudge()) {
+        return this.$warn(this.$message.warn.noResultJudge);
+      }
+      return this.showModal('requestApproverModal');
+    },
+    hasNonResultJudge() {
+      const item = FormUtil.getData(this.itemList.forms);
+      return StringUtil.isNotEmpty(item.sytJdg);
+    },
+    searchFormEvent(event) {
       const forms = this.list.forms;
       const value = event.item.value;
       if (event.type === 'keydown' && event.originEvent.key === 'Enter') {
@@ -152,6 +166,12 @@ export default {
       }
       if (event.type === 'change' && event.item.name === 'upperMitmPitmDiv') {
         this.setSelectByUpperCd(forms, value, 'mitmPitmDiv');
+      }
+      if (event.type === 'change' && event.item.name === 'mitmWrkStudioDiv') {
+        this.setSelectByUpperCd(forms, value, 'upperMitmWrkPlcDiv');
+      }
+      if (event.type === 'change' && event.item.name === 'upperMitmWrkPlcDiv') {
+        this.setSelectByUpperCd(forms, value, 'mitmWrkPlcDiv');
       }
     },
     onClickButton({ name }) {
@@ -164,9 +184,6 @@ export default {
       if (name === 'preResultTrend') {
         alert('이전결과동향');
       }
-      if (name === 'stage') {
-        alert('stage');
-      }
       if (name === 'hold') {
         this.hold();
       }
@@ -174,12 +191,12 @@ export default {
         this.reject();
       }
       if (name === 'approveRequest') {
-        this.showModal('requestApproverModal');
+        return this.beforeCheckCompletedReview();
       }
     },
     init() {
       this.itemList.$grid.clearGridData();
-      this.disableButtons(['stage', 'preResultTrend', 'hold', 'reject', 'approveRequest', 'init']);
+      this.disableButtons(['preResultTrend', 'hold', 'reject', 'approveRequest', 'init']);
     },
     showModal(name) {
       this.$setState(name, { show: true });

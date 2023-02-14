@@ -8,7 +8,11 @@ const todayDate = dayjs().format('YYYY-MM-DD');
 const sampleGrid = {
   static: {
     title: '조회',
-    buttons: [{ name: 'search', label: '조회' }],
+    buttons: [
+      { name: 'approve', label: '승인' },
+      { name: 'reject', label: '반려' },
+      { name: 'search', label: '조회' },
+    ],
     props: {
       showRowCheckColumn: true,
       editable: false,
@@ -16,14 +20,14 @@ const sampleGrid = {
   },
   forms: () =>
     FormBuilder.builder()
-      .Select('smpDiv', '검체구분')
+      .Select('smpDivCd', '검체구분', { async: () => api.combo.systemCommon.getSmpDivCombo() })
       .Input('pitmNm', '품목명')
       .Input('ansNo', '시험번호')
       .Input('lotNo', '제조번호')
       .Input('batchNo', '배치번호')
       .Input('pitmCd', '품목코드')
-      .Select('smpProcCd', '검체상태')
-      .Select('pitmDiv', '품목구분')
+      .Select('smpProcCd', '검체상태', { async: () => api.combo.systemCommon.getSmpProcCombo() })
+      .Select('pitmTyp', '품목구분', { async: () =>  api.combo.systemCommon.getPitmDivCombo() })
       .DatepickerTwinWithSwitch('dpsExpDtList', '폐기예정일', { value: [todayDate, todayDate] })
       .DatepickerTwinWithSwitch('smpEtrDtList', '검체입고일자', {
         value: [todayDate, todayDate],
@@ -46,8 +50,6 @@ const sampleGrid = {
       .col('lotNo', '제조번호')
       .col('batchNo', '배치번호')
       .col('smpDiv', '검체구분')
-      .col('rjtNm', '반려자')
-      .col('rjtDs', '반려일시')
       .col('smpDpsNm', '검체상태')
       .build(),
 };
@@ -55,10 +57,7 @@ const sampleGrid = {
 const inputForm = {
   static: {
     title: '입력정보',
-    buttons: [
-      { name: 'approve', label: '승인' },
-      { name: 'reject', label: '반려' },
-    ],
+    buttons: [{ name: 'init', label: '초기화' }],
   },
   forms: () =>
     FormBuilder.builder()

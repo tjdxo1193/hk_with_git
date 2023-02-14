@@ -28,6 +28,11 @@
             , QPS.PITM_SPEC_IDX
             , QPSSUB.AITM_SPEC_IDX
             , QPSSUB.USE_VER_YN AS OPS_SEPC_USE_VER_YN
+            , QPI.CLLT_MTD
+            , QPI.CLLT_MCN
+            , QPI.CLLT_PLA
+            , QPI.SMP_STRG_MTD
+            , QPI.SMP_VOL_UNIT
         FROM QM_PITM QP
         LEFT JOIN QM_PITM_INFO QPI ON QP.PLNT_CD = QPI.PLNT_CD AND QP.PITM_CD = QPI.PITM_CD AND QP.PITM_VER = QPI.PITM_VER
         LEFT JOIN QM_PITM_INFO_SAP QPIS ON QP.PLNT_CD = QPIS.PLNT_CD AND QP.PITM_CD = QPIS.PITM_CD AND QP.PITM_VER = QPIS.PITM_VER
@@ -172,7 +177,7 @@
         <if test= "aitmKn != null and aitmKn != '' ">
             AND M.AITM_KN LIKE '%' || #{aitmKn} || '%'
         </if>
-        ORDER BY MA.AITM_CD
+        ORDER BY TO_NUMBER(SUBSTR(MA.AMITM_CD, 3, 8))
     </select>
 
     <select id="getDepartmentList" parameterType="specManageVO" resultType="specManageDptVO">

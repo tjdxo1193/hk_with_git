@@ -23,6 +23,12 @@ public class Publisher {
         this.entityFactory = entityFactory;
     }
 
+    public <T> T post(String path, Class<T> responseType, Object bodyParameter) {
+        HttpRestInfo<T> info = createHttpInfo(path, responseType);
+        HttpEntity<String> entity = entityFactory.json(bodyParameter);
+        return template.request(new HttpPostExecutor<>(info, entity));
+    }
+
     public <T> T getEAI(String path, Class<T> responseType, Object... uriVariables) {
         HttpRestInfo<T> info = createEAIHttpInfo(path, responseType, uriVariables);
         HttpEntity<String> entity = entityFactory.json();
@@ -39,6 +45,10 @@ public class Publisher {
         return postEAI(path, InterfaceTrsResponse.class, bodyParameter);
     }
 
+    public <T> T postEAI(String path, Object bodyParameter, Class<T> responseType) {
+        return postEAI(path, responseType, bodyParameter);
+    }
+
     public <T> T postEAIForFile(String path, Class<T> responseType, Object bodyParameter, String fileName, byte[] fileBytes) {
         HttpRestInfo<T> info = createEAIHttpInfo(path, responseType);
         HttpEntity<MultiValueMap<String, HttpEntity<?>>> entity = entityFactory.multipartFile(bodyParameter, fileName, fileBytes);
@@ -47,6 +57,16 @@ public class Publisher {
 
     public InterfaceTrsResponse postEAIForFile(String path, Object bodyParameter, String fileName, byte[] fileBytes) {
         return postEAIForFile(path, InterfaceTrsResponse.class, bodyParameter, fileName, fileBytes);
+    }
+
+    private <T> HttpRestInfo<T> createHttpInfo(String path, Class<T> responseType, Object... uriVariables) {
+        return HttpRestInfo.<T>builder()
+                .protocol(system.getProtocol())
+                .host(system.getHost())
+                .path(path)
+                .responseType(responseType)
+                .uriVariables(uriVariables)
+                .build();
     }
 
     private <T> HttpRestInfo<T> createEAIHttpInfo(String path, Class<T> responseType, Object... uriVariables) {

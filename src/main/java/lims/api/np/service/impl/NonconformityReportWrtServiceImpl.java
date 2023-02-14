@@ -54,7 +54,7 @@ public class NonconformityReportWrtServiceImpl implements NonconformityReportWrt
         param.setNonCfmAprReqIdx(nonCfmAprReqIdx);
         param.setNonCfmProcCd(NonCfmProcess.NON_CFM_REPORT_REQUEST.getProcessCode());
         dao.save(param);
-        int result = dao.requestAppr(param);
+        int result = dao.request(param);
 
         if(result == 0) {
             throw new NoUpdatedDataException();

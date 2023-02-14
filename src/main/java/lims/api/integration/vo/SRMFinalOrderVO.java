@@ -4,7 +4,7 @@ import lims.api.integration.annotation.EnumType;
 import lims.api.util.process.KeyGenerator;
 import lims.api.util.process.MappingKey;
 import lims.api.integration.domain.eai.RevStateful;
-import lims.api.integration.enums.SRMFinalOrderStatus;
+import lims.api.integration.enums.FinalOrderStatus;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,7 +17,7 @@ public class SRMFinalOrderVO extends RevStateful implements KeyGenerator {
     private String phsOrderNo;
     @MappingKey
     private String lotNo;
-    @EnumType(SRMFinalOrderStatus.class)
+    @EnumType(FinalOrderStatus.class)
     private String status;
     private String orderItm;
     private String ifId;

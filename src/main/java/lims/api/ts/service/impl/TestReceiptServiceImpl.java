@@ -49,6 +49,7 @@ public class TestReceiptServiceImpl implements TestReceiptService {
             //진행상태 데이터 보내기
             InterfaceSendVO.TestStatus data = InterfaceSendVO.TestStatus.builder()
                     .lotNo(item.getLotNo())
+                    .splLotNo(item.getSplLotNo())
                     .batchNo(item.getBatchNo())
                     .status(TestStatusProcess.TEST_PROCEEDING.getValue())
                     .ispReqNo(item.getIspReqNo())

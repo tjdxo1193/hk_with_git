@@ -22,6 +22,7 @@ public class InterfaceControllerAdvice {
 
     private final InterfaceErrorService errorService;
 
+    // TODO DELETE
     @ExceptionHandler(FailedPostProcessException.class)
     public void failedPostProcessExceptionHandler(FailedPostProcessException e) {
         errorService.recordByPostProcess(e, e.getRevStateful(), e.getMessage());

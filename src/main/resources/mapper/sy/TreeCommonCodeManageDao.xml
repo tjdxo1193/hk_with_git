@@ -33,7 +33,7 @@
                 TREE_CD_ORD,
                 USE_YN
             FROM SY_CD_TREE
-            WHERE PLNT_CD = #{plntCd} AND USE_YN = 'Y'
+            WHERE PLNT_CD = #{plntCd}
             START WITH TREE_CD = #{treeCd}
             CONNECT BY PRIOR TREE_CD = HIR_TREE_CD
         )
@@ -94,9 +94,9 @@
         SET TREE_EN     = #{treeEn},
             TREE_ABBR   = #{treeAbbr},
             TREE_CD_ORD = #{treeCdOrd},
-            TREE_RMK    = #{treeRmk}
-        WHERE PLNT_CD = #{plntCd}
-          AND TREE_CD = #{treeCd}
+            TREE_RMK    = #{treeRmk},
+            USE_YN      = #{useYn}
+        WHERE PLNT_CD = #{plntCd} AND TREE_CD = #{treeCd}
     </update>
 
 </mapper>

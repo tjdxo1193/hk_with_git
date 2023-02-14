@@ -101,7 +101,6 @@ public class SAPMaterialVO {
         private String sobsk;
         private String fvidk;
         private String zfirstGiDate;
-
     }
 
     @Getter
@@ -117,7 +116,6 @@ public class SAPMaterialVO {
         private String dwerk;
         private String aumng;
         private String ktgrm;
-
     }
 
     @Getter
@@ -136,7 +134,6 @@ public class SAPMaterialVO {
         private String charDataTyp;
         private String charValChar;
         private String charValNum;
-
     }
 
     @Getter
@@ -148,7 +145,6 @@ public class SAPMaterialVO {
         @MappingKey
         private String spras;
         private String maktx;
-
     }
 
 }

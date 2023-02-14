@@ -59,6 +59,7 @@
             , QPIS.BRD_ABBR
             , QPIS.ETR_CTN_QTY
             , QPIS.RMTR_SPEC
+            , QPIS.NBR
             , QPIS.FTN_YN
             , QPIS.PCS01
             , QPIS.PCS02
@@ -83,6 +84,7 @@
             , QPAP.ANS_NO
             , QPAP.ANS_TYP
             , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = QPAP.ANS_TYP) AS ANS_TYP_NM
+            , QPAP.ANS_EDT
         FROM QT_PITM_ANS_REQ QPAR
         LEFT JOIN QT_PITM_ANS_PROC QPAP ON QPAR.REQ_IDX = QPAP.REQ_IDX AND QPAR.PLNT_CD = QPAP.PLNT_CD
         LEFT JOIN QT_PITM_ANS_INFO QPAI ON QPAP.ANS_IDX = QPAI.ANS_IDX AND QPAP.PLNT_CD = QPAI.PLNT_CD
@@ -169,6 +171,7 @@
             , QPAR.UDT_DS
             , QPAR.REV_DS
             , QP.PITM_CD
+            , QPI.PKG_MTR_SPEC
             , QPI.PITM_NM
             , QPI.PITM_EN
             , QPI.PITM_TYP
@@ -177,6 +180,7 @@
             , QP.PITM_VER
             , QPIS.LAB_NO
             , QPIS.BRD_ABBR
+            , QPIS.NOM_MTR
             , QPIS.ETR_CTN_QTY
             , QPIS.RMTR_SPEC
             , QPIS.FTN_YN
@@ -222,8 +226,8 @@
             , QPAP.CLLT_RMK
             , QPAP.REVW_CMMT
             , QPAP.ASS_SPCC
-            , QPAP.PITM_SPCC
-            , QPAP.NON_CFM_REA
+            , QPAI.PITM_SPCC
+            , QPAI.NON_CFM_REA
         FROM QT_PITM_ANS_REQ QPAR
         LEFT JOIN QT_PITM_ANS_PROC QPAP ON QPAR.REQ_IDX = QPAP.REQ_IDX AND QPAR.PLNT_CD = QPAP.PLNT_CD
         LEFT JOIN QT_PITM_ANS_INFO QPAI ON QPAP.ANS_IDX = QPAI.ANS_IDX AND QPAP.PLNT_CD = QPAI.PLNT_CD

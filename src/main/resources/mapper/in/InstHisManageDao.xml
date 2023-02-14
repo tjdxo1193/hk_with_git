@@ -3,42 +3,61 @@
 <mapper namespace="lims.api.in.dao.InstHisManageDao">
 
     <select id="findAll" parameterType="InstHisManageVO" resultType="InstHisManageVO">
-        SELECT A.PLNT_CD,
-               A.EQM_CD,
-               A.EQM_NM,
-               A.EQM_DIV,
-               (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = A.PLNT_CD AND DTL_CD = A.EQM_DIV) AS EQM_DIV_NM,
-               A.SRL_NO,
-               A.MAK_COMP,
-               A.SPL_COMP,
-               A.MOD_NM,
-               A.SAP_AST_NO,
-               B.HIS_SEQ,
-               B.EQM_HIS_DIV,
-               (SELECT DTL_NM
-                FROM SY_CD_DTL
-                WHERE PLNT_CD = B.PLNT_CD
-                  AND DTL_CD = B.EQM_HIS_DIV)                                                  AS EQM_HIS_DIV_NM,
-               B.EQM_HIS_PROC_CD,
-               (SELECT DTL_NM
-                FROM SY_CD_DTL
-                WHERE PLNT_CD = A.PLNT_CD
-                  AND DTL_CD = B.EQM_HIS_PROC_CD)                                              AS EQM_HIS_PROC_NM,
-               B.EQM_HIS_APR_IDX,
-               B.RJT_UID,
-               (SELECT USER_NM FROM SY_USER WHERE PLNT_CD = B.PLNT_CD AND USER_ID = B.RJT_UID) AS RJT_NM,
-               TO_CHAR(B.RJT_DS, 'YYYY-MM-DD')                                                 AS RJT_DS,
-               B.RJT_REA,
-               B.DEL_YN,
-               B.RGT_UID,
-               (SELECT USER_NM FROM SY_USER WHERE PLNT_CD = B.PLNT_CD AND USER_ID = B.RGT_UID) AS RGT_NM,
-               B.RGT_DT,
-               B.ANS_DT,
-               B.RMK,
-               NVL(B.HIS_FILE_IDX, 0)                                                          AS HIS_FILE_IDX
+        SELECT
+            A.PLNT_CD,
+            A.EQM_CD,
+            A.EQM_NM,
+            A.EQM_DIV,
+            (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = A.PLNT_CD AND DTL_CD = A.EQM_DIV) AS EQM_DIV_NM,
+            A.SRL_NO,
+            A.MAK_COMP,
+            A.SPL_COMP,
+            A.MOD_NM,
+            A.SAP_AST_NO,
+            A.EQM_CRST,
+            (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = A.PLNT_CD AND DTL_CD = A.EQM_CRST) AS EQM_CRST_NM,
+            B.HIS_SEQ,
+            B.EQM_HIS_DIV,
+            (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = B.PLNT_CD AND DTL_CD = B.EQM_HIS_DIV) AS EQM_HIS_DIV_NM,
+            B.EQM_HIS_PROC_CD,
+            (SELECT DTL_NM  FROM SY_CD_DTL WHERE PLNT_CD = A.PLNT_CD AND DTL_CD = B.EQM_HIS_PROC_CD) AS EQM_HIS_PROC_NM,
+            B.EQM_HIS_APR_IDX,
+            B.RJT_UID,
+            (SELECT USER_NM FROM SY_USER WHERE PLNT_CD = B.PLNT_CD AND USER_ID = B.RJT_UID) AS RJT_NM,
+            TO_CHAR(B.RJT_DS, 'YYYY-MM-DD') AS RJT_DS,
+            B.RJT_REA,
+            B.DEL_YN,
+            B.RGT_UID,
+            (SELECT USER_NM FROM SY_USER WHERE PLNT_CD = B.PLNT_CD AND USER_ID = B.RGT_UID) AS RGT_NM,
+            B.RGT_DT,
+            B.ANS_DT,
+            B.RMK,
+            NVL(B.HIS_FILE_IDX, 0) AS HIS_FILE_IDX,
+            C.APR_DS
         FROM EM_EQM_INFO A
-                 JOIN EM_EQM_HIS B ON A.PLNT_CD = B.PLNT_CD AND A.EQM_CD = B.EQM_CD
-        WHERE 1 = 1
+        JOIN EM_EQM_HIS B ON A.PLNT_CD = B.PLNT_CD AND A.EQM_CD = B.EQM_CD
+        LEFT OUTER JOIN SY_APR_INFO C ON B.EQM_HIS_APR_IDX = C.APR_IDX
+        WHERE 1=1
+        AND A.DEL_YN = #{delYn}
+        <if test="eqmDiv != null and eqmDiv != ''">
+            AND A.EQM_DIV = #{eqmDiv}
+        </if>
+        <if test="eqmHisDiv != null and eqmHisDiv != ''">
+            AND B.EQM_HIS_DIV = #{eqmHisDiv}
+        </if>
+        <if test="eqmCrst != null and eqmCrst != ''">
+            AND A.EQM_CRST = #{eqmCrst}
+        </if>
+        <if test="eqmNm != null and eqmNm != ''">
+            AND UPPER(A.EQM_NM) LIKE '%'|| UPPER(#{eqmNm}) || '%'
+        </if>
+        <if test="srlNo != null and srlNo != ''">
+            AND UPPER(A.SRL_NO) LIKE '%'|| UPPER(#{srlNo}) || '%'
+        </if>
+        <if test="searchEqmHisAprDt != null and searchEqmHisAprDt != ''">
+            AND TO_CHAR(C.APR_DS, 'YYYY-MM-DD') BETWEEN #{searchEqmHisAprDt[0]} AND #{searchEqmHisAprDt}
+        </if>
+        ORDER BY A.EQM_DIV, A.EQM_CD, B.HIS_SEQ
     </select>
 
     <insert id="save" parameterType="InstHisManageVO">
@@ -47,34 +66,34 @@
         </selectKey>
 
         INSERT INTO EM_EQM_HIS(
-        PLNT_CD,
-        EQM_CD,
-        HIS_SEQ,
-        EQM_HIS_DIV,
-        EQM_HIS_PROC_CD,
-        RGT_UID,
-        RGT_DT,
-        ANS_DT,
-        RMK,
-        HIS_FILE_IDX
+            PLNT_CD,
+            EQM_CD,
+            HIS_SEQ,
+            EQM_HIS_DIV,
+            EQM_HIS_PROC_CD,
+            RGT_UID,
+            RGT_DT,
+            ANS_DT,
+            RMK,
+            HIS_FILE_IDX
         ) VALUES (
-        #{plntCd},
-        #{eqmCd},
-        #{hisSeq},
-        #{eqmHisDiv},
-        #{eqmHisProcCd},
-        #{rgtUid},
-        SYSDATE,
-        #{ansDt},
-        #{rmk},
-        #{hisFileIdx}
+            #{plntCd},
+            #{eqmCd},
+            #{hisSeq},
+            #{eqmHisDiv},
+            #{eqmHisProcCd},
+            #{rgtUid},
+            SYSDATE,
+            #{ansDt},
+            #{rmk},
+            #{hisFileIdx}
         )
     </insert>
 
     <update id="update" parameterType="InstHisManageVO">
-        UPDATE EM_EQM_HIS
-        SET ANS_DT       = #{ansDt},
-            RMK          = #{rmk},
+        UPDATE EM_EQM_HIS SET
+            ANS_DT = #{ansDt},
+            RMK = #{rmk},
             HIS_FILE_IDX = #{hisFileIdx}
         WHERE PLNT_CD = #{plntCd}
           AND EQM_CD = #{eqmCd}
@@ -82,19 +101,19 @@
     </update>
 
     <update id="delete" parameterType="InstHisManageVO">
-        UPDATE EM_EQM_HIS
-        SET DEL_YN = 'Y'
+        UPDATE EM_EQM_HIS SET
+            SET DEL_YN = 'Y'
         WHERE PLNT_CD = #{plntCd}
           AND EQM_CD = #{eqmCd}
           AND HIS_SEQ = #{hisSeq}
     </update>
 
     <update id="requestApprove" parameterType="InstHisManageVO">
-        UPDATE EM_EQM_HIS
-        SET EQM_HIS_PROC_CD = #{eqmHisProcCd},
+        UPDATE EM_EQM_HIS SET
+            EQM_HIS_PROC_CD = #{eqmHisProcCd},
             EQM_HIS_APR_IDX = #{eqmHisAprIdx},
-            ANS_DT          = #{ansDt},
-            RMK             = #{rmk}
+            ANS_DT = #{ansDt},
+            RMK = #{rmk}
         WHERE PLNT_CD = #{plntCd}
           AND EQM_CD = #{eqmCd}
           AND HIS_SEQ = #{hisSeq}

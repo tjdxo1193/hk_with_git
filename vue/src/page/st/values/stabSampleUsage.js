@@ -1,118 +1,124 @@
 import dayjs from 'dayjs';
 
+import api from '@/api';
 import { ColumnBuilder, FormBuilder } from '@/util';
 
 const todayDate = dayjs().format('YYYY-MM-DD');
 
-const searchForm = {
+const yesterdayDate = dayjs().add(-1, 'day').format('YYYY-MM-DD');
+
+const sampleUsageGrid = {
   static: {
     title: '조회',
     countPerRow: 4,
     buttons: [{ name: 'search', label: '조회' }],
+    legends: [
+      { value: '임시저장', className: 'tempSave' },
+      { value: '승인대기중', className: 'approveWating' },
+      { value: '반려', className: 'return' },
+      { value: '이상', className: 'weird' },
+      { value: '폐기', className: 'disposal' },
+    ],
+    props: {
+      editable: false,
+    },
   },
   forms: () =>
     FormBuilder.builder()
-      .Select('1', '품목구분')
-      .required()
-      .Input('3', '품목코드')
-      .Input('5', '품목명')
-      .required()
-      .DatepickerTwinWithSwitch('6', '사용일', { value: [todayDate, todayDate] })
-      .Input('2', '라벨번호')
-      .Input('4', '제조번호')
-      .required()
+      .Select('pitmDiv', '품목구분', {
+        async: () => api.combo.systemCommon.getPitmDivCombo(),
+      })
+      .Input('labelCd', '라벨코드')
+      .Input('pitmCd', '품목코드')
+      .Input('lotNo', '제조번호')
+      .Input('batchNo', '배치번호')
+      .Input('pitmNm', '품목명')
+      .DatepickerTwinWithSwitch('useDtList', '사용일', {
+        value: [yesterdayDate, todayDate],
+        _colSpan: 2,
+      })
       .build(),
-};
-
-const legends = [
-  { className: 'tempSave', value: '임시저장' },
-  { className: 'approveWating', value: '승인대기중' },
-  { className: 'return', value: '반려' },
-  { className: 'weird', value: '이상' },
-  { className: 'disposal', value: '폐기' },
-];
-
-const gridForSearchResult = {
-  static: {
-    title: '조회결과',
-    legends: legends,
-    $grid: null,
-    data: [{ div: '1' }, { div: '2' }, { div: '3' }, { div: '4' }],
-    props: {
-      editable: false,
-      showRowCheckColumn: false,
-    },
-  },
   columns: () =>
     ColumnBuilder.builder()
-      .col('1', '품목구분')
-      .col('2', '품목코드')
-      .col('3', '품목명')
-      .col('4', '공정명')
-      .col('5', '제조번호')
-      .col('6', '시험종류')
-      .col('7', '안정성검체량')
-      .col('8', '사용량')
-      .col('9', '재고량')
-      .col('10', '안정성검체단위')
-      .col('11', '사용자')
-      .col('12', '사용일')
-      .col('13', '사용목적')
-      .col('14', '이상여부')
-      .col('15', '검체상태')
-      .col('16', '사용이력진행상황')
-      .col('17', '반려여부')
-      .col('18', '반려일')
-      .col('19', '반려사유')
+      .col('smpMngIdx', { visible: false })
+      .col('useSeq', { visible: false })
+      .col('smpUseProc', { visible: false })
+      .col('useUid', { visible: false })
+      .col('smpUseAprIdx', { visible: false })
+      .col('rjtUid', { visible: false })
+      .col('pitmTyp', { visible: false })
+      .col('ansTyp', { visible: false })
+      .col('ansIdx', { visible: false })
+      .col('smpStrgMtd', { visible: false })
+      .col('smpUseNm', '사용이력진행상태')
+      .col('useSmpVol', '사용검체량')
+      .col('remains', '재고량')
+      .col('mngSmpVol', '관리검체량')
+      .col('inpUnit', '입력단위')
+      .col('usePps', '사용목적')
+      .col('useNm', '사용자')
+      .col('useDt', '사용일자')
+      .col('strgPla', '보관장소')
+      .col('rjtNm', '반려자')
+      .col('rjtRea', '반려사유')
+      .col('pitmTypNm', '품목유형')
+      .col('pitmCd', '품목코드')
+      .col('pitmNm', '품목명')
+      .col('ansTypNm', '시험유형')
+      .col('smpStrgMtdNm', '보관방법')
+      .col('lotNo', '제조번호')
+      .col('batchNo', '배치번호')
+      .col('makDt', '생산일자')
+      .col('strgLmt', '보관기한')
+      .col('irgYn', '이상여부')
+      .col('smpRmk', '비고')
+      .col('dpsExpDt', '폐기예정일자')
+      .col('smpEtrDt', '입고일자')
       .build(),
 };
 
-const inputInfoForm = {
+const inputForm = {
   static: {
     title: '입력정보',
     countPerRow: 4,
+    buttons: [
+      { name: 'requestApproveUse', label: '사용승인요청', disabled: false },
+      { name: 'save', label: '저장' },
+      { name: 'update', label: '수정', disabled: false },
+      { name: 'delete', label: '삭제', disabled: false },
+      { name: 'requestCancelUse', label: '사용취소요청', disabled: false },
+      { name: 'init', label: '초기화' },
+    ],
   },
-
   forms: () =>
     FormBuilder.builder()
+      .Hidden('useUid')
+      .Hidden('pitmCd')
+      .Hidden('useUid')
+      .Hidden('smpMngIdx')
+      .Hidden('useSeq')
       .multiple(
-        '1',
+        'pitm',
         '품목명',
         FormBuilder.builder()
-          .Input('11', { readonly: true })
-          .spanCol(5)
-          .Button('search', 'stabTargetItemSearchModal', { type: 'search' })
+          .Input('pitmNm', { readonly: true, _colSpan: 10, _required: true })
+          .Button('sampleSearch', { type: 'search' })
           .build(),
       )
-      .Input('1', '보관단위', { readonly: true })
-      .Input('1', '시험번호', { readonly: true })
-      .Input('1', '재고량', { readonly: true })
-      .Input('1', '제조번호', { readonly: true })
-      .Input('1', '사용량')
-      .required()
-      .Select('1', '사용자', { readonly: true })
-      .required()
-      .Textarea('1', '사용목적')
-      .spanRow(2)
-      .Datepicker('1', '사용일', { value: todayDate })
-      .required()
+      .spanCol(2)
+      .Input('ansNo', '시험번호', { readonly: true })
+      .Input('inpUnit', '입력단위', { readonly: true })
+      .Input('lotNo', '제조번호', { readonly: true })
+      .Input('batchNo', '배치번호', { readonly: true })
+      .Input('remains', '재고량', { readonly: true })
+      .InputNumber('useSmpVol', '사용량', { _required: true })
+      .Input('useNm', '사용자', { readonly: true, _required: true })
+      .Datepicker('useDt', '사용일', { value: todayDate, _required: true })
+      .Textarea('usePps', '사용목적', { _colSpan: 2 })
       .build(),
 };
 
-const buttonGroups = {
-  buttons: [
-    { name: 'useapproveReq', label: '사용승인요청', disabled: true },
-    { name: 'save', label: '저장' },
-    { name: 'update', label: '수정', disabled: true },
-    { name: 'delete', label: '삭제', disabled: true, type: 'danger' },
-    { name: 'useCancelReq', label: '사용취소요청', disabled: true },
-    { name: 'init', label: '초기화' },
-  ],
-};
-
 export default {
-  searchForm,
-  gridForSearchResult,
-  inputInfoForm,
-  buttonGroups,
+  sampleUsageGrid,
+  inputForm,
 };

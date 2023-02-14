@@ -18,5 +18,5 @@ public interface NonconformityReportWrtDao {
     int save(NonconformityReportWrtVO param);
 
     @Audit(target = QtPitmAnsInfo.class, label = AuditEvent.NonconformityReport.requestApprove)
-    int requestAppr(NonconformityReportWrtVO param);
+    int request(NonconformityReportWrtVO param);
 }

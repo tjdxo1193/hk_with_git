@@ -78,6 +78,7 @@ const testItemPerGrid = {
 };
 
 const vriaNoList = [
+  { value: '00', label: '00' },
   { value: '01', label: '01' },
   { value: '02', label: '02' },
   { value: '03', label: '03' },

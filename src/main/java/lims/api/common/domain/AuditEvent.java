@@ -378,4 +378,22 @@ public interface AuditEvent {
         String approveAddSample = "추가 검체 승인";
         String rejectAddSample = "추가 검체 반려";
     }
+
+    interface InspectionProductionPerformance {
+        String createRecord = "생산 연계 이력 저장";
+        String updateState = " 생산 연계 상태 수정";
+    }
+
+    interface InspectionPurchasingPerformance {
+        String createRecord = "구매 연계 이력 저장";
+        String updateState = "구매 연계 상태 수정";
+    }
+
+    interface LabelPrint {
+        String createLabelPrint = "라벨 출력 생성";
+        String updateLabelPrint = "라벨 출력 수정";
+        String requestReLabelPrint = "라벨 재출력 요청";
+        String rejectReLabelPrint = "라벨 재출력 반려";
+        String approveReLabelPrint = "라벨 재출력 승인";
+    }
 }

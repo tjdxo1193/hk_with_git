@@ -31,7 +31,7 @@ const monitorManage = {
   forms: () =>
     FormBuilder.builder()
       .Select('mitmPitmUpperDiv', '품목구분', {
-        async: () => api.combo.common.getTreeCd('M1000000'),
+        async: () => api.combo.common.getTreeCd('M1000001'),
       })
       .Select('mitmPitmDiv', '품목명', {
         async: (param) => api.combo.common.getTreeCd(param),
@@ -62,27 +62,31 @@ const monitorSearchResult = {
   },
   columns: () =>
     ColumnBuilder.builder()
+      .col('upperMitmPitmNm', '품목구분')
       .col('mitmPitmNm', '품목명')
       .col('mitmCd', '품목코드')
       .col('mitmWrkPlcNm', '작업실')
       .col('roomno', 'RoomNo')
       .col('point', '포인트')
-      .col('grade', 'Grade')
+      .col('grade', false)
+      .col('gradeNm', 'Grade')
       .col('ansCylNm', '시험주기')
       .col('perSpec', '허가규격')
       .col('ansStrDt', '시험시작일')
       .col('revwDurTm', '검토소요시간')
       .col('aprDurTm', '승인소요시간')
       .col('crgDptNm', '담당부서')
-      .col('plntCd', { visible: false })
-      .col('mitmWrkPlcDiv', { visible: false })
-      .col('mitmPitmDiv', { visible: false })
-      .col('ansCylDt', { visible: false })
-      .col('crgDptCd', { visible: false })
-      .col('useYn', { visible: false })
-      .col('mitmWrkStudioDiv', { visible: false })
-      .col('mitmWrkPlcUpperDiv', { visible: false })
-      .col('mitmPitmUpperDiv', { visible: false })
+      .col('wrkDiv', false)
+      .col('wrkDivNm', '작업구분')
+      .col('plntCd', false)
+      .col('mitmWrkPlcDiv', false)
+      .col('mitmPitmDiv', false)
+      .col('ansCylDt', false)
+      .col('crgDptCd', false)
+      .col('useYn', false)
+      .col('mitmWrkStudioDiv', false)
+      .col('mitmWrkPlcUpperDiv', false)
+      .col('mitmPitmUpperDiv', false)
       .build(),
 };
 
@@ -108,11 +112,11 @@ const monitorManageInfo = {
         async: (param) => api.combo.common.getTreeCd(param),
         _required: true,
       })
-      .Select('crgDptCd', '담당부서', {
-        async: () => api.combo.common.getdptByLevel(2),
+      .Select('ansCylCd', '시험주기', {
+        async: api.combo.common.getAnsCyl,
         _required: true,
       })
-      .Input('perSpec', '허가규격', { maxLength: 40 })
+      .Datepicker('ansStrDt', '시험시작일', { value: todayDate, _required: true })
       .Select('mitmWrkStudioDiv', '작업동', {
         async: () => api.combo.common.getTreeCd('M2000000'),
         _required: true,
@@ -125,16 +129,21 @@ const monitorManageInfo = {
         async: (param) => api.combo.common.getTreeCd(param),
         _required: true,
       })
-      .Input('point', '포인트', { readonly: true })
-      .Select('ansCylCd', '시험주기', {
-        async: api.combo.common.getAnsCyl,
-        _required: true,
+      .Select('crgDptCd', '담당부서', {
+        async: () => api.combo.common.getdptByLevel(2),
       })
-      .Datepicker('ansStrDt', '시험시작일', { value: todayDate })
-      .Input('roomno', 'RoomNo', { readonly: true })
-      .Input('grade', 'Grade', { readonly: true })
-      .Input('revwDurTm', '검토소요시간', { maxLength: 40 })
-      .Input('aprDurTm', '승인소요시간', { maxLength: 40 })
+      .Input('roomno', 'RoomNo', { maxLength: 5 })
+      .Input('point', '포인트', { maxLength: 5 })
+      .Select('grade', 'Grade', {
+        async: () => api.combo.userCommon.getGradeCombo(),
+      })
+      .Select('wrkDiv', '작업구분', {
+        async: () => api.combo.userCommon.getWorkDivCombo(),
+      })
+      .Input('perSpec', '허가규격', { maxLength: 20 })
+      .Input('revwDurTm', '검토소요시간', { maxLength: 20 })
+      .Input('aprDurTm', '승인소요시간', { maxLength: 20 })
+      .blank()
       .build(),
 };
 

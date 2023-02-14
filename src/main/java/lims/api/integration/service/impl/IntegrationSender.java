@@ -1,6 +1,8 @@
 package lims.api.integration.service.impl;
 
 import lims.api.common.service.impl.ReportDesignerHelper;
+import lims.api.integration.domain.eai.TrsResult;
+import lims.api.integration.enums.ReportDivOfNonCfm;
 import lims.api.integration.service.*;
 import lims.api.integration.vo.ELNSendVO;
 import lims.api.integration.vo.SAPSendVO;
@@ -31,8 +33,12 @@ public class IntegrationSender {
      */
     public void sendTestStatus(InterfaceSendVO.TestStatus data) {
         sapService.publishTestStatus(data.toSAP());
-        srmService.publishTestStatus(data.toSRM());
-        mesService.publishTestStatus(data.toMES());
+        if (data.isMES()) {
+            mesService.publishTestStatus(data.toMES());
+        }
+        if (data.isSRM()) {
+            srmService.publishTestStatus(data.toSRM());
+        }
     }
 
     /*
@@ -40,8 +46,12 @@ public class IntegrationSender {
      */
     public void sendTestResult(InterfaceSendVO.TestResult data) {
         sapService.publishTestResultJudgment(data.toSAP());
-        srmService.publishTestResultJudgment(data.toSRM());
-        mesService.publishTestResultJudgment(data.toMES());
+        if (data.isMES()) {
+            mesService.publishTestResultJudgment(data.toMES());
+        }
+        if (data.isSRM()) {
+            srmService.publishTestResultJudgment(data.toSRM());
+        }
     }
 
     /**
@@ -50,22 +60,22 @@ public class IntegrationSender {
      */
     public void sendNonconformityReport(InterfaceSendVO.NonconformityReport data, ConvertMrd nonconformityReport, ConvertMrd reoccurReport) {
         if (nonconformityReport != null) {
-            sendNonconformityReportToSRMAndMES(data, nonconformityReport);
+            sendNonconformityReportToSRMAndMES(data, nonconformityReport, ReportDivOfNonCfm.A);
         }
         if (reoccurReport != null) {
-            sendNonconformityReportToSRMAndMES(data, reoccurReport);
+            sendNonconformityReportToSRMAndMES(data, reoccurReport, ReportDivOfNonCfm.B);
         }
     }
 
-    private void sendNonconformityReportToSRMAndMES(InterfaceSendVO.NonconformityReport data, ConvertMrd convertMrd) {
-        TempFile tempFile = toTempFile(convertMrd);
-        srmService.publishNonCfmReport(data.toSRM(), FileUtil.getName(tempFile.getFile()), FileUtil.toBytes(tempFile.getFile()));
-        mesService.publishNonCfmReport(data.toMES(), FileUtil.getName(tempFile.getFile()), FileUtil.toBytes(tempFile.getFile()));
+    private void sendNonconformityReportToSRMAndMES(InterfaceSendVO.NonconformityReport data, ConvertMrd convertMrd, ReportDivOfNonCfm reportDiv) {
+        TempFile tempFile = rdHelper.toTempFile(convertMrd.getName(), convertMrd.getParameter(), convertMrd.getTargetFullName());
+        if (data.isMES()) {
+            mesService.publishNonCfmReport(data.toMES(), FileUtil.getName(tempFile.getFile()), FileUtil.toBytes(tempFile.getFile()));
+        }
+        if (data.isSRM()) {
+            srmService.publishNonCfmReport(data.toSRM(reportDiv), FileUtil.getName(tempFile.getFile()), FileUtil.toBytes(tempFile.getFile()));
+        }
         tempFile.delete();
-    }
-
-    private TempFile toTempFile(ConvertMrd mrdVO) {
-        return rdHelper.toTempFile(mrdVO.getName(), mrdVO.getParameter(), mrdVO.getTargetFullName());
     }
 
     /**
@@ -84,17 +94,17 @@ public class IntegrationSender {
     }
 
     /**
-     * 1달 마다 구매오더 기준 품질 검사 횟수를 전송한다.
+     * 1달 마다 구매오더 기준 품질 검사 횟수(실적)를 전송한다.
      */
-    public void sendTestPerformanceOfPurchaseInbound(List<SAPSendVO.TestPerformanceOfPurchaseInbound> data) {
-        sapService.publishTestPerformanceOfPurchaseInbound(data);
+    public TrsResult sendTestPerformanceOfPurchaseInbound(InterfaceSendVO.PurchaseInboundTestPerformance data) {
+        return sapService.publishTestPerformanceOfPurchaseInbound(data.toSAP());
     }
 
     /**
-     * 매일 생산입고 기준 품질 검사 횟수를 전송한다.
+     * 매일 생산입고 기준 품질 검사 횟수(실적)를 전송한다.
      */
-    public void sendPerformanceOfManufactureInbound(List<SAPSendVO.TestPerformanceOfManufactureInbound> data) {
-        sapService.publishTestPerformanceOfManufactureInbound(data);
+    public TrsResult sendPerformanceOfManufactureInbound(InterfaceSendVO.ManufactureInboundTestPerformance data) {
+        return sapService.publishTestPerformanceOfManufactureInbound(data.toSAP());
     }
 
     /**

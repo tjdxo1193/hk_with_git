@@ -3,11 +3,11 @@ package lims.api.util;
 public class ThreadUtil {
 
     public static String getCurrentMethodName() {
-        return getStackTrace(2);
+        return getStackTrace(3);
     }
 
     public static String getCallerMethodName() {
-        return getStackTrace(3);
+        return getStackTrace(4);
     }
 
     private static String getStackTrace(int depth) {

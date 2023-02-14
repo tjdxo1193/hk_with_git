@@ -3,77 +3,62 @@
 <mapper namespace="lims.api.ms.dao.MonitorManageDao">
     <select id="find" parameterType="MonitorManageVO" resultType="MonitorManageVO">
         SELECT
-        (SELECT HIR_TREE_CD FROM SY_CD_TREE WHERE TREE_CD = MITM_PITM_DIV) AS MITM_PITM_UPPER_DIV,
-        MITM.PLNT_CD AS PLNT_CD,
-        MITM_PITM_DIV AS MITM_PITM_DIV,
-        MITM_CD,
-        HIR_TREE_CD AS MITM_WRK_STUDIO_DIV,
-        MITM_WRK_PLC_UPPER_DIV AS MITM_WRK_PLC_UPPER_DIV,
-        MITM_WRK_PLC_DIV,
-        POINT,
-        ROOMNO,
-        GRADE,
-        ANS_STR_DT,
-        ANS_CYL_CD,
-        CRG_DPT_CD,
-        PER_SPEC,
-        REVW_DUR_TM,
-        APR_DUR_TM,
-        (SELECT TREE_NM FROM SY_CD_TREE WHERE TREE_CD = MITM_PITM_DIV AND PLNT_CD = #{plntCd}) AS MITM_PITM_NM,
-        MITM_WRK_PLC_NM,
-        (SELECT ANS_CYL_MARK_NM FROM SY_ANS_CYL WHERE ANS_CYL_CD = MITM.ANS_CYL_CD AND PLNT_CD = #{plntCd}) AS
-        ANS_CYL_NM,
-        (SELECT DPT_NM FROM SY_DPT WHERE DPT_CD = CRG_DPT_CD AND PLNT_CD = #{plntCd}) AS CRG_DPT_NM
-        FROM (SELECT SCT.PLNT_CD AS PLNT_CD,
-        SCT.HIR_TREE_CD AS MITM_WRK_PLC_UPPER_DIV,
-        SCT.TREE_NM AS MITM_WRK_PLC_NM,
-        M2.MITM_CD,
-        M2.MITM_WRK_PLC_DIV,
-        M2.MITM_PITM_DIV,
-        M2.POINT,
-        M2.ROOMNO,
-        M2.GRADE,
-        M2.ANS_STR_DT,
-        M2.ANS_CYL_CD,
-        M2.CRG_DPT_CD,
-        M2.PER_SPEC,
-        M2.REVW_DUR_TM,
-        M2.APR_DUR_TM,
-        M2.USE_YN,
-        M2.DEL_YN
-        FROM SY_CD_TREE SCT,
-        MM_MITM M2
-        WHERE SCT.TREE_CD = M2.MITM_WRK_PLC_DIV
-        AND M2.PLNT_CD = #{plntCd}
-        AND M2.DEL_YN = 'N'
-        AND M2.USE_YN = 'Y') MITM,
-        SY_CD_TREE SCT2
-        WHERE MITM.MITM_WRK_PLC_UPPER_DIV = SCT2.TREE_CD
-        AND MITM.DEL_YN = 'N'
-        AND MITM.USE_YN = 'Y'
+            (SELECT HIR_TREE_CD FROM SY_CD_TREE WHERE TREE_CD = SCT.HIR_TREE_CD) AS MITM_WRK_STUDIO_DIV,
+            SCTR.HIR_TREE_CD AS MITM_PITM_UPPER_DIV,
+            (SELECT TREE_NM FROM SY_CD_TREE WHERE TREE_CD = SCTR.HIR_TREE_CD) AS UPPER_MITM_PITM_NM,
+            SCTR.TREE_NM AS MITM_PITM_NM,
+            SDP.DPT_NM AS CRG_DPT_NM,
+            SCT.PLNT_CD AS PLNT_CD,
+            SCT.HIR_TREE_CD AS MITM_WRK_PLC_UPPER_DIV,
+            SCT.TREE_NM AS MITM_WRK_PLC_NM,
+            MITM.MITM_CD,
+            MITM.MITM_WRK_PLC_DIV,
+            MITM.MITM_PITM_DIV,
+            MITM.POINT,
+            MITM.ROOMNO,
+            MITM.GRADE,
+            SCD.DTL_NM AS GRADE_NM,
+            MITM.WRK_DIV,
+            (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = MITM.WRK_DIV AND PLNT_CD = #{plntCd}) AS WRK_DIV_NM,
+            MITM.ANS_STR_DT,
+            MITM.ANS_CYL_CD,
+            MITM.CRG_DPT_CD,
+            MITM.PER_SPEC,
+            MITM.REVW_DUR_TM,
+            MITM.APR_DUR_TM,
+            MITM.USE_YN,
+            MITM.DEL_YN,
+            SAC.ANS_CYL_MARK_NM AS ANS_CYL_NM
+        FROM MM_MITM MITM
+        JOIN SY_CD_TREE SCT ON SCT.TREE_CD = MITM.MITM_WRK_PLC_DIV AND MITM.PLNT_CD = #{plntCd}
+        JOIN SY_CD_TREE SCTR ON SCTR.TREE_CD = MITM.MITM_PITM_DIV AND MITM.PLNT_CD = #{plntCd}
+        JOIN SY_ANS_CYL SAC ON SAC.ANS_CYL_CD = MITM.ANS_CYL_CD AND SAC.PLNT_CD = #{plntCd}
+        LEFT OUTER JOIN SY_DPT SDP ON DPT_CD = MITM.CRG_DPT_CD AND SDP.PLNT_CD = #{plntCd}
+        LEFT OUTER JOIN SY_CD_DTL SCD ON SCD.DTL_CD = MITM.GRADE AND SCD.PLNT_CD = #{plntCd}
+        WHERE MITM.DEL_YN = 'N' AND MITM.USE_YN = 'Y'
         <if test="mitmPitmUpperDiv != '' and mitmPitmUpperDiv != null">
-            AND MITM_PITM_UPPER_DIV = #{mitmPitmUpperDiv}
+            AND SCTR.HIR_TREE_CD = #{mitmPitmUpperDiv}
         </if>
         <if test="mitmPitmDiv != '' and mitmPitmDiv != null">
-            AND MITM_PITM_DIV LIKE '%' || #{mitmPitmDiv} || '%'
+            AND MITM.MITM_PITM_DIV = #{mitmPitmDiv}
         </if>
         <if test="crgDptCd != '' and crgDptCd != null">
             AND MITM.CRG_DPT_CD = #{crgDptCd}
         </if>
         <if test="perSpec != '' and perSpec != null">
-            AND MITM.PER_SPEC LIKE '%' || #{perSpec} || '%'
+            AND UPPER(MITM.PER_SPEC) LIKE '%' || UPPER(#{perSpec}) || '%'
         </if>
         <if test="mitmWrkStudioDiv != '' and mitmWrkStudioDiv != null">
-            AND HIR_TREE_CD = #{mitmWrkStudioDiv}
+            AND SCT.HIR_TREE_CD IN (SELECT TREE_CD FROM SY_CD_TREE WHERE HIR_TREE_CD IN (SELECT HIR_TREE_CD FROM SY_CD_TREE WHERE TREE_CD = SCT.HIR_TREE_CD))
         </if>
         <if test="mitmWrkPlcUpperDiv != '' and mitmWrkPlcUpperDiv != null">
-            AND TREE_CD = #{mitmWrkPlcUpperDiv}
+            AND SCT.HIR_TREE_CD = #{mitmWrkPlcUpperDiv}
         </if>
         <if test="mitmWrkPlcDiv != '' and mitmWrkPlcDiv != null">
-            AND MITM.MITM.MITM_WRK_PLC_DIV = #{mitmWrkPlcDiv}
+            AND MITM.MITM_WRK_PLC_DIV = #{mitmWrkPlcDiv}
         </if>
         <if test="point != '' and point != null">
-            AND MITM.POINT LIKE '%' || #{point} || '%'
+            AND UPPER(MITM.POINT) LIKE '%' || UPPER(#{point}) || '%'
         </if>
         ORDER BY MITM.MITM_CD DESC
     </select>
@@ -82,10 +67,38 @@
         <selectKey resultType="string" keyProperty="mitmCd" order="BEFORE">
             SELECT 'M'||LPAD(NVL(MAX(SUBSTR(MITM_CD, -5))+1,1),5,0) FROM MM_MITM WHERE PLNT_CD = #{plntCd}
         </selectKey>
-        INSERT INTO MM_MITM (PLNT_CD, MITM_CD, MITM_WRK_PLC_DIV, MITM_PITM_DIV, POINT, ROOMNO, GRADE,
-        ANS_STR_DT, ANS_CYL_CD, CRG_DPT_CD, PER_SPEC, REVW_DUR_TM, APR_DUR_TM)
-        VALUES (#{plntCd}, #{mitmCd}, #{mitmWrkPlcDiv}, #{mitmPitmDiv}, #{point}, #{roomno}, #{grade},
-        #{ansStrDt}, #{ansCylCd}, #{crgDptCd}, #{perSpec}, #{revwDurTm}, #{aprDurTm})
+
+        INSERT INTO MM_MITM (
+            PLNT_CD,
+            MITM_CD,
+            MITM_WRK_PLC_DIV,
+            MITM_PITM_DIV,
+            POINT,
+            ROOMNO,
+            GRADE,
+            WRK_DIV,
+            ANS_STR_DT,
+            ANS_CYL_CD,
+            CRG_DPT_CD,
+            PER_SPEC,
+            REVW_DUR_TM,
+            APR_DUR_TM
+        )VALUES (
+            #{plntCd},
+            #{mitmCd},
+            #{mitmWrkPlcDiv},
+            #{mitmPitmDiv},
+            #{point},
+            #{roomno},
+            #{grade},
+            #{wrkDiv},
+            #{ansStrDt},
+            #{ansCylCd},
+            #{crgDptCd},
+            #{perSpec},
+            #{revwDurTm},
+            #{aprDurTm}
+        )
     </insert>
 
     <update id="update" parameterType="MonitorManageVO">
@@ -95,14 +108,12 @@
             PER_SPEC    = #{perSpec},
             REVW_DUR_TM = #{revwDurTm},
             APR_DUR_TM  = #{aprDurTm}
-        WHERE PLNT_CD = #{plntCd}
-          AND MITM_CD = #{mitmCd}
+        WHERE PLNT_CD = #{plntCd} AND MITM_CD = #{mitmCd}
     </update>
 
     <update id="delete" parameterType="MonitorManageVO">
         UPDATE MM_MITM
         SET DEL_YN = 'Y'
-        WHERE PLNT_CD = #{plntCd}
-          AND MITM_CD = #{mitmCd}
+        WHERE PLNT_CD = #{plntCd} AND MITM_CD = #{mitmCd}
     </update>
 </mapper>

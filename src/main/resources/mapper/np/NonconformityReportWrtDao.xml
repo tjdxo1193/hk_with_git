@@ -170,7 +170,7 @@
         WHERE PLNT_CD = #{plntCd} AND ANS_IDX = #{ansIdx}
     </update>
 
-    <update id="requestAppr" parameterType="NonconformityReportWrtVO">
+    <update id="request" parameterType="NonconformityReportWrtVO">
         UPDATE QT_PITM_ANS_INFO SET
             NON_CFM_APR_REQ_IDX = #{nonCfmAprReqIdx}
         WHERE PLNT_CD = #{plntCd} AND ANS_IDX = #{ansIdx}

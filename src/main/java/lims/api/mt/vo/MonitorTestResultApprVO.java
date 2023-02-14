@@ -1,5 +1,6 @@
 package lims.api.mt.vo;
 
+import lims.api.common.domain.UpdateDetect;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -7,7 +8,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class MonitorTestResultApprVO {
+public class MonitorTestResultApprVO implements UpdateDetect {
     private int mitmReqIdx; //모니터링항목 의뢰 IDX
     private int mitmSpecIdx; //모니터링항목 규격서 IDX
     private int aitmSpecIdx; //시험항목 규격 IDX
@@ -24,7 +25,10 @@ public class MonitorTestResultApprVO {
     private String ansNo; //시험번호
     private String assNo; //지시번호
     private String assDt; //지시일자
+    private String revwCmmt;
     private String mitmCd; //모니터링항목
+    private String mitmWrkStudioDiv; //모니터링항목 작업동
+    private String mitmWrkStudioDivNm;
     private String upperMitmWrkPlcDivNm; //모니터링항목 작업소 구분명
     private String upperMitmWrkPlcDiv; //모니터링항목 작업소 구분
     private String mitmWrkPlcDivNm; //모니터링항목 작업실 구분명
@@ -46,6 +50,8 @@ public class MonitorTestResultApprVO {
     private String rjtUnm; //반려자
     private String rjtRea; //반려사유
     private String rjtDs; //반려일시
+    private String wrkDivNm; //작업구분
+    private String sytJdg;
 
     private int rstSeq; //결과 순번
     private String rstProcCd; //결과진행상태

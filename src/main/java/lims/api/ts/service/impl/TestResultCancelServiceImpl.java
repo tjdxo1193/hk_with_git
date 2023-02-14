@@ -115,6 +115,7 @@ public class TestResultCancelServiceImpl implements TestResultCancelService {
         }
         InterfaceSendVO.TestStatus data = InterfaceSendVO.TestStatus.builder()
                 .lotNo(item.getLotNo())
+                .splLotNo(item.getSplLotNo())
                 .batchNo(item.getBatchNo())
                 .holdReason(reason)
                 .status(process)

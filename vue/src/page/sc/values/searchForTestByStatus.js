@@ -36,7 +36,7 @@ const searchGridWithForm = {
         async: () => api.combo.systemCommon.getAnsProcCombo(),
       })
       .Select('SytJdg', '결과판정', {
-        async: () => api.combo.systemCommon.getSytTypCombo(),
+        async: () => api.combo.systemCommon.getSytJdgCombo(),
       })
       .Input('pitmNm', '품목명')
       .Input('ansNo', '시험번호')
@@ -62,7 +62,7 @@ const searchGridWithForm = {
       .col('pitmNm', '품목명')
       .col('lotNo', '제조번호')
       .combo('sytJdg', '결과판정', {
-        async: () => api.combo.systemCommon.getSytTypCombo(),
+        async: () => api.combo.systemCommon.getSytJdgCombo(),
       })
       .col('revwCmmt', '검토의견')
       .col('assSpcc', '시험지시특이사항', { width: 120 })

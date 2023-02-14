@@ -62,7 +62,7 @@ const qmPkgaList = {
     FormBuilder.builder()
       .Input('sapPrdha', '자재 계층 코드', { maxLength: 80 })
       .Input('docNo', '문서번호', { maxLength: 80 })
-      .Select('pkgaDiv', '자재 유형', {
+      .Select('pkgaDiv', '자재계층관리 구분', {
         async: () => api.combo.systemCommon.getPackageDivCombo(),
       })
       .RadioGroup('delYn', '사용여부', {
@@ -177,9 +177,11 @@ const versionForm = {
   },
   forms: () =>
     FormBuilder.builder()
-      .Select('pkgaDiv', '자재 유형', {
+      .Select('pkgaDiv', '자재계층관리 구분', {
         async: () => api.combo.systemCommon.getPackageDivCombo(),
       })
+      .required()
+      .Input('pkgaTypNm', '자재 유형', { maxLength: 25 })
       .required()
       .Input('sapPrdha', '자재 계층 코드', { maxLength: 18 })
       .Input('rvsNo', '개정 번호', { maxLength: 6 })
@@ -196,8 +198,8 @@ const versionForm = {
         ],
       })
       .required()
+      .blank()
       .Hidden('aitmSpecVer', '시험항목 규격 버전')
-      .Hidden('pkgaTypNm', '자재 유형')
       .Hidden('rvsReaCd', '개정사유')
       .Hidden('rvsDivPs', '개정구분')
       .Hidden('rvsCtt', '개정 내역')
@@ -213,7 +215,7 @@ const versionForm = {
       .build(),
 };
 
-const versionFormRequiredList = ['pkgaDiv', 'sapPrdha', 'delYn'];
+const versionFormRequiredList = ['pkgaDiv', 'pkgaTypNm', 'sapPrdha', 'delYn'];
 
 const tabs = {
   tabs: [

@@ -7,9 +7,7 @@ import lims.api.sc.service.InspectPurchasingPerformanceService;
 import lims.api.sc.vo.InspectPurchasingPerformanceVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -26,9 +24,30 @@ public class InspectPurchasingPerformanceController {
         return ResponseEntity.ok(service.find(request));
     }
 
-    @GetMapping("/detail")
-    public ResponseEntity<List<InspectPurchasingPerformanceVO>> getDetail(@AuthToken Token token, InspectPurchasingPerformanceVO request) {
-        request.setPlntCd(jwtResolver.getPlantCode(token.getJwt()));
-        return ResponseEntity.ok(service.findDetail(request));
+    @GetMapping("/{plntCd}/{mtrCd}/{phsOrderNo}/{etrDt}")
+    public ResponseEntity<List<InspectPurchasingPerformanceVO>> getDetail(@PathVariable String plntCd, @PathVariable String mtrCd
+        ,@PathVariable String phsOrderNo, @PathVariable String etrDt) {
+        return ResponseEntity.ok(service.findDetail(plntCd, mtrCd, phsOrderNo, etrDt));
     }
+
+    @GetMapping("/{ispPhsPfaIdx}")
+    public ResponseEntity<List<InspectPurchasingPerformanceVO>> getRecord(@PathVariable Integer ispPhsPfaIdx) {
+        return ResponseEntity.ok(service.getRecord(ispPhsPfaIdx));
+    }
+
+    @PostMapping
+    public ResponseEntity<String> send(@AuthToken Token token, @RequestBody List<InspectPurchasingPerformanceVO> list) {
+        String userId = getAuthUserId(token);
+        for (InspectPurchasingPerformanceVO param : list) {
+            param.setHoprIfUid(userId);
+        }
+        return ResponseEntity.ok(service.send(list));
+    }
+
+    private String getAuthUserId(Token token) {
+        String jwt = token.getJwt();
+        return jwtResolver.getUserId(jwt);
+    }
+
+
 }

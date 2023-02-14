@@ -168,6 +168,12 @@ export default {
       if (event.type === 'change' && event.item.name === 'upperMitmPitmDiv') {
         this.setSelectByUpperCd(forms, value, 'mitmPitmDiv');
       }
+      if (event.type === 'change' && event.item.name === 'mitmWrkStudioDiv') {
+        this.setSelectByUpperCd(forms, value, 'upperMitmWrkPlcDiv');
+      }
+      if (event.type === 'change' && event.item.name === 'upperMitmWrkPlcDiv') {
+        this.setSelectByUpperCd(forms, value, 'mitmWrkPlcDiv');
+      }
     },
     onClickButton({ name }) {
       if (name === 'select') {
@@ -196,6 +202,7 @@ export default {
       }
     },
     init() {
+      this.itemList.forms = values.itemList.forms();
       this.itemList.$grid.clearGridData();
       this.disableButtons([
         'resultHistory',
@@ -284,6 +291,9 @@ export default {
       if (!this.isCompletedInputForReview()) {
         return this.$warn(this.$message.warn.afterSaveRequestReview);
       }
+      if (!this.hasNonResultJudge()) {
+        return this.$warn(this.$message.warn.noResultJudge);
+      }
       return this.showModal('requestReviewerModal');
     },
 
@@ -326,6 +336,10 @@ export default {
       return this.save();
     },
 
+    hasNonResultJudge() {
+      const item = FormUtil.getData(this.itemList.forms);
+      return StringUtil.isNotEmpty(item.sytJdg);
+    },
     /* judge */
     judgementTypeCheck({ item }) {
       /**
@@ -373,6 +387,7 @@ export default {
     numericExceedTypeJdg(item) {
       const ownType = 'S0060001';
       const permissionType = 'S0060002';
+      let slvLow, slvUpp, slvLowEtc, slvUppEtc, rstJdgEtc;
 
       if (
         item.specTyp === ownType &&
@@ -395,22 +410,30 @@ export default {
         return this.$warn(message);
       }
 
-      let slvLow, slvUpp;
       if (item.specTyp === ownType) {
         slvLow = item.owcSlvLow;
         slvUpp = item.owcSlvUpp;
+        slvLowEtc = item.perSlvLow;
+        slvUppEtc = item.perSlvUpp;
       } else {
         slvLow = item.perSlvLow;
         slvUpp = item.perSlvUpp;
+        slvLowEtc = item.owcSlvLow;
+        slvUppEtc = item.owcSlvUpp;
       }
 
+      rstJdgEtc = this.setJudgmentExceedValue(item, slvLowEtc, slvUppEtc);
       const markVal = this.setNumericTypeMarkVal(item);
       const updateData = {
         _$uid: item._$uid,
         markVal,
         rstJdg: this.setJudgmentExceedValue(item, slvLow, slvUpp),
+        rstJdgEtc: rstJdgEtc,
       };
       this.itemList.$grid.updateRowsById(updateData);
+      if (rstJdgEtc === 'S0120002') {
+        this.$warn('기타 규격 판정이 부적합입니다.');
+      }
     },
     setJudgmentExceedValue(item, slvLow, slvUpp) {
       /**
@@ -446,6 +469,7 @@ export default {
     numericMoreThanTypeJdg(item) {
       const ownType = 'S0060001';
       const permissionType = 'S0060002';
+      let slvLow, slvUpp, slvLowEtc, slvUppEtc, rstJdgEtc;
 
       if (
         item.specTyp === ownType &&
@@ -468,22 +492,30 @@ export default {
         return this.$warn(message);
       }
 
-      let slvLow, slvUpp;
       if (item.specTyp === ownType) {
         slvLow = item.owcSlvLow;
         slvUpp = item.owcSlvUpp;
+        slvLowEtc = item.perSlvLow;
+        slvUppEtc = item.perSlvUpp;
       } else {
         slvLow = item.perSlvLow;
         slvUpp = item.perSlvUpp;
+        slvLowEtc = item.owcSlvLow;
+        slvUppEtc = item.owcSlvUpp;
       }
 
+      rstJdgEtc = this.setJudgmentMoreThanValue(item, slvLowEtc, slvUppEtc);
       const markVal = this.setNumericTypeMarkVal(item);
       const updateData = {
         _$uid: item._$uid,
         markVal,
         rstJdg: this.setJudgmentMoreThanValue(item, slvLow, slvUpp),
+        rstJdgEtc: rstJdgEtc,
       };
       this.itemList.$grid.updateRowsById(updateData);
+      if (rstJdgEtc === 'S0120002') {
+        this.$warn('기타 규격 판정이 부적합입니다.');
+      }
     },
     setJudgmentMoreThanValue(item, slvLow, slvUpp) {
       /**

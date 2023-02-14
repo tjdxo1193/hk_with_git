@@ -170,7 +170,7 @@ const registerForm = {
       })
       .Datepicker('etrDt', '입고일자', { value: todayDate })
       .Datepicker('istDt', '설치일자', { value: todayDate })
-      .Datepicker('dpsDt', '폐기일자', { value: todayDate })
+      .Datepicker('dpsDt', '폐기일자')
       .Datepicker('qualAprDt', 'Qual승인일자', { value: todayDate })
       .Datepicker('calAprDt', 'Cal승인일자', { value: todayDate })
       .Datepicker('rglChkAprDt', '정기점검승인일자', { value: todayDate })

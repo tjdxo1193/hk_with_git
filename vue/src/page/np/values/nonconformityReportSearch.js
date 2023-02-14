@@ -30,9 +30,11 @@ const list = {
       })
       .Input('pitmCd', '품목코드')
       .Input('pitmNm', '품목명')
+      .Select('nonCfmProcCd', '진행상태', {
+        async: () => api.combo.systemCommon.getNonCfmProcCombo(),
+      })
       .Input('ansNo', '시험번호')
       .Input('lotNo', '제조번호')
-      .Input('assNo', '지시번호')
       .DatepickerTwinWithSwitch('searchReqDt', '의뢰일', {
         value: [weekAgoDate, todayDate],
       })
@@ -45,6 +47,7 @@ const list = {
       .col('fileIdx', false)
       .col('fileCnt', '첨부파일', { colSpan: 2, width: 50 })
       .button('fileAttacher', '첨부', { width: 50 })
+      .col('nonCfmProcNm', '부적합통보서진행상태', { width: 80 })
       .col('rcpDt', '접수일자')
       .col('emgYn', '긴급')
       .col('ansNo', '시험번호', { width: 90 })
@@ -101,8 +104,8 @@ const testInfo = {
       .Hidden('phsOrderItm', '구매오더항목')
       .Input('pitmTyp', '품목구분', { readonly: true })
       .Input('pitmNm', '품목명', { readonly: true })
-      .Input('pitmNm', '품목코드', { readonly: true })
-      .Input('splLotNo', '자재코드', { readonly: true })
+      .Input('pitmCd', '품목코드', { readonly: true })
+      .Input('mtrCd', '자재코드', { readonly: true })
       .Input('ispReqNo', '검사요청번호', { readonly: true })
       .Input('ansNo', '시험번호', { readonly: true })
       .Input('reqDt', '의뢰일자', { readonly: true })

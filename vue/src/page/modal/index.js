@@ -11,10 +11,12 @@ import InputReasonForItemReviseModal from './InputReasonForItemReviseModal';
 import InputReasonModal from './InputReasonModal';
 import InstrumentHistoryRegisterModal from './InstrumentHistoryRegisterModal';
 import InstrumentSearchModal from './InstrumentSearchModal';
+import InterfaceRecordModal from './InterfaceRecordModal';
 import ItemManageFileAttacherModal from './ItemManageFileAttacherModal';
 import ItemModal from './ItemModal';
 import ItemsByTestMethodModal from './ItemsByTestMethodModal.vue';
 import ItemsCopyByTestMethodModal from './ItemsCopyByTestMethodModal.vue';
+import LabelListModal from './LabelListModal';
 import NonconformityTestModal from './NonconformityTestModal';
 import PackagingItemModal from './PackagingItemModal';
 import PackingSpecificationModal from './PackingSpecificationModal';
@@ -40,6 +42,7 @@ import TestMaterialItemModal from './TestMaterialItemModal';
 import TestMaterialOpenItemModal from './TestMaterialOpenItemModal';
 import TestModal from './TestModal';
 import TestSearchModal from './TestSearchModal.vue';
+import ToDoListModal from './ToDoListModal';
 import TreeCommonCodeModal from './TreeCommonCodeModal';
 
 export {
@@ -86,4 +89,7 @@ export {
   InputReasonForDeleteModal,
   InputPerformanceModal,
   ElnSpecCopyForTestMethodModal,
+  LabelListModal,
+  InterfaceRecordModal,
+  ToDoListModal,
 };

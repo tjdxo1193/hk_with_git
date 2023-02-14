@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -17,7 +18,7 @@ public class InspectPurchasingPerformanceVO {
     private String mtrCd;
     private String mtrNm;
     private String batchNo;
-    private String etrQty;
+    private Integer etrQty;
     private String inpUnit;
     private String savePla;
     private String etrDt;
@@ -62,15 +63,27 @@ public class InspectPurchasingPerformanceVO {
     private String addCol5;
     private String udtDs;
     private String revDs;
+    private Integer ispPhsPfaIdx;
+    private Integer srlNo;
+    private String ifMtdDiv;
+    private String ifStt;
+    private String hoprIfUid;
+    private Date ifDs;
+    private String ifDate;
+    private Integer ifInfoIdx;
+    private Integer degree;
 
     /* 별칭 */
+    private String plntNm;
     private String pitmCd;
     private String pitmNm;
     private List<String>ispReqDtList = new ArrayList<>();
     private String fiscalYr;
     private String month;
+    private String pitmTyp;
     private String pitmTypNm;
     private String ispScr;
-    private String ispPfaCanlYn;
-    private String ispPfaIfDs;
+    private String ifSttNm;
+    private String ifMtdDivNm;
+    private String hoprIfNm;
 }

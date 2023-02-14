@@ -3,35 +3,66 @@
 <mapper namespace="lims.api.tp.dao.SampleDisApprDao">
     <select id="find" parameterType="SampleDisApprVO" resultType="SampleDisApprVO">
         SELECT QSM.PLNT_CD,
-               QSM.SMP_MNG_IDX,
-               QSM.SMP_DPS_PROC,
-               QSM.PITM_TYP,
-               QSM.PITM_CD,
-               QSM.PITM_NM,
-               QSM.ANS_TYP,
-               QSM.ANS_IDX,
-               QSM.SMP_DIV_CD,
-               QSM.MNG_SMP_VOL,
-               QSM.SMP_STRG_MTD,
-               QSM.SMP_VOL_UNIT,
-               QSM.LOT_NO,
-               QSM.BATCH_NO,
-               QSM.INP_UNIT,
-               QSM.MAK_DT,
-               QSM.STRG_LMT,
-               QSM.USE_LMT,
-               QSM.IRG_YN,
-               QSM.SMP_RMK,
-               QSM.DPS_EXP_DT,
-               QSM.DPS_FIX_DT,
-               QSM.SMP_DPS_APR_IDX,
-               QSM.SMP_ETR_DT
+        QSM.SMP_MNG_IDX,
+        QSM.SMP_DPS_PROC,
+        (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.SMP_DPS_PROC) AS SMP_DPS_NM,
+        QSM.PITM_TYP,
+        (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.PITM_TYP) AS PITM_TYP_NM,
+        QSM.PITM_CD,
+        QSM.PITM_NM,
+        QSM.ANS_TYP,
+        (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.ANS_TYP) AS ANS_TYP_NM,
+        QSM.ANS_IDX,
+        QSM.SMP_DIV_CD,
+        (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.SMP_DIV_CD) AS SMP_DIV_NM,
+        QSM.MNG_SMP_VOL,
+        QSM.SMP_STRG_MTD,
+        QSM.SMP_VOL_UNIT,
+        QSM.LOT_NO,
+        QSM.BATCH_NO,
+        QSM.INP_UNIT,
+        QSM.MAK_DT,
+        QSM.STRG_LMT,
+        QSM.USE_LMT,
+        QSM.IRG_YN,
+        QSM.SMP_RMK,
+        QSM.DPS_EXP_DT,
+        QSM.DPS_FIX_DT,
+        QSM.SMP_DPS_APR_IDX,
+        QSM.SMP_ETR_DT,
+        QPAP.ANS_NO
         FROM QS_SMP_MNG QSM
-                 LEFT JOIN SY_APR_INFO SAI ON QSM.PLNT_CD = SAI.PLNT_CD AND QSM.SMP_DPS_APR_IDX = SAI.APR_IDX
+        JOIN SY_APR_INFO SAI ON QSM.PLNT_CD = SAI.PLNT_CD AND QSM.SMP_DPS_APR_IDX = SAI.APR_IDX
+        JOIN QT_PITM_ANS_INFO QPAI on QSM.PLNT_CD = QPAI.PLNT_CD and QSM.ANS_IDX = QPAI.ANS_IDX
+        JOIN QT_PITM_ANS_PROC QPAP on QPAI.PLNT_CD = QPAP.PLNT_CD and QPAI.ANS_IDX = QPAP.ANS_IDX
         WHERE QSM.PLNT_CD = #{plntCd}
-          AND QSM.DEL_YN = 'N'
-          AND QSM.SMP_DPS_PROC IN ('S0270400', 'S0270600')
-          AND SAI.APR_UID = #{aprUid}
+        AND QSM.DEL_YN = 'N'
+        AND QSM.SMP_DPS_PROC IN ('S0270400', 'S0270600')
+        AND SAI.APR_UID = #{aprUid}
+        <if test="smpDivCd != ''">
+            AND QSM.SMP_DIV_CD = #{smpDivCd}
+        </if>
+        <if test="pitmCd != ''">
+            AND QSM.PITM_CD LIKE '%' || UPPER(#{pitmCd}) || '%'
+        </if>
+        <if test="pitmTyp != ''">
+            AND QSM.PITM_TYP = #{pitmTyp}
+        </if>
+        <if test="lotNo != ''">
+            AND QSM.LOT_NO LIKE '%' || UPPER(#{lotNo}) || '%'
+        </if>
+        <if test="batchNo != ''">
+            AND QSM.BATCH_NO LIKE '%' || UPPER(#{batchNo}) || '%'
+        </if>
+        <if test="pitmNm != ''">
+            AND QSM.PITM_NM LIKE '%' || UPPER(#{pitmNm}) || '%'
+        </if>
+        <if test="dpsExpDtList.size() > 0">
+            AND QSM.DPS_EXP_DT BETWEEN TO_DATE(#{dpsExpDtList[0]}) AND TO_DATE(#{dpsExpDtList[1]})
+        </if>
+        <if test="smpEtrDtList.size() > 0">
+            AND QSM.SMP_ETR_DT BETWEEN TO_DATE(#{smpEtrDtList[0]}) AND TO_DATE(#{smpEtrDtList[1]})
+        </if>
         ORDER BY QSM.SMP_MNG_IDX DESC
     </select>
 
@@ -45,9 +76,10 @@
 
     <update id="reject" parameterType="SampleDisApprVO">
         UPDATE QS_SMP_MNG
-        SET RJT_UID = #{rjtUid},
-            RJT_REA = #{rjtRea},
-            RJT_DS  = SYSDATE
+        SET RJT_UID      = #{rjtUid},
+            RJT_REA      = #{rjtRea},
+            RJT_DS       = SYSDATE,
+            SMP_DPS_PROC = #{smpDpsProc}
         WHERE PLNT_CD = #{plntCd}
           AND SMP_MNG_IDX = #{smpMngIdx}
     </update>

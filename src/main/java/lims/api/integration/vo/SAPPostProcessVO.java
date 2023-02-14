@@ -150,6 +150,7 @@ public class SAPPostProcessVO {
             private String prbInYn;
             private String prbFeYn;
             private String pnxFeYn;
+            private String useTrm;
         }
 
         @Getter
@@ -267,6 +268,10 @@ public class SAPPostProcessVO {
             private String phsUnitPre;
             private String amtUnit;
             private String currCd;
+
+            public void setReqIdx(Integer reqIdx) {
+                this.reqIdx = reqIdx;
+            }
         }
 
         @Getter

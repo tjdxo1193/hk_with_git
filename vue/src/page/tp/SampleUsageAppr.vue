@@ -31,6 +31,11 @@ export default {
         ...sampleUsageGrid.static,
         forms: sampleUsageGrid.forms(),
         columns: sampleUsageGrid.columns(),
+        event: {
+          cellDoubleClick: (event) => {
+            this.setDataToForm(event.item);
+          },
+        },
       },
       inputForm: {
         ...inputForm.static,
@@ -42,7 +47,9 @@ export default {
     };
   },
   methods: {
-    init() {},
+    init() {
+      this.inputForm.forms = values.inputForm.forms();
+    },
     async fetchSampleUsageGrid() {
       const param = FormUtil.getData(this.sampleUsageGrid.forms);
       const { $grid } = this.sampleUsageGrid;
@@ -58,10 +65,12 @@ export default {
       await this.$eSign(() => this.$axios.put('/tp/sampleUsageAppr/approve', param))
         .then(() => {
           this.$info(this.$message.info.approve);
-          this.fetchSearchGrid();
-          this.initForms();
+          this.fetchSampleUsageGrid();
+          this.init();
         })
-        .catch(() => this.$error(this.$message.error.updateData));
+        .catch(() => {
+          this.$error(this.$message.error.updateData);
+        });
     },
     async reject({ rjtRea }) {
       const { $grid } = this.sampleUsageGrid;
@@ -76,19 +85,21 @@ export default {
           this.fetchSampleUsageGrid();
           this.init();
         })
-        .catch(() => {
-          this.$error(this.$message.error.saveData);
-        });
+        .catch(() => this.$error(this.$message.error.saveData));
+    },
+    setDataToForm(data) {
+      const { forms, buttons } = this.inputForm;
+      FormUtil.setData(forms, data);
+      FormUtil.disableButtons(buttons, ['save']);
+      FormUtil.enableButtons(buttons, ['update', 'delete']);
     },
     onClickSampleUsageGridButton({ name }) {
+      const { $grid } = this.sampleUsageGrid;
+      const checkedRow = $grid.getCheckedRowItems();
       if (name === 'search') {
         this.fetchSampleUsageGrid();
         this.init();
       }
-    },
-    onClickInputFormButtons({ name }) {
-      const { $grid } = this.sampleUsageGrid;
-      const checkedRow = $grid.getCheckedRowItems();
       if (name === 'approve') {
         if (checkedRow.length > 0) {
           this.approve(checkedRow);
@@ -102,6 +113,12 @@ export default {
         } else {
           this.$warn(this.$message.warn.unSelectedData);
         }
+      }
+    },
+    onClickInputFormButtons({ name }) {
+      const { forms } = this.inputForm;
+      if (name === 'init') {
+        this.init();
       }
     },
     showModal(name) {

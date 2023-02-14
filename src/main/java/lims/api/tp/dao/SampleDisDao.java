@@ -2,7 +2,6 @@ package lims.api.tp.dao;
 
 import lims.api.common.domain.AuditEvent;
 import lims.api.tp.entity.QsSmpMng;
-import lims.api.tp.entity.QsSmpUse;
 import lims.api.tp.vo.SampleDisVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;

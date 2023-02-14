@@ -116,6 +116,9 @@ export default {
       if (event.type === 'keydown' && event.originEvent.key === 'Enter') {
         this.getMonitorTestReceipt();
       }
+      if (event.type === 'change' && event.item.name === 'upperMitmPitmDiv') {
+        this.setSelectByUpperCd(forms, value, 'mitmPitmDiv');
+      }
       if (event.type === 'change' && event.item.name === 'mitmWrkStudioDiv') {
         this.setSelectByUpperCd(forms, value, 'upperMitmWrkPlcDiv');
       }

@@ -50,8 +50,10 @@ public class InstHisManageVO implements UpdateDetect {
 	private String rgtDt;
 	private String ansDt;
 	private String rmk;
+	private String aprDs;
 	private Integer hisFileIdx;
 	private ApproveVO approveInfo;
+	private List<String> searchEqmHisAprDt;
 	private List<MultipartFile> addedFiles = new ArrayList<>();
 	private List<FileKey> removedFileIds = new ArrayList<>();
 }

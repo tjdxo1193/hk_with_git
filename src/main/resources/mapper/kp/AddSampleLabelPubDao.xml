@@ -7,27 +7,48 @@
                QASM.ANS_IDX,
                QASM.SMP_MNG_IDX,
                QASM.ADD_SMP_PROC,
-               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QASM.ADD_SMP_PROC) AS ADD_SMP_NM,
+               (SELECT SCD.DTL_NM FROM SY_CD_DTL SCD WHERE SCD.PLNT_CD = QASM.PLNT_CD AND SCD.DTL_CD = QASM.ADD_SMP_PROC) AS ADD_SMP_PROC_NM,
                QASM.PITM_TYP,
-               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QASM.PITM_TYP)     AS PITM_TYP_NM,
+               (SELECT SCD.DTL_NM FROM SY_CD_DTL SCD WHERE SCD.PLNT_CD = QASM.PLNT_CD AND SCD.DTL_CD = QASM.PITM_TYP)     AS PITM_TYP_NM,
                QASM.PITM_CD,
                QASM.PITM_NM,
                QASM.ANS_TYP,
-               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QASM.ANS_TYP)      AS ANS_TYP_NM,
+               (SELECT SCD.DTL_NM FROM SY_CD_DTL SCD WHERE SCD.PLNT_CD = QASM.PLNT_CD AND SCD.DTL_CD = QASM.ANS_TYP)      AS ANS_TYP_NM,
                QASM.LOT_NO,
                QASM.BATCH_NO,
                QASM.INP_UNIT,
                QASM.REQ_SMP_VOL,
                QASM.SMP_REQ_REA,
-               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QASM.SMP_REQ_REA)  AS SMP_REQ_REA_NM,
+               (SELECT SCD.DTL_NM FROM SY_CD_DTL SCD WHERE SCD.PLNT_CD = QASM.PLNT_CD AND SCD.DTL_CD = QASM.SMP_REQ_REA)  AS SMP_REQ_REA_NM,
                QASM.SMP_REQ_REA_DTL,
                QASM.LABEL_CD,
                QASM.ADD_SMP_APR_REQ_IDX,
-               QASM.SMP_REQ_DT
+               QASM.SMP_REQ_DT,
+               QPAP.ANS_NO
         FROM QS_ADD_SMP_MNG QASM
+            INNER JOIN QT_PITM_ANS_PROC QPAP
+                ON(QASM.PLNT_CD = QPAP.PLNT_CD AND QASM.ANS_IDX = QPAP.ANS_IDX)
         WHERE QASM.DEL_YN = 'N'
-          AND QASM.PLNT_CD = #{plntCd}
-          AND QASM.ADD_SMP_PROC = #{addSmpProc}
+            AND QASM.PLNT_CD = #{plntCd}
+            AND QASM.ADD_SMP_PROC = #{addSmpProc}
+            <if test="pitmNm != null and pitmNm != ''">
+                AND UPPER(QASM.PITM_NM) LIKE UPPER('%' || #{pitmNm} || '%')
+            </if>
+            <if test="pitmCd != null and pitmCd != ''">
+                AND UPPER(QASM.PITM_CD) LIKE UPPER('%' || #{pitmCd} || '%')
+            </if>
+            <if test="lotNo != null and lotNo != ''">
+                AND UPPER(QASM.LOT_NO) LIKE UPPER('%' || #{lotNo} || '%')
+            </if>
+            <if test="batchNo != null and batchNo != ''">
+                AND UPPER(QASM.BATCH_NO) LIKE UPPER('%' || #{batchNo} || '%')
+            </if>
+            <if test="batchNo != null and batchNo != ''">
+                AND UPPER(QASM.BATCH_NO) LIKE UPPER('%' || #{batchNo} || '%')
+            </if>
+            <if test="searchSmpReqDt != null and searchSmpReqDt != ''">
+                AND QASM.SMP_REQ_DT BETWEEN #{searchSmpReqDt[0]} AND #{searchSmpReqDt[1]}
+            </if>
         ORDER BY QASM.ADD_SMP_IDX DESC
     </select>
 </mapper>

@@ -32,7 +32,7 @@ const commonCode = {
         list: useYnCombo,
         width: '8%',
       })
-      .col('treeCdOrd', '정렬 순서', { width: '8%' })
+      .col('treeCdOrd', '정렬 순서', false, { width: '8%' })
       .col('treeRmk', '비고')
       .col('treeCd', '코드', false)
       .col('hirTreeCd', '상위 코드', false)

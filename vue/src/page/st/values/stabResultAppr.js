@@ -8,7 +8,6 @@ const searchForm = {
   static: {
     title: '조회',
     countPerRow: 4,
-    data: [],
     buttons: [{ name: 'search', label: '조회' }],
   },
   forms: () =>

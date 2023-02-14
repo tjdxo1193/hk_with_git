@@ -368,7 +368,7 @@ public class SAPMaterialPostProcessor implements PostProcessor {
                 .pitmCd(pitmCode)
                 .pitmVer(version)
                 .brdAbbr(zmdvMap.get(MaterialCharCode.BRD_ABBR))
-                .etrCtnQty(zmdvMap.get(MaterialCharCode.ETR_CTN_QTY))
+                .useTrm(zmdvMap.get(MaterialCharCode.USE_TRM))
                 .nbr(zmdvMap.get(MaterialCharCode.NBR))
                 .ftnYn(zmdvMap.get(MaterialCharCode.FTN_YN))
                 .pcs01(zmdvMap.get(MaterialCharCode.PCS01))

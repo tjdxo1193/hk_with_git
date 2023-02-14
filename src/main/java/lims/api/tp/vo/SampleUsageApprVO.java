@@ -67,4 +67,5 @@ public class SampleUsageApprVO {
     private String useNm;
     private String pitmTypNm;
     private String ansNo;
+    private String smpDivNm;
 }

@@ -14,6 +14,7 @@ public class MonitorManageVO implements UpdateDetect {
     private String point;           // 포인트
     private String roomno;          //
     private String grade;           //
+    private String wrkDiv;
     private String ansStrDt;        // 시험 시작 일자
     private String ansCylCd;        // 시험 주기 코드
     private String crgDptCd;        // 담당 부서 코드
@@ -31,4 +32,9 @@ public class MonitorManageVO implements UpdateDetect {
     private String mitmWrkPlcNm;      // 모니터링 작업실 이름
     private String ansCylNm;        // 시험 주기 이름
     private String crgDptNm;        // 담당 부서 이름
+    private String gradeNm;         // grade 구분 이름
+    private String wrkDivNm;        // 작업 구분 이름
+    private String upperMitmPitmCd;
+    private String upperMitmPitmNm;
+
 }

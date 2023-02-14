@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 import spring.audit.type.CommandType;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 public class AuditRecordData {
@@ -13,5 +15,6 @@ public class AuditRecordData {
     private String label;
     private AuditRowData beforeData;
     private AuditRowData afterData;
+    private LocalDateTime updatedDate;
 
 }

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.st.dao.StabSampleDisDao">
+    <select id="find" parameterType="StabSampleDisVO" resultType="StabSampleDisVO">
+        SELECT QSM.PLNT_CD,
+               QSM.SMP_MNG_IDX,
+               QSM.SMP_DPS_PROC,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.SMP_DPS_PROC)                         AS SMP_DPS_NM,
+               QSM.PITM_TYP,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.PITM_TYP)                             AS PITM_TYP_NM,
+               QSM.PITM_CD,
+               QSM.PITM_NM,
+               QSM.ANS_TYP,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.ANS_TYP)                              AS ANS_TYP_NM,
+               QSM.ANS_IDX,
+               QSM.SMP_DIV_CD,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.SMP_DIV_CD)                           AS SMP_DIV_NM,
+               QSM.MNG_SMP_VOL,
+               QSM.SMP_STRG_MTD,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = #{plntCd} AND DTL_CD = QSM.SMP_STRG_MTD) AS STRG_MTD_NM,
+               QSM.SMP_VOL_UNIT,
+               QSM.LOT_NO,
+               QSM.BATCH_NO,
+               QSM.INP_UNIT,
+               QSM.MAK_DT,
+               QSM.STRG_LMT,
+               QSM.USE_LMT,
+               QSM.IRG_YN,
+               QSM.SMP_RMK,
+               QSM.DPS_EXP_DT,
+               QSM.DPS_FIX_DT,
+               QSM.SMP_DPS_APR_IDX,
+               QSM.DPS_REA,
+               QSM.DPS_CANL_REA,
+               QSM.RJT_UID,
+               (SELECT USER_NM FROM SY_USER WHERE PLNT_CD = #{plntCd} AND USER_ID = QSM.RJT_UID)      AS RJT_NM,
+               QSM.RJT_DS,
+               QSM.RJT_REA,
+               QSM.DPS_YN,
+               QSM.SMP_ETR_DT,
+               QS.SUM_VOL,
+               QS.REMAINS
+        FROM QS_SMP_MNG QSM
+                 JOIN (SELECT QSU.PLNT_CD,
+                              QSU.SMP_MNG_IDX,
+                              QSM.MNG_SMP_VOL,
+                              SUM(USE_SMP_VOL)                   AS SUM_VOL,
+                              QSM.MNG_SMP_VOL - SUM(USE_SMP_VOL) AS REMAINS
+                       FROM QS_SMP_USE QSU
+                                LEFT JOIN QS_SMP_MNG QSM
+                                          ON QSU.PLNT_CD = QSM.PLNT_CD and QSU.SMP_MNG_IDX = QSM.SMP_MNG_IDX
+                       WHERE QSU.DEL_YN = 'N'
+                         AND QSM.PLNT_CD = #{plntCd}
+                         AND QSM.ANS_TYP = 'S0230004'
+                         AND QSM.SMP_DIV_CD = 'S0260001'
+                         AND QSM.SMP_DPS_PROC IN ('S0270300', 'S0270310', 'S0270500', 'S0270510', 'S0270700')
+                       GROUP BY QSU.PLNT_CD, QSU.SMP_MNG_IDX, QSM.MNG_SMP_VOL) QS
+                      ON QS.PLNT_CD = QSM.PLNT_CD AND QS.SMP_MNG_IDX = QSM.SMP_MNG_IDX
+        WHERE QSM.PLNT_CD = #{plntCd}
+          AND QSM.DEL_YN = 'N'
+          AND QSM.ANS_TYP = 'S0230004'
+          AND QSM.SMP_DIV_CD = 'S0260001'
+          AND QSM.SMP_DPS_PROC IN ('S0270300', 'S0270310', 'S0270500', 'S0270510', 'S0270700')
+    </select>
+
+
+    <update id="requestDispose" parameterType="StabSampleDisVO">
+        UPDATE QS_SMP_MNG
+        SET SMP_DPS_PROC    = 'S0270400',
+            SMP_DPS_APR_IDX = #{smpDpsAprIdx}
+        WHERE PLNT_CD = #{plntCd}
+          AND SMP_MNG_IDX = #{smpMngIdx}
+    </update>
+
+    <update id="requestCancelDispose" parameterType="StabSampleDisVO">
+        UPDATE QS_SMP_MNG
+        SET SMP_DPS_PROC    = 'S0270600',
+            SMP_DPS_APR_IDX = #{smpDpsAprIdx}
+        WHERE PLNT_CD = #{plntCd}
+          AND SMP_MNG_IDX = #{smpMngIdx}
+    </update>
+</mapper>

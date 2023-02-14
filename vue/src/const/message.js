@@ -16,6 +16,7 @@ export default {
     pleaseSelectPlant: '플랜트를 선택해주세요.',
     pleaseSelectEmgYN: '긴급여부를 선택해주세요.',
     requireTestSample: '시험검체량은 0 또는 빈값을 입력할 수 없습니다.',
+    invalidInputDateValue: '날짜형식이 맞지 않습니다.',
   },
 
   eSign: {
@@ -48,6 +49,8 @@ export default {
     published: '발행되었습니다.',
     stopRequest: '중단요청되었습니다.',
     stopCancelRequest: '중단취소요청되었습니다.',
+    sended: '전송되었습니다.',
+    createdRequest: '완료되었습니다. 해당하는 시험이 없는 경우 생성된 사항이 없을 수 있습니다.',
   },
   error: {
     fetchData: '정보를 불러올 수 없습니다.',
@@ -80,6 +83,7 @@ export default {
     pwdIncludeConsecutiveLetter: '비밀번호에 연속된 문자 3개가 있습니다.',
     pwdIncludeResidentRegistrationBackNumber: '비밀번호에 주민등록번호 뒷자리가 포함되어있습니다.',
     isSapPrdhaDuplicate: 'SAP코드가 중복되었습니다.',
+    sended: '전송 도중 오류가 발생했습니다.',
   },
   warn: {
     unSelectedData: '선택된 정보가 없습니다.',
@@ -126,6 +130,7 @@ export default {
     noExceedAnsSmpVol: '안정성검체량을 초과하였습니다',
     noNegativeNumber: '사용검체량은 0이거나 0보다 작을 수 없습니다.',
     noCtrptNo: 'CT성적서 ID가 없습니다.',
+    sameSlvJdg: '기준판정 적합과 부적합 값이 같습니다. 다시 선택해주세요.',
   },
   confirm: {
     saveData: '저장하시겠습니까?',
@@ -145,5 +150,7 @@ export default {
     holdOff: '보류해제하시겠습니까?',
     labEventPublished: '실험실이벤트를 발생하시겠습니까?',
     published: '발행하시겠습니까?',
+    sended: '전송하시겠습니까?',
+    created: '생성하시겠습니까?',
   },
 };

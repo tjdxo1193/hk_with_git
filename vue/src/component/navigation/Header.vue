@@ -7,13 +7,15 @@
     </div>
     <div class="inner">
       <div class="top_menu">
-        <span><a href="#">오늘의 할일</a></span>
+        <span><a @click="toDoList">오늘의 할일</a></span>
         <span><a @click="toAudit">AuditTrail</a></span>
         <span><a @click="changePw">Password change</a></span>
         <span><a @click="logout">LOGOUT</a></span>
       </div>
 
       <PasswordChangeModal :show="passwordChangeModal.show" @close="hidePasswordChangeModal()" />
+
+      <ToDoListModal :show="toDoListModal.show" @close="hideToDoListModal()" />
 
       <div class="user">
         <BreadCrumb />
@@ -25,7 +27,7 @@
 
 <script>
 import { actionType, mutationType } from '@/const';
-import { PasswordChangeModal } from '@/page/modal';
+import { PasswordChangeModal, ToDoListModal } from '@/page/modal';
 import store from '@/store';
 import { TokenUtil } from '@/util';
 
@@ -36,12 +38,15 @@ export default {
   components: {
     BreadCrumb,
     PasswordChangeModal,
+    ToDoListModal,
   },
   data() {
     return {
       name: TokenUtil.myName(),
-
       passwordChangeModal: {
+        show: false,
+      },
+      toDoListModal: {
         show: false,
       },
     };
@@ -49,6 +54,15 @@ export default {
   methods: {
     showPopupToDoList() {},
     resetMenuName() {},
+    toDoList() {
+      this.showToDoListModal();
+    },
+    showToDoListModal() {
+      this.$setState('toDoListModal', { show: true });
+    },
+    hideToDoListModal() {
+      this.$setState('toDoListModal', { show: false });
+    },
     changePw() {
       this.showPasswordChangeModal();
     },

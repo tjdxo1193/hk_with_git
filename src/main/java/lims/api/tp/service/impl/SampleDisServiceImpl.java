@@ -47,7 +47,7 @@ public class SampleDisServiceImpl implements SampleDisService {
             param.setAprReqDiv(ApproveRequestDivision.DISPOSE_SAMPLE.getCode());
             ApproveVO approveInfo = setApproveInfo(param);
             approveService.create(approveInfo);
-            param.setSmpDpsProc(SampleDisposalProgress.APPROVE_DISPOSAL_CANCEL.getCode());
+            param.setSmpDpsProc(SampleDisposalProgress.REQUEST_DISPOSAL_CANCEL.getCode());
             param.setSmpDpsAprIdx(approveInfo.getAprIdx());
             result += dao.requestDis(param);
         }

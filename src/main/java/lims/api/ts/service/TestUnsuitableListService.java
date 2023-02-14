@@ -7,6 +7,4 @@ import java.util.List;
 public interface TestUnsuitableListService {
     List<TestUnsuitableListVO> findAll(TestUnsuitableListVO param);
     List<TestUnsuitableListVO> findResultItem(Integer ansIdx);
-    void save(TestUnsuitableListVO param);
-    void publish(TestUnsuitableListVO param);
 }

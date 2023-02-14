@@ -20,10 +20,14 @@ public class MonitorTestReceiptVO implements UpdateDetect {
     private String ansEdt; //시험 예정일자
     private String reqDs; //의뢰 일시
     private String reqDptNm; //의뢰 부서
+    private String reqRmk;
     private String rcpDt; //접수일자
     private String rcpDs; //접수일시
+    private String rcpRmk;
     private String ansNo; //시험번호
     private String mitmCd; //모니터링항목
+    private String mitmWrkStudioDiv; //모니터링항목 작업동
+    private String mitmWrkStudioDivNm;
     private String upperMitmWrkPlcDivNm; //모니터링항목 작업소 구분명
     private String upperMitmWrkPlcDiv; //모니터링항목 작업소 구분
     private String mitmWrkPlcDivNm; //모니터링항목 작업실 구분명
@@ -31,6 +35,7 @@ public class MonitorTestReceiptVO implements UpdateDetect {
     private String upperMitmPitmDiv; //품목 구분
     private String upperMitmPitmDivNm; //품목 구분명
     private String mitmPitmDivNm; //모니터링항목 품목 구분
+    private String mitmPitmDiv;
     private String point;
     private String roomno;
     private String grade;
@@ -38,6 +43,7 @@ public class MonitorTestReceiptVO implements UpdateDetect {
     private String crgDptCd; //담당 부서
     private String ansCylCd; //시험주기코드
     private String ansCylRuleNm; //시험주기
+    private String wrkDivNm; //작업구분
     private String rcpDptCd; //접수부서
     private String rcpUid; //접수자
 
