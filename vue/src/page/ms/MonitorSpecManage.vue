@@ -17,10 +17,6 @@
     @button-click="onClickBtnEvent"
   />
 
-  <Form-Base v-bind="valueWithMItemSpecList" />
-
-  <Form-Base v-bind="valueWithVersionList" />
-
   <ItemsByTestMethodModal
     :show="itemsByTestMethodModal.show"
     @close="hideItemsByTestMethodModal()"
@@ -51,25 +47,17 @@ export default {
     RequestReviewerModal,
   },
   data() {
-    const {
-      mItemSpecList,
-      versionList,
-      testItemList,
-      valueWithVersionList,
-      valueWithMItemSpecList,
-    } = this.$copy(values);
+    const { mItemSpecList, versionList, testItemList } = this.$copy(values);
     return {
       mItemSpecList: {
         ...mItemSpecList.static,
         forms: mItemSpecList.forms(),
         columns: mItemSpecList.columns(),
         event: {
-          cellDoubleClick: (e) => {
+          cellClick: (e) => {
             this.init();
             this.fetchVersionList(e.item);
             this.settingDepartmentList(e.item);
-            this.setValueWithMItemSpecListHiddenForm(e.item);
-            this.bottomGridSetting($grid);
           },
         },
       },
@@ -77,7 +65,7 @@ export default {
         ...versionList.static,
         columns: versionList.columns(),
         event: {
-          cellDoubleClick: (e) => {
+          cellClick: (e) => {
             this.fetchMItemSpecAItemList(e);
             this.changeButtonWhenSelectedVersion();
           },
@@ -87,7 +75,7 @@ export default {
         ...testItemList.static,
         columns: testItemList.columns(),
         event: {
-          cellDoubleClick: () => {
+          cellClick: () => {
             this.changeButtonWhenSelectedTestItem();
           },
           cellEditBegin: (e) => {
@@ -110,12 +98,6 @@ export default {
       departmentList: {
         list: [],
       },
-      valueWithVersionList: {
-        forms: valueWithVersionList.forms(),
-      },
-      valueWithMItemSpecList: {
-        forms: valueWithMItemSpecList.forms(),
-      },
     };
   },
   methods: {
@@ -136,13 +118,10 @@ export default {
         .then(({ data }) => data);
 
       $grid.setGridData(data);
+
+      this.bottomGridSetting($grid);
     },
-    setValueWithMItemSpecListHiddenForm(item) {
-      FormUtil.setData(this.valueWithMItemSpecList.forms, item);
-    },
-    setValueWithVersionListHiddenForm(item) {
-      FormUtil.setData(this.valueWithMItemSpecList.forms, item);
-    },
+
     bottomGridSetting($grid) {
       if (this.isFirstVersionMode()) {
         this.changeButtonWhenSelectedMItem();
@@ -286,10 +265,12 @@ export default {
       }
     },
     requestReview(popupParam) {
-      const parameter = FormUtil.getData(this.valueWithVersionList.forms);
-      Object.assign(parameter, popupParam);
+      const [selectedItem] = this.versionList.$grid.getSelectedRows();
+      Object.assign(selectedItem, popupParam);
 
-      this.$eSignWithReason(() => this.$axios.put('/ms/monitorSpecManage/requestReview', parameter))
+      this.$eSignWithReason(() =>
+        this.$axios.put('/ms/monitorSpecManage/requestReview', selectedItem),
+      )
         .then(() => {
           this.$info(this.$message.info.reviewRequest);
           this.init();
@@ -300,8 +281,10 @@ export default {
         });
     },
     delete() {
-      const parameter = FormUtil.getData(this.valueWithVersionList.forms);
-      this.$eSignWithReason(() => this.$axios.put('/ms/monitorSpecManage/mSpec/delete', parameter))
+      const [selectedItem] = this.versionList.$grid.getSelectedRows();
+      this.$eSignWithReason(() =>
+        this.$axios.put('/ms/monitorSpecManage/mSpec/delete', selectedItem),
+      )
         .then(() => {
           this.$info(this.$message.info.delete);
           this.init();
@@ -314,7 +297,7 @@ export default {
     addRowVersion() {
       this.versionList.$grid.addRow({
         aitmSpecVer: 1,
-        mitmCd: FormUtil.getData(this.valueWithMItemSpecList.forms).mitmCd ?? '',
+        mitmCd: this.mItemSpecList.$grid.getSelectedRows()[0].mitmCd,
       });
     },
     showItemsByTestMethodModal() {
@@ -356,20 +339,20 @@ export default {
         });
     },
     isTemporaryStorage() {
-      const { specProcCd } = FormUtil.getData(this.valueWithVersionList.forms);
-      return specProcCd == 'S0080100';
+      const selectedItem = this.versionList.$grid.getSelectedRows();
+      return selectedItem[0].specProcCd == 'S0080100';
     },
     isReviewReject() {
-      const { specProcCd } = FormUtil.getData(this.valueWithVersionList.forms);
-      return specProcCd == 'S0080110';
+      const selectedItem = this.versionList.$grid.getSelectedRows();
+      return selectedItem[0].specProcCd == 'S0080110';
     },
     isApproved() {
-      const { specProcCd } = FormUtil.getData(this.valueWithVersionList.forms);
-      return specProcCd == 'S0080400';
+      const selectedItem = this.versionList.$grid.getSelectedRows();
+      return selectedItem[0].specProcCd == 'S0080400';
     },
     isUseVersionY() {
-      const { useVerYn } = FormUtil.getData(this.valueWithVersionList.forms);
-      return useVerYn == 'Y';
+      const selectedItem = this.versionList.$grid.getSelectedRows();
+      return selectedItem[0].useVerYn == 'Y';
     },
     updateVersion() {
       if (this.isNotExistJdgType()) {
@@ -381,9 +364,8 @@ export default {
       }
 
       const gridData = this.testItemList.$grid.getGridData();
-      const { mitmCd, aitmSpecVer, rvsDt, enfoDt, rvsCtt, rvsDivPs, rvsReaCd } = FormUtil.getData(
-        this.valueWithVersionList.forms,
-      );
+      const { mitmCd, aitmSpecVer, rvsDt, enfoDt, rvsCtt, rvsDivPs, rvsReaCd } =
+        this.versionList.$grid.getSelectedRows()[0];
 
       const parameter = gridData.map((row, index) => ({
         ...row,
@@ -419,7 +401,7 @@ export default {
       }
 
       const gridData = this.testItemList.$grid.getGridData();
-      const getSpecInfo = FormUtil.getData(this.valueWithMItemSpecList.forms);
+      const [getSpecInfo] = this.mItemSpecList.$grid.getSelectedRows();
 
       const parameter = gridData.map((row, index) => ({
         ...row,
@@ -447,7 +429,7 @@ export default {
       }
 
       const gridData = this.testItemList.$grid.getGridData();
-      const getVersionInfo = FormUtil.getData(this.valueWithVersionList.forms);
+      const [getVersionInfo] = this.versionList.$grid.getSelectedRows();
       const parameter = gridData.map((row, index) => ({
         ...row,
         aitmSpecIdx: getVersionInfo.aitmSpecIdx,
@@ -465,10 +447,10 @@ export default {
         });
     },
     addRowTestItem(items) {
-      const { aitmSpecIdx } = FormUtil.getData(this.valueWithVersionList.forms);
+      const { aitmSpecIdx } = this.versionList.$grid.getSelectedRows()[0] ?? '';
       this.testItemList.$grid.addRow(
         items.map((row) => ({
-          aitmSpecIdx: aitmSpecIdx ?? '',
+          aitmSpecIdx,
           amitmCd: row.amitmCd,
           aitmKn: row.aitmKn,
           vriaKn: row.vriaKn,
