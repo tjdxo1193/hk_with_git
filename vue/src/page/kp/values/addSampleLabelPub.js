@@ -42,6 +42,7 @@ const sampleGrid = {
     ColumnBuilder.builder()
       .col('plntCd', '사업장 코드', { visible: false })
       .col('pitmTyp', { visible: false })
+      .col('ansIdx', '시험 IDX', { visible: false })
       .col('ansTyp', { visible: false })
       .col('batchNo', { visible: false })
       .col('smpReqRea', { visible: false })
@@ -104,6 +105,7 @@ const requestForm = {
       .Textarea('smpReqReaDtl', '요청사유상세', { readonly: true })
       .Input('labelCd', '라벨코드', { readonly: true })
       .Hidden('plntCd', '사업장 코드')
+      .Hidden('ansIdx', '시험 IDX')
       .build(),
 };
 

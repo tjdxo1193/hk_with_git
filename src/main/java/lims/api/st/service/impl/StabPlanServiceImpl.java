@@ -24,6 +24,9 @@ public class StabPlanServiceImpl implements StabPlanService {
     private final StabPlanDao stabPlanDao;
     private final ApproveService approveService;
 
+    // 첫 시험
+    static final String ACC_MARK_NM = "Initial";
+
     @Override
     public List<StabPlanVO> findAll(StabPlanVO param) {
         List<StabPlanVO> result = stabPlanDao.findAll(param);
@@ -207,9 +210,8 @@ public class StabPlanServiceImpl implements StabPlanService {
 
         if(ansStrDt != null && ansItv != null && ansTrm != null) {
             int count = (ansTrm / ansItv);
-            String accMarkNm = "Initial";
             String sbtAnsStt = SbtAnsSttProcess.TEST_ON_PROCESS.getProcessCode();
-            StabPlanVO initialStSbtAns = this.getNewAns(param, mappedAnsTrm, 0, accMarkNm, sbtAnsStt);
+            StabPlanVO initialStSbtAns = this.getNewAns(param, mappedAnsTrm, 0, ACC_MARK_NM, sbtAnsStt);
             stabPlanDao.saveAns(initialStSbtAns);
 
             // Initial 데이터에서 사용할 sbtAnsIdx 값
@@ -217,6 +219,7 @@ public class StabPlanServiceImpl implements StabPlanService {
 
             // Initial(시작날짜, 첫 시험만 안정성시험중, 그 이후는 시험시작전 으로)
             sbtAnsStt = SbtAnsSttProcess.TEST_BEFORE.getProcessCode();
+            String accMarkNm;
             for(int i = 1; i <= count; i++) {
                 accMarkNm = String.valueOf((i * ansItv));
 

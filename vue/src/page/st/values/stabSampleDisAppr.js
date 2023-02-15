@@ -5,7 +5,7 @@ import { ColumnBuilder, FormBuilder } from '@/util';
 
 const todayDate = dayjs().format('YYYY-MM-DD');
 
-const yesterdayDate = dayjs().add(-1, 'day').format('YYYY-MM-DD');
+const weekAgoDate = dayjs().add(-1, 'week').format('YYYY-MM-DD');
 
 const sampleGrid = {
   static: {
@@ -32,18 +32,22 @@ const sampleGrid = {
         api: () => api.combo.userCommon.getSmpStrgMtdCombo(),
       })
       .Input('pitmNm', '품목명')
-      .DatepickerTwinWithSwitch('useLmt', '사용기한', {
-        value: [yesterdayDate, todayDate],
+      .DatepickerTwinWithSwitch('useLmtDtList', '사용기한', {
+        value: [weekAgoDate, todayDate],
         _colSpan: 2,
       })
       .build(),
   columns: () =>
     ColumnBuilder.builder()
+      .col('smpDpsNm', '승인구분')
       .col('pitmTypNm', '품목유형')
       .col('pitmCd', '품목코드')
       .col('pitmNm', '품목명')
       .col('lotNo', '제조번호')
+      .col('batchNo', '배치번호')
+      .col('makDt', '제조일자')
       .col('useLmt', '사용기한')
+      .col('ansTypNm', '시험유형')
       .col('remains', '재고량')
       .col('mngSmpVol', '안정성검체량')
       .col('inpUnit', '안정성검체량단위')

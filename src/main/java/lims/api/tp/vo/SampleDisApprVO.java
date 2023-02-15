@@ -79,4 +79,5 @@ public class SampleDisApprVO {
     private String rcpDt;           // 시험 접수 날짜
     private List<String> dpsExpDtList = new ArrayList<>();
     private List<String> smpEtrDtList = new ArrayList<>();
+
 }

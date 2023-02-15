@@ -8,12 +8,14 @@ import lims.api.tp.enums.SampleDisposalProgress;
 import lims.api.tp.service.SampleDisApprService;
 import lims.api.tp.vo.SampleDisApprVO;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SampleDisApprServiceImpl implements SampleDisApprService {
     private final SampleDisApprDao dao;
     private final ApproveService approveService;
@@ -30,15 +32,20 @@ public class SampleDisApprServiceImpl implements SampleDisApprService {
 
         for (SampleDisApprVO param : params) {
             if (param.getSmpDpsProc().equals(SampleDisposalProgress.REQUEST_DISPOSAL.getCode())) {
+                // 폐기 승인
+                log.info("😎😎😎😎😎😎😎😎");
                 param.setSmpDpsProc(SampleDisposalProgress.APPROVE_DISPOSAL.getCode());
-            } else {
-                param.setSmpDpsProc(SampleDisposalProgress.APPROVE_DISPOSAL_CANCEL.getCode());
+                result += dao.approveDispose(param);
             }
-            approveService.approve(param.getSmpDpsAprIdx());
-            result += dao.approve(param);
+            if (param.getSmpDpsProc().equals(SampleDisposalProgress.REQUEST_DISPOSAL_CANCEL.getCode())) {
+                // 폐기 취소 승인
+                log.info("✨✨✨✨✨");
+                param.setSmpDpsProc(SampleDisposalProgress.APPROVE_DISPOSAL_CANCEL.getCode());
+                result += dao.approveCancelDispose(param);
+            }
         }
-
         if (result != params.size()) {
+            
             throw new NoUpdatedDataException();
         }
     }

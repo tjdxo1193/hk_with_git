@@ -54,7 +54,7 @@ public class SAPSendVO {
     @Setter
     public static class TestPerformanceOfPurchaseInbound extends TrsStateful {
         @Setter(AccessLevel.NONE)
-        private String kokrs = CompanyType.KOLMAR.getValue();
+        private String kokrs = CompanyType.KOLMAR.getCode();
         private String gjahr;
         private String poper;
         private String werks;
@@ -87,7 +87,7 @@ public class SAPSendVO {
     @Setter
     public static class AssetsMovementHistory extends TrsStateful {
         @Setter(AccessLevel.NONE)
-        private String bukrs = CompanyType.KOLMAR.getValue();
+        private String bukrs = CompanyType.KOLMAR.getCode();
         private String anlnFrom;
         private String bzdat;
         private String zzpicFrom;

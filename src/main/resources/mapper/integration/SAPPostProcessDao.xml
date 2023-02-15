@@ -207,7 +207,7 @@
                 #{pitmVer},
                 (SELECT MTART FROM MS_SAP_MTR_MARA WHERE MATNR = #{pitmCd}),
                 (SELECT DISPO FROM MS_SAP_MTR_MARC WHERE MATNR = #{pitmCd} AND WERKS = #{plntCd}),
-                (SELECT ZLABNO FROM MS_SAP_MTR_MARA WHERE MATNR = #{pitmCd}),
+                #{labNo},
                 #{brdAbbr},
                 null,
                 (SELECT BISMT FROM MS_SAP_MTR_MARA WHERE MATNR = #{pitmCd}),
@@ -243,7 +243,7 @@
         UPDATE QM_PITM_INFO_SAP
         SET MTR_TYP       = (SELECT MTART FROM MS_SAP_MTR_MARA WHERE MATNR = #{pitmCd}),
             MTR_MRP       = (SELECT DISPO FROM MS_SAP_MTR_MARC WHERE MATNR = #{pitmCd} AND WERKS = #{plntCd}),
-            LAB_NO        = (SELECT ZLABNO FROM MS_SAP_MTR_MARA WHERE MATNR = #{pitmCd}),
+            LAB_NO        = #{labNo},
             BRD_ABBR      = NVL(#{brdAbbr}, BRD_ABBR),
             BRD_LNE       = null,
             NOM_MTR       = (SELECT BISMT FROM MS_SAP_MTR_MARA WHERE MATNR = #{pitmCd}),

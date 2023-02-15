@@ -5,10 +5,7 @@
     @button-click="onSampleGridButtonClick"
     @form-event="sampleGridEvent"
   />
-  <FormWithHeader 
-    v-bind="requestForm" 
-    @button-click="onRequestFormsButtonClick"
-  />
+  <FormWithHeader v-bind="requestForm" @button-click="onRequestFormsButtonClick" />
 </template>
 
 <script>
@@ -86,14 +83,19 @@ export default {
       const { forms } = this.requestForm;
       const parameter = FormUtil.getData(forms);
 
-      if(!parameter || !parameter.plntCd || !parameter.addSmpIdx || !this.pitmTypList.rawMaterial) {
+      if (
+        !parameter ||
+        !parameter.plntCd ||
+        !parameter.ansIdx ||
+        !this.pitmTypList.rawMaterial
+      ) {
         this.$warn(this.$message.warn.unSelectedData);
         return;
       }
 
       RdUtil.openReport(
         '/LABEL_PRINT.mrd',
-        `/rp [${parameter.plntCd}] [${parameter.addSmpIdx}] [${this.pitmTypList.rawMaterial}]`,
+        `/rp [${parameter.plntCd}] [${parameter.ansIdx}] [${this.pitmTypList.rawMaterial}]`,
       );
     },
   },

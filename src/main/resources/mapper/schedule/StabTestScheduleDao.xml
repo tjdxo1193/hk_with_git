@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.schedule.dao.StabTestScheduleDao">
+
+    <select id="findStabs" resultType="StabTestSearchVO" parameterType="StabTestConditionVO">
+        SELECT
+            A.PLNT_CD,
+            A.SBT_ANS_IDX,
+            A.SBT_PLN_IDX,
+            A.ANS_DT
+        FROM ST_SBT_ANS A
+        LEFT OUTER JOIN ST_SBT_PLN P ON A.PLNT_CD = P.PLNT_CD AND A.SBT_PLN_IDX = P.SBT_PLN_IDX
+        WHERE A.SBT_ANS_STT = #{sbtAnsStt}
+          AND P.SBT_ANS_PROC = #{sbtAnsProc}
+          AND P.DEL_YN = 'N'
+        ORDER BY SBT_ANS_IDX DESC, ANS_DT DESC
+    </select>
+
+</mapper>

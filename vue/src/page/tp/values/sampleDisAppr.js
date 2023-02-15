@@ -27,7 +27,7 @@ const sampleGrid = {
       .Input('batchNo', '배치번호')
       .Input('pitmCd', '품목코드')
       .Select('smpProcCd', '검체상태', { async: () => api.combo.systemCommon.getSmpProcCombo() })
-      .Select('pitmTyp', '품목구분', { async: () =>  api.combo.systemCommon.getPitmDivCombo() })
+      .Select('pitmTyp', '품목구분', { async: () => api.combo.systemCommon.getPitmDivCombo() })
       .DatepickerTwinWithSwitch('dpsExpDtList', '폐기예정일', { value: [todayDate, todayDate] })
       .DatepickerTwinWithSwitch('smpEtrDtList', '검체입고일자', {
         value: [todayDate, todayDate],

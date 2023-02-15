@@ -7,6 +7,7 @@ import lims.api.ms.enums.SpecProgress;
 import lims.api.mt.enums.MonitorTestProcess;
 import lims.api.schedule.dao.MonitorTestScheduleDao;
 import lims.api.schedule.enums.MonitorCycleUnit;
+import lims.api.schedule.service.Scheduler;
 import lims.api.schedule.vo.MonitorTestConditionVO;
 import lims.api.schedule.vo.MonitorTestSearchVO;
 import lims.api.schedule.vo.MonitorTestVO;
@@ -17,7 +18,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -25,28 +25,29 @@ import java.util.Optional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class MonitorTestScheduler {
+public class MonitorTestScheduler implements Scheduler {
 
     private final MonitorTestScheduleDao scheduleDao;
     private final HolidayService holidayService;
 
     @Scheduled(cron = "0 0 2 * * *")
+    @Override
     public void run() {
-        LocalDate standardDay = LocalDate.now().plus(0, ChronoUnit.DAYS);
-        List<MonitorTestVO> monitors = getMonitorTestToSave(standardDay);
+        LocalDate standardDay = LocalDate.now();
+        HolidayCalculator calculator = holidayService.getCalculator();
+
+        List<MonitorTestVO> monitors = getMonitorTestToSave(standardDay, calculator);
 
         if (CollectionUtils.isEmpty(monitors)) {
-            log.info("[MonitorTestScheduler] no exists data to save.");
+            log.info("[MonitorTestScheduler] No exists data to save.");
             return;
         }
         save(monitors);
     }
 
-    private List<MonitorTestVO> getMonitorTestToSave(LocalDate standardDay) {
-        List<MonitorTestVO> willSaveMonitors = new ArrayList<>();
+    private List<MonitorTestVO> getMonitorTestToSave(LocalDate standardDay, HolidayCalculator calculator) {
         List<MonitorTestSearchVO> monitors = scheduleDao.findMonitors(createFindMonitorCondition());
-
-        HolidayCalculator calculator = holidayService.getCalculator();
+        List<MonitorTestVO> willSaveData = new ArrayList<>();
 
         int interval;
         LocalDate targetDate, lastCreatedDate;
@@ -66,11 +67,11 @@ public class MonitorTestScheduler {
                  * 다음 스케쥴링에서 첫번째 루프때 저장되지 않도록 하기 위해 간격만큼 증가시킨 뒤 저장합니다.
                  */
                 targetDate = targetDate.plus(interval, cycleUnit.getUnit());
-                willSaveMonitors.add(toSaveVO(calculator, targetDate, lastCreatedDate, monitor));
+                willSaveData.add(toSaveVO(calculator, targetDate, lastCreatedDate, monitor));
                 lastCreatedDate = targetDate;
             }
         }
-        return willSaveMonitors;
+        return willSaveData;
     }
 
     private void save(List<MonitorTestVO> monitors) {

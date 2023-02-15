@@ -161,6 +161,7 @@ const versionList = {
       .col('udtIp', '수정 IP', false)
       .col('udtDs', '수정 일시', false)
       .col('udtUid', '수정 UID', false)
+      .col('udtUserNm', '수정자')
       .build(),
 };
 

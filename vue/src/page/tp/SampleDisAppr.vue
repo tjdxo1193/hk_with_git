@@ -6,7 +6,11 @@
     @form-event="onDoubleClickSampleGridCell"
   />
   <FormWithHeader v-bind="inputForm" @button-click="onClickInputFormButtons" />
-  <RejectionReasonModal :show="rejectionReasonModal.show"  @check="reject" @close="hideModal('rejectionReasonModal')"/>
+  <RejectionReasonModal
+    :show="rejectionReasonModal.show"
+    @check="reject"
+    @close="hideModal('rejectionReasonModal')"
+  />
 </template>
 
 <script>
@@ -62,7 +66,7 @@ export default {
       }));
       await this.$eSign(() => this.$axios.put('/tp/sampleDisAppr/approve', param))
         .then(() => {
-          this.$info(this.$message.info.message.approve);
+          this.$info(this.$message.info.approve);
           this.fetchSampleGrid();
           this.init();
         })
@@ -116,10 +120,10 @@ export default {
       }
       if (name === 'reject') {
         if (checkedRows.length > 0) {
-            this.showModal('rejectionReasonModal');
-          } else {
-            return this.$warn(this.$message.warn.unSelectedData);
-          }
+          this.showModal('rejectionReasonModal');
+        } else {
+          return this.$warn(this.$message.warn.unSelectedData);
+        }
       }
     },
     onClickInputFormButtons({ name }) {

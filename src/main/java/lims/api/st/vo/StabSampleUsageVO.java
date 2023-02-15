@@ -3,6 +3,9 @@ package lims.api.st.vo;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
 public class StabSampleUsageVO {
@@ -82,5 +85,5 @@ public class StabSampleUsageVO {
     private String ansNo;           // 시험 번호
     private String smpTypNm;        // 검체 구분 명칭
     private String sumVol;          // 사용 검체량 총합
-
+    private List<String> useDtList = new ArrayList<>();
 }

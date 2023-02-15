@@ -29,11 +29,15 @@
     @close="hideRequestReviewerModal()"
     @modalReturnDataEvent="requestReview"
   />
+
+    <FormBase v-bind="valueWithMItemSpecGrid" />
+
+    <FormBase v-bind="valueWithVersionGrid" />
 </template>
 
 <script>
-import { ItemsByTestMethodModal, RequestReviewerModal } from '@/page/modal';
-import { FormUtil, StringUtil, GridUtil } from '@/util';
+import {ItemsByTestMethodModal, RequestReviewerModal} from '@/page/modal';
+import {FormUtil, GridUtil, StringUtil} from '@/util';
 
 import values from './values/monitorSpecManage';
 
@@ -47,17 +51,19 @@ export default {
     RequestReviewerModal,
   },
   data() {
-    const { mItemSpecList, versionList, testItemList } = this.$copy(values);
+    const { mItemSpecList, versionList, testItemList, valueWithMItemSpecGrid, valueWithVersionGrid } = this.$copy(values);
     return {
       mItemSpecList: {
         ...mItemSpecList.static,
         forms: mItemSpecList.forms(),
         columns: mItemSpecList.columns(),
         event: {
-          cellClick: (e) => {
+          cellDoubleClick: async (e) => {
             this.init();
-            this.fetchVersionList(e.item);
+            await this.fetchVersionList(e.item);
             this.settingDepartmentList(e.item);
+            this.setValueWithMItemSpecGrid(e.item);
+            this.focusFirstRowItemOfVersionGrid();
           },
         },
       },
@@ -65,8 +71,8 @@ export default {
         ...versionList.static,
         columns: versionList.columns(),
         event: {
-          cellClick: (e) => {
-            this.fetchMItemSpecAItemList(e);
+          cellDoubleClick: (e) => {
+            this.fetchMItemSpecAItemList(e.item);
             this.changeButtonWhenSelectedVersion();
           },
         },
@@ -75,7 +81,7 @@ export default {
         ...testItemList.static,
         columns: testItemList.columns(),
         event: {
-          cellClick: () => {
+          cellDoubleClick: () => {
             this.changeButtonWhenSelectedTestItem();
           },
           cellEditBegin: (e) => {
@@ -86,6 +92,13 @@ export default {
           },
         },
       },
+      valueWithMItemSpecGrid: {
+        forms: valueWithMItemSpecGrid.forms(),
+      },
+      valueWithVersionGrid: {
+        forms: valueWithVersionGrid.forms(),
+      },
+
       itemsByTestMethodModal: {
         show: false,
       },
@@ -118,31 +131,42 @@ export default {
         .then(({ data }) => data);
 
       $grid.setGridData(data);
-
-      this.bottomGridSetting($grid);
+    },
+    
+    setValueWithMItemSpecGrid(item){  
+      FormUtil.setData(this.valueWithMItemSpecGrid.forms, item);
+    },
+    
+    setValueWithVersionGrid(item){  
+      FormUtil.setData(this.valueWithVersionGrid.forms, item);
     },
 
-    bottomGridSetting($grid) {
+    focusFirstRowItemOfVersionGrid(){
+      const { $grid } = this.versionList;
       if (this.isFirstVersionMode()) {
         this.changeButtonWhenSelectedMItem();
-      } else {
-        const bottomSetting = {
-          item: $grid.getItemsByValue('aitmSpecVer', $grid.getRowCount())[0],
-          rowIndex: $grid.getRowIndexesByValue('aitmSpecVer', $grid.getRowCount())[0],
-        };
-        this.fetchMItemSpecAItemList(bottomSetting);
-        this.versionList.$grid.setSelectionByIndex(bottomSetting.rowIndex);
-        this.changeButtonWhenSelectedVersion();
+      } else{
+        $grid.setSelectionByIndex(0);
+        const item = $grid.getSelectedRows()[0];
+        this.loadToVersionFormAndTestListGrid(item);
       }
     },
 
-    async fetchMItemSpecAItemList({ item }) {
+    loadToVersionFormAndTestListGrid(item){
+      this.setValueWithVersionGrid(item);
+      const { aitmSpecIdx } = FormUtil.getData(this.valueWithVersionGrid.forms);
+      this.fetchMItemSpecAItemList({ aitmSpecIdx });
+      this.changeButtonWhenSelectedVersion();
+    },
+
+    async fetchMItemSpecAItemList({aitmSpecIdx}) {
       const { $grid } = this.testItemList;
       const data = await $grid
-        ._useLoader(() => this.$axios.get('ms/monitorSpecManage/aItem', item))
+        ._useLoader(() => this.$axios.get('ms/monitorSpecManage/aItem', {aitmSpecIdx}))
         .then(({ data }) => data);
       $grid.setGridData(data);
     },
+
     onClickBtnEvent({ name }) {
       if (name == 'search') {
         this.fetchMItemSpecList();
@@ -186,6 +210,8 @@ export default {
     init() {
       this.versionList.$grid.clearGridData();
       this.testItemList.$grid.clearGridData();
+      this.valueWithMItemSpecGrid.forms = values.valueWithMItemSpecGrid.forms();
+      this.valueWithVersionGrid.forms = values.valueWithVersionGrid.forms();
       this.changeButtonDisabledAll();
     },
     changeButtonDisabledAll() {
@@ -216,60 +242,74 @@ export default {
       return this.testItemList.$grid.getRowCount() == 0;
     },
     changeButtonWhenSelectedVersion() {
-      //사용버전 Y일때 수정(개정)가능
-      if (this.isUseVersionY()) {
-        FormUtil.enableButtons(this.testItemList.buttons, ['updateVersion', 'addRow', 'removeRow']);
-        FormUtil.disableButtons(this.testItemList.buttons, [
-          'up',
-          'down',
-          'temporarySave',
-          'requestReview',
-        ]);
+      const buttons = this.testItemList.buttons;
+
+      if (this.isSelectedUsableVersion()) {
+        FormUtil.enableButtons(buttons, ['updateVersion', 'addRow', 'copyRow', 'removeRow']);
         return;
-      } else {
-        //사용버전 N이고, 임시저장또는 검토반려일때 임시저장(수정) 가능
-        if (this.isTemporaryStorage() || this.isReviewReject()) {
-          FormUtil.enableButtons(this.testItemList.buttons, [
-            'temporarySave',
-            'requestReview',
-            'addRow',
-            'removeRow',
-          ]);
-          FormUtil.disableButtons(this.testItemList.buttons, ['up', 'down', 'updateVersion']);
-          return;
-        } else {
-          FormUtil.disableButtons(this.testItemList.buttons, [
-            'temporarySave',
-            'requestReview',
-            'updateVersion',
-            'addRow',
-            'removeRow',
-            'up',
-            'down',
-          ]);
-          return;
+      }
+
+      // 임시저장, 검토반려일때
+      if (this.isSelectedTemporaryVersion() || this.isSelectedReviewRejectVersion()) {
+        FormUtil.enableButtons(buttons, ['temporarySave', 'addRow', 'copyRow', 'removeRow']);
+
+        if (this.isSelectedItemHasVersion()) {
+          FormUtil.enableButtons(buttons, ['requestReview']);
         }
+
+        return;
       }
     },
     changeButtonWhenSelectedTestItem() {
       // 사용버전 Y일떄 up,down 가능, 임시저장, 검토반려(N)일때 up,down 가능
       if (
         this.isFirstVersionMode() ||
-        this.isTemporaryStorage() ||
-        this.isReviewReject() ||
-        this.isUseVersionY()
+        this.isSelectedTemporaryVersion() ||
+        this.isSelectedReviewRejectVersion() ||
+        this.isSelectedUsableVersion()
       ) {
         FormUtil.enableButtons(this.testItemList.buttons, ['up', 'down']);
       } else {
         FormUtil.disableButtons(this.testItemList.buttons, ['up', 'down']);
       }
     },
+
+    isSelectedUsableVersion() {
+      const { useVerYn } = FormUtil.getData(this.valueWithVersionGrid.forms);
+      return useVerYn == 'Y';
+    },
+
+    isSelectedTemporaryVersion() {
+      const { specProcCd } = FormUtil.getData(this.valueWithVersionGrid.forms);
+      return specProcCd == 'S0080100';
+    },
+
+    isSelectedReviewRejectVersion() {
+      const { specProcCd } = FormUtil.getData(this.valueWithVersionGrid.forms);
+      return specProcCd == 'S0080110';
+    },
+
+    isSelectedItemHasVersion() {
+      return !this.isSelectedItemHasNotVersion();
+    },
+
+    isSelectedItemHasNotVersion() {
+      const { $grid } = this.versionList;
+      const parameter = FormUtil.getData(this.valueWithVersionGrid.forms);
+
+      return $grid.getRowCount() == 1 && !parameter.aitmSpecVer;
+    },
+
     requestReview(popupParam) {
-      const [selectedItem] = this.versionList.$grid.getSelectedRows();
-      Object.assign(selectedItem, popupParam);
+      const {mitmSpecIdx , aitmSpecIdx} = FormUtil.getData(this.valueWithVersionGrid.forms);
+      popupParam.mitmSpecIdx = mitmSpecIdx;
+
+      if(!!aitmSpecIdx){
+        return this.$error(this.$message.error.noAitmSpecIdx);
+      }
 
       this.$eSignWithReason(() =>
-        this.$axios.put('/ms/monitorSpecManage/requestReview', selectedItem),
+        this.$axios.put('/ms/monitorSpecManage/requestReview', popupParam),
       )
         .then(() => {
           this.$info(this.$message.info.reviewRequest);
@@ -280,38 +320,23 @@ export default {
           this.$error(this.$message.error.createData);
         });
     },
-    delete() {
-      const [selectedItem] = this.versionList.$grid.getSelectedRows();
-      this.$eSignWithReason(() =>
-        this.$axios.put('/ms/monitorSpecManage/mSpec/delete', selectedItem),
-      )
-        .then(() => {
-          this.$info(this.$message.info.delete);
-          this.init();
-          this.fetchMItemSpecList();
-        })
-        .catch(() => {
-          this.$error(this.$message.error.deleteData);
-        });
-    },
-    addRowVersion() {
-      this.versionList.$grid.addRow({
-        aitmSpecVer: 1,
-        mitmCd: this.mItemSpecList.$grid.getSelectedRows()[0].mitmCd,
-      });
-    },
+
     showItemsByTestMethodModal() {
       this.$setState('itemsByTestMethodModal', { show: true });
     },
+
     hideItemsByTestMethodModal() {
       this.$setState('itemsByTestMethodModal', { show: false });
     },
+
     showRequestReviewerModal() {
       this.$setState('requestReviewerModal', { show: true });
     },
+
     hideRequestReviewerModal() {
       this.$setState('requestReviewerModal', { show: false });
     },
+
     copyRowToPreviousVersion() {
       let copyData = this.versionList.$grid.getItemsByValue(
         'aitmSpecVer',
@@ -321,6 +346,7 @@ export default {
       copyData.specProcCd = '';
       this.versionList.$grid.addRow(copyData);
     },
+
     saveCopyAndUpVersion() {
       this.copyRowToPreviousVersion();
       const checkedRows = this.versionList.$grid.getAddedRowItems();
@@ -338,22 +364,7 @@ export default {
           this.$error(this.$message.error.createData);
         });
     },
-    isTemporaryStorage() {
-      const selectedItem = this.versionList.$grid.getSelectedRows();
-      return selectedItem[0].specProcCd == 'S0080100';
-    },
-    isReviewReject() {
-      const selectedItem = this.versionList.$grid.getSelectedRows();
-      return selectedItem[0].specProcCd == 'S0080110';
-    },
-    isApproved() {
-      const selectedItem = this.versionList.$grid.getSelectedRows();
-      return selectedItem[0].specProcCd == 'S0080400';
-    },
-    isUseVersionY() {
-      const selectedItem = this.versionList.$grid.getSelectedRows();
-      return selectedItem[0].useVerYn == 'Y';
-    },
+
     updateVersion() {
       if (this.isNotExistJdgType()) {
         return;
@@ -363,24 +374,18 @@ export default {
         return;
       }
 
-      const gridData = this.testItemList.$grid.getGridData();
-      const { mitmCd, aitmSpecVer, rvsDt, enfoDt, rvsCtt, rvsDivPs, rvsReaCd } =
-        this.versionList.$grid.getSelectedRows()[0];
+      const versionParam = FormUtil.getData(this.valueWithVersionGrid.forms);
 
-      const parameter = gridData.map((row, index) => ({
-        ...row,
-        mitmCd,
-        aitmSpecVer,
-        rvsDt,
-        enfoDt,
-        rvsCtt,
-        rvsDivPs,
-        rvsReaCd,
-        aitmOrd: index + 1,
-      }));
+      const parameter = {
+        ...versionParam,
+        addedRowItems: this.testItemList.$grid.getGridData(),
+        editedRowItems: [],
+        removedRowItems: [],
+      };
+
 
       this.$confirm(this.$message.warn.updateAprrovedSpec).then(() => {
-        this.$eSignWithReason(() => this.$axios.post('/ms/monitorSpecManage/version', parameter))
+        this.$eSignWithReason(() => this.$axios.post('/ms/monitorSpecManage/newVersion', parameter))
           .then(() => {
             this.$info(this.$message.info.saved);
             this.init();
@@ -391,6 +396,7 @@ export default {
           });
       });
     },
+
     saveFirstVersion() {
       if (this.isNotExistJdgType()) {
         return;
@@ -400,16 +406,16 @@ export default {
         return;
       }
 
-      const gridData = this.testItemList.$grid.getGridData();
-      const [getSpecInfo] = this.mItemSpecList.$grid.getSelectedRows();
+      const Mitmparam = FormUtil.getData(this.valueWithMItemSpecGrid.forms);
 
-      const parameter = gridData.map((row, index) => ({
-        ...row,
-        mitmCd: getSpecInfo.mitmCd,
-        aitmOrd: index + 1,
-      }));
+      const parameter = {
+        ...Mitmparam,
+        addedRowItems: this.testItemList.$grid.getGridData(),
+        editedRowItems: [],
+        removedRowItems: [],
+      };
 
-      this.$eSign(() => this.$axios.post('/ms/monitorSpecManage/version', parameter))
+      this.$eSign(() => this.$axios.post('/ms/monitorSpecManage/firstVersion', parameter))
         .then(() => {
           this.$info(this.$message.info.saved);
           this.init();
@@ -419,7 +425,8 @@ export default {
           this.$error(this.$message.error.createData);
         });
     },
-    saveAllRow() {
+
+    async saveAllRow() {
       if (this.isNotExistJdgType()) {
         return;
       }
@@ -428,15 +435,22 @@ export default {
         return;
       }
 
-      const gridData = this.testItemList.$grid.getGridData();
-      const [getVersionInfo] = this.versionList.$grid.getSelectedRows();
-      const parameter = gridData.map((row, index) => ({
-        ...row,
-        aitmSpecIdx: getVersionInfo.aitmSpecIdx,
-        aitmOrd: index + 1,
-      }));
+      const { $grid } = this.testItemList;
+      const { aitmSpecIdx } = FormUtil.getData(this.valueWithVersionGrid.forms);
 
-      this.$eSignWithReason(() => this.$axios.post('/ms/monitorSpecManage/aItem', parameter))
+      const parameter = {
+        aitmSpecIdx,
+        addedRowItems: $grid.getAddedRowItems(),
+        editedRowItems: $grid.getEditedRowItems(),
+        removedRowItems: $grid.getRemovedItems(),
+      };
+
+
+      if (this.isNotUpdateTestItemList()) {
+        return this.$warn(this.$message.warn.noSaveGridData);
+      }
+
+      await this.$eSignWithReason(() => this.$axios.post('/ms/monitorSpecManage/aItem', parameter))
         .then(() => {
           this.$info(this.$message.info.saved);
           this.init();
@@ -446,27 +460,16 @@ export default {
           this.$error(this.$message.error.createData);
         });
     },
-    addRowTestItem(items) {
-      const { aitmSpecIdx } = this.versionList.$grid.getSelectedRows()[0] ?? '';
-      this.testItemList.$grid.addRow(
-        items.map((row) => ({
-          aitmSpecIdx,
-          amitmCd: row.amitmCd,
-          aitmKn: row.aitmKn,
-          vriaKn: row.vriaKn,
-          vriaNo: row.vriaNo,
-        })),
+
+    isNotUpdateTestItemList() {
+      const { $grid } = this.testItemList;
+      return (
+        $grid.getAddedRowItems().length == 0 &&
+        $grid.getEditedRowItems().length == 0 &&
+        $grid.getRemovedItems().length == 0
       );
     },
-    removeRowTestItem() {
-      this.testItemList.$grid.removeRow('selectedIndex');
-    },
-    upOrd() {
-      this.testItemList.$grid.moveRowsToUp();
-    },
-    downOrd() {
-      this.testItemList.$grid.moveRowsToDown();
-    },
+
     changeModifiableColumn({ value, rowIndex, dataField, item }) {
       const grid = this.testItemList.$grid;
       const isColNameJudgmentType = dataField == 'jdgTyp';
@@ -622,6 +625,70 @@ export default {
         return false;
       }
     },
+
+    addRowTestItem(items) {
+      const { aitmSpecIdx } = FormUtil.getData(this.valueWithVersionGrid.forms);
+      const { $grid } = this.testItemList;
+      $grid.addRow(
+        items.map((row, idx) => ({
+          aitmSpecIdx: aitmSpecIdx ?? '',
+          amitmCd: row.amitmCd,
+          aitmKn: row.aitmKn,
+          vriaKn: row.vriaKn,
+          vriaNo: row.vriaNo,
+          aitmOrd: $grid.getRowCount() + idx + 1,
+        })),
+      );
+    },
+
+    removeRowTestItem() {
+      const { $grid } = this.testItemList;
+      const startRowIndex = $grid.getSelectedIndex()[0];
+      const endRowIndex = $grid.getRowCount() - 1;
+
+      this.testItemList.$grid.removeRow('selectedIndex');
+
+      if (startRowIndex == endRowIndex) {
+        return;
+      }
+
+      const indexArray = [...Array(endRowIndex - startRowIndex).keys()].map(
+        (x) => x + startRowIndex,
+      );
+
+      const indexList = indexArray.map((_, index) => ({
+        aitmOrd: indexArray[index] + 1,
+      }));
+
+      $grid.updateRows(indexList, indexArray);
+    },
+
+    upOrd() {
+      const { $grid } = this.testItemList;
+      const rowIndex = $grid.getSelectedIndex()[0];
+      if (rowIndex == 0) {
+        return;
+      }
+      $grid.updateRows(
+        [{ aitmOrd: rowIndex }, { aitmOrd: rowIndex + 1 }],
+        [rowIndex, rowIndex - 1],
+      );
+      this.testItemList.$grid.moveRowsToUp();
+    },
+
+    downOrd() {
+      const { $grid } = this.testItemList;
+      const rowIndex = $grid.getSelectedIndex()[0];
+      if (rowIndex == $grid.getRowCount() - 1) {
+        return;
+      }
+      $grid.updateRows(
+        [{ aitmOrd: rowIndex + 2 }, { aitmOrd: rowIndex + 1 }],
+        [rowIndex, rowIndex + 1],
+      );
+      $grid.moveRowsToDown();
+    },
+
     settingDepartmentList({ crgDptCd }) {
       if (crgDptCd == null || crgDptCd == '') {
         this.departmentList.list = [];

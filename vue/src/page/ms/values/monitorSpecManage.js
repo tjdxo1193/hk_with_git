@@ -1,26 +1,25 @@
 import api from '@/api';
-import { ColumnBuilder, FormBuilder } from '@/util';
+import {ColumnBuilder, FormBuilder} from '@/util';
 
 const rvsDivPsComboList = [
   { value: 'P', label: '품목' },
   { value: 'S', label: '규격서' },
 ];
 
-const valueWithMItemSpecList = {
+const valueWithMItemSpecGrid = {
   forms: () => FormBuilder.builder().Hidden('mitmCd', '품목코드').build(),
 };
-const valueWithVersionList = {
+const valueWithVersionGrid = {
   forms: () =>
     FormBuilder.builder()
       .Hidden('specProcCd', '진행상황')
       .Hidden('mitmCd', '모니터링항목코드')
       .Hidden('aitmSpecIdx', '시험항목 규격 IDX')
+      .Hidden('mitmSpecIdx', '모니터링규격IDX')
       .Hidden('aitmSpecVer', '버전')
-      .Hidden('rvsDt', '개정일자')
+      .Hidden('useVerYn', '버전사용여부')
+      .Hidden('docNo', '문서번호')
       .Hidden('enfoDt', '시행일자')
-      .Hidden('rvsCtt', '개정내역')
-      .Hidden('rvsReaCd', '개정사유')
-      .Hidden('rvsDivPs', '개정구분')
       .build(),
 };
 
@@ -29,8 +28,27 @@ const mItemSpecList = {
     title: '모니터링항목 목록',
     countPerRow: 4,
     $grid: null,
+    legends: [
+      { value: '임시저장', className: 'tempSave' },
+      { value: '승인/검토중', className: 'approveWating' },
+      { value: '반려품목', className: 'return' },
+    ],
     buttons: [{ name: 'search', label: '조회' }],
     props: {
+      rowStyleFunction: (rowIndex, item) => {
+        if (item.specProcCd === 'S0080100') {
+          return 'tempSave';
+        }
+        if (item.specProcCd === 'S0080300' || item.specProcCd === 'S0080200') {
+          return 'approveWating';
+        }
+        if (item.specProcCd === 'S0080110' || item.specProcCd === 'S0080210') {
+          return 'return';
+        }
+        if (item.specProcCd === '') {
+          return null;
+        }
+      },
       editable: false,
       showRowCheckColumn: false,
     },
@@ -127,6 +145,7 @@ const testItemList = {
     ],
     props: {
       editable: true,
+      selectionMode: 'multipleCells',
     },
   },
   columns: () =>
@@ -247,6 +266,6 @@ export default {
   mItemSpecList,
   versionList,
   testItemList,
-  valueWithMItemSpecList,
-  valueWithVersionList,
+  valueWithMItemSpecGrid,
+  valueWithVersionGrid,
 };

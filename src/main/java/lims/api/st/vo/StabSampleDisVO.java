@@ -3,6 +3,9 @@ package lims.api.st.vo;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
 public class StabSampleDisVO {
@@ -65,4 +68,6 @@ public class StabSampleDisVO {
     private String smpDivNm;
     private Integer remains;
     private String smpDpsNm;
+    private List<String> useLmtDtList = new ArrayList<>();
+    private String ansTypNm;
 }

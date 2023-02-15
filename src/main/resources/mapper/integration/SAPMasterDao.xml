@@ -417,6 +417,7 @@
                UDT_DS
         FROM MS_SAP_MTR_ZMDV
         WHERE MATNR = #{value}
+        ORDER BY UDT_DS DESC
     </select>
 
     <insert id="createMaterialZmdv" parameterType="lims.api.integration.vo.SAPMaterialVO$Zmdv">

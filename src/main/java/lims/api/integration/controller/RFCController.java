@@ -40,13 +40,12 @@ public class RFCController {
     @Permit
     @GetMapping("assets")
     public void assets() {
-        scheduler.run();
-//        RFCParam param = new RFCParam();
-//        List<RFCAssetsVO> results =  rfcService.getAssets(param);
-//        log.info("Call common code RFC. result size: {}", results.size());
-//        for (RFCAssetsVO vo : results) {
-//            log.info(vo.toString());
-//        }
+        RFCParam param = new RFCParam();
+        List<RFCAssetsVO> results =  rfcService.getAssets(param);
+        log.info("Call common code RFC. result size: {}", results.size());
+        for (RFCAssetsVO vo : results) {
+            log.info(vo.toString());
+        }
     }
 
     @Permit

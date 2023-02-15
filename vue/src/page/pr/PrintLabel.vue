@@ -68,6 +68,8 @@ export default {
       const rptDiv = item?.rptDiv;
       if(rptDiv) {
         FormUtil.disable(forms, 'rptDiv');
+      } else {
+        FormUtil.enable(forms, 'rptDiv');
       }
     },
     onPrintLabelGridWithSearchFormsButtonClick({ name }) {
@@ -88,7 +90,7 @@ export default {
       const { forms } = this.printLabelInfoForms;
       const parameter = FormUtil.getData(forms);
 
-      if(!parameter || !parameter.plntCd || !parameter.addSmpIdx || !this.pitmTypList.rawMaterial) {
+      if(!parameter || !parameter.plntCd || !parameter.ansIdx || !this.pitmTypList.rawMaterial) {
         this.$warn(this.$message.warn.unSelectedData);
         return;
       }
@@ -103,15 +105,17 @@ export default {
       const { forms } = this.printLabelInfoForms;
       const parameter = FormUtil.getData(forms);
 
-      if(!parameter || !parameter.plntCd || !parameter.addSmpIdx || !this.pitmTypList.rawMaterial) {
+      if(!parameter || !parameter.plntCd || !parameter.ansIdx || !this.pitmTypList.rawMaterial) {
         this.$warn(this.$message.warn.unSelectedData);
         return;
       }
 
       RdUtil.openReport(
         '/LABEL_PRINT.mrd',
-        `/rp [${parameter.plntCd}] [${parameter.addSmpIdx}] [${this.pitmTypList.rawMaterial}]`,
+        `/rp [${parameter.plntCd}] [${parameter.ansIdx}] [${this.pitmTypList.rawMaterial}]`,
       );
+
+      this.fetchPrintLabelGridWithSearchForms();
     },
     resetPrintLabelGridWithSearchForms() {
       this.printLabelInfoForms.forms = values.printLabelInfoForms.forms();

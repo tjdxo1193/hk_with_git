@@ -25,7 +25,7 @@ public abstract class TrsStateful implements Cloneable {
         try {
             return super.clone();
         } catch(Exception e) {
-            throw new CloneFailedException(e.getCause());
+            throw new CloneFailedException(e);
         }
     }
 

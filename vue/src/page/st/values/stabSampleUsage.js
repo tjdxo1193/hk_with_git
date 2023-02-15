@@ -21,14 +21,30 @@ const sampleUsageGrid = {
     ],
     props: {
       editable: false,
+      rowStyleFunction: (rowIndex, item) => {
+        if (item.irgYn === 'Y') {
+          return 'weird';
+        }
+        if (item.dpsYn === 'Y' || item.smpDpsProc === 'S0270500') {
+          return 'disposal';
+        }
+        if (item.smpUseProc === 'S0280100') {
+          return 'tempSave';
+        }
+        if (item.smpUseProc === 'S0280200' || item.smpUseProc === 'S0280400') {
+          return 'approveWating';
+        }
+        if (item.smpUseProc === 'S0280110' || item.smpUseProc === 'S0280310') {
+          return 'return';
+        }
+      },
     },
   },
   forms: () =>
     FormBuilder.builder()
-      .Select('pitmDiv', '품목구분', {
+      .Select('pitmTyp', '품목구분', {
         async: () => api.combo.systemCommon.getPitmDivCombo(),
       })
-      .Input('labelCd', '라벨코드')
       .Input('pitmCd', '품목코드')
       .Input('lotNo', '제조번호')
       .Input('batchNo', '배치번호')
@@ -50,30 +66,31 @@ const sampleUsageGrid = {
       .col('ansTyp', { visible: false })
       .col('ansIdx', { visible: false })
       .col('smpStrgMtd', { visible: false })
-      .col('smpUseNm', '사용이력진행상태')
-      .col('useSmpVol', '사용검체량')
-      .col('remains', '재고량')
-      .col('mngSmpVol', '관리검체량')
-      .col('inpUnit', '입력단위')
-      .col('usePps', '사용목적')
-      .col('useNm', '사용자')
-      .col('useDt', '사용일자')
-      .col('strgPla', '보관장소')
-      .col('rjtNm', '반려자')
-      .col('rjtRea', '반려사유')
+      .col('strgPla', { visible: false })
+      .col('smpStrgMtdNm', { visible: false })
+      .col('makDt', { visible: false })
+      .col('strgLmt', { visible: false })
+      .col('smpRmk', { visible: false })
+      .col('dpsExpDt', { visible: false })
+      .col('smpEtrDt', { visible: false })
       .col('pitmTypNm', '품목유형')
       .col('pitmCd', '품목코드')
       .col('pitmNm', '품목명')
-      .col('ansTypNm', '시험유형')
-      .col('smpStrgMtdNm', '보관방법')
       .col('lotNo', '제조번호')
       .col('batchNo', '배치번호')
-      .col('makDt', '생산일자')
-      .col('strgLmt', '보관기한')
+      .col('ansTypNm', '시험유형')
+      .col('mngSmpVol', '안정성검체량')
+      .col('useSmpVol', '사용량')
+      .col('remains', '재고량')
+      .col('inpUnit', '입력단위')
+      .col('useNm', '사용자')
+      .col('useDt', '사용일자')
+      .col('usePps', '사용목적')
       .col('irgYn', '이상여부')
-      .col('smpRmk', '비고')
-      .col('dpsExpDt', '폐기예정일자')
-      .col('smpEtrDt', '입고일자')
+      .col('smpDpsNm', '검체상태')
+      .col('smpUseNm', '사용이력진행상태')
+      .col('rjtNm', '반려자')
+      .col('rjtRea', '반려사유')
       .build(),
 };
 

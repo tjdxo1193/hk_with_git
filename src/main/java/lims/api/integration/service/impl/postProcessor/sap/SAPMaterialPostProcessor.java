@@ -8,6 +8,7 @@ import lims.api.integration.dao.SAPMasterDao;
 import lims.api.integration.dao.SAPPostProcessDao;
 import lims.api.integration.domain.eai.RevStateful;
 import lims.api.integration.enums.MaterialCharCode;
+import lims.api.integration.enums.SAPPItemType;
 import lims.api.integration.exception.IntegrationNoSavedException;
 import lims.api.integration.service.impl.postProcessor.PostProcessor;
 import lims.api.integration.vo.SAPMaterialVO;
@@ -102,6 +103,16 @@ public class SAPMaterialPostProcessor implements PostProcessor {
     }
 
     private void updateDifferentDataToPItem(SAPMaterialVO differentVO) {
+        List<SAPMaterialVO.Mara> latestMara = masterDao.findMaterialMaraAll();
+        Map<String, SAPMaterialVO.Mara> materialMap = toMaterialMapByMaterialCode(latestMara);
+
+        List<SAPMaterialVO.Marc> latestMarc = masterDao.findMaterialMarcAll();
+
+        Set<String> zlabCodes = latestMara.stream()
+                .filter(mara -> SAPPItemType.ZLAB.name().equals(mara.getMtart()))
+                .map(SAPMaterialVO.Mara::getMatnr)
+                .collect(Collectors.toSet());
+
         Set<String> changedMaterialCodes = Stream.of(
                         differentVO.getMara().stream().map(SAPMaterialVO.Mara::getMatnr).collect(Collectors.toList()),
                         differentVO.getMarc().stream().map(SAPMaterialVO.Marc::getMatnr).collect(Collectors.toList()),
@@ -110,12 +121,9 @@ public class SAPMaterialPostProcessor implements PostProcessor {
                         differentVO.getMakt().stream().map(SAPMaterialVO.Makt::getMatnr).collect(Collectors.toList())
                 )
                 .flatMap(Collection::stream)
+                // Lab No 자재는 품목 등록 처리에서 제외합니다.
+                .filter(code -> !zlabCodes.contains(code))
                 .collect(Collectors.toSet());
-
-        List<SAPMaterialVO.Mara> latestMara = masterDao.findMaterialMaraAll();
-        Map<String, SAPMaterialVO.Mara> materialMap = toMaterialMapByMaterialCode(latestMara);
-
-        List<SAPMaterialVO.Marc> latestMarc = masterDao.findMaterialMarcAll();
 
         Set<SAPPostProcessVO.Material.PItemKey> pitemKeys = getChangedPItemKeyForUpdate(latestMarc, changedMaterialCodes);
 
@@ -362,7 +370,7 @@ public class SAPMaterialPostProcessor implements PostProcessor {
     }
 
     private SAPPostProcessVO.Material.PItemInfoSap createPItemInfoSAPByCreateAndUpdate(String plantCode, String pitmCode, Integer version) {
-        Map<MaterialCharCode, String> zmdvMap = getZmdvMapByMaterialCode(pitmCode);
+        Map<MaterialCharCode, String> zmdvMap = getZmdvCodeMapByMaterialCode(pitmCode);
         return SAPPostProcessVO.Material.PItemInfoSap.builder()
                 .plntCd(plantCode)
                 .pitmCd(pitmCode)
@@ -385,10 +393,11 @@ public class SAPMaterialPostProcessor implements PostProcessor {
                 .prbInYn(zmdvMap.get(MaterialCharCode.PRB_IN_YN))
                 .prbFeYn(zmdvMap.get(MaterialCharCode.PRB_FE_YN))
                 .pnxFeYn(zmdvMap.get(MaterialCharCode.PNX_FE_YN))
+                .labNo(zmdvMap.get(MaterialCharCode.LAB_NO))
                 .build();
     }
 
-    private Map<MaterialCharCode, String> getZmdvMapByMaterialCode(String materialCode) {
+    private Map<MaterialCharCode, String> getZmdvCodeMapByMaterialCode(String materialCode) {
         Map<MaterialCharCode, String> result = new HashMap<>();
 
         Map<String, SAPMaterialVO.Zmdv> zmdvByMaterialCodeSet = masterDao.findMaterialZmdvByMaterialCode(materialCode)

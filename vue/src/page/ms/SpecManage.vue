@@ -419,10 +419,10 @@ export default {
     },
 
     requestReview(popupParam) {
-      const { pitmSpecIdx } = FormUtil.getData(this.valueWithVersionGrid.forms);
-      const { aitmSpecIdx } = FormUtil.getData(this.valueWithVersionGrid.forms);
-      if (aitmSpecIdx) {
-      }
+      const { pitmSpecIdx, aitmSpecIdx } = FormUtil.getData(this.valueWithVersionGrid.forms);
+      // if (!!aitmSpecIdx && !!pitmSpecIdx) {
+      //   return;
+      // }
       popupParam.pitmSpecIdx = pitmSpecIdx;
       popupParam.revwUid = popupParam.aprUid;
 
@@ -735,69 +735,6 @@ export default {
       }
     },
 
-    addRowTestItem(items) {
-      const { aitmSpecIdx } = FormUtil.getData(this.valueWithVersionGrid.forms);
-      const { $grid } = this.testItemList;
-      $grid.addRow(
-        items.map((row, idx) => ({
-          aitmSpecIdx: aitmSpecIdx ?? '',
-          amitmCd: row.amitmCd,
-          aitmKn: row.aitmKn,
-          vriaKn: row.vriaKn,
-          vriaNo: row.vriaNo,
-          aitmOrd: $grid.getRowCount() + idx + 1,
-        })),
-      );
-    },
-
-    removeRowTestItem() {
-      const { $grid } = this.testItemList;
-      const startRowIndex = $grid.getSelectedIndex()[0];
-      const endRowIndex = $grid.getRowCount() - 1;
-
-      this.testItemList.$grid.removeRow('selectedIndex');
-
-      if (startRowIndex == endRowIndex) {
-        return;
-      }
-
-      const indexArray = [...Array(endRowIndex - startRowIndex).keys()].map(
-        (x) => x + startRowIndex,
-      );
-
-      const indexList = indexArray.map((_, index) => ({
-        aitmOrd: indexArray[index] + 1,
-      }));
-
-      $grid.updateRows(indexList, indexArray);
-    },
-
-    upOrd() {
-      const { $grid } = this.testItemList;
-      const rowIndex = $grid.getSelectedIndex()[0];
-      if (rowIndex == 0) {
-        return;
-      }
-      $grid.updateRows(
-        [{ aitmOrd: rowIndex }, { aitmOrd: rowIndex + 1 }],
-        [rowIndex, rowIndex - 1],
-      );
-      this.testItemList.$grid.moveRowsToUp();
-    },
-
-    downOrd() {
-      const { $grid } = this.testItemList;
-      const rowIndex = $grid.getSelectedIndex()[0];
-      if (rowIndex == $grid.getRowCount() - 1) {
-        return;
-      }
-      $grid.updateRows(
-        [{ aitmOrd: rowIndex + 2 }, { aitmOrd: rowIndex + 1 }],
-        [rowIndex, rowIndex + 1],
-      );
-      $grid.moveRowsToDown();
-    },
-
     changeModifiableColumn({ value, rowIndex, dataField, item }) {
       const grid = this.testItemList.$grid;
       const isColNameJudgmentType = dataField == 'jdgTyp';
@@ -902,6 +839,70 @@ export default {
         (row) => row.valueOfHir == this.departmentList.hirDepartmentCode || row.value == ansDptCd,
       );
     },
+
+    addRowTestItem(items) {
+      const { aitmSpecIdx } = FormUtil.getData(this.valueWithVersionGrid.forms);
+      const { $grid } = this.testItemList;
+      $grid.addRow(
+        items.map((row, idx) => ({
+          aitmSpecIdx: aitmSpecIdx ?? '',
+          amitmCd: row.amitmCd,
+          aitmKn: row.aitmKn,
+          vriaKn: row.vriaKn,
+          vriaNo: row.vriaNo,
+          aitmOrd: $grid.getRowCount() + idx + 1,
+        })),
+      );
+    },
+
+    removeRowTestItem() {
+      const { $grid } = this.testItemList;
+      const startRowIndex = $grid.getSelectedIndex()[0];
+      const endRowIndex = $grid.getRowCount() - 1;
+
+      this.testItemList.$grid.removeRow('selectedIndex');
+
+      if (startRowIndex == endRowIndex) {
+        return;
+      }
+
+      const indexArray = [...Array(endRowIndex - startRowIndex).keys()].map(
+        (x) => x + startRowIndex,
+      );
+
+      const indexList = indexArray.map((_, index) => ({
+        aitmOrd: indexArray[index] + 1,
+      }));
+
+      $grid.updateRows(indexList, indexArray);
+    },
+
+    upOrd() {
+      const { $grid } = this.testItemList;
+      const rowIndex = $grid.getSelectedIndex()[0];
+      if (rowIndex == 0) {
+        return;
+      }
+      $grid.updateRows(
+        [{ aitmOrd: rowIndex }, { aitmOrd: rowIndex + 1 }],
+        [rowIndex, rowIndex - 1],
+      );
+      this.testItemList.$grid.moveRowsToUp();
+    },
+
+    downOrd() {
+      const { $grid } = this.testItemList;
+      const rowIndex = $grid.getSelectedIndex()[0];
+      if (rowIndex == $grid.getRowCount() - 1) {
+        return;
+      }
+      $grid.updateRows(
+        [{ aitmOrd: rowIndex + 2 }, { aitmOrd: rowIndex + 1 }],
+        [rowIndex, rowIndex + 1],
+      );
+      $grid.moveRowsToDown();
+    },
+
     copyRowTestItem(list) {
       const { $grid } = this.testItemList;
       const gridRowCnt = $grid.getRowCount();

@@ -3,71 +3,89 @@
 <mapper namespace="lims.api.st.dao.StabSampleUsageDao">
     <select id="find" parameterType="StabSampleUsageVO" resultType="StabSampleUsageVO">
         SELECT QSU.PLNT_CD,
-               QSU.SMP_MNG_IDX,
-               QSU.USE_SEQ,
-               QSU.SMP_USE_PROC,
-               QSM.ANS_TYP,
-               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.ANS_TYP)                         AS ANS_TYP_NM,
-               (SELECT DTL_NM
-                FROM SY_CD_DTL SCD
-                WHERE SCD.PLNT_CD = #{plntCd}
-                  AND SCD.DTL_CD = QSU.SMP_USE_PROC)                                             AS SMP_USE_NM,
-               QSM.MNG_SMP_VOL,
-               QSU.USE_SMP_VOL,
-               QS.SUM_VOL,
-               QS.REMAINS,
-               QSM.INP_UNIT,
-               QSU.USE_PPS,
-               QSU.USE_UID,
-               (SELECT USER_NM FROM SY_USER WHERE PLNT_CD = #{plntCd} AND USER_ID = QSU.USE_UID) AS USE_NM,
-               QSU.USE_DT,
-               QSU.STRG_PLA,
-               QSU.SMP_USE_APR_IDX,
-               QSU.RJT_UID,
-               (SELECT USER_NM FROM SY_USER WHERE PLNT_CD = #{plntCd} AND USER_ID = QSU.RJT_UID) AS RJT_NM,
-               QSU.RJT_DS,
-               QSU.RJT_REA,
-               QPAP.ANS_NO,
-               QPAI.ANS_IDX,
-               QSM.LOT_NO,
-               QSM.BATCH_NO,
-               QSM.PITM_CD,
-               QSM.PITM_NM,
-               QSM.PITM_TYP,
-               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = PITM_TYP)                            AS PITM_TYP_NM,
-               QSM.SMP_DIV_CD,
-               QSM.SMP_DPS_PROC,
-               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.SMP_DPS_PROC)                    AS SMP_DPS_NM,
-               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = SMP_DIV_CD)                          AS SMP_DIV_NM
+        QSU.SMP_MNG_IDX,
+        QSU.USE_SEQ,
+        QSU.SMP_USE_PROC,
+        QSM.ANS_TYP,
+        (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.ANS_TYP) AS ANS_TYP_NM,
+        (SELECT DTL_NM
+        FROM SY_CD_DTL SCD
+        WHERE SCD.PLNT_CD = #{plntCd}
+        AND SCD.DTL_CD = QSU.SMP_USE_PROC) AS SMP_USE_NM,
+        QSM.MNG_SMP_VOL,
+        QSU.USE_SMP_VOL,
+        QS.SUM_VOL,
+        QS.REMAINS,
+        QSM.INP_UNIT,
+        QSU.USE_PPS,
+        QSU.USE_UID,
+        (SELECT USER_NM FROM SY_USER WHERE PLNT_CD = #{plntCd} AND USER_ID = QSU.USE_UID) AS USE_NM,
+        QSU.USE_DT,
+        QSU.STRG_PLA,
+        QSU.SMP_USE_APR_IDX,
+        QSU.RJT_UID,
+        (SELECT USER_NM FROM SY_USER WHERE PLNT_CD = #{plntCd} AND USER_ID = QSU.RJT_UID) AS RJT_NM,
+        QSU.RJT_DS,
+        QSU.RJT_REA,
+        QPAP.ANS_NO,
+        QPAI.ANS_IDX,
+        QSM.LOT_NO,
+        QSM.BATCH_NO,
+        QSM.PITM_CD,
+        QSM.PITM_NM,
+        QSM.PITM_TYP,
+        (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = PITM_TYP) AS PITM_TYP_NM,
+        QSM.SMP_DIV_CD,
+        QSM.SMP_DPS_PROC,
+        (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.SMP_DPS_PROC) AS SMP_DPS_NM,
+        (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = SMP_DIV_CD) AS SMP_DIV_NM,
+        QSM.IRG_YN
         FROM QS_SMP_USE QSU
-                 LEFT JOIN (SELECT QSU.PLNT_CD,
-                                   QSU.SMP_MNG_IDX,
-                                   QSM.MNG_SMP_VOL,
-                                   SUM(USE_SMP_VOL)                   AS SUM_VOL,
-                                   QSM.MNG_SMP_VOL - SUM(USE_SMP_VOL) AS REMAINS
-                            FROM QS_SMP_USE QSU
-                                     LEFT JOIN QS_SMP_MNG QSM
-                                               ON QSU.PLNT_CD = QSM.PLNT_CD and QSU.SMP_MNG_IDX = QSM.SMP_MNG_IDX
-                            WHERE QSU.DEL_YN = 'N'
-                              AND QSM.SMP_DIV_CD = 'S0260001'
-                              AND QSM.ANS_TYP = 'S0230004'
-                            GROUP BY QSU.PLNT_CD, QSU.SMP_MNG_IDX, QSM.MNG_SMP_VOL) QS
-                           ON QS.SMP_MNG_IDX = QSU.SMP_MNG_IDX
-                 LEFT JOIN QS_SMP_MNG QSM ON QSU.PLNT_CD = QSM.PLNT_CD AND QSU.SMP_MNG_IDX = QSM.SMP_MNG_IDX
-                 LEFT JOIN QT_PITM_ANS_INFO QPAI on QSM.PLNT_CD = QPAI.PLNT_CD and QSM.ANS_IDX = QPAI.ANS_IDX
-                 LEFT JOIN QT_PITM_ANS_PROC QPAP on QPAI.PLNT_CD = QPAP.PLNT_CD and QPAI.ANS_IDX = QPAP.ANS_IDX
+        LEFT JOIN (SELECT QSU.PLNT_CD,
+        QSU.SMP_MNG_IDX,
+        QSM.MNG_SMP_VOL,
+        SUM(USE_SMP_VOL) AS SUM_VOL,
+        QSM.MNG_SMP_VOL - SUM(USE_SMP_VOL) AS REMAINS
+        FROM QS_SMP_USE QSU
+        LEFT JOIN QS_SMP_MNG QSM
+        ON QSU.PLNT_CD = QSM.PLNT_CD and QSU.SMP_MNG_IDX = QSM.SMP_MNG_IDX
+        WHERE QSU.DEL_YN = 'N'
+        AND QSM.SMP_DIV_CD = 'S0260001'
+        AND QSM.SMP_DPS_PROC = 'S0270300'
+        AND QSM.ANS_TYP = 'S0230004'
+        GROUP BY QSU.PLNT_CD, QSU.SMP_MNG_IDX, QSM.MNG_SMP_VOL) QS
+        ON QS.SMP_MNG_IDX = QSU.SMP_MNG_IDX
+        LEFT JOIN QS_SMP_MNG QSM ON QSU.PLNT_CD = QSM.PLNT_CD AND QSU.SMP_MNG_IDX = QSM.SMP_MNG_IDX
+        LEFT JOIN QT_PITM_ANS_INFO QPAI on QSM.PLNT_CD = QPAI.PLNT_CD and QSM.ANS_IDX = QPAI.ANS_IDX
+        LEFT JOIN QT_PITM_ANS_PROC QPAP on QPAI.PLNT_CD = QPAP.PLNT_CD and QPAI.ANS_IDX = QPAP.ANS_IDX
         WHERE QSU.PLNT_CD = #{plntCd}
-          AND QSU.DEL_YN = 'N'
-          AND QSM.DEL_YN = 'N'
-          AND QSM.SMP_DIV_CD = 'S0260001'
-          AND QSM.ANS_TYP = 'S0230004'
-        ORDER BY QSM.SMP_MNG_IDX DESC
+        AND QSU.DEL_YN = 'N'
+        AND QSM.DEL_YN = 'N'
+        AND QSM.SMP_DIV_CD = 'S0260001'
+        AND QSM.ANS_TYP = 'S0230004'
+        <if test="pitmTyp != null and pitmTyp != ''">
+            AND QSM.PITM_TYP = #{pitmTyp}
+        </if>
+        <if test="pitmCd != null and pitmCd != ''">
+            AND QSM.PITM_CD LIKE '%' || UPPER(#{pitmCd}) || '%'
+        </if>
+        <if test="lotNo != null and lotNo != ''">
+            AND QSM.LOT_NO LIKE '%' || UPPER(#{lotNo}) || '%'
+        </if>
+        <if test="pitmNm != null and pitmNm != ''">
+            AND QSM.PITM_NM LIKE '%' || UPPER(#{pitmNm}) || '%'
+        </if>
+        <if test="useDtList.size > 0">
+            AND TO_DATE(QSU.USE_DT) BETWEEN TO_DATE(#{useDtList[0]}) AND TO_DATE(#{useDtList[1]})
+        </if>
+        ORDER BY QSM.UDT_DS DESC
     </select>
 
     <update id="requestApproveUse" parameterType="StabSampleUsageVO">
         UPDATE QS_SMP_USE
-        SET SMP_USE_PROC = 'S0280200',
-            SMP_USE_APR_IDX = #{smpUseAprIdx}
+        SET SMP_USE_PROC    = 'S0280200',
+            SMP_USE_APR_IDX = #{smpUseAprIdx},
+            USE_SMP_VOL     = #{useSmpVol}
         WHERE PLNT_CD = #{plntCd}
           AND SMP_MNG_IDX = #{smpMngIdx}
           AND USE_SEQ = #{useSeq}
@@ -75,7 +93,7 @@
 
     <update id="requestCancelUse" parameterType="StabSampleUsageVO">
         UPDATE QS_SMP_USE
-        SET SMP_USE_PROC = 'S0280400',
+        SET SMP_USE_PROC    = 'S0280400',
             SMP_USE_APR_IDX = #{smpUseAprIdx}
         WHERE PLNT_CD = #{plntCd}
           AND SMP_MNG_IDX = #{smpMngIdx}
@@ -131,6 +149,10 @@
                (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.SMP_DIV_CD)                       AS SMP_DIV_NM,
                QSM.MNG_SMP_VOL,
                QSM.SMP_STRG_MTD,
+               (SELECT DTL_NM
+                FROM SY_CD_DTL
+                WHERE PLNT_CD = #{plntCd}
+                  AND DTL_CD = QSM.SMP_STRG_MTD)                                                  AS SMP_STRG_MTD_NM,
                QSM.SMP_VOL_UNIT,
                QSM.LOT_NO,
                QSM.BATCH_NO,

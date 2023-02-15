@@ -25,10 +25,9 @@ const sampleGrid = {
   },
   forms: () =>
     FormBuilder.builder()
-      .Select('pitmDiv', '품목구분', {
+      .Select('pitmTyp', '품목구분', {
         async: () => api.combo.systemCommon.getPitmDivCombo(),
       })
-      .Input('labelCd', '라벨코드')
       .Input('pitmCd', '품목코드')
       .Input('lotNo', '제조번호')
       .Input('batchNo', '배치번호')
@@ -45,15 +44,15 @@ const sampleGrid = {
       .col('useSeq', { visible: false })
       .col('smpUseAprIdx', { visible: false })
       .col('smpUseProc', { visible: false })
-      .col('aprReqNm', '승인구분')
+      .col('smpUseNm', '사용진행상황')
       .col('pitmTypNm', '품목구분')
-      .col('ansNo', '시험번호')
       .col('pitmCd', '품목코드')
       .col('pitmNm', '품목명')
+      .col('ansNo', '시험번호')
       .col('lotNo', '제조번호')
       .col('batchNo', '배치번호')
       .col('ansTypNm', '시험구분')
-      .col('useSmpVol', '안정성검체량')
+      .col('mngSmpVol', '안정성검체량')
       .col('useSmpVol', '사용량')
       .col('remains', '재고량')
       .col('inpUnit', '검체단위')
@@ -61,7 +60,6 @@ const sampleGrid = {
       .col('usePps', '사용목적')
       .col('irgYn', '이상여부')
       .col('smpDpsNm', '검체상태')
-      .col('smpUseNm', '사용진행상황')
       .build(),
 };
 
@@ -89,7 +87,7 @@ const inputForm = {
       .Input('batchNo', '배치번호', { readonly: true })
       .InputNumber('useSmpVol', '사용량', { readonly: true })
       .Input('useNm', '사용자', { readonly: true })
-      .Datepicker('useDt', '사용일', { readonly: true })
+      .Input('useDt', '사용일', { readonly: true })
       .Textarea('usePps', '사용목적', { readonly: true, _colSpan: 2 })
       .build(),
 };

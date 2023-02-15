@@ -45,7 +45,6 @@
         LEFT JOIN QT_PITM_ANS_PROC QPAP on QPAI.PLNT_CD = QPAP.PLNT_CD AND QPAI.ANS_IDX = QPAP.ANS_IDX
         WHERE QSM.PLNT_CD = #{plntCd}
         AND QSM.DEL_YN = 'N'
-        AND QSM.SMP_DPS_PROC NOT IN ('S0270400', 'S0270600')
         <if test="smpDivCd != ''">
             AND QSM.SMP_DIV_CD = #{smpDivCd}
         </if>

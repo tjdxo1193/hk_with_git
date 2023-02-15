@@ -9,7 +9,7 @@ public enum CompanyType {
         this.code = code;
     }
 
-    public String getValue() {
+    public String getCode() {
         return code;
     }
 }

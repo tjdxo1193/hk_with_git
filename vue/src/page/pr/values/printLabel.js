@@ -107,6 +107,8 @@ const printLabelGridWithSearchForms = {
       .col('rptDivNm', '리포트 구분')
       .col('smpRmk', '검체 비고', { visible: false })
       .col('ansIdx', '시험 IDX', { visible: false })
+      .col('labelPrtIdx', '라벨 출력 IDX', { visible: false })
+      .col('prtSeq', '라벨 출력 순서', { visible: false })
       .build(),
 };
 
@@ -161,6 +163,8 @@ const printLabelInfoForms = {
       .Hidden('addSmpIdx', '추가 검체 IDX')
       .Hidden('plntCd', '사업장 코드')
       .Hidden('ansIdx', '시험 IDX')
+      .Hidden('labelPrtIdx', '라벨 출력 IDX')
+      .Hidden('prtSeq', '라벨 출력 순서')
       .build(),
 };
 

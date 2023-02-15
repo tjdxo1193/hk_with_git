@@ -15,7 +15,10 @@ public interface SampleDisApprDao {
     List<SampleDisApprVO> find(SampleDisApprVO param);
 
     @Audit(target = QsSmpMng.class, label = AuditEvent.Sample.approve)
-    int approve(SampleDisApprVO param);
+    int approveCancelDispose(SampleDisApprVO param);
+
+    @Audit(target = QsSmpMng.class, label = AuditEvent.Sample.approve)
+    int approveDispose(SampleDisApprVO param);
 
     @Audit(target = QsSmpMng.class, label = AuditEvent.Sample.reject)
     int reject(SampleDisApprVO param);

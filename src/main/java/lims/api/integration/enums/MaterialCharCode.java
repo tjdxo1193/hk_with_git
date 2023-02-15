@@ -19,7 +19,8 @@ public enum MaterialCharCode {
     DIO_YN("ZMDE_DIOXANE_MGMT_TGT"),        // 디옥산 관리 대상
     PRB_IN_YN("ZMDE_INCL_PARABEN"),         // 파라벤 포함 여부
     PRB_FE_YN("ZMDE_PARABEN_MGMT_TGT"),     // 파라벤 프리 관리 대상
-    PNX_FE_YN("ZMDE_EGPHE_MGMT_TGT");       // 페녹시 에탄올 프리 관리 대상
+    PNX_FE_YN("ZMDE_EGPHE_MGMT_TGT"),       // 페녹시 에탄올 프리 관리 대상
+    LAB_NO("ZMDE_LABNO");                   // Lab No;
 
     private final String code;
 

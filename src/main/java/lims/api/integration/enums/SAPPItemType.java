@@ -9,7 +9,8 @@ public enum SAPPItemType {
     ROH2("원료(무상)", PItemType.RAW_MATERIAL),
     ROH3("포장재", PItemType.PACKAGING_MATERIAL),
     ROH4("포장재(무상)", PItemType.PACKAGING_MATERIAL),
-    HAWA("상품", PItemType.GOODS);
+    HAWA("상품", PItemType.GOODS),
+    ZLAB("Lab No");
 
     private final PItemType[] type;
 

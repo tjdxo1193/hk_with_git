@@ -23,6 +23,17 @@ const sampleGrid = {
     props: {
       showRowCheckColumn: true,
       editable: false,
+      rowStyleFunction: (rowIndex, item) => {
+        if (item.dpsYn === 'Y') {
+          return 'disposal';
+        }
+        if (item.smpUseProc === 'S0280200' || item.smpUseProc === 'S0280400') {
+          return 'approveWating';
+        }
+        if (item.smpUseProc === 'S0280110' || item.smpUseProc === 'S0280310') {
+          return 'return';
+        }
+      },
     },
   },
   forms: () =>
@@ -33,11 +44,8 @@ const sampleGrid = {
       .Input('lotNo', '제조번호')
       .Input('batchNo', '배치번호')
       .Input('pitmCd', '품목코드')
-      .Select('strgPla', '보관장소', {
-        api: () => api.combo.userCommon.getSmpStrgMtdCombo(),
-      })
       .Input('pitmNm', '품목명')
-      .DatepickerTwinWithSwitch('useLmt', '사용기한', {
+      .DatepickerTwinWithSwitch('useLmtDtList', '사용기한', {
         value: [yesterdayDate, todayDate],
         _colSpan: 2,
       })
@@ -49,6 +57,8 @@ const sampleGrid = {
       .col('pitmCd', '품목코드')
       .col('pitmNm', '품목명')
       .col('lotNo', '제조번호')
+      .col('makDt', '제조일자')
+      .col('ansTypNm', '시험유형')
       .col('useLmt', '사용기한')
       .col('smpDivNm', '검체구분')
       .col('remains', '재고량')

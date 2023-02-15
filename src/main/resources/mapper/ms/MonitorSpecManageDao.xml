@@ -3,33 +3,38 @@
 <mapper namespace="lims.api.ms.dao.MonitorSpecManageDao">
     <select id="getMItemSpecList" resultType="monitorSpecManageVO" parameterType="monitorSpecManageVO">
         SELECT
-            MM.PLNT_CD
-             , MM.MITM_CD
-             , MM.MITM_WRK_PLC_DIV
-             , SCTWRK.TREE_NM AS MITM_WRK_PLC_DIV_NM
-             , MM.MITM_PITM_DIV
-             , SCTPITM.TREE_NM AS MITM_PITM_DIV_NM
-             , MM.POINT
-             , MM.ROOMNO
-             , MM.GRADE
-             , SDGRD.DTL_NM AS GRADE_NM
-             , MM.ANS_CYL_CD
-             , SAC.ANS_CYL_MARK_NM AS ANS_CYL_NM
-             , MM.CRG_DPT_CD
-             , SDPT.DPT_NM AS CRG_DPT_NM
-             , MM.ANS_STR_DT
-             , MM.PER_SPEC
-             , MM.REVW_DUR_TM
-             , MM.APR_DUR_TM
-             , MMS.MITM_SPEC_IDX
-             , MMS.AITM_SPEC_IDX
-             , MMS.SPEC_PROC_CD
-             , SDPROC.DTL_NM AS SPEC_PROC_NM
-             , MMS.USE_VER_YN
+        MM.PLNT_CD
+        , MM.MITM_CD
+        , MM.MITM_WRK_PLC_DIV
+        , SCTWRK.TREE_NM AS MITM_WRK_PLC_DIV_NM
+        , MM.MITM_PITM_DIV
+        , SCTPITM.TREE_NM AS MITM_PITM_DIV_NM
+        , MM.POINT
+        , MM.ROOMNO
+        , MM.GRADE
+        , SDGRD.DTL_NM AS GRADE_NM
+        , MM.ANS_CYL_CD
+        , SAC.ANS_CYL_MARK_NM AS ANS_CYL_NM
+        , MM.CRG_DPT_CD
+        , SDPT.DPT_NM AS CRG_DPT_NM
+        , MM.ANS_STR_DT
+        , MM.PER_SPEC
+        , MM.REVW_DUR_TM
+        , MM.APR_DUR_TM
+        , MMS.MITM_SPEC_IDX
+        , MMSSUB.AITM_SPEC_IDX
+        , MMSSUB.SPEC_PROC_CD
+        , SDPROC.DTL_NM AS SPEC_PROC_NM
+        , MMSSUB.USE_VER_YN
         FROM MM_MITM MM
-        LEFT JOIN MM_MITM_SPEC MMS ON MM.PLNT_CD = MMS.PLNT_CD AND MMS.MITM_CD = MM.MITM_CD AND MMS.USE_VER_YN = 'Y' AND MMS.DEL_YN = 'N'
+        LEFT JOIN (SELECT PLNT_CD, MITM_CD, MAX(MITM_SPEC_IDX) AS MITM_SPEC_IDX FROM MM_MITM_SPEC
+            WHERE DEL_YN = 'N'
+            GROUP BY PLNT_CD, MITM_CD) MMS
+        ON MM.PLNT_CD = MMS.PLNT_CD AND MMS.MITM_CD = MM.MITM_CD
+        LEFT JOIN (SELECT PLNT_CD, MITM_CD, SPEC_PROC_CD, AITM_SPEC_IDX, USE_VER_YN, MITM_SPEC_IDX FROM MM_MITM_SPEC) MMSSUB
+            ON MMSSUB.PLNT_CD = MM.PLNT_CD AND MMSSUB.MITM_CD = MM.MITM_CD AND MMSSUB.MITM_SPEC_IDX = MMS.MITM_SPEC_IDX
         LEFT JOIN SY_CD_DTL SDGRD ON MM.PLNT_CD = SDGRD.PLNT_CD AND MM.GRADE = SDGRD.DTL_CD
-        LEFT JOIN SY_CD_DTL SDPROC ON MMS.PLNT_CD = SDPROC.PLNT_CD AND MMS.SPEC_PROC_CD = SDPROC.DTL_CD
+        LEFT JOIN SY_CD_DTL SDPROC ON MMSSUB.PLNT_CD = SDPROC.PLNT_CD AND MMSSUB.SPEC_PROC_CD = SDPROC.DTL_CD
         LEFT JOIN SY_DPT SDPT ON SDPT.PLNT_CD = MM.PLNT_CD AND SDPT.DPT_CD = MM.CRG_DPT_CD
         LEFT JOIN SY_ANS_CYL SAC ON SAC.PLNT_CD = MM.PLNT_CD AND MM.ANS_CYL_CD = SAC.ANS_CYL_CD
         LEFT JOIN SY_CD_TREE SCTWRK ON SCTWRK.PLNT_CD = MM.PLNT_CD AND SCTWRK.TREE_CD = MM.MITM_WRK_PLC_DIV
@@ -38,7 +43,7 @@
         AND MM.DEL_YN = 'N'
         AND MM.USE_YN = 'Y'
         <if test=" specProcCd != null and specProcCd != '' ">
-            AND MMS.SPEC_PROC_CD = #{specProcCd}
+            AND MMSSUB.SPEC_PROC_CD = #{specProcCd}
         </if>
         <if test=" mitmCd != null and mitmCd != '' ">
             AND MM.MITM_CD LIKE '%' || (#{mitmCd}) || '%'
@@ -49,6 +54,7 @@
         <if test="mitmPitmDivNm != null and mitmPitmDivNm != '' ">
             AND SCTPITM.TREE_NM LIKE '%' || (#{mitmPitmDivNm}) || '%'
         </if>
+        ORDER BY MITM_CD
     </select>
 
     <select id="getVersionList" parameterType="monitorSpecManageVO" resultType="monitorSpecManageVO">
@@ -86,6 +92,7 @@
         WHERE MMS.PLNT_CD = #{plntCd}
         AND MITM_CD = #{mitmCd}
         AND MMS.DEL_YN = 'N'
+        ORDER BY MMAS.AITM_SPEC_VER DESC, MMS.AITM_SPEC_IDX DESC, MMS.USE_VER_YN DESC
     </select>
 
     <select id="getMItemSpecAItemList" parameterType="monitorSpecManageVO" resultType="monitorSpecManageVO">
@@ -127,9 +134,13 @@
          LEFT JOIN MS_AITM M ON SUBSTR(MMSA.AMITM_CD, 0, 6) = M.AITM_CD
         WHERE MMSA.PLNT_CD = #{plntCd}
           AND MMSA.AITM_SPEC_IDX = #{aitmSpecIdx}
+         ORDER BY AITM_ORD
     </select>
 
     <insert id="createVersion" parameterType="monitorSpecManageVO">
+        <selectKey resultType="int" keyProperty="aitmSpecIdx" order="BEFORE">
+            SELECT NVL(MAX(AITM_SPEC_IDX)+1,1) AS AITM_SPEC_IDX FROM MM_MITM_AITM_SPEC WHERE PLNT_CD = #{plntCd}
+        </selectKey>
         INSERT INTO MM_MITM_AITM_SPEC
             (
                 PLNT_CD
@@ -145,6 +156,9 @@
     </insert>
 
     <insert id="createMItemSpec" parameterType="monitorSpecManageVO">
+        <selectKey resultType="int" keyProperty="mitmSpecIdx" order="BEFORE">
+            SELECT NVL(MAX(MITM_SPEC_IDX)+1,1) AS MITM_SPEC_IDX FROM MM_MITM_SPEC WHERE PLNT_CD = #{plntCd}
+        </selectKey>
         INSERT INTO MM_MITM_SPEC
             (
                 PLNT_CD
@@ -158,8 +172,6 @@
                 , DOC_NO
                 , RVS_DT
                 , ENFO_DT
-                , RVS_REA_CD
-                , RVS_CTT
                 , RVS_DIV_PS
             )
         VALUES
@@ -175,8 +187,6 @@
                 , #{docNo}
                 , #{rvsDt}
                 , #{enfoDt}
-                , #{rvsReaCd}
-                , #{rvsCtt}
                 , #{rvsDivPs}
             )
     </insert>
@@ -198,71 +208,75 @@
 
     <insert id="createMItemSpecAItem" parameterType="monitorSpecManageVO">
         <selectKey resultType="int" keyProperty="aitmSeq" order="BEFORE">
-            SELECT NVL(MAX(AITM_SEQ)+1,1) FROM MM_MITM_SPEC_AITM WHERE PLNT_CD = #{plntCd} AND AITM_SPEC_IDX = #{aitmSpecIdx}
+            SELECT NVL(MAX(AITM_SEQ)+1,1) AS AITM_SEQ FROM MM_MITM_SPEC_AITM WHERE PLNT_CD = #{plntCd} AND AITM_SPEC_IDX = #{aitmSpecIdx}
         </selectKey>
         INSERT INTO MM_MITM_SPEC_AITM
         (
-             PLNT_CD
-            , AITM_SPEC_IDX
-            , AITM_SEQ
-            , ANS_DPT_CD
-            , AMITM_CD
-            , AITM_ORD
-            , PERSPEC_TXT
-            , OWC_SPEC_TXT
-            , SPEC_TXT_EN
-            , SPEC_TYP
-            , JDG_TYP
-            , PER_SLV_LOW
-            , PER_SLV_UPP
-            , PER_SLV_DESC
-            , OWC_SLV_LOW
-            , OWC_SLV_UPP
-            , OWC_SLV_DESC
-            , SLV_JDG_CFM
-            , SLV_JDG_NON_CFM
-            , RST_UNIT_CD
-            , RST_DPNT
-            , RPT_PRT_SLV_VAL
-            , RPT_PRT_ITM_NM
-            , RPT_PRT_YN
-            , ISP_DPT_CD
-            , SMP_CLLT_QTY
-            , SMP_CLLT_UNIT
-            , ISP_DUR_TM
-            , EQM_USE_TM
+            PLNT_CD,
+            AITM_SPEC_IDX,
+            AITM_SEQ,
+            ANS_DPT_CD,
+            AMITM_CD,
+            AITM_ORD,
+            PERSPEC_TXT,
+            OWC_SPEC_TXT,
+            SPEC_TXT_EN,
+            SPEC_TYP,
+            JDG_TYP,
+            PER_SLV_LOW,
+            PER_SLV_UPP,
+            PER_SLV_DESC,
+            OWC_SLV_LOW,
+            OWC_SLV_UPP,
+            OWC_SLV_DESC,
+            SLV_JDG_CFM,
+            SLV_JDG_NON_CFM,
+            RST_UNIT_CD,
+            RST_DPNT,
+            RPT_PRT_SLV_VAL,
+            RPT_PRT_ITM_NM,
+            RPT_PRT_YN,
+            ISP_DPT_CD,
+            SMP_CLLT_QTY,
+            SMP_CLLT_UNIT,
+            ISP_DUR_TM,
+            EQM_USE_TM,
+            MKR_QTY,
+            AITM_RMK
         )
         VALUES
         (
-        #{plntCd}
-        , #{aitmSpecIdx}
-        , #{aitmSeq}
-        , #{ansDptCd}
-        , #{amitmCd}
-        , #{aitmOrd}
-        , #{perspecTxt}
-        , #{owcSpecTxt}
-        , #{specTxtEn}
-        , #{specTyp}
-        , #{jdgTyp}
-        , #{perSlvLow}
-        , #{perSlvUpp}
-        , #{perSlvDesc}
-        , #{owcSlvLow}
-        , #{owcSlvUpp}
-        , #{owcSlvDesc}
-        , #{slvJdgCfm}
-        , #{slvJdgNonCfm}
-        , #{rstUnitCd}
-        , #{rstDpnt}
-        , #{rptPrtSlvVal}
-        , #{rptPrtItmNm}
-        , #{rptPrtYn}
-        , #{ispDptCd}
-        , #{smpClltQty}
-        , #{smpClltUnit}
-        , #{ispDurTm}
-        , #{eqmUseTm}
+            #{plntCd},
+            #{aitmSpecIdx},
+            #{aitmSeq},
+            #{ansDptCd},
+            #{amitmCd},
+            #{aitmOrd},
+            #{perspecTxt},
+            #{owcSpecTxt},
+            #{specTxtEn},
+            #{specTyp},
+            #{jdgTyp},
+            #{perSlvLow},
+            #{perSlvUpp},
+            #{perSlvDesc},
+            #{owcSlvLow},
+            #{owcSlvUpp},
+            #{owcSlvDesc},
+            #{slvJdgCfm},
+            #{slvJdgNonCfm},
+            #{rstUnitCd},
+            #{rstDpnt},
+            #{rptPrtSlvVal},
+            #{rptPrtItmNm},
+            #{rptPrtYn},
+            #{ispDptCd},
+            #{smpClltQty},
+            #{smpClltUnit},
+            #{ispDurTm},
+            #{eqmUseTm},
+            #{mkrQty},
+            #{aitmRmk}
         )
     </insert>
 
@@ -270,6 +284,7 @@
         DELETE FROM MM_MITM_SPEC_AITM
         WHERE PLNT_CD = #{plntCd}
         AND AITM_SPEC_IDX = #{aitmSpecIdx}
+        AND AITM_SEQ = #{aitmSeq}
     </delete>
 
     <select id="getItemMethodList" parameterType="monitorSpecManageVO" resultType="monitorSpecManageVO">
@@ -304,12 +319,47 @@
         FROM DUAL
     </select>
 
-    <update id="updateUseVerN" parameterType="monitorSpecApprVO">
+    <update id="updateUseVerN" parameterType="monitorSpecManageVO">
         UPDATE MM_MITM_SPEC SET
             USE_VER_YN = 'N'
         WHERE PLNT_CD = #{plntCd}
           AND MITM_CD = #{mitmCd}
           AND USE_VER_YN = 'Y'
+    </update>
+
+    <update id="updateMItemSpecAItem" parameterType="monitorSpecManageVO">
+        UPDATE MM_MITM_SPEC_AITM SET
+            ANS_DPT_CD = #{ansDptCd},
+            AMITM_CD = #{amitmCd},
+            AITM_ORD = #{aitmOrd},
+            PERSPEC_TXT = #{perspecTxt},
+            OWC_SPEC_TXT = #{owcSpecTxt},
+            SPEC_TXT_EN = #{specTxtEn},
+            SPEC_TYP = #{specTyp},
+            JDG_TYP = #{jdgTyp},
+            PER_SLV_LOW = #{perSlvLow},
+            PER_SLV_UPP = #{perSlvUpp},
+            PER_SLV_DESC = #{perSlvDesc},
+            OWC_SLV_LOW = #{owcSlvLow},
+            OWC_SLV_UPP = #{owcSlvUpp},
+            OWC_SLV_DESC = #{owcSlvDesc},
+            SLV_JDG_CFM = #{slvJdgCfm},
+            SLV_JDG_NON_CFM = #{slvJdgNonCfm},
+            RST_UNIT_CD = #{rstUnitCd},
+            RST_DPNT = #{rstDpnt},
+            RPT_PRT_SLV_VAL = #{rptPrtSlvVal},
+            RPT_PRT_ITM_NM = #{rptPrtItmNm},
+            RPT_PRT_YN = #{rptPrtYn},
+            ISP_DPT_CD = #{ispDptCd},
+            SMP_CLLT_QTY = #{smpClltQty},
+            SMP_CLLT_UNIT = #{smpClltUnit},
+            ISP_DUR_TM = #{ispDurTm},
+            EQM_USE_TM = #{eqmUseTm},
+            MKR_QTY = #{mkrQty},
+            AITM_RMK = #{aitmRmk}
+        WHERE AITM_SPEC_IDX = #{aitmSpecIdx}
+        AND AITM_SEQ = #{aitmSeq}
+        AND PLNT_CD = #{plntCd}
     </update>
 
     <select id="getDepartmentList" parameterType="specManageVO" resultType="comboVO">

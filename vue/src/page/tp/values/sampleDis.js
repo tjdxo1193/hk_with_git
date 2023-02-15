@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 
-import { ColumnBuilder, FormBuilder } from '@/util';
 import api from '@/api';
+import { ColumnBuilder, FormBuilder } from '@/util';
 
 const monthAgoDate = dayjs().add(-1, 'month').format('YYYY-MM-DD');
 
@@ -24,6 +24,15 @@ const sampleDisGrid = {
     props: {
       editable: false,
       showRowCheckColumn: true,
+      rowStyleFunction: (rowIndex, item) => {
+        if (item.smpDpsProc === 'S0270500') {
+          return 'disposal';
+        } else if (item.smpDpsProc === 'S0270400' || item.smpDpsProc === 'S0270600') {
+          return 'approveWating';
+        } else if (item.smpDpsProc === 'S0270310' || item.smpDpsProc === 'S0270510') {
+          return 'return';
+        }
+      },
     },
   },
   forms: () =>

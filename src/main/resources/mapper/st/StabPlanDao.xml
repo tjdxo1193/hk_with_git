@@ -131,6 +131,7 @@
              , QPAP.ANS_IDX
              , QPAP.ANS_NO
              , QPAP.ANS_TYP
+             , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = QPAP.ANS_TYP) AS ANS_TYP_NM
              , QPAP.ANS_EDT
              , QPAP.REQ_DT
              , QPAP.CLLT_DT

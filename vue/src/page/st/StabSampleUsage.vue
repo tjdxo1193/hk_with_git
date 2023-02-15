@@ -111,28 +111,44 @@ export default {
     async save() {
       const { forms } = this.inputForm;
       const param = FormUtil.getData(forms);
-      await this.$eSign(() => this.$axios.post('/st/stabSampleUsage', param))
-        .then(() => {
-          this.$info(this.$message.info.saved);
-          this.fetchSampleUsageGrid();
-          this.init();
-        })
-        .catch(() => {
-          this.$error(this.$message.error.saveData);
-        });
+      if (this.isBiggerThanSmpVol()) {
+        if (this.isPositive()) {
+          await this.$eSign(() => this.$axios.post('/st/stabSampleUsage', param))
+            .then(() => {
+              this.$info(this.$message.info.saved);
+              this.fetchSampleUsageGrid();
+              this.init();
+            })
+            .catch(() => {
+              this.$error(this.$message.error.saveData);
+            });
+        } else {
+          return this.$warn(this.$message.warn.noNegativeNumber);
+        }
+      } else {
+        return this.$warn(this.$message.warn.biggerThanRemains);
+      }
     },
     async update() {
       const { forms } = this.inputForm;
       const param = FormUtil.getData(forms);
-      await this.$eSign(() => this.$axios.put('/st/stabSampleUsage', param))
-        .then(() => {
-          this.$info(this.$message.info.saved);
-          this.fetchSampleUsageGrid();
-          this.init();
-        })
-        .catch(() => {
-          this.$error(this.$message.error.saveData);
-        });
+      if (this.isBiggerThanSmpVol()) {
+        if (this.isPositive()) {
+          await this.$eSign(() => this.$axios.put('/st/stabSampleUsage', param))
+            .then(() => {
+              this.$info(this.$message.info.saved);
+              this.fetchSampleUsageGrid();
+              this.init();
+            })
+            .catch(() => {
+              this.$error(this.$message.error.saveData);
+            });
+        } else {
+          return this.$warn(this.$message.warn.noNegativeNumber);
+        }
+      } else {
+        return this.$warn(this.$message.warn.biggerThanRemains);
+      }
     },
     async delete() {
       const { forms } = this.inputForm;
@@ -175,6 +191,17 @@ export default {
           this.$error(this.$message.error.updateData);
         });
     },
+    isBiggerThanSmpVol() {
+      const { forms } = this.inputForm;
+      const remains = FormUtil.getValue(forms, 'remains');
+      const useSmpVol = FormUtil.getValue(forms, 'useSmpVol');
+      return Number(remains) >= Number(useSmpVol);
+    },
+    isPositive() {
+      const { forms } = this.inputForm;
+      const useSmpVol = FormUtil.getValue(forms, 'useSmpVol');
+      return Number(useSmpVol) > 0;
+    },
     onSelectSample(event) {
       const { forms } = this.inputForm;
       FormUtil.setData(forms, event[0]);
@@ -186,7 +213,7 @@ export default {
       this.setButtonsEnable(data.smpUseProc);
     },
     setButtonsEnable(status) {
-      const buttons = this.inputForm.buttons;
+      const { buttons } = this.inputForm;
       if (status === TEMP_SAVE || status === REJECT_USE) {
         FormUtil.enableButtons(buttons, ['init', 'requestApproveUse', 'update', 'delete']);
         FormUtil.disableButtons(buttons, ['save', 'requestCancelUse']);
@@ -213,7 +240,15 @@ export default {
         this.inputForm.forms
           .validate()
           .then(() => {
-            this.showModal('requestApproveUse');
+            if (this.isBiggerThanSmpVol()) {
+              if (this.isPositive()) {
+                this.showModal('requestApproveUse');
+              } else {
+                return this.$warn(this.$message.warn.noNegativeNumber);
+              }
+            } else {
+              return this.$warn(this.$message.warn.biggerThanRemains);
+            }
           })
           .catch(() => {});
       }
@@ -230,10 +265,7 @@ export default {
           .catch(() => {});
       }
       if (name === 'delete') {
-        this.inputForm.forms
-          .validate()
-          .then(() => this.delete())
-          .catch(() => {});
+        this.delete();
       }
       if (name === 'requestCancelUse') {
         this.inputForm.forms
@@ -250,6 +282,7 @@ export default {
     onFormEvent(event) {
       if (event.originEvent === 'sampleSearch') {
         this.showModal('stabSampleItemSearchModal');
+        this.init();
       }
     },
     showModal(name) {

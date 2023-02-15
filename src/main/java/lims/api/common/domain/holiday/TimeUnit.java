@@ -4,7 +4,8 @@ import java.time.temporal.ChronoUnit;
 
 public enum TimeUnit {
     DAY(ChronoUnit.DAYS),
-    MONTH(ChronoUnit.MONTHS);
+    MONTH(ChronoUnit.MONTHS),
+    YEAR(ChronoUnit.YEARS);
 
     private ChronoUnit chronoUnit;
 

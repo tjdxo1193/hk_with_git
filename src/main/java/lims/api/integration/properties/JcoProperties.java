@@ -58,7 +58,7 @@ public class JcoProperties {
                     passwd,
                     lang
             );
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 

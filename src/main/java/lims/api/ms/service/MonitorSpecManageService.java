@@ -12,11 +12,11 @@ public interface MonitorSpecManageService {
 
     List<MonitorSpecManageVO> getMItemSpecAItemList(MonitorSpecManageVO param);
 
-    void createVersion(List<MonitorSpecManageVO> param);
+    void createNewVersion(MonitorSpecManageVO param);
 
-    void createMItemSpecAItem(List<MonitorSpecManageVO> param);
+    void createFirstVersion(MonitorSpecManageVO param);
 
-    void deleteMItemSpec(MonitorSpecManageVO param);
+    void makeAItem(MonitorSpecManageVO param);
 
     void updateRequestReview(MonitorSpecManageVO param);
 

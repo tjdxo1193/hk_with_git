@@ -4,6 +4,9 @@ import lims.api.common.domain.UpdateDetect;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
 public class MonitorSpecManageVO implements UpdateDetect {
@@ -86,15 +89,20 @@ public class MonitorSpecManageVO implements UpdateDetect {
     //modal - ms_aitm , ms_amitm
     private String aitmCd;
     private String aitmKn;
-     private String aitmEn;
-     private String aitmAbbr;
-     private String vriaNo;
-     private String vriaKn;
-     private String vriaEn;
-     private String rmk;
-     private String aprUid;
-     private String aprReqUid;
+    private String aitmEn;
+    private String aitmAbbr;
+    private String vriaNo;
+    private String vriaKn;
+    private String vriaEn;
+    private String rmk;
+    private String aprUid;
+    private String aprReqUid;
 
-     private String revwUnm;
-     private String rjtUnm;
+    private String revwUnm;
+    private String rjtUnm;
+    private String mkrQty;
+    private String aitmRmk;
+    private List<MonitorSpecManageVO> addedRowItems = new ArrayList<>();
+    private List<MonitorSpecManageVO> editedRowItems = new ArrayList<>();
+    private List<MonitorSpecManageVO> removedRowItems = new ArrayList<>();
 }

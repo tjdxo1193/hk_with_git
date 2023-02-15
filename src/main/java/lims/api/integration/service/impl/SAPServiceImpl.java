@@ -3,10 +3,7 @@ package lims.api.integration.service.impl;
 import lims.api.integration.dao.InterfaceCommonDao;
 import lims.api.integration.dao.SAPDao;
 import lims.api.integration.domain.eai.*;
-import lims.api.integration.enums.InterfaceResponseStatus;
-import lims.api.integration.enums.InterfaceSystemType;
-import lims.api.integration.enums.RevInterface;
-import lims.api.integration.enums.TrsInterface;
+import lims.api.integration.enums.*;
 import lims.api.integration.exception.IntegrationNoSavedException;
 import lims.api.integration.model.InterfaceTrsResponse;
 import lims.api.integration.model.interfaceTrsSAPPurchasePerformResponse;
@@ -422,7 +419,7 @@ public class SAPServiceImpl implements SAPService {
                     @Override
                     public InterfaceTrsResponse send() {
                         Map<String, Object> body = new HashMap<>();
-                        body.put("bukrs", "1000");
+                        body.put("bukrs", CompanyType.KOLMAR.getCode());
                         body.put("xsysid", "LIMS");
                         body.put("dataList", data);
                         return publisher.postEAI(

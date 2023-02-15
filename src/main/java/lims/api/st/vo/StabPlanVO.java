@@ -98,6 +98,7 @@ public class StabPlanVO implements UpdateDetect {
     // QT_PITM_ANS_PROC
     private String qpapAnsProcCd;               // S013, 시험 진행상태 코드
     private String ansTyp;                      // 시험 유형
+    private String ansTypNm;                    // 시험 유형(임의추가)
     private String ansNo;                       // 시험 번호
     private String reqDt;                       // 의뢰 일자
     private String ansEdt;                      // 시험 예정일

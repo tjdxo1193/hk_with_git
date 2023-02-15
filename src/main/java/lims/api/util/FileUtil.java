@@ -18,7 +18,7 @@ public class FileUtil {
             return Base64.getEncoder().encode(bytes);
         } catch (IOException e) {
             log.error("[{}] Failed convert to byte array from file. {}", ThreadUtil.getCurrentMethodName(), file.getAbsolutePath());
-            throw new RuntimeException(e.getCause());
+            throw new RuntimeException(e);
         }
     }
 
@@ -27,7 +27,7 @@ public class FileUtil {
             return file.getBytes();
         } catch(IOException e) {
             log.error("[{}] Failed convert multipart file to BLOB", ThreadUtil.getCurrentMethodName());
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 
@@ -36,7 +36,7 @@ public class FileUtil {
             return Files.readAllBytes(file.toPath());
         } catch (IOException e) {
             log.error("[{}] Failed convert file to BLOB. {}", ThreadUtil.getCurrentMethodName(), file.getName());
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 
