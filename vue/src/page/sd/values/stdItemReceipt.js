@@ -84,7 +84,8 @@ const list = {
       .col('strgPlaDtl', '세부보관장소')
       .col('spec', '규격')
       .col('stdMois', '수분')
-      .col('stdCtetCd', '함량종류')
+      .col('stdCtetCd', false)
+      .col('stdCtetCdNm', '함량종류')
       .col('stdCtetVal', '함량')
       .col('stdCtetUnitCd', false)
       .col('stdCtetUnitNm', '함량단위')
@@ -248,7 +249,8 @@ const detail = {
       )
       .spanCol(2)
       .Datepicker('opnBefExpirDt', '개봉 전 사용기한', { value: todayDate })
-      .Input('opnAftExpirTrm', '개봉 후 사용기간', { disabled: true })
+      .Input('opnAftExpirTrm', '개봉 후 사용기간(개월)', { maxlength: 5, disabled: true })
+      .validator((value) => value === '' || Number.isInteger(Number(value)))
       .multiple(
         'stdCtet',
         '함량',

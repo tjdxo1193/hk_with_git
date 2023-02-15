@@ -34,12 +34,12 @@ export default {
     ansIdx: {
       type: Number,
       default: null,
-    }
+    },
   },
   data() {
     const { labelListGridWithForms, buttonGroups } = this.$copy(values);
     return {
-      labelListGridWithForms : {
+      labelListGridWithForms: {
         ...labelListGridWithForms.static,
         forms: labelListGridWithForms.forms(),
         columns: labelListGridWithForms.columns(),
@@ -47,15 +47,15 @@ export default {
       buttonGroups: {
         buttons: buttonGroups.buttons,
       },
-    }
+    };
   },
   watch: {
-    show: function() {
+    show: function () {
       const { show } = this.$props;
-      if(show) {
+      if (show) {
         this.doInit();
       }
-    }
+    },
   },
   methods: {
     doInit() {
@@ -66,12 +66,12 @@ export default {
       const { forms, $grid } = this.labelListGridWithForms;
       const { ansIdx } = this.$props;
       const parameter = { ansIdx, ...FormUtil.getData(forms) };
-      
+
       const data = await $grid
         ._useLoader(() => this.$axios.get('/pr/rePrintLabelRequest/labelList', parameter))
         .then(({ data }) => data)
         .catch(() => this.$error(this.$message.error.fetchData));
-      
+
       $grid.setGridData(data);
     },
     resetLabelListGridWithForms() {
@@ -88,9 +88,7 @@ export default {
       this.$emit('close', 'labelListModal');
     },
   },
-}
+};
 </script>
 
-<style>
-
-</style>
+<style></style>

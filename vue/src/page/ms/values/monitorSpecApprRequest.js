@@ -10,6 +10,16 @@ const rvsDivPsComboList = [
   { value: 'S', label: '규격서' },
 ];
 
+const versionValueHiddenForm = {
+  forms: () =>
+    FormBuilder.builder()
+      .Hidden('specProcCd', '진행상황')
+      .Hidden('mitmCd', '모니터링항목코드')
+      .Hidden('aitmSpecIdx', '시험항목 규격 IDX')
+      .Hidden('mitmSpecIdx', '모니터링규격IDX')
+      .Hidden('aitmSpecVer', '버전')
+      .build(),
+};
 const versionList = {
   static: {
     title: '조회',
@@ -200,4 +210,5 @@ const testItemList = {
 export default {
   versionList,
   testItemList,
+  versionValueHiddenForm,
 };

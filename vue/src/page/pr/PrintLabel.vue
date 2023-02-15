@@ -5,7 +5,7 @@
     @button-click="onPrintLabelGridWithSearchFormsButtonClick"
     @form-event="printLabelGridWithSearchFormsEvent"
   />
-  <FormWithHeader 
+  <FormWithHeader
     v-bind="printLabelInfoForms"
     @button-click="onPrintLabelGridWithSearchFormsButtonClick"
   />
@@ -33,11 +33,11 @@ export default {
           },
         },
       },
-      printLabelInfoForms : {
+      printLabelInfoForms: {
         ...printLabelInfoForms.static,
         forms: printLabelInfoForms.forms(),
-      }
-    }
+      },
+    };
   },
   mounted() {
     this.doInit();
@@ -50,23 +50,23 @@ export default {
     async fetchPrintLabelGridWithSearchForms() {
       const { forms, $grid } = this.printLabelGridWithSearchForms;
       const parameter = FormUtil.getData(forms);
-      
+
       const data = await $grid
         ._useLoader(() => this.$axios.get('/pr/printLabel', parameter))
         .then(({ data }) => data)
         .catch(() => this.$error(this.$message.error.fetchData));
-      
+
       $grid.setGridData(data);
     },
     printLabelGridDoubleClicked(e) {
       const { forms } = this.printLabelInfoForms;
       const { item } = e;
-      
+
       FormUtil.setData(forms, item);
 
       // 재출력 승인 프로세스 후, rptDiv값이 있으면
       const rptDiv = item?.rptDiv;
-      if(rptDiv) {
+      if (rptDiv) {
         FormUtil.disable(forms, 'rptDiv');
       } else {
         FormUtil.enable(forms, 'rptDiv');
@@ -90,22 +90,24 @@ export default {
       const { forms } = this.printLabelInfoForms;
       const parameter = FormUtil.getData(forms);
 
-      if(!parameter || !parameter.plntCd || !parameter.ansIdx || !this.pitmTypList.rawMaterial) {
+      if (!parameter || !parameter.plntCd || !parameter.ansIdx || !this.pitmTypList.rawMaterial) {
         this.$warn(this.$message.warn.unSelectedData);
         return;
       }
 
-      forms.validate()
-        .then(() => this.$axios.put('/pr/printLabel', parameter)
+      forms.validate().then(() =>
+        this.$axios
+          .put('/pr/printLabel', parameter)
           .then(({ data }) => data)
           .then(() => this.printLabel())
-          .catch(() => this.$error(this.$message.error.printData)));
+          .catch(() => this.$error(this.$message.error.printData)),
+      );
     },
     printLabel() {
       const { forms } = this.printLabelInfoForms;
       const parameter = FormUtil.getData(forms);
 
-      if(!parameter || !parameter.plntCd || !parameter.ansIdx || !this.pitmTypList.rawMaterial) {
+      if (!parameter || !parameter.plntCd || !parameter.ansIdx || !this.pitmTypList.rawMaterial) {
         this.$warn(this.$message.warn.unSelectedData);
         return;
       }
@@ -119,11 +121,9 @@ export default {
     },
     resetPrintLabelGridWithSearchForms() {
       this.printLabelInfoForms.forms = values.printLabelInfoForms.forms();
-    }
+    },
   },
-}
+};
 </script>
 
-<style>
-
-</style>
+<style></style>

@@ -5,7 +5,6 @@
     @grid-created="(proxy) => $setState('list.$grid', proxy)"
     @form-event="searchFormEvent"
   />
-  
 </template>
 
 <script>
@@ -78,7 +77,7 @@ export default {
         this.$warn(this.$message.warn.unSelectedData);
       }
     },
-    requestCreate(){
+    requestCreate() {
       this.$confirm(this.$message.confirm.created).then(() => {
         this.$axios.post('/mt/monitorTestRequest/test');
         this.$info(this.$message.info.createdRequest);

@@ -23,12 +23,21 @@
     @close="hideModal('requestCancelUse')"
     @modalReturnDataEvent="requestCancelUseModalReturnDataEvent"
   />
+  <InputReasonForDeleteModal
+    :show="inputReasonForDeleteModal.show"
+    @close="hideModal('inputReasonForDeleteModal')"
+    @onModalDataReturn="onReturnInputReasonForDeleteModal"
+  />
 </template>
 
 <script>
 import dayjs from 'dayjs';
 
-import { StabSampleItemSearchModal, RequestApproverModal } from '@/page/modal';
+import {
+  StabSampleItemSearchModal,
+  RequestApproverModal,
+  InputReasonForDeleteModal,
+} from '@/page/modal';
 import { FormUtil, TokenUtil } from '@/util/index.js';
 
 import values from './values/stabSampleUsage.js';
@@ -46,6 +55,7 @@ export default {
   components: {
     StabSampleItemSearchModal,
     RequestApproverModal,
+    InputReasonForDeleteModal,
   },
   data() {
     const { sampleUsageGrid, inputForm } = this.$copy(values);
@@ -74,6 +84,9 @@ export default {
       requestCancelUse: {
         show: false,
         aprReqDiv: 'S0050018',
+      },
+      inputReasonForDeleteModal: {
+        show: false,
       },
     };
   },
@@ -150,9 +163,8 @@ export default {
         return this.$warn(this.$message.warn.biggerThanRemains);
       }
     },
-    async delete() {
+    async delete(param) {
       const { forms } = this.inputForm;
-      const param = FormUtil.getData(forms);
       await this.$eSign(() => this.$axios.put('/st/stabSampleUsage/delete', param))
         .then(() => {
           this.$info(this.$message.info.saved);
@@ -265,7 +277,7 @@ export default {
           .catch(() => {});
       }
       if (name === 'delete') {
-        this.delete();
+        this.showModal('inputReasonForDeleteModal');
       }
       if (name === 'requestCancelUse') {
         this.inputForm.forms
@@ -285,6 +297,14 @@ export default {
         this.init();
       }
     },
+    onReturnInputReasonForDeleteModal(data) {
+      const formData = FormUtil.getData(this.inputForm.forms);
+      const param = {
+        delRea: data.delRea,
+        ...formData,
+      };
+      this.delete(param);
+    },
     showModal(name) {
       if (name === 'stabSampleItemSearchModal') {
         return (this.stabSampleItemSearchModal.show = true);
@@ -294,6 +314,9 @@ export default {
       }
       if (name === 'requestCancelUse') {
         return (this.requestCancelUse.show = true);
+      }
+      if (name === 'inputReasonForDeleteModal') {
+        return (this.inputReasonForDeleteModal.show = true);
       }
     },
     hideModal(name) {
@@ -305,6 +328,9 @@ export default {
       }
       if (name === 'requestCancelUse') {
         return (this.requestCancelUse.show = false);
+      }
+      if (name === 'inputReasonForDeleteModal') {
+        return (this.inputReasonForDeleteModal.show = false);
       }
     },
   },

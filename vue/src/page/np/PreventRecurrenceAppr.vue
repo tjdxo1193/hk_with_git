@@ -90,9 +90,7 @@ export default {
     approve() {
       const parameter = FormUtil.getData(this.testInfo.forms);
       this.$confirm(this.$message.confirm.approved).then(() => {
-        this.$eSignWithReason(() =>
-          this.$axios.put('/np/preventRecurrenceAppr/approve', parameter),
-        )
+        this.$eSignWithReason(() => this.$axios.put('/np/preventRecurrenceAppr/approve', parameter))
           .then(() => {
             this.$info(this.$message.info.saved);
             this.init();

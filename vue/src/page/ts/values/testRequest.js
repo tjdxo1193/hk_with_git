@@ -119,7 +119,7 @@ const list = {
           .col('amtLoccurr', '금액현지통화', { width: 100 })
           .build(),
       })
-      
+
       .build(),
 };
 

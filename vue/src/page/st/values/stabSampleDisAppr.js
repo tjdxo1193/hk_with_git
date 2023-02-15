@@ -25,13 +25,11 @@ const sampleGrid = {
       .Select('pitmTyp', '품목유형', {
         async: () => api.combo.systemCommon.getPitmDivCombo(),
       })
-      .Input('lotNo', '제조번호')
-      .Input('batchNo', '배치번호')
-      .Input('pitmCd', '품목코드')
-      .Select('strgPla', '보관장소', {
-        api: () => api.combo.userCommon.getSmpStrgMtdCombo(),
-      })
-      .Input('pitmNm', '품목명')
+      .Input('pitmNm', '품목명', { maxLength: 100 })
+      .Input('lotNo', '제조번호', { maxLength: 20 })
+      .Input('batchNo', '배치번호', { maxLength: 20 })
+      .Input('pitmCd', '품목코드', { maxLength: 8 })
+      .Input('strgPla', '보관장소', { maxLength: 9 })
       .DatepickerTwinWithSwitch('useLmtDtList', '사용기한', {
         value: [weekAgoDate, todayDate],
         _colSpan: 2,

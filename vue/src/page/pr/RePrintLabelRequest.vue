@@ -6,7 +6,7 @@
     @form-event="rePrintLabelRequestGridWithFormsEvent"
   />
 
-  <FormWithHeader 
+  <FormWithHeader
     v-bind="rePrintLabelRequestInfoForms"
     @button-click="onButtonClick"
     @form-event="rePrintLabelRequestInfoFormsEvent"
@@ -48,20 +48,20 @@ export default {
           },
         },
       },
-      rePrintLabelRequestInfoForms : {
+      rePrintLabelRequestInfoForms: {
         ...rePrintLabelRequestInfoForms.static,
         forms: rePrintLabelRequestInfoForms.forms(),
       },
       requestApproverModal: {
         show: false,
         updateType: null,
-        aprReqDiv: 'S0050022',  // 내일 할 일 ☆ , 임시 코드임
+        aprReqDiv: 'S0050022', // 내일 할 일 ☆ , 임시 코드임
       },
       labelListModal: {
         show: false,
         ansIdx: null,
-      }
-    }
+      },
+    };
   },
   mounted() {
     this.doInit();
@@ -74,7 +74,7 @@ export default {
     async fetchRePrintLabelRequestGridWithForms() {
       const { forms, $grid } = this.rePrintLabelRequestGridWithForms;
       const parameter = FormUtil.getData(forms);
-      
+
       const data = await $grid
         ._useLoader(() => this.$axios.get('/pr/rePrintLabelRequest', parameter))
         .then(({ data }) => data)
@@ -85,12 +85,12 @@ export default {
     rePrintLabelRequestGridWithFormsDoubleClicked(event) {
       const { forms } = this.rePrintLabelRequestInfoForms;
       const { item } = event;
-      
+
       FormUtil.setData(forms, item);
-      
+
       // 라벨목록 ansIdx 바인딩
       const ansIdx = item?.ansIdx;
-      if(ansIdx) {
+      if (ansIdx) {
         this.labelListModal.ansIdx = item.ansIdx;
         FormUtil.enableButtons(forms[0]._multiForms, ['labelListModal']);
       }
@@ -128,18 +128,20 @@ export default {
       const { forms } = this.rePrintLabelRequestInfoForms;
       const parameter = FormUtil.getData(forms);
 
-      const data = forms.validate()
+      const data = forms
+        .validate()
         .then(() => this.$axios.put(`/pr/rePrintLabelRequest`, parameter))
         .then(({ data }) => data)
         .catch(() => this.$error(this.$message.error.updateData));
-      
+
       console.log(data, 'data');
     },
     rePrintLabelCancel() {
       const { forms } = this.rePrintLabelRequestInfoForms;
       const parameter = FormUtil.getData(forms);
 
-      const data = forms.validate()
+      const data = forms
+        .validate()
         .then(() => this.$axios.put(`/pr/rePrintLabelRequest/cancel`, parameter))
         .then(({ data }) => data)
         .then(() => {
@@ -147,7 +149,7 @@ export default {
           this.doInit();
         })
         .catch(() => this.$error(this.$message.error.updateData));
-      
+
       console.log(data, 'data');
     },
     showModal(name) {
@@ -163,11 +165,9 @@ export default {
       } else if (name === 'labelListModal') {
         return (this.labelListModal.show = false);
       }
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
-<style>
-
-</style>
+<style></style>

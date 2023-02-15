@@ -43,7 +43,11 @@ export default {
         const todayDate = dayjs().format('YYYY-MM-DD');
         this.$props.initData.rvsDivPs = 'S';
         this.$props.initData.rvsNo = 'v' + this.$props.initData.aitmSpecVer;
-        this.$props.initData.docNo = 'SP_' + this.$props.initData.pitmCd;
+        this.$props.initData.docNo =
+          'SP_' +
+          (!this.$props.initData.pitmCd
+            ? this.$props.initData.mitmCd
+            : this.$props.initData.pitmCd);
         this.$props.initData.enfoDt = this.$props.initData.enfoDt ?? todayDate;
         this.$props.initData.rvsDt = this.$props.initData.rvsDt ?? todayDate;
         FormUtil.setData(this.reasonForm.forms, this.$props.initData);

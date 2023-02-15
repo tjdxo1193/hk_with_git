@@ -6,22 +6,19 @@
     @form-event="labelSearchGridWithFormsEvent"
   />
 
-  <FormWithHeader 
-    v-bind="labelSearchInfoForms"
-    @button-click="onButtonClick"
-  />
+  <FormWithHeader v-bind="labelSearchInfoForms" @button-click="onButtonClick" />
 </template>
 
 <script>
-import values from './values/labelSearch';
-
 import { FormUtil } from '@/util';
+
+import values from './values/labelSearch';
 
 export default {
   name: 'LabelSearch',
   components: {},
   data() {
-    const {   labelSearchGridWithForms, labelSearchInfoForms } = this.$copy(values);
+    const { labelSearchGridWithForms, labelSearchInfoForms } = this.$copy(values);
     return {
       labelSearchGridWithForms: {
         ...labelSearchGridWithForms.static,
@@ -33,11 +30,11 @@ export default {
           },
         },
       },
-      labelSearchInfoForms : {
+      labelSearchInfoForms: {
         ...labelSearchInfoForms.static,
         forms: labelSearchInfoForms.forms(),
       },
-    }
+    };
   },
   mounted() {
     this.doInit();
@@ -50,12 +47,12 @@ export default {
     async fetchLabelSearchGridWithForms() {
       const { forms, $grid } = this.labelSearchGridWithForms;
       const parameter = FormUtil.getData(forms);
-      
+
       const data = await $grid
         ._useLoader(() => this.$axios.get('/pr/labelSearch', parameter))
         .then(({ data }) => data)
         .catch(() => this.$error(this.$message.error.fetchData));
-      
+
       $grid.setGridData(data);
     },
     resetLabelSearchInfoForms() {
@@ -76,13 +73,11 @@ export default {
     labelSearchGridWithFormsDoubleClicked(event) {
       const { forms } = this.labelSearchInfoForms;
       const { item } = event;
-      
+
       FormUtil.setData(forms, item);
     },
-  }
-}
+  },
+};
 </script>
 
-<style>
-
-</style>
+<style></style>

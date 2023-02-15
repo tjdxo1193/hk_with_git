@@ -54,13 +54,7 @@ export default {
           cellDoubleClick: (e) => {
             FormUtil.setData(this.itemList.forms, e.item);
             this.getMonitorTestRst(e);
-            this.enableButtons([
-              'preResultTrend',
-              'hold',
-              'reject',
-              'approveRequest',
-              'init',
-            ]);
+            this.enableButtons(['preResultTrend', 'hold', 'reject', 'approveRequest', 'init']);
           },
         },
       },

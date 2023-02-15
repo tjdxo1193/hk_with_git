@@ -90,7 +90,15 @@ export default {
     },
     getReagentItemByRitmEtrIdx(event) {
       const selectedItem = event.item;
+      this.setCheckedValue(selectedItem);
       FormUtil.setData(this.detail.forms, selectedItem);
+    },
+    setCheckedValue(data) {
+      this.detail.forms.filter((column) => {
+        if (column.name === 'makDt') {
+          column.disabled = data.makDt != null ? false : true;
+        }
+      });
     },
     onClickButton({ name }) {
       if (name === 'search') {

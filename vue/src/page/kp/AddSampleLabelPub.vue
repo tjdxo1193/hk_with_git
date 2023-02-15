@@ -83,12 +83,7 @@ export default {
       const { forms } = this.requestForm;
       const parameter = FormUtil.getData(forms);
 
-      if (
-        !parameter ||
-        !parameter.plntCd ||
-        !parameter.ansIdx ||
-        !this.pitmTypList.rawMaterial
-      ) {
+      if (!parameter || !parameter.plntCd || !parameter.ansIdx || !this.pitmTypList.rawMaterial) {
         this.$warn(this.$message.warn.unSelectedData);
         return;
       }

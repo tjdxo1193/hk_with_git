@@ -28,6 +28,11 @@ export default {
       default: false,
     },
   },
+  watch: {
+    disabled() {
+      this.checked = !this.$props.disabled;
+    },
+  },
   data() {
     return {
       checked: !this.$props.disabled,

@@ -121,6 +121,9 @@ export default {
         if (column.name === 'extraYn') {
           column.value = checkedValue;
         }
+        if (column.name === 'makDt') {
+          column.disabled = data.makDt != null ? false : true;
+        }
       });
     },
     onClickButton({ name }) {

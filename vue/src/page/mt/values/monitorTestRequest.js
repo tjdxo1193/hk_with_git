@@ -1,10 +1,12 @@
 import dayjs from 'dayjs';
-import api from '@/api';
 
+import api from '@/api';
 import { ColumnBuilder, FormBuilder } from '@/util/builder';
 
 const todayDate = dayjs().format('YYYY-MM-DD');
-const monthAddDate = dayjs().add(+1, 'M').format('YYYY-MM-DD');
+const monthAddDate = dayjs()
+  .add(+1, 'M')
+  .format('YYYY-MM-DD');
 
 const list = {
   static: {
@@ -64,7 +66,6 @@ const list = {
       .col('wrkDivNm', '작업구분')
       .build(),
 };
-
 
 export default {
   list,

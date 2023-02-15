@@ -74,7 +74,9 @@ export default {
         const parameter = checkedRows.map((row) => ({
           ...row.item,
         }));
-        this.$eSignWithReason(() => this.$axios.put('/mt/monitorTestInstruction/instruct', parameter))
+        this.$eSignWithReason(() =>
+          this.$axios.put('/mt/monitorTestInstruction/instruct', parameter),
+        )
           .then(() => {
             this.$info(this.$message.info.saved);
             this.getMonitorTestInstruction();
@@ -90,7 +92,9 @@ export default {
       const parameter = checkedRows.map((row) => ({
         ...row.item,
       }));
-      this.$eSignWithReason(() => this.$axios.put('/mt/monitorTestInstruction/deleteRst', parameter))
+      this.$eSignWithReason(() =>
+        this.$axios.put('/mt/monitorTestInstruction/deleteRst', parameter),
+      )
         .then(() => {
           this.$info(this.$message.info.deleted);
           this.getMonitorTestRst(checkedRows[0]);

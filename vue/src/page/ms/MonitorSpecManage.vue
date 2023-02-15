@@ -30,14 +30,14 @@
     @modalReturnDataEvent="requestReview"
   />
 
-    <FormBase v-bind="valueWithMItemSpecGrid" />
+  <FormBase v-bind="valueWithMItemSpecGrid" />
 
-    <FormBase v-bind="valueWithVersionGrid" />
+  <FormBase v-bind="valueWithVersionGrid" />
 </template>
 
 <script>
-import {ItemsByTestMethodModal, RequestReviewerModal} from '@/page/modal';
-import {FormUtil, GridUtil, StringUtil} from '@/util';
+import { ItemsByTestMethodModal, RequestReviewerModal } from '@/page/modal';
+import { FormUtil, GridUtil, StringUtil } from '@/util';
 
 import values from './values/monitorSpecManage';
 
@@ -51,7 +51,13 @@ export default {
     RequestReviewerModal,
   },
   data() {
-    const { mItemSpecList, versionList, testItemList, valueWithMItemSpecGrid, valueWithVersionGrid } = this.$copy(values);
+    const {
+      mItemSpecList,
+      versionList,
+      testItemList,
+      valueWithMItemSpecGrid,
+      valueWithVersionGrid,
+    } = this.$copy(values);
     return {
       mItemSpecList: {
         ...mItemSpecList.static,
@@ -132,37 +138,37 @@ export default {
 
       $grid.setGridData(data);
     },
-    
-    setValueWithMItemSpecGrid(item){  
+
+    setValueWithMItemSpecGrid(item) {
       FormUtil.setData(this.valueWithMItemSpecGrid.forms, item);
     },
-    
-    setValueWithVersionGrid(item){  
+
+    setValueWithVersionGrid(item) {
       FormUtil.setData(this.valueWithVersionGrid.forms, item);
     },
 
-    focusFirstRowItemOfVersionGrid(){
+    focusFirstRowItemOfVersionGrid() {
       const { $grid } = this.versionList;
       if (this.isFirstVersionMode()) {
         this.changeButtonWhenSelectedMItem();
-      } else{
+      } else {
         $grid.setSelectionByIndex(0);
         const item = $grid.getSelectedRows()[0];
         this.loadToVersionFormAndTestListGrid(item);
       }
     },
 
-    loadToVersionFormAndTestListGrid(item){
+    loadToVersionFormAndTestListGrid(item) {
       this.setValueWithVersionGrid(item);
       const { aitmSpecIdx } = FormUtil.getData(this.valueWithVersionGrid.forms);
       this.fetchMItemSpecAItemList({ aitmSpecIdx });
       this.changeButtonWhenSelectedVersion();
     },
 
-    async fetchMItemSpecAItemList({aitmSpecIdx}) {
+    async fetchMItemSpecAItemList({ aitmSpecIdx }) {
       const { $grid } = this.testItemList;
       const data = await $grid
-        ._useLoader(() => this.$axios.get('ms/monitorSpecManage/aItem', {aitmSpecIdx}))
+        ._useLoader(() => this.$axios.get('ms/monitorSpecManage/aItem', { aitmSpecIdx }))
         .then(({ data }) => data);
       $grid.setGridData(data);
     },
@@ -301,11 +307,12 @@ export default {
     },
 
     requestReview(popupParam) {
-      const {mitmSpecIdx , aitmSpecIdx} = FormUtil.getData(this.valueWithVersionGrid.forms);
+      const { mitmSpecIdx, aitmSpecIdx } = FormUtil.getData(this.valueWithVersionGrid.forms);
       popupParam.mitmSpecIdx = mitmSpecIdx;
+      popupParam.revwUid = popupParam.aprUid;
 
-      if(!!aitmSpecIdx){
-        return this.$error(this.$message.error.noAitmSpecIdx);
+      if (!aitmSpecIdx) {
+        return this.$error(this.$message.warn.noAitmSpecIdx);
       }
 
       this.$eSignWithReason(() =>
@@ -383,7 +390,6 @@ export default {
         removedRowItems: [],
       };
 
-
       this.$confirm(this.$message.warn.updateAprrovedSpec).then(() => {
         this.$eSignWithReason(() => this.$axios.post('/ms/monitorSpecManage/newVersion', parameter))
           .then(() => {
@@ -444,7 +450,6 @@ export default {
         editedRowItems: $grid.getEditedRowItems(),
         removedRowItems: $grid.getRemovedItems(),
       };
-
 
       if (this.isNotUpdateTestItemList()) {
         return this.$warn(this.$message.warn.noSaveGridData);

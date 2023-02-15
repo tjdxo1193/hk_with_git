@@ -54,7 +54,7 @@ import {
   ItemsCopyByTestMethodModal,
   RequestReviewerModal,
 } from '@/page/modal';
-import {FormUtil, GridUtil, StringUtil} from '@/util';
+import { FormUtil, GridUtil, StringUtil } from '@/util';
 
 import values from './values/specManage';
 
@@ -922,7 +922,9 @@ export default {
           }
         });
       });
-      checkedDuplicateAitmCopyList.map((element, index)=>{element.aitmOrd = preGirdRowCnt + index + 1});
+      checkedDuplicateAitmCopyList.map((element, index) => {
+        element.aitmOrd = preGirdRowCnt + index + 1;
+      });
       $grid.addRow(checkedDuplicateAitmCopyList, 'last');
     },
   },

@@ -28,10 +28,10 @@ const sampleGrid = {
       .Select('pitmTyp', '품목구분', {
         async: () => api.combo.systemCommon.getPitmDivCombo(),
       })
-      .Input('pitmCd', '품목코드')
-      .Input('lotNo', '제조번호')
-      .Input('batchNo', '배치번호')
-      .Input('pitmNm', '품목명')
+      .Input('pitmCd', '품목코드', { maxLength: 8 })
+      .Input('lotNo', '제조번호', { maxLength: 20 })
+      .Input('batchNo', '배치번호', { maxLength: 20 })
+      .Input('pitmNm', '품목명', { maxLength: 100 })
       .DatepickerTwinWithSwitch('useDtList', '사용일', {
         value: [yesterdayDate, todayDate],
         _colSpan: 2,
@@ -88,7 +88,8 @@ const inputForm = {
       .InputNumber('useSmpVol', '사용량', { readonly: true })
       .Input('useNm', '사용자', { readonly: true })
       .Input('useDt', '사용일', { readonly: true })
-      .Textarea('usePps', '사용목적', { readonly: true, _colSpan: 2 })
+      .Input('strgPla', '보관장소', { readonly: true })
+      .Textarea('usePps', '사용목적', { readonly: true })
       .build(),
 };
 

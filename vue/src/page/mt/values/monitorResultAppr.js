@@ -92,7 +92,7 @@ const itemList = {
       { name: 'init', label: '초기화', disabled: true },
     ],
   },
-  forms: () => 
+  forms: () =>
     FormBuilder.builder()
       .Hidden('plntCd')
       .Hidden('mitmReqIdx')

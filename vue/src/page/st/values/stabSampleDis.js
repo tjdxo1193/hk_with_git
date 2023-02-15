@@ -11,7 +11,7 @@ const sampleGrid = {
   static: {
     title: '조회',
     legends: [
-      { value: '승인대기중', className: 'approveWating' },
+      //{ value: '승인대기중', className: 'approveWating' },
       { value: '반려', className: 'return' },
       { value: '폐기', className: 'disposal' },
     ],
@@ -24,13 +24,13 @@ const sampleGrid = {
       showRowCheckColumn: true,
       editable: false,
       rowStyleFunction: (rowIndex, item) => {
-        if (item.dpsYn === 'Y') {
+        if (item.dpsYn === 'Y' || item.smpDpsProc === 'S0270500') {
           return 'disposal';
         }
-        if (item.smpUseProc === 'S0280200' || item.smpUseProc === 'S0280400') {
+        if (item.smpDpsProc === 'S0270400' || item.smpDpsProc === 'S0270600') {
           return 'approveWating';
         }
-        if (item.smpUseProc === 'S0280110' || item.smpUseProc === 'S0280310') {
+        if (item.smpDpsProc === 'S0270310' || item.smpDpsProc === 'S0270510') {
           return 'return';
         }
       },
@@ -41,10 +41,10 @@ const sampleGrid = {
       .Select('pitmTyp', '품목유형', {
         async: () => api.combo.systemCommon.getPitmDivCombo(),
       })
-      .Input('lotNo', '제조번호')
-      .Input('batchNo', '배치번호')
-      .Input('pitmCd', '품목코드')
-      .Input('pitmNm', '품목명')
+      .Input('lotNo', '제조번호', { maxLength: 20 })
+      .Input('batchNo', '배치번호', { maxLength: 20 })
+      .Input('pitmCd', '품목코드', { maxLength: 8 })
+      .Input('pitmNm', '품목명', { maxLength: 100 })
       .DatepickerTwinWithSwitch('useLmtDtList', '사용기한', {
         value: [yesterdayDate, todayDate],
         _colSpan: 2,

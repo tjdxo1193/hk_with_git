@@ -24,6 +24,8 @@
     @close="hideSpecChangeReasonRegModal()"
     @save="approveRequest"
   />
+
+  <FormBase v-bind="versionValueHiddenForm" />
 </template>
 
 <script>
@@ -42,7 +44,7 @@ export default {
     this.fetchMonitorSpecVersion();
   },
   data() {
-    const { versionList, testItemList } = this.$copy(values);
+    const { versionList, testItemList, versionValueHiddenForm } = this.$copy(values);
     return {
       versionList: {
         ...versionList.static,
@@ -51,6 +53,7 @@ export default {
         event: {
           cellDoubleClick: (e) => {
             this.fetchMItemSpecAItemList(e.item);
+            this.setVersionValueHiddenForm(e.item);
           },
         },
       },
@@ -67,6 +70,9 @@ export default {
 
       rejectionReasonModal: {
         show: false,
+      },
+      versionValueHiddenForm: {
+        forms: versionValueHiddenForm.forms(),
       },
     };
   },
@@ -88,6 +94,11 @@ export default {
         .then(({ data }) => data);
       $grid.setGridData(data);
     },
+
+    setVersionValueHiddenForm(item) {
+      FormUtil.setData(this.versionValueHiddenForm.forms, item);
+    },
+
     onClickBtnEvent({ name }) {
       if (name == 'search') {
         this.init();

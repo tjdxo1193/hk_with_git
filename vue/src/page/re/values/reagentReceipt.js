@@ -201,7 +201,8 @@ const detail = {
       )
       .spanCol(2)
       .Datepicker('opnBefExpirDt', '개봉 전 사용기한', { value: todayDate })
-      .Input('opnAftExpirTrm', '개봉 후 사용기간', { disabled: true })
+      .Input('opnAftExpirTrm', '개봉 후 사용기간(개월)', { maxlength: 5, disabled: true })
+      .validator((value) => value === '' || Number.isInteger(Number(value)))
       .multiple(
         'enterTotalQuantity',
         '총수량',
