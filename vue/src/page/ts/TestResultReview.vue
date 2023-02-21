@@ -171,7 +171,7 @@ export default {
         return this.$warn(this.$message.warn.noResultJudge);
       }
       if (this.hasNonConformity()) {
-        return this.$warn(this.$message.warn.inputNonConformityReason);
+        //return this.$warn(this.$message.warn.inputNonConformityReason);
       }
       return this.showModal('requestApproverModal');
     },

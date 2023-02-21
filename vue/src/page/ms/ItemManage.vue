@@ -20,12 +20,6 @@
 
   <FormWithHeader v-bind="sampleInfoForm" />
 
-  <SapPrdhaSearchModal
-    :show="sapPrdhaSearchModal.show"
-    :sapPrdha="sapPrdhaSearchModal.sapPrdha"
-    @close="hideModal('sapPrdhaSearchModal')"
-    @modalReturnDataEvent="sapPrdhaModalReturnDataEvent"
-  />
 
   <ReasonForItemRevisionModal
     :show="reasonForItemRevisionModal.show"
@@ -55,16 +49,16 @@ import {
   BomModal,
   ItemManageFileAttacherModal,
   ReasonForItemRevisionModal,
-  SapPrdhaSearchModal,
 } from '@/page/modal';
 import { FormUtil, TokenUtil } from '@/util';
 
 import values from './values/itemManage';
 
+const { pitemType, processCode } = values;
+
 export default {
   name: 'itemManage',
   components: {
-    SapPrdhaSearchModal,
     ReasonForItemRevisionModal,
     ItemManageFileAttacherModal,
     BomModal,
@@ -73,7 +67,6 @@ export default {
     this.setPlntCd();
     this.initItemVersionForms();
     this.fetchSearchGrid();
-    this.setSapCodeList();
   },
   data() {
     const {
@@ -104,10 +97,12 @@ export default {
             if (
               event.maxPosition - event.position < 6 &&
               event.position - event.oldPosition > 0 &&
-              this.currentPitemList.flag == true
+              this.currentValueForScroll.loadListFlag == true
             ) {
-              this.currentPitemList.flag = false;
-              await this.addNextListGridData();
+              // TODO 여기서 검색 조건 캐싱
+              this.currentValueForScroll.loadListFlag = false;
+              const isNotEnd = await this.addNextListGridData();
+              this.currentValueForScroll.loadListFlag = isNotEnd;
             }
           },
         },
@@ -133,32 +128,9 @@ export default {
         ...sampleInfoForm.static,
         forms: sampleInfoForm.forms(),
       },
-      sapPrdhaSearchModal: {
-        show: false,
-        sapPrdha: null,
-      },
       reasonForItemRevisionModal: {
         show: false,
         initData: {},
-      },
-      processCode: {
-        temporarySave: 'S0080100',
-        approved: 'S0080400',
-      },
-      pitemtype: {
-        finishedSet: 'S0180100',
-        finishedSingle: 'S0180101',
-        beautifulPackaging: 'S0180102',
-        semiManufacturesFillingFoam: 'S0180201',
-        semiManufacturesOtherProduct: 'S0180202',
-        semiManufacturesBulk: 'S0180203',
-        semiManufacturesBase: 'S0180204',
-        rawMaterial: 'S0180400',
-        packagingMaterial: 'S0180500',
-        goods: 'S0180600',
-      },
-      sapCodeList: {
-        list: [],
       },
       bomModal: {
         show: false,
@@ -170,9 +142,10 @@ export default {
         initData: {},
         readonly: false,
       },
-      currentPitemList: {
-        rowCnt: 0,
-        flag: true,
+      currentValueForScroll: {
+        searchParam: {}, 
+        gridRowCnt: 0,
+        loadListFlag: true,
       },
     };
   },
@@ -208,7 +181,6 @@ export default {
       const { specProcCd, qpSpecProcCd } = FormUtil.getData(this.codeWithSearchGrid.forms);
       const { useVerYn } = rowItem;
       this.setButtonsByStatus(specProcCd, qpSpecProcCd, useVerYn);
-      this.setSapPrdhaSearchButtonByPItemType(rowItem);
     },
 
     async fetchSearchGrid() {
@@ -217,13 +189,17 @@ export default {
 
       const { $grid } = this.searchGridWithForm;
       const param = FormUtil.getData(this.searchGridWithForm.forms);
+
+      // 스크롤 이벤트 파라미터 초기화
+      this.currentValueForScroll.searchParam = param;
+
       param.offset = 0;
       param.limit = 100;
 
       const data = await $grid
         ._useLoader(() => this.$axios.get('/ms/itemManage/pItem', param))
         .then(({ data }) => data);
-      this.currentPitemList.rowCnt = data.resultList.length;
+      this.currentValueForScroll.gridRowCnt = data.resultList.length;
       $grid.setGridData(data.resultList);
     },
 
@@ -233,14 +209,6 @@ export default {
         ._useLoader(() => this.$axios.get('/ms/itemManage/version', param))
         .then(({ data }) => data);
       $grid.setGridData(data);
-    },
-
-    async sapPrdhaModalReturnDataEvent({ sapPrdha = null }) {
-      const forms = this.materialInfoForm?.forms;
-
-      if (forms && sapPrdha) {
-        FormUtil.setData(forms, { sapPrdha });
-      }
     },
 
     onClickSearchFormButtons({ name }) {
@@ -253,16 +221,18 @@ export default {
 
     async addNextListGridData() {
       const { $grid } = this.searchGridWithForm;
-      const param = FormUtil.getData(this.searchGridWithForm.forms);
-      param.offset = this.currentPitemList.rowCnt;
-      param.limit = 100;
+
+      this.currentValueForScroll.searchParam.offset = this.currentValueForScroll.gridRowCnt;
+      this.currentValueForScroll.searchParam.limit = 100;
 
       const data = await $grid
-        ._useLoader(() => this.$axios.get('/ms/itemManage/pItem', param, { _progress: false }))
-        .then(({ data }) => data.resultList);
-      this.currentPitemList.rowCnt += data.length;
-      $grid.addRow(data, 'last');
-      this.currentPitemList.flag = true;
+        ._useLoader(() => this.$axios.get('/ms/itemManage/pItem', this.currentValueForScroll.searchParam, { _progress: false }))
+        .then(({ data }) => data);
+      this.currentValueForScroll.gridRowCnt += data.length;
+      $grid.addRow(data.resultList, 'last');
+
+      // offset이 total보다 같거나 크면 더이상 로딩하지 않도록 처리..
+      return data.offset < data.total;
     },
 
     async onClickCommonInfoFormButtons({ name }) {
@@ -270,8 +240,8 @@ export default {
 
       if (name === 'save') {
         const { specProcCd } = FormUtil.getData(this.commonInfoForm.forms);
-        const isTemporarySave = specProcCd == this.processCode.temporarySave;
-        const isApproved = specProcCd == this.processCode.approved;
+        const isTemporarySave = specProcCd == processCode.TEMPORARY_SAVE;
+        const isApproved = specProcCd == processCode.APPROVED;
 
         if (isTemporarySave) {
           return forms.validate().then(() => {
@@ -303,21 +273,13 @@ export default {
     isWrap() {
       const { pitmTyp } = FormUtil.getData(this.codeWithSearchGrid.forms);
       return (
-        pitmTyp == this.pitemtype.finishedSet ||
-        pitmTyp == this.pitemtype.finishedSingle ||
-        pitmTyp == this.pitemtype.packagingMaterial
+        pitmTyp == pitemType.FINISHED_SET ||
+        pitmTyp == pitemType.FINISHED_SINGLE ||
+        pitmTyp == pitemType.PACKAGING_MATERIAL
       );
     },
 
-    isVaildateSapCode() {
-      let { sapPrdha } = this.formToParam();
-      return this.sapCodeList.list.find((row) => row.sapPrdha == sapPrdha) === undefined;
-    },
-
     async firstReg() {
-      if (this.isWrap() && this.isVaildateSapCode()) {
-        return this.$warn(this.$message.warn.noSapCode);
-      }
       let param = this.formToParam();
       await this.$axios
         .put('/ms/itemManage/firstSave', param)
@@ -330,9 +292,6 @@ export default {
     },
 
     async tempSave() {
-      if (this.isWrap() && this.isVaildateSapCode()) {
-        return this.$warn(this.$message.warn.noSapCode);
-      }
       let param = this.formToParam();
       await this.$axios
         .put('/ms/itemManage/tempSave', param)
@@ -376,11 +335,6 @@ export default {
     },
 
     formEventMaterialInfoForm({ originEvent, item }) {
-      if (originEvent == 'sapPrdhaSearch') {
-        if (item?.itemLabel == 'sapPrdhaSearchModal') {
-          this.showModal(item.itemLabel);
-        }
-      }
       if (originEvent === 'ctrptNoSearch') {
         if (item?.itemLabel === 'itemManageFileAttacherModal') {
           this.showModal(item.itemLabel);
@@ -389,14 +343,6 @@ export default {
     },
 
     showModal(name) {
-      if (name === 'sapPrdhaSearchModal') {
-        const forms = this.materialInfoForm?.forms;
-        if (forms) {
-          const sapPrdha = FormUtil.getValue(forms, 'sapPrdha');
-          this.sapPrdhaSearchModal.sapPrdha = sapPrdha;
-        }
-        return (this.sapPrdhaSearchModal.show = true);
-      }
       if (name === 'reasonForItemRevisionModal') {
         return (this.reasonForItemRevisionModal.show = true);
       }
@@ -409,9 +355,6 @@ export default {
     },
 
     hideModal(name) {
-      if (name === 'sapPrdhaSearchModal') {
-        return (this.sapPrdhaSearchModal.show = false);
-      }
       if (name === 'reasonForItemRevisionModal') {
         return (this.reasonForItemRevisionModal.show = false);
       }
@@ -426,10 +369,10 @@ export default {
     setButtonsByStatus(specProcCd, qpSpecProcCd, useVerYn) {
       const buttons = this.commonInfoForm.buttons;
       const isStorable =
-        (specProcCd == this.processCode.temporarySave || specProcCd == this.processCode.approved) &&
+        (specProcCd == processCode.TEMPORARY_SAVE || specProcCd == processCode.APPROVED) &&
         useVerYn == 'Y' &&
-        qpSpecProcCd == this.processCode.approved;
-      const isFirstStorable = qpSpecProcCd == this.processCode.temporarySave;
+        qpSpecProcCd == processCode.APPROVED;
+      const isFirstStorable = qpSpecProcCd == processCode.TEMPORARY_SAVE;
 
       FormUtil.disableButtons(buttons, ['bomModal', 'save', 'firstReg']);
       this.disableFormButton('ctrptNoSearch');
@@ -453,23 +396,6 @@ export default {
       }
     },
 
-    setSapPrdhaSearchButtonByPItemType({ specProcCd, pitmTyp }) {
-      const isChangeable =
-        (specProcCd == this.processCode.temporarySave || specProcCd == this.processCode.approved) &&
-        (pitmTyp == this.pitemtype.finishedSet ||
-          pitmTyp == this.pitemtype.finishedSingle ||
-          pitmTyp == this.pitemtype.packagingMaterial);
-      const isNotChangeable = !isChangeable;
-
-      if (isChangeable) {
-        this.enableFormButton('sapPrdhaSearch');
-      }
-
-      if (isNotChangeable) {
-        this.disableFormButton('sapPrdhaSearch');
-      }
-    },
-
     enableFormButton(buttonName) {
       const { forms } = this.materialInfoForm;
       FormUtil.enable(forms, buttonName);
@@ -477,18 +403,6 @@ export default {
     disableFormButton(buttonName) {
       const { forms } = this.materialInfoForm;
       FormUtil.disable(forms, buttonName);
-    },
-
-    async setSapCodeList() {
-      const param = {};
-      await this.$axios
-        .get('ms/wrapTestManage', param)
-        .then(
-          ({ data }) =>
-            (this.sapCodeList.list = data.filter(
-              (row) => row.specProcCd == this.processCode.approved,
-            )),
-        );
     },
 
     getRevisionReason({ rvsReaCd, rvsCtt }) {
@@ -548,7 +462,6 @@ export default {
             this.hideModal('itemManageFileAttacherModal');
             this.initItemVersionForms();
             this.fetchSearchGrid();
-            this.setSapCodeList();
           })
           .catch(() => {
             this.$error(this.$message.error.savedFiles);

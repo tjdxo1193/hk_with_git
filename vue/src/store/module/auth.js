@@ -57,10 +57,13 @@ const actions = {
     commit(mutationType.AUTHENTICATE, data);
     router.push('/');
   },
-  async [actionType.LOGOUT]({ commit }) {
-    await api.auth.logout();
-    commit(mutationType.DE_AUTHENTICATE);
-    commit(mutationType.END_RE_AUTHENNTICATE);
+  [actionType.LOGOUT]({ commit }) {
+    try {
+      api.auth.logout();
+    } finally {
+      commit(mutationType.DE_AUTHENTICATE);
+      commit(mutationType.END_RE_AUTHENNTICATE);
+    }
   },
   async [actionType.VERIFY_TOKEN]() {
     try {

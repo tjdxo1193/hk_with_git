@@ -9,6 +9,9 @@
 
 <script>
 import { Alert, ESign, Progress } from '@/component/feedback';
+import { actionType, getterType, message, mutationType } from './const';
+import { TokenUtil } from './util';
+import { mapGetters } from 'vuex';
 
 export default {
   name: 'App',
@@ -16,6 +19,29 @@ export default {
     Alert,
     ESign,
     Progress,
+  },
+  mounted() {
+    document.addEventListener('keydown', this.checkAuthExpire);
+    document.addEventListener('mousedown', this.checkAuthExpire);
+  },
+  beforeUnmount() {
+    document.removeEventListener('keydown', this.checkAuthExpire);
+    document.removeEventListener('mousedown', this.checkAuthExpire);
+  },
+  methods: {
+    checkAuthExpire() {
+      if (this.isLoggedIn && TokenUtil.isExpiredAuth()) {
+        this.$warn(message.warn.expireAuthentication).then(() => {
+          this.$store.dispatch(actionType.LOGOUT);
+          this.$store.commit(mutationType.TO_WELCOME);
+        });
+      }
+    },
+  },
+  computed: {
+    ...mapGetters({
+      isLoggedIn: getterType.IS_LOGGED_IN,
+    }),
   },
 };
 </script>

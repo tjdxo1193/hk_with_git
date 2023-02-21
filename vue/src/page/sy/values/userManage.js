@@ -24,7 +24,7 @@ const userGrid = {
           { checkedValue: 'Y', label: '사용함' },
           { checkedValue: 'N', label: '사용안함' },
         ],
-        gap: 60,
+        _colSpan: 2,
       })
       .build(),
   columns: () =>
@@ -36,22 +36,23 @@ const userGrid = {
       .col('lognFailCnt', { visible: false })
       .col('lockYn', { visible: false })
       .col('emid', { visible: false })
-      .col('ansYn', '시험자여부', { visible: false })
-      .col('clltYn', '채취자여부', { visible: false })
-      .col('revwYn', '검토자여부', { visible: false })
-      .col('aprYn', '승인자여부', { visible: false })
+      .col('ansYn', { visible: false })
+      .col('clltYn', { visible: false })
+      .col('revwYn', { visible: false })
+      .col('aprYn', { visible: false })
       .col('ord', { visible: false })
       .col('userLognId', 'ID')
       .col('userNm', '사용자명')
+      .col('userNmEn', '사용자명영문')
       .col('emid', '사번')
       .col('dptNm', '부서명')
       .col('gradeNm', '직급')
       .col('titleNm', '직책')
-      .col('useYn', '사용여부')
       .col('userTel', '전화번호')
+      .col('userCompTel', '회사연락처')
       .col('userMail', '이메일')
-      .col('userNmEn', '사용자명영문')
-      .col('userCompTel', '사용자회사연락처')
+      .col('workStt', '업무수행상태')
+      .col('useYn', '사용여부')
       .build(),
 };
 
@@ -68,9 +69,10 @@ const userForm = {
     FormBuilder.builder()
       .Hidden('userId')
       .Hidden('dptCd')
-      .Input('userNm', '사용자명', { disabled: true, _required: true })
       .Input('userLognId', 'ID', { disabled: true, _required: true })
       .Input('emid', '사번', { disabled: true })
+      .Input('userNm', '사용자명', { disabled: true, _required: true })
+      .Input('userNmEn', '사용자명영문', { disabled: true })
       .multiple(
         'dptNm',
         '부서명',
@@ -81,6 +83,8 @@ const userForm = {
       )
       .Input('gradeNm', '직급', { disabled: true })
       .Input('titleNm', '직책', { disabled: true })
+      .Input('userTel', '전화번호', { disabled: true })
+      .Input('userCompTel', '회사연락처', { disabled: true })
       .Select('athCd', '사용권한', {
         value: null,
         async: api.combo.auth.getUserAuthList,
@@ -93,7 +97,6 @@ const userForm = {
       )
       .Input('lognFailCnt', '로그인 실패 횟수', { disabled: true })
       .Input('userMail', '이메일', { disabled: true })
-      .Input('userTel', '전화번호', { disabled: true })
       .RadioGroup('useYn', '사용여부', {
         value: 'Y',
         groups: [
@@ -129,6 +132,7 @@ const userForm = {
           { checkedValue: 'N', label: '아니오' },
         ],
       })
+      .Input('workStt', '업무수행상태')
       .build(),
 };
 

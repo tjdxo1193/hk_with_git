@@ -7,25 +7,22 @@ const { REPORTING_SERVER, DATA_SERVER, REPOSITORY_PATH, SERVICE_NAME, USER, PASS
 const getViewer = () => new $m2soft.crownix.Viewer(REPORTING_SERVER.URL);
 const makeParam = (rdParam) => `
   /rcontype [Data Server] 
-  /rf [${DATA_SERVER.URL}] 
+  /rf [${DATA_SERVER.URL}]  
   /rsn [${SERVICE_NAME}] 
   /rui [${USER}] 
   /rpw [${PASSWORD}] 
-  ${rdParam}
+  ${rdParam} 
   `;
 
 export default {
   openReport(filePath, fileParam, options) {
-    const viewer = getViewer();
-    viewer.openFile(`["${REPOSITORY_PATH}${filePath}"]`, `["${makeParam(fileParam)}"]`, options);
-    return viewer;
+    return this.openReports([filePath], [fileParam], options);
   },
   openReports(filePaths, fileParams, options) {
     const mrdList = filePaths.map((filePath, index) => ({
       mrdPath: `${REPOSITORY_PATH}${filePath}`,
       mrdParam: fileParams[index] ? makeParam(fileParams[index]) : '',
     }));
-
     const viewer = getViewer();
     viewer.openFile(mrdList, options);
     return viewer;

@@ -1,6 +1,24 @@
 import api from '@/api';
 import { ColumnBuilder, FormBuilder } from '@/util';
 
+const pitemType = {
+  FINISHED_SET: 'S0180100',
+  FINISHED_SINGLE: 'S0180101',
+  BEAUTIFUL_PACKAGING: 'S0180102',
+  SEMI_MANUFACTURES_FILLING_FOAM: 'S0180201',
+  SEMI_MANUFACTURES_OTHER_PRODUCT: 'S0180202',
+  SEMI_MANUFACTURES_BULK: 'S0180203',
+  SEMI_MANUFACTURES_BASE: 'S0180204',
+  RAW_MATERIAL: 'S0180400',
+  PACKAGING_MATERIAL: 'S0180500',
+  GOODS: 'S0180600',
+}
+
+const processCode = {
+  TEMPORARY_SAVE: 'S0080100',
+  APPROVED: 'S0080400',
+}
+
 const codeWithSearchGrid = {
   forms: () =>
     FormBuilder.builder()
@@ -275,14 +293,7 @@ const materialInfoForm = {
   },
   forms: () =>
     FormBuilder.builder()
-      .multiple(
-        'sapPrdhaMulti',
-        '자재계층코드',
-        FormBuilder.builder()
-          .Input('sapPrdha', '자재계층코드', { readonly: true })
-          .Button('sapPrdhaSearch', 'sapPrdhaSearchModal', { type: 'search', disabled: true })
-          .build(),
-      )
+      .Input('sapPrdha', '자재계층코드')
       .readonly()
       .Input('mtrTyp', '자재유형')
       .readonly()
@@ -396,6 +407,8 @@ const sampleInfoForm = {
 };
 
 export default {
+  pitemType,
+  processCode,
   searchGridWithForm,
   itemVersionGrid,
   commonInfoForm,

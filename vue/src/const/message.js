@@ -20,7 +20,7 @@ export default {
   },
 
   eSign: {
-    info: '이 전자서명은 PharmMate 시스템 내부에서 수기서명과 동일한 효력을 가집니다.',
+    info: '이 전자서명은 Kolmar LIMS 시스템 내부에서 수기서명과 동일한 효력을 가집니다.',
     agree: '위 내용에 동의합니다.',
     shouldBeAgree: '전자서명에 동의하셔야 합니다.',
     pleaseInputReason: '사유를 입력해주세요.',
@@ -134,6 +134,7 @@ export default {
     sameSlvJdg: '기준판정 적합과 부적합 값이 같습니다. 다시 선택해주세요.',
     noAitmSpecIdx: '규격 정보가 없습니다.',
     noWaitingApproved: '승인 대기 중인 정보가 있습니다. 다시 선택해 주세요.',
+    expireAuthentication: '로그인 인증이 만료되었습니다.',
   },
   confirm: {
     saveData: '저장하시겠습니까?',
