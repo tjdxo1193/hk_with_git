@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.ts.dao.TestIFModalDao">
+
+    <select id="getSrmFinalOrderList" parameterType="TestIFModalVO" resultType="TestIFModalVO">
+        SELECT MSFO.PHS_ORDER_NO
+            , MSFO.ORDER_ITM
+            , MSFO.LOT_NO
+            , MSFO.FINL_STT
+            , MSFO.CRT_DS
+            , MSFO.IF_INFO_IDX
+            , QPAR.PHS_ORDER_TYP
+            , QPAR.ISP_REQ_NO
+            , QPAP.ANS_NO
+            , QPAP.ANS_PROC_CD
+            , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = QPAP.ANS_PROC_CD) AS ANS_PROC_NM
+            , QPAP.SYT_JDG
+            , (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QPAP.SYT_JDG) AS SYT_JDG_NM
+            , QPAP.HLD_YN
+            , QP.PITM_CD
+            , QPI.PITM_NM
+            , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = QPI.PITM_TYP) AS PITM_TYP_NM
+        FROM MS_SRM_FINL_ORDER MSFO
+        LEFT JOIN QT_PITM_ANS_REQ QPAR ON MSFO.PHS_ORDER_NO = QPAR.PHS_ORDER_NO AND MSFO.ORDER_ITM = QPAR.PHS_ORDER_ITM AND MSFO.LOT_NO = QPAR.LOT_NO
+        LEFT JOIN QT_PITM_ANS_PROC QPAP ON QPAR.PLNT_CD = QPAP.PLNT_CD AND QPAR.REQ_IDX = QPAP.REQ_IDX
+        LEFT JOIN QM_PITM_SPEC QPS ON QPAP.PITM_SPEC_IDX = QPS.PITM_SPEC_IDX AND QPAR.MTR_CD = QPS.PITM_CD AND QPAP.PLNT_CD = QPS.PLNT_CD
+        LEFT JOIN QM_PITM QP ON QPS.PITM_CD = QP.PITM_CD AND QPS.PITM_VER = QP.PITM_VER AND QPS.PLNT_CD = QP.PLNT_CD
+        LEFT JOIN QM_PITM_INFO QPI ON QP.PITM_CD = QPI.PITM_CD AND QP.PITM_VER = QPI.PITM_VER AND QP.PLNT_CD = QPI.PLNT_CD
+        WHERE QPAR.PLNT_CD = #{plntCd}
+        AND MSFO.PHS_ORDER_NO = #{phsOrderNo}
+        AND MSFO.ORDER_ITM = #{phsOrderItm}
+        AND MSFO.LOT_NO = #{lotNo}
+        ORDER BY QPAP.ANS_IDX, QPAP.REQ_IDX
+    </select>
+
+    <select id="getMesFinalOrderList" parameterType="TestIFModalVO" resultType="TestIFModalVO">
+        SELECT MMFO.PDT_ORDER_NO
+            , MMFO.ORDER_ITM
+            , MMFO.LOT_NO
+            , MMFO.FINL_STT
+            , MMFO.CRT_DS
+            , MMFO.IF_INFO_IDX
+            , QPAR.PDT_ORDER_TYP
+            , QPAR.ISP_REQ_NO
+            , QPAP.ANS_NO
+            , QPAP.ANS_PROC_CD
+            , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = QPAP.ANS_PROC_CD) AS ANS_PROC_NM
+            , QPAP.SYT_JDG
+            , (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QPAP.SYT_JDG) AS SYT_JDG_NM
+            , QPAP.HLD_YN
+            , QP.PITM_CD
+            , QPI.PITM_NM
+            , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = QPI.PITM_TYP) AS PITM_TYP_NM
+        FROM MS_MES_FINL_ORDER MMFO
+        LEFT JOIN QT_PITM_ANS_REQ QPAR ON MMFO.PDT_ORDER_NO = QPAR.PDT_ORDER_NO AND MMFO.ORDER_ITM = QPAR.PHS_ORDER_ITM AND MMFO.LOT_NO = QPAR.LOT_NO
+        LEFT JOIN QT_PITM_ANS_PROC QPAP ON QPAR.PLNT_CD = QPAP.PLNT_CD AND QPAR.REQ_IDX = QPAP.REQ_IDX
+        LEFT JOIN QM_PITM_SPEC QPS ON QPAP.PITM_SPEC_IDX = QPS.PITM_SPEC_IDX AND QPAR.MTR_CD = QPS.PITM_CD AND QPAP.PLNT_CD = QPS.PLNT_CD
+        LEFT JOIN QM_PITM QP ON QPS.PITM_CD = QP.PITM_CD AND QPS.PITM_VER = QP.PITM_VER AND QPS.PLNT_CD = QP.PLNT_CD
+        LEFT JOIN QM_PITM_INFO QPI ON QP.PITM_CD = QPI.PITM_CD AND QP.PITM_VER = QPI.PITM_VER AND QP.PLNT_CD = QPI.PLNT_CD
+        WHERE QPAR.PLNT_CD = #{plntCd}
+        AND MMFO.PDT_ORDER_NO = #{pdtOrderNo}
+        AND MMFO.ORDER_ITM = #{phsOrderItm}
+        AND MMFO.LOT_NO = #{lotNo}
+        ORDER BY QPAP.ANS_IDX, QPAP.REQ_IDX
+    </select>
+
+    <select id="getPrvRcrReportList" parameterType="TestIFModalVO" resultType="TestIFModalVO">
+        SELECT BATCH_NO
+            , PHS_ORDER_NO
+            , MAK_NO
+            , IF_INFO_IDX AS FILE_IDX
+            , SEQ AS FILE_SRLNO
+            , FILE_NAME AS NAME
+            , FILE_ID
+            , FILE_DATA AS SRC
+            , CRT_DS
+            , IF_INFO_IDX
+        FROM MS_SRM_REO_PREV
+        WHERE 1=1
+        AND BATCH_NO = #{batchNo}
+        <if test="phsOrderNo != null and phsOrderNo != ''">
+            AND PHS_ORDER_NO = #{phsOrderNo}
+        </if>
+        <if test="lotNo != null and lotNo != ''">
+            AND MAK_NO = #{lotNo}
+        </if>
+    </select>
+
+    <select id="getSrmReportList" parameterType="TestIFModalVO" resultType="TestIFModalVO">
+        SELECT BATCH_NO
+            , RPT_DIV
+            , PHS_ORDER_NO
+            , MAK_NO
+            , IF_INFO_IDX AS FILE_IDX
+            , SEQ AS FILE_SRLNO
+            , FILE_NAME AS NAME
+            , FILE_ID
+            , FILE_DATA AS SRC
+            , CRT_DS
+            , IF_INFO_IDX
+        FROM MS_SRM_RPT
+        WHERE 1=1
+        AND BATCH_NO = #{batchNo}
+        <if test="phsOrderNo != null and phsOrderNo != ''">
+            AND PHS_ORDER_NO = #{phsOrderNo}
+        </if>
+        <if test="lotNo != null and lotNo != ''">
+            AND MAK_NO = #{lotNo}
+        </if>
+    </select>
+
+    <select id="getPackingSpecList" parameterType="TestIFModalVO" resultType="TestIFModalVO">
+        SELECT PITM_CD
+            , VER
+            , IF_INFO_IDX AS FILE_IDX
+            , VER AS FILE_SRLNO
+            , FILE_NAME AS NAME
+            , FILE_DATA AS SRC
+            , CRT_DS
+            , IF_INFO_IDX
+        FROM MS_MES_PKG_SPEC
+        WHERE 1=1
+        AND PITM_CD = #{pitmCd}
+    </select>
+
+    <select id="getInpPerformanceList" parameterType="TestIFModalVO" resultType="TestIFModalVO">
+        SELECT * FROM (
+            SELECT MSIP.PLNT_CD
+                , NULL AS MTR_CD
+                , NULL AS BATCH_NO
+                , MSIP.MTR_CD AS INP_MTR_CD
+                , MSIP.BATCH_NO AS INP_BATCH_NO
+                , MSIP.LOT_NO
+                , MSIP.MTR_NM
+                , MSIP.MRP_MNG
+                , QPAR.ISP_REQ_NO
+                , QPAP.ANS_NO
+                , QPAP.ANS_PROC_CD
+                , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = QPAP.ANS_PROC_CD) AS ANS_PROC_NM
+                , QPAP.SYT_JDG
+                , (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QPAP.SYT_JDG) AS SYT_JDG_NM
+                , QPAP.HLD_YN
+                , MSIP.PHS_ORDER_NO
+                , MSIP.PHS_ORDER_ITM
+                , MSIP.PDT_ORDER_NO
+                , MSIP.BWART
+                , MSIP.ERFMG
+                , MSIP.ERFME
+                , MSIP.LGORT
+                , MSIP.BUDAT
+                , MSIP.ZEXFIELD1
+                , MSIP.ZEXFIELD2
+                , MSIP.ZEXFIELD3
+                , MSIP.ZEXFIELD4
+                , MSIP.ZEXFIELD5
+            FROM MS_SAP_INP_PFA MSIP
+            LEFT JOIN QT_PITM_ANS_REQ QPAR ON MSIP.MTR_CD = QPAR.MTR_CD AND MSIP.BATCH_NO = QPAR.BATCH_NO
+            LEFT JOIN QT_PITM_ANS_PROC QPAP ON QPAR.PLNT_CD =  QPAP.PLNT_CD AND QPAR.REQ_IDX =  QPAP.REQ_IDX
+            WHERE MSIP.PLNT_CD = #{plntCd}
+            AND MSIP.MTR_CD = #{pitmCd}
+            AND MSIP.BATCH_NO = #{batchNo}
+            UNION ALL
+            SELECT SIPD.PLNT_CD
+                , SIPD.MTR_CD
+                , SIPD.BATCH_NO
+                , SIPD.INP_MTR_CD
+                , SIPD.INP_BATCH_NO
+                , SIPD.LOT_NO
+                , SIPD.MTR_NM
+                , SIPD.MRP_MNG
+                , QPAR.ISP_REQ_NO
+                , QPAP.ANS_NO
+                , QPAP.ANS_PROC_CD
+                , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = QPAP.ANS_PROC_CD) AS ANS_PROC_NM
+                , QPAP.SYT_JDG
+                , (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QPAP.SYT_JDG) AS SYT_JDG_NM
+                , QPAP.HLD_YN
+                , SIPD.PHS_ORDER_NO
+                , SIPD.PHS_ORDER_ITM
+                , SIPD.PDT_ORDER_NO
+                , SIPD.BWART
+                , SIPD.ERFMG
+                , SIPD.ERFME
+                , SIPD.LGORT
+                , SIPD.BUDAT
+                , SIPD.ZEXFIELD1
+                , SIPD.ZEXFIELD2
+                , SIPD.ZEXFIELD3
+                , SIPD.ZEXFIELD4
+                , SIPD.ZEXFIELD5
+            FROM MS_SAP_INP_PFA_DTL SIPD
+            LEFT JOIN QT_PITM_ANS_REQ QPAR ON SIPD.MTR_CD = QPAR.MTR_CD AND SIPD.BATCH_NO = QPAR.BATCH_NO
+            LEFT JOIN QT_PITM_ANS_PROC QPAP ON QPAR.PLNT_CD =  QPAP.PLNT_CD AND QPAR.REQ_IDX =  QPAP.REQ_IDX
+        )
+        START WITH PLNT_CD = #{plntCd}
+            AND MTR_CD IS NULL
+            AND BATCH_NO IS NULL
+        CONNECT BY PRIOR INP_MTR_CD = MTR_CD
+            AND PRIOR INP_BATCH_NO = BATCH_NO
+    </select>
+
+</mapper>

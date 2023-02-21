@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.sy.dao.SystemCommonCodeManagementDao">
+    <!-- 그룹 코드 조회 -->
+    <select id="getSyCmCodeHir" parameterType="SystemCommonCodeManagementVO" resultType="SystemCommonCodeManagementVO">
+        SELECT SCH.HIR_CD,
+            SCH.USE_YN,
+            SCH.HIR_CD_NM,
+            SCH.HIR_CD_ORD,
+            SCH.HIR_DESC,
+            (SELECT USER_LGN_ID FROM SY_USER SU WHERE SU.USER_ID = SCH.UDT_UID) AS UDT_UID,
+            TO_CHAR(SCH.UDT_DS,'YYYY-MM-DD') AS UDT_DS
+        FROM SY_CD_HIR SCH
+        WHERE TRIM(UPPER(HIR_CD_NM)) LIKE ('%'||TRIM(UPPER(#{hirCdNm}))||'%')
+        <if test="hirUseYn != null and hirUseYn != ''">
+            AND UPPER(USE_YN) = #{hirUseYn}
+        </if>
+        ORDER BY HIR_CD_ORD, HIR_CD ASC
+    </select>
+
+    <!--  상세코드 조회 -->
+    <select id="getSyCmCodeDtl" resultType="SystemCommonCodeManagementVO" parameterType="SystemCommonCodeManagementVO">
+        SELECT HIR_CD
+            DTL_CD,
+            DTL_NM,
+            USE_YN,
+            DTL_CD_ORD,
+            EXT_CD1,
+            EXT_CD2,
+            DTL_EN,
+            DTL_ABBR
+        FROM SY_CD_DTL
+        WHERE UPPER(HIR_CD) = UPPER(#{hirCd})
+        <if test="dtlNm != null and dtlNm != ''">
+            AND UPPER(DTL_NM) LIKE ('%'||TRIM(UPPER(#{dtlNm}))||'%')
+        </if>
+        <if test="dtlUseYn != null and dtlUseYn != ''">
+            AND UPPER(USE_YN) = UPPER(#{dtlUseYn})
+        </if>
+        ORDER BY DTL_CD_ORD
+    </select>
+</mapper>

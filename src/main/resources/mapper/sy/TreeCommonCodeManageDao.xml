@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.sy.dao.TreeCommonCodeManageDao">
+
+    <select id="findAll" resultType="TreeCommonCodeManageVO">
+        SELECT TREE_CD,
+               HIR_TREE_CD,
+               TREE_NM,
+               TREE_EN,
+               TREE_ABBR,
+               TREE_RMK,
+               DEPT_LMT,
+               TREE_CD_ORD
+        FROM SY_CD_TREE
+        WHERE PLNT_CD = #{value}
+          AND USE_YN = 'Y'
+        START WITH HIR_TREE_CD IS NULL
+        CONNECT BY PRIOR TREE_CD = HIR_TREE_CD
+        ORDER BY HIR_TREE_CD, TREE_CD_ORD
+    </select>
+
+    <select id="findByCode" parameterType="TreeCommonCodeManageVO" resultType="TreeCommonCodeManageVO">
+        WITH T AS (
+            SELECT
+                SYS_CONNECT_BY_PATH(TREE_CD, '/') AS TREE_CD_PATH_FOR_SEARCH,
+                DECODE(TREE_CD, #{treeCd}, null, HIR_TREE_CD) AS HIR_TREE_CD,
+                TREE_CD,
+                TREE_NM,
+                TREE_EN,
+                TREE_ABBR,
+                TREE_RMK,
+                DEPT_LMT - 1 AS DEPT_LMT, -- 2번째 노드가 기준이므로 루트의 노드 레벨을 빼줍니다.
+                TREE_CD_ORD,
+                USE_YN
+            FROM SY_CD_TREE
+            WHERE PLNT_CD = #{plntCd}
+            START WITH TREE_CD = #{treeCd}
+            CONNECT BY PRIOR TREE_CD = HIR_TREE_CD
+        )
+        SELECT
+            DISTINCT
+            ALL_DATA.HIR_TREE_CD,
+            ALL_DATA.TREE_CD,
+            ALL_DATA.TREE_NM,
+            ALL_DATA.TREE_EN,
+            ALL_DATA.TREE_ABBR,
+            ALL_DATA.TREE_RMK,
+            ALL_DATA.DEPT_LMT,
+            ALL_DATA.TREE_CD_ORD,
+            ALL_DATA.USE_YN
+        FROM T ALL_DATA
+        JOIN
+        -- 검색절. 여기서 조회되는 row들의 부모 및 자식을 조회합니다.
+        (
+            SELECT
+                TREE_CD_PATH_FOR_SEARCH
+            FROM T
+            <where>
+                <if test="treeNm != null and treeNm != '' ">
+                    UPPER(TREE_NM) LIKE '%'||UPPER(#{treeNm})||'%'
+                </if>
+            </where>
+        ) SEARCH_RESULT
+        -- 검색절에서 조회된 데이터들의 부모들을 검색, 검색 결과 자신도 포함
+        ON SEARCH_RESULT.TREE_CD_PATH_FOR_SEARCH LIKE ALL_DATA.TREE_CD_PATH_FOR_SEARCH||'%'
+        -- 검색절에서 조회된 데이터들의 자식들을 검색. 검색 결과 자신도 포함
+        OR ALL_DATA.TREE_CD_PATH_FOR_SEARCH LIKE SEARCH_RESULT.TREE_CD_PATH_FOR_SEARCH||'%'
+        ORDER BY ALL_DATA.TREE_CD
+    </select>
+
+    <select id="getNextChildCodeByRoot" parameterType="String" resultType="String">
+        SELECT MAX(SUBSTR(TREE_CD, 0, 1)) ||
+               TO_CHAR(NVL(MAX(LTRIM((RTRIM(SUBSTR(TREE_CD, 0, 3), '0')), SUBSTR(TREE_CD, 0, 1))), 0) + 1) ||
+               '000000'
+        FROM SY_CD_TREE
+        WHERE HIR_TREE_CD = #{value}
+    </select>
+
+    <select id="getNextChildCode" parameterType="String" resultType="String">
+        SELECT MAX(SUBSTR(TREE_CD, 0, 1)) ||
+               TO_CHAR(NVL(MAX(LTRIM(TREE_CD, SUBSTR(TREE_CD, 0, 1))), 0) + 1)
+        FROM SY_CD_TREE
+        WHERE TREE_CD LIKE SUBSTR(#{value}, 0, 3) || '%'
+    </select>
+
+    <insert id="createNode" parameterType="TreeCommonCodeManageVO">
+        INSERT INTO SY_CD_TREE
+        (PLNT_CD, TREE_CD, HIR_TREE_CD, TREE_NM, TREE_EN, TREE_ABBR, TREE_CD_ORD, TREE_RMK)
+        VALUES (#{plntCd}, #{treeCd}, #{hirTreeCd}, #{treeNm}, #{treeEn}, #{treeAbbr}, #{treeCdOrd}, #{treeRmk})
+    </insert>
+
+    <update id="updateNode" parameterType="TreeCommonCodeManageVO">
+        UPDATE SY_CD_TREE
+        SET TREE_EN     = #{treeEn},
+            TREE_ABBR   = #{treeAbbr},
+            TREE_CD_ORD = #{treeCdOrd},
+            TREE_RMK    = #{treeRmk},
+            USE_YN      = #{useYn}
+        WHERE PLNT_CD = #{plntCd} AND TREE_CD = #{treeCd}
+    </update>
+
+</mapper>

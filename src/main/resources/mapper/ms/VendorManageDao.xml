@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.ms.dao.VendorManageDao">
+
+    <select id="findAll" parameterType="VendorVO" resultType="VendorVO">
+        SELECT
+            PLNT_CD,
+            VDR_CD,
+            VDR_DIV,
+            (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = VDR_DIV ) AS VDR_DIV_NM,
+            VDR_NM,
+            VDR_CRG_NM,
+            VDR_CRG_TEL,
+            VDR_ADR,
+            VDR_ADR_DTL,
+            DEL_YN
+        FROM RM_RITM_VDR
+        WHERE PLNT_CD = #{plntCd}
+            <if test="vdrDiv != null and vdrDiv != ''">
+                AND VDR_DIV = #{vdrDiv}
+            </if>
+            <if test="vdrNm != null and vdrNm != ''">
+                AND UPPER(VDR_NM) LIKE ('%' || TRIM(UPPER(#{vdrNm})) || '%')
+            </if>
+            <if test="delYn != null and delYn != ''">
+                AND DEL_YN = #{delYn}
+            </if>
+        ORDER BY PLNT_CD, VDR_NM
+    </select>
+
+    <insert id="create" parameterType="VendorVO">
+        <selectKey resultType="string" keyProperty="vdrCd" order="BEFORE">
+            SELECT 'RV'||LPAD(NVL(MAX(SUBSTR(VDR_CD, -4))+1,1),4,0) FROM RM_RITM_VDR
+        </selectKey>
+
+        INSERT INTO RM_RITM_VDR (
+            PLNT_CD,
+            VDR_CD,
+            VDR_DIV,
+            VDR_NM,
+            VDR_CRG_NM,
+            VDR_CRG_TEL,
+            VDR_ADR,
+            VDR_ADR_DTL
+        ) VALUES (
+            #{plntCd},
+            #{vdrCd},
+            #{vdrDiv},
+            #{vdrNm},
+            #{vdrCrgNm},
+            #{vdrCrgTel},
+            #{vdrAdr},
+            #{vdrAdrDtl}
+        )
+    </insert>
+
+    <update id="update" parameterType="VendorVO">
+        UPDATE RM_RITM_VDR SET
+            VDR_CRG_NM = #{vdrCrgNm},
+            VDR_CRG_TEL = #{vdrCrgTel},
+            VDR_ADR = #{vdrAdr},
+            VDR_ADR_DTL = #{vdrAdrDtl}
+        WHERE VDR_CD = #{vdrCd}
+    </update>
+
+    <update id="delete" parameterType="VendorVO">
+        UPDATE RM_RITM_VDR SET
+            DEL_YN = 'Y'
+        WHERE VDR_CD = #{vdrCd}
+    </update>
+
+</mapper>

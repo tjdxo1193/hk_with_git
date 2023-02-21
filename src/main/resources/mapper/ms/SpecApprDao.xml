@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.ms.dao.SpecApprDao">
+    <select id="getVersionList" parameterType="specApprVO" resultType="specApprVO">
+        SELECT
+            QPS.PLNT_CD
+             , PTYP.DTL_NM AS PITM_TYP_NM
+             , QPI.PITM_NM
+             , QPI.PITM_EN
+             , QPI.CRG_DPT_CD
+             , SD.DPT_NM AS CRG_DPT_NM
+             , QPS.PITM_SPEC_IDX
+             , QPS.PITM_CD
+             , QPS.PITM_VER
+             , QPS.AITM_SPEC_IDX
+             , QPS.SPEC_PROC_CD
+             , SDPROC.DTL_NM AS SPEC_PROC_NM
+             , QPS.DEL_YN
+             , QPS.USE_VER_YN
+             , QPS.RVS_NO
+             , QPS.DOC_NO
+             , QPS.RVS_DT
+             , QPS.ENFO_DT
+             , QPS.RVS_REA_CD
+             , QPS.RVS_CTT
+             , QPS.RVS_DIV_PS
+             , QPS.REVW_UID
+             , SU1.USER_NM AS REVW_UNM
+             , QPS.REVW_DS
+             , QPS.REVW_IP
+             , QPS.PITM_ANS_SPEC_APR_IDX
+             , SU2.USER_NM AS RJT_UNM
+             , QPS.RJT_UID
+             , QPS.RJT_DS
+             , QPS.RJT_REA
+             , QPAS.AITM_SPEC_IDX
+             , QPAS.AITM_SPEC_VER
+        FROM QM_PITM_SPEC QPS
+                 LEFT JOIN QM_PITM QP ON QP.PLNT_CD = QPS.PLNT_CD AND QP.PITM_CD = QPS.PITM_CD AND QP.PITM_VER = QPS.PITM_VER AND QP.USE_VER_YN = 'Y'
+                 LEFT JOIN QM_PITM_INFO QPI ON QPI.PLNT_CD = QPS.PLNT_CD AND QPI.PITM_CD = QPS.PITM_CD AND QPI.PITM_VER = QPS.PITM_VER
+                 LEFT JOIN QM_PITM_AITM_SPEC QPAS ON QPS.PLNT_CD = QPAS.PLNT_CD AND QPS.AITM_SPEC_IDX = QPAS.AITM_SPEC_IDX
+                 LEFT JOIN SY_CD_DTL SDPROC ON QPS.SPEC_PROC_CD = SDPROC.DTL_CD
+                 LEFT JOIN SY_CD_DTL PTYP ON QPI.PITM_TYP = PTYP.DTL_CD
+                 LEFT JOIN SY_DPT SD ON SD.PLNT_CD = QPS.PLNT_CD AND QPI.CRG_DPT_CD = SD.DPT_CD
+                 LEFT JOIN SY_APR_INFO SAI ON QP.PLNT_CD = SAI.PLNT_CD AND SAI.APR_IDX = QPS.PITM_ANS_SPEC_APR_IDX
+                 LEFT JOIN SY_USER SU1 ON QPS.REVW_UID = SU1.USER_ID
+                 LEFT JOIN SY_USER SU2 ON QPS.RJT_UID = SU2.USER_ID
+        WHERE QPS.PLNT_CD = #{plntCd}
+          AND QPS.DEL_YN = 'N'
+          AND QP.DEL_YN = 'N'
+          AND QPS.SPEC_PROC_CD = #{specProcCd}
+          AND SAI.APR_UID = #{loginUserUid}
+        <if test="crgDptCd != '' and crgDptCd != null">
+            AND QPI.CRG_DPT_CD = #{crgDptCd}
+        </if>
+        <if test="pitmTyp != '' and pitmTyp != null">
+            AND QPI.PITM_TYP = #{pitmTyp}
+        </if>
+        <if test="pitmNm != '' and pitmNm != null">
+            AND QPI.PITM_NM LIKE '%' || #{pitmNm} || '%'
+        </if>
+        <if test="pitmCd != '' and pitmCd != null">
+            AND QPI.PITM_CD LIKE '%' || #{pitmCd} || '%'
+        </if>
+        ORDER BY QPI.PITM_CD, QPS.PITM_SPEC_IDX
+    </select>
+
+    <select id="getAItmList" parameterType="specApprVO" resultType="specApprVO">
+        SELECT
+            QPSA.PLNT_CD
+             , QPSA.AITM_SPEC_IDX
+             , QPSA.AITM_SEQ
+             , QPSA.ANS_DPT_CD
+             , QPSA.AMITM_CD
+             , M.AITM_KN
+             , MA.VRIA_NO
+             , MA.VRIA_KN
+             , QPSA.AITM_ORD
+             , QPSA.PERSPEC_TXT
+             , QPSA.OWC_SPEC_TXT
+             , QPSA.SPEC_TXT_EN
+             , QPSA.SPEC_TYP
+             , QPSA.JDG_TYP
+             , QPSA.PER_SLV_LOW
+             , QPSA.PER_SLV_UPP
+             , QPSA.PER_SLV_DESC
+             , QPSA.OWC_SLV_LOW
+             , QPSA.OWC_SLV_UPP
+             , QPSA.OWC_SLV_DESC
+             , QPSA.SLV_JDG_CFM
+             , QPSA.SLV_JDG_NON_CFM
+             , QPSA.RST_UNIT_CD
+             , QPSA.RST_DPNT
+             , QPSA.RPT_PRT_SLV_VAL
+             , QPSA.RPT_PRT_ITM_NM
+             , QPSA.RPT_PRT_YN
+             , QPSA.ISP_DPT_CD
+             , QPSA.SMP_CLLT_QTY
+             , QPSA.SMP_CLLT_UNIT
+             , QPSA.ISP_DUR_TM
+             , QPSA.EQM_USE_TM
+             , QPSA.MKR_QTY
+             , QPSA.AITM_RMK
+        FROM QM_PITM_SPEC_AITM QPSA
+        LEFT JOIN MS_AMITM MA ON QPSA.AMITM_CD = MA.AMITM_CD
+        LEFT JOIN MS_AITM M ON SUBSTR(QPSA.AMITM_CD, 0, 6) = M.AITM_CD
+        WHERE PLNT_CD = #{plntCd}
+          AND AITM_SPEC_IDX = #{aitmSpecIdx}
+        ORDER BY AITM_ORD
+    </select>
+
+
+    <update id="updateApproval" parameterType="specApprVO">
+        UPDATE QM_PITM_SPEC SET
+            SPEC_PROC_CD = #{specProcCd}
+            ,USE_VER_YN = 'Y'
+        WHERE PLNT_CD = #{plntCd}
+          AND PITM_SPEC_IDX = #{pitmSpecIdx}
+    </update>
+
+    <update id="updateReject" parameterType="specApprVO">
+        UPDATE QM_PITM_SPEC SET
+            SPEC_PROC_CD = #{specProcCd}
+          ,RJT_DS = SYSDATE
+          ,RJT_REA = #{rjtRea}
+          ,RJT_UID = #{rjtUid}
+        WHERE PLNT_CD = #{plntCd}
+      AND PITM_SPEC_IDX = #{pitmSpecIdx}
+    </update>
+</mapper>

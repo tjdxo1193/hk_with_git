@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.ms.dao.ItemApprDao">
+    <select id="find" parameterType="ItemManageVO" resultType="ItemManageVO">
+        SELECT
+        QP.PLNT_CD,
+        QP.SPEC_PROC_CD,
+        (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = SPEC_PROC_CD) AS SPEC_PROC_NM,
+        QP.USE_VER_YN,
+        QP.RVS_NO,
+        QP.DOC_NO,
+        QP.PITM_CD AS PITM_CD,
+        QP.PITM_VER AS PITM_VER,
+        PITM_TYP,
+        (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = PITM_TYP AND PLNT_CD = #{plntCd}) AS PITM_TYP_NM,
+        RVS_DT,
+        ENFO_DT,
+        RVS_REA_CD,
+        RVS_CTT,
+        RVS_DIV_PS,
+        REVW_UID,
+        REVW_DS,
+        REVW_IP,
+        PITM_MST_APR_IDX,
+        RJT_UID,
+        RJT_DS,
+        RJT_REA,
+        PITM_TYP,
+        (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = PITM_TYP AND PLNT_CD = #{plntCd}) AS PITM_TYP_NM,
+        QPI.PITM_NM,
+        PITM_EN,
+        SAP_PRDHA,
+        ANS_DUR_DAY,
+        CRG_DPT_CD,
+        (SELECT DPT_NM FROM SY_DPT WHERE DPT_CD = CRG_DPT_CD AND PLNT_CD = #{plntCd}) AS CRG_DPT_NM,
+        SPCM_NO,
+        MIC_YN,
+        CLLT_MTD,
+        CLLT_MCN,
+        CLLT_PLA,
+        SMP_STRG_MTD,
+        SMP_VOL_UNIT,
+        SMP_VOL_ANS,
+        SMP_VOL_ETC,
+        SMP_VOL_STRG,
+        MTR_TYP,
+        MTR_MRP,
+        LAB_NO,
+        BRD_ABBR,
+        NOM_MTR,
+        ETR_CTN_QTY,
+        RMTR_SPEC,
+        NBR,
+        FTN_YN,
+        PCS01,
+        PCS02,
+        PCS03,
+        PCS04,
+        USE_TRM,
+        OTC_PRD,
+        DMS_EPT_YN,
+        PEAR_DIV,
+        MKR_VOL,
+        MKR_VOL_UNIT,
+        ETN_ANS_REQ,
+        CTRPT_NO,
+        PER_NO,
+        CHAG_VOL,
+        CHAG_VOL_UNIT,
+        DIO_YN,
+        PRB_IN_YN,
+        PRB_FE_YN,
+        PNX_FE_YN,
+        PKG_MTR_SPEC,
+        RMTR_CFMUL
+        FROM QM_PITM QP
+        JOIN QM_PITM_INFO QPI ON QP.PLNT_CD = QPI.PLNT_CD
+        AND QP.PITM_CD = QPI.PITM_CD
+        AND QP.PITM_VER = QPI.PITM_VER
+        JOIN QM_PITM_INFO_SAP QPIS ON QP.PLNT_CD = QPIS.PLNT_CD
+        AND QP.PITM_CD = QPIS.PITM_CD
+        AND QP.PITM_VER = QPIS.PITM_VER
+        JOIN SY_APR_INFO SAI ON QP.PITM_MST_APR_IDX = SAI.APR_IDX
+        <where>
+            DEL_YN = 'N'
+            AND SPEC_PROC_CD = #{specProcCd}
+            AND APR_REQ_UID = #{aprReqUid}
+            <if test="pitmTyp != ''">
+                AND PITM_TYP = #{pitmTyp}
+            </if>
+            <if test="plntCd != ''">
+                AND QP.PLNT_CD = #{plntCd}
+            </if>
+            <if test="pitmCd != ''">
+                AND QP.PITM_CD LIKE '%' || UPPER(#{pitmCd}) || '%'
+            </if>
+            <if test="pitmNm != ''">
+                AND QPI.PITM_NM LIKE '%' || UPPER(#{pitmNm}) || '%'
+            </if>
+        </where>
+        ORDER BY QP.CRT_DS DESC
+    </select>
+
+    <select id="findAitmSpecIdxBySapPrdha" parameterType="ItemManageVO" resultType="ItemManageVO">
+        SELECT NVL(MAX(AITM_SPEC_IDX), 0) AS NEW_AITM_SPEC_IDX
+        FROM QM_PKGA
+        WHERE PLNT_CD = #{plntCd}
+          AND SAP_PRDHA = #{sapPrdha}
+          AND SPEC_PROC_CD = #{specProcCd}
+    </select>
+
+    <select id="findNewAitmSpecIdx" parameterType="ItemManageVO" resultType="ItemManageVO">
+        SELECT NVL(MAX(AITM_SPEC_IDX) + 1, 1) AS AITM_SPEC_IDX
+        , MAX((SELECT COUNT(PITM_CD) FROM QM_PITM_SPEC WHERE PITM_CD = #{pitmCd}) + 1) AS AITM_SPEC_VER
+        FROM QM_PITM_AITM_SPEC
+        WHERE PLNT_CD = #{plntCd}
+    </select>
+
+    <select id="findSpecAitm" parameterType="ItemApprSpecVO" resultType="ItemApprSpecAitmVO">
+        SELECT PLNT_CD,
+               AITM_SPEC_IDX,
+               ANS_DPT_CD,
+               AMITM_CD,
+               AITM_ORD,
+               PERSPEC_TXT,
+               OWC_SPEC_TXT,
+               SPEC_TXT_EN,
+               SPEC_TYP,
+               JDG_TYP,
+               PER_SLV_LOW,
+               PER_SLV_UPP,
+               PER_SLV_DESC,
+               OWC_SLV_LOW,
+               OWC_SLV_UPP,
+               OWC_SLV_DESC,
+               SLV_JDG_CFM,
+               SLV_JDG_NON_CFM,
+               RST_UNIT_CD,
+               RST_DPNT,
+               RPT_PRT_SLV_VAL,
+               RPT_PRT_ITM_NM,
+               RPT_PRT_YN,
+               ISP_DPT_CD,
+               SMP_CLLT_QTY,
+               SMP_CLLT_UNIT,
+               ISP_DUR_TM,
+               EQM_USE_TM,
+               AITM_RMK,
+               MKR_QTY
+        FROM QM_PITM_SPEC_AITM
+        WHERE PLNT_CD = #{plntCd}
+          AND AITM_SPEC_IDX = #{aitmSpecIdx}
+        ORDER BY AITM_SEQ
+    </select>
+
+    <select id="findSpecByPitmCd" parameterType="ItemManageVO" resultType="ItemManageVO">
+        SELECT PLNT_CD,
+               PITM_SPEC_IDX,
+               PITM_CD,
+               PITM_VER,
+               AITM_SPEC_IDX,
+               SPEC_PROC_CD,
+               DEL_YN,
+               USE_VER_YN,
+               RVS_NO,
+               DOC_NO,
+               RVS_DT,
+               ENFO_DT,
+               RVS_REA_CD,
+               RVS_CTT,
+               RVS_DIV_PS,
+               REVW_UID,
+               REVW_DS,
+               REVW_IP,
+               PITM_ANS_SPEC_APR_IDX,
+               RJT_UID,
+               RJT_DS,
+               RJT_REA,
+               CRT_IP,
+               CRT_DS,
+               CRT_UID,
+               UDT_IP,
+               UDT_DS,
+               UDT_UID
+        FROM QM_PITM_SPEC
+        WHERE PITM_SPEC_IDX = (SELECT MAX(PITM_SPEC_IDX)
+                               FROM QM_PITM_SPEC
+                               WHERE PLNT_CD = #{plntCd}
+                                 AND PITM_CD = #{pitmCd})
+    </select>
+
+    <update id="approve" parameterType="ItemManageVO">
+        UPDATE QM_PITM
+        SET SPEC_PROC_CD = #{specProcCd},
+            USE_VER_YN   = #{useVerYn}
+        WHERE PLNT_CD = #{plntCd}
+          AND PITM_CD = #{pitmCd}
+          AND PITM_VER = #{pitmVer}
+    </update>
+
+    <update id="reject" parameterType="ItemManageVO">
+        UPDATE QM_PITM
+        SET SPEC_PROC_CD = #{specProcCd},
+            RJT_UID      = #{rjtUid},
+            RJT_DS       = SYSDATE,
+            RJT_REA      = #{rjtRea},
+            USE_VER_YN   = 'N'
+        WHERE PLNT_CD = #{plntCd}
+          AND PITM_CD = #{pitmCd}
+          AND PITM_VER = #{pitmVer}
+    </update>
+
+    <update id="updatePitm" parameterType="ItemManageVO">
+        UPDATE QM_PITM
+        SET SPEC_PROC_CD = #{specProcCd},
+            USE_VER_YN   = #{useVerYn}
+        WHERE PLNT_CD = #{plntCd}
+          AND PITM_CD = #{pitmCd}
+          AND PITM_VER = #{pitmVer}
+    </update>
+
+    <update id="updateSpec" parameterType="ItemManageVO">
+        UPDATE QM_PITM_SPEC
+        SET USE_VER_YN = #{useVerYn}
+        WHERE PLNT_CD = #{plntCd}
+          AND PITM_SPEC_IDX = #{pitmSpecIdx}
+    </update>
+
+    <update id="updateSpecPitmVer" parameterType="ItemManageVO">
+        UPDATE QM_PITM_SPEC
+        SET PITM_VER = #{pitmVer}
+        WHERE PLNT_CD = #{plntCd}
+          AND PITM_SPEC_IDX = #{pitmSpecIdx}
+    </update>
+
+    <insert id="createQmPitmAitmSpec" parameterType="ItemManageVO">
+        INSERT INTO QM_PITM_AITM_SPEC (PLNT_CD, AITM_SPEC_IDX, AITM_SPEC_VER)
+        VALUES (#{plntCd}, #{aitmSpecIdx}, #{aitmSpecVer})
+    </insert>
+
+    <insert id="createQmPitmSpecAitm" parameterType="ItemApprSpecAitmVO">
+        <selectKey resultType="int" keyProperty="aitmSeq" order="BEFORE">
+            SELECT NVL(MAX(AITM_SEQ)+1,1)
+            FROM QM_PITM_SPEC_AITM
+            WHERE PLNT_CD = #{plntCd}
+            AND AITM_SPEC_IDX = #{aitmSpecIdx}
+        </selectKey>
+        INSERT INTO QM_PITM_SPEC_AITM
+        (PLNT_CD, AITM_SPEC_IDX, AITM_SEQ, ANS_DPT_CD, AMITM_CD, AITM_ORD, PERSPEC_TXT, OWC_SPEC_TXT, SPEC_TXT_EN
+        , SPEC_TYP, JDG_TYP, PER_SLV_LOW, PER_SLV_UPP, PER_SLV_DESC, OWC_SLV_LOW, OWC_SLV_UPP, OWC_SLV_DESC
+        , SLV_JDG_CFM, SLV_JDG_NON_CFM, RST_UNIT_CD, RST_DPNT, RPT_PRT_SLV_VAL, RPT_PRT_ITM_NM, RPT_PRT_YN
+        , ISP_DPT_CD, SMP_CLLT_QTY, SMP_CLLT_UNIT, ISP_DUR_TM, EQM_USE_TM, AITM_RMK, MKR_QTY)
+        VALUES
+        (#{plntCd}, #{aitmSpecIdx}, #{aitmSeq}, #{ansDptCd}, #{amitmCd}, #{aitmOrd}, #{perspecTxt}
+        , #{owcSpecTxt}, #{specTxtEn}, #{specTyp}, #{jdgTyp}, #{perSlvLow}, #{perSlvUpp}, #{perSlvDesc}, #{owcSlvLow}
+        , #{owcSlvUpp}, #{owcSlvDesc}, #{slvJdgCfm}, #{slvJdgNonCfm}, #{rstUnitCd}, #{rstDpnt}, #{rptPrtSlvVal},
+        #{rptPrtItmNm}, #{rptPrtYn}, #{ispDptCd}, #{smpClltQty}, #{smpClltUnit}, #{ispDurTm}, #{eqmUseTm}, #{aitmRmk}, #{mkrQty})
+    </insert>
+
+    <insert id="createQmPitmSpec" parameterType="ItemManageVO">
+        <selectKey keyProperty="pitmSpecIdx" resultType="Integer" order="BEFORE">
+            SELECT NVL(MAX(PITM_SPEC_IDX) + 1, 1) FROM QM_PITM_SPEC WHERE PLNT_CD = #{plntCd}
+        </selectKey>
+        INSERT INTO QM_PITM_SPEC (PLNT_CD, PITM_SPEC_IDX, AITM_SPEC_IDX, PITM_CD, PITM_VER, USE_VER_YN, DEL_YN,
+        SPEC_PROC_CD) VALUES
+        (#{plntCd}, #{pitmSpecIdx}, #{aitmSpecIdx}, #{pitmCd}, #{pitmVer}, #{useVerYn}, 'N', #{specProcCd})
+    </insert>
+</mapper>

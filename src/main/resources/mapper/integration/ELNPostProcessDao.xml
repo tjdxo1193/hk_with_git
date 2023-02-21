@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.integration.dao.ELNPostProcessDao">
+
+    <select id="findFinalSpecByLabNoAndPrdDiv" resultType="lims.api.integration.vo.ELNPostProcessVO$PItemSpec"
+            parameterType="lims.api.integration.vo.ELNStandardSpecVO$DifferentKey">
+        SELECT PLNT_CD,
+               PITM_SPEC_IDX,
+               PITM_CD,
+               PITM_VER,
+               SPEC_PROC_CD
+        FROM QM_PITM_SPEC
+        WHERE DEL_YN = 'N'
+          AND (PLNT_CD, PITM_SPEC_IDX) IN (
+            SELECT PLNT_CD, NVL(MAX(PITM_SPEC_IDX), 0)
+            FROM QM_PITM_SPEC
+            WHERE (PLNT_CD, PITM_CD) IN (
+                SELECT A.PLNT_CD, A.PITM_CD
+                FROM QM_PITM A
+                         JOIN QM_PITM_INFO B
+                              ON A.PLNT_CD = B.PLNT_CD AND A.PITM_CD = B.PITM_CD AND A.PITM_VER = B.PITM_VER
+                         JOIN QM_PITM_INFO_SAP C
+                              ON A.PLNT_CD = C.PLNT_CD AND A.PITM_CD = C.PITM_CD AND A.PITM_VER = C.PITM_VER
+                WHERE A.DEL_YN = 'N'
+                  AND A.USE_VER_YN = 'Y'
+                  AND C.LAB_NO = #{labNo}
+                  AND B.PITM_TYP IN ( ${prdDivCode} )
+            )
+            GROUP BY PLNT_CD, PITM_CD
+        )
+    </select>
+
+    <select id="nextIdxOfSpec" parameterType="lims.api.integration.vo.ELNPostProcessVO$PItemSpec"
+            resultType="int">
+        SELECT NVL(MAX(PITM_SPEC_IDX), 0) + 1
+        FROM QM_PITM_SPEC
+        WHERE PLNT_CD = #{plntCd}
+    </select>
+
+    <insert id="createNewVersionOfSpec" parameterType="lims.api.integration.vo.ELNPostProcessVO$PItemSpec">
+        INSERT INTO QM_PITM_SPEC
+        (PLNT_CD, PITM_SPEC_IDX, PITM_CD, PITM_VER, SPEC_PROC_CD, DEL_YN, USE_VER_YN, CRT_IP, CRT_DS,
+         CRT_UID, UDT_IP, UDT_DS, UDT_UID)
+        VALUES (#{plntCd},
+                #{nextPitmSpecIdx},
+                #{pitmCd},
+                #{pitmVer},
+                #{specProcCd},
+                #{delYn},
+                #{useVerYn},
+                #{updatedIp},
+                SYSDATE,
+                #{updatedUid},
+                #{updatedIp},
+                SYSDATE,
+                #{updatedUid})
+    </insert>
+
+    <update id="updateStatusOfSpec" parameterType="lims.api.integration.vo.ELNPostProcessVO$PItemSpec">
+        UPDATE QM_PITM_SPEC
+        SET SPEC_PROC_CD = #{specProcCd},
+            DEL_YN       = #{delYn},
+            UDT_UID      = #{updatedUid},
+            UDT_IP       = #{updatedIp},
+            UDT_DS       = SYSDATE
+        WHERE PLNT_CD = #{plntCd}
+          AND PITM_SPEC_IDX = #{pitmSpecIdx}
+    </update>
+
+    <update id="updateAitmSpecIdxToNullOfSpec" parameterType="lims.api.integration.vo.ELNPostProcessVO$PItemSpec">
+        UPDATE QM_PITM_SPEC
+        SET AITM_SPEC_IDX = null,
+            UDT_UID       = #{updatedUid},
+            UDT_IP        = #{updatedIp},
+            UDT_DS        = SYSDATE
+        WHERE PLNT_CD = #{plntCd}
+          AND PITM_SPEC_IDX = #{pitmSpecIdx}
+    </update>
+
+    <!--    <select id="nextVersionOfSpec" parameterType="lims.api.integration.vo.SAPPostProcessVO$Material$PItemKey"-->
+    <!--            resultType="int">-->
+    <!--        SELECT NVL(MAX(PITM_VER), 0) + 1-->
+    <!--        FROM QM_PITM_SPEC-->
+    <!--        WHERE PLNT_CD = #{plntCd}-->
+    <!--          AND PITM_CD = #{pitmCd}-->
+    <!--    </select>-->
+
+    <!--    <select id="currentFinalVersionStatusCodeOfSpec" resultType="String"-->
+    <!--            parameterType="lims.api.integration.vo.SAPPostProcessVO$Material$PItemKey">-->
+    <!--        SELECT SPEC_PROC_CD-->
+    <!--        FROM QM_PITM_SPEC-->
+    <!--        WHERE PLNT_CD = #{plntCd}-->
+    <!--          AND PITM_CD = #{pitmCd}-->
+    <!--          AND PITM_VER = #{version}-->
+    <!--    </select>-->
+
+    <!--    <select id="nextPItemSpecIdxOfSpec" resultType="Integer" parameterType="lims.api.integration.vo.SAPPostProcessVO$Material$PItemKey">-->
+    <!--        SELECT NVL(MAX(PITM_SPEC_IDX), 0) + 1 FROM QM_PITM_SPEC WHERE PLNT_CD = #{plntCd}-->
+    <!--    </select>-->
+
+</mapper>

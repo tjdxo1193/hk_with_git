@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.integration.dao.InterfaceErrorDao">
+
+    <select id="nextId" resultType="int">
+        SELECT NVL(MAX(ERRORLOG_ID), 0) + 1
+        FROM IF_ERRORLOG
+    </select>
+
+    <insert id="createLog" parameterType="InterfaceErrorVO">
+        INSERT INTO IF_ERRORLOG
+            (ERRORLOG_ID, IF_INFO_IDX, EXCEPTION, MESSAGE, STACK_TRACE, CRT_DS)
+        VALUES (#{errorlogId},
+                #{ifInfoIdx},
+                #{exception},
+                #{message},
+                #{stackTrace},
+                SYSDATE)
+    </insert>
+
+
+    <select id="nextIdOfPostProcess" resultType="int">
+        SELECT NVL(MAX(ERRORLOG_ID), 0) + 1
+        FROM IF_POST_PROCESS_ERRORLOG
+    </select>
+
+    <insert id="createLogOfPostProcess" parameterType="InterfacePostProcessErrorVO">
+        INSERT INTO IF_POST_PROCESS_ERRORLOG
+        (ERRORLOG_ID, IF_INFO_IDX, DEGREE, EXCEPTION, MESSAGE, STACK_TRACE, CRT_DS)
+        VALUES (#{errorlogId},
+                #{ifInfoIdx},
+                #{degree},
+                #{exception},
+                #{message},
+                #{stackTrace},
+                SYSDATE)
+    </insert>
+
+    <select id="findPostProcessById" resultType="InterfacePostProcessErrorVO">
+        SELECT ERRORLOG_ID,
+               IF_INFO_IDX,
+               DEGREE,
+               EXCEPTION,
+               MESSAGE,
+               STACK_TRACE,
+               CRT_DS
+        FROM IF_POST_PROCESS_ERRORLOG
+        WHERE ERRORLOG_ID = #{value}
+    </select>
+
+</mapper>

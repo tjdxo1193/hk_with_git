@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.ms.dao.MsElnCtRptFileDao">
+
+    <select id="getMsElnCtRptFileList" parameterType="MsElnCtRptFileVO" resultType="MsElnCtRptFileVO">
+        SELECT MECRF.CT_ID
+            , MECRF.CT_SEQ
+            , MECRF.FILE_NAME
+            , MECRF.FILE_NAME AS NAME
+            , MECRF.FILE_DATA
+            , MECRF.FILE_DATA AS SRC
+            , MECRF.CRT_DS
+            , TO_CHAR(TO_DATE(MECRF.CRT_DS, 'YYYY-MM-DD')) AS CRT_DT
+            , MECRF.UDT_DS
+            , TO_CHAR(TO_DATE(MECRF.UDT_DS, 'YYYY-MM-DD')) AS UDT_DT
+            , LENGTH(MECRF.FILE_DATA) AS "SIZE"
+            , MECRF.CT_ID AS FILE_IDX
+            , MECRF.CT_SEQ AS FILE_SRLNO
+            , MECRM.MATNR
+        FROM MS_ELN_CT_RPT_FILE MECRF
+        LEFT JOIN MS_ELN_CT_RPT_MTR MECRM ON MECRF.CT_ID = MECRM.CT_ID and MECRF.CT_SEQ = MECRM.CT_SEQ
+        <where>
+            <if test="ctId != null and ctId != ''">
+                AND MECRF.CT_ID = #{ctId}
+            </if>
+            <if test="matnr != null and matnr != ''">
+                AND MECRM.MATNR = #{matnr}
+            </if>
+        </where>
+        ORDER BY MECRF.CT_SEQ
+    </select>
+
+    <!-- MS_ELN_CT_RPT_FILE, 새 키값 조회 -->
+    <select id="nextIdx" resultType="String">
+        SELECT TO_CHAR(TO_NUMBER(NVL(MAX(CT_ID), 0)) + 1)
+        FROM MS_ELN_CT_RPT_FILE
+    </select>
+
+    <!-- MS_ELN_CT_RPT_FILE, 키에 따른 다음 seq 조회 -->
+    <select id="nextSeq" parameterType="MsElnCtRptFileVO" resultType="String">
+        SELECT TO_CHAR(TO_NUMBER(NVL(MAX(CT_SEQ), 0)) + 1)
+        FROM MS_ELN_CT_RPT_FILE
+        WHERE 1 = 1
+            AND CT_ID = #{ctId}
+    </select>
+
+    <!-- MS_ELN_CT_RPT_FILE 저장, 파일 저장 -->
+    <insert id="save" parameterType="MsElnCtRptFileVO">
+        INSERT INTO MS_ELN_CT_RPT_FILE
+        (CT_ID, CT_SEQ, FILE_NAME, FILE_DATA, CRT_DS, UDT_DS)
+        VALUES (#{ctId}, #{ctSeq}, #{fileName}, #{data}, SYSDATE, SYSDATE)
+    </insert>
+
+    <!-- MS_ELN_CT_RPT_FILE 삭제, 1개 -->
+    <delete id="delete" parameterType="MsElnCtRptFileVO">
+        DELETE FROM MS_ELN_CT_RPT_FILE
+        WHERE CT_ID = #{ctId}
+            AND CT_SEQ = #{ctSeq}
+    </delete>
+
+</mapper>

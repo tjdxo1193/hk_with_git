@@ -1,0 +1,50 @@
+.aui-grid {
+  font-size: 14.64px;
+
+  & td {
+    vertical-align: middle;
+  }
+
+  .aui-grid-default-header {
+    vertical-align: middle;
+    font-size: 0.8rem !important;
+  }
+
+  & tr:hover,
+  & th:hover,
+  & td:hover {
+    background-color: rgb(245, 245, 245) !important;
+  }
+
+  & .aui-grid-row-background {
+    background-color: #fff;
+  }
+
+  //* 선택 행, 선택한 셀의 헤더, no. 컬럼의 배경색
+  & .aui-grid-selection-row-others-bg,
+  & .aui-grid-selection-row-bg,
+  & .aui-grid-selection-header-column,
+  & .aui-grid-selection-row-num-column {
+    background-color: rgb(240, 240, 240) !important;
+  }
+
+  //* 체크된 행
+  & .aui-grid-extra-checked-row,
+  & .aui-grid .aui-grid-row-background {
+    background-color: rgb(255, 255, 228);
+  }
+
+  //* editable: true인 컬럼
+  .editable-col {
+    color: #2f62a5 !important;
+  }
+  
+  & .redFont {
+    color: #FF0000;
+  }
+  
+  & .boldFont {
+    color: #383838;
+    font-weight: bold;
+  }
+}

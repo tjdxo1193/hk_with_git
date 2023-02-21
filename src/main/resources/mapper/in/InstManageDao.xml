@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.in.dao.InstManageDao">
+    <select id="find" parameterType="InstManageVO" resultType="InstManageVO">
+        SELECT EEI.PLNT_CD,
+               EEI.EQM_CD,
+               EEI.EQM_NM,
+               EEI.EQM_DIV,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = EEI.PLNT_CD AND DTL_CD = EQM_DIV) AS EQM_DIV_NM,
+               EEI.EQM_CRST,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = EEI.PLNT_CD AND DTL_CD = EQM_CRST) AS EQM_CRST_NM,
+               EEI.EQM_STT,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = EEI.PLNT_CD AND DTL_CD = EQM_STT) AS EQM_STT_NM,
+               EEI.IST_PLA,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = EEI.PLNT_CD AND DTL_CD = IST_PLA) AS IST_PLA_NM,
+               EEI.MAK_COMP,
+               EEI.SPL_COMP,
+               EEI.MOD_NM,
+               EEI.SRL_NO,
+               EEI.CRG_UID,
+               (SELECT USER_NM FROM SY_USER WHERE PLNT_CD = EEI.PLNT_CD AND USER_ID = EEI.CRG_UID) AS CRG_NM,
+               EEI.IQ,
+               EEI.OQ,
+               EEI.PQ,
+               EEI.APR_NO,
+               EEI.CHK_CYL,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = EEI.PLNT_CD AND DTL_CD = CHK_CYL) AS CHK_CYL_NM,
+               EEI.QUA_CYL,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = EEI.PLNT_CD AND DTL_CD = QUA_CYL) AS QUA_CYL_NM,
+               EEI.CAL_CYL,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = EEI.PLNT_CD AND DTL_CD = CAL_CYL) AS CAL_CYL_NM,
+               EEI.ETR_DT,
+               EEI.IST_DT,
+               EEI.DPS_DT,
+               EEI.QUAL_APR_DT,
+               EEI.CAL_APR_DT,
+               EEI.RGL_CHK_APR_DT,
+               EEI.USE_RNG,
+               EEI.QTT_RNG,
+               EEI.RMK,
+               NVL(EEI.EQM_FILE_IDX, 0) AS EQM_FILE_IDX,
+               EEI.SAP_AST_NO,
+               EEI.SAP_AST_NM,
+               EEI.SAP_CRT_DT,
+               EEI.SAP_CHG_DT,
+               EEI.SAP_ACQ_DT,
+               EEI.SAP_SALE_DPS_DT,
+               EEI.SAP_ADD_DESC,
+               EEI.SAP_CRG_NM_EMID,
+               EEI.SAP_COSC,
+               EEI.SAP_ORCO,
+               EEI.SAP_ACCD,
+               EEI.PMS_CHK_TAGT_YN
+        FROM EM_EQM_INFO EEI
+        WHERE EEI.PLNT_CD = #{plntCd}
+          AND EEI.DEL_YN = 'N'
+        <if test="eqmDiv != ''">
+            AND EEI.EQM_DIV = #{eqmDiv}
+        </if>
+        <if test="eqmNm != ''">
+            AND UPPER(EEI.EQM_NM) LIKE '%' || UPPER(#{eqmNm}) || '%'
+        </if>
+        <if test="eqmCd != ''">
+            AND UPPER(EEI.EQM_CD) LIKE '%' || UPPER(#{eqmCd}) || '%'
+        </if>
+        <if test="dpsDtList.size() > 0">
+            AND TO_DATE(EEI.DPS_DT) BETWEEN TO_DATE(#{dpsDtList[0]}) AND TO_DATE(#{dpsDtList[1]})
+        </if>
+        <if test="qualAprDtList.size() > 0">
+            AND TO_DATE(EEI.QUAL_APR_DT) BETWEEN TO_DATE(#{qualAprDtList[0]}) AND TO_DATE(#{qualAprDtList[1]})
+        </if>
+        <if test="calAprDtList.size() > 0">
+            AND TO_DATE(EEI.CAL_APR_DT) BETWEEN TO_DATE(#{calAprDtList[0]}) AND TO_DATE(#{calAprDtList[1]})
+        </if>
+        <if test="eqmStt != null">
+            AND EQM_STT = #{eqmStt}
+        </if>
+        ORDER BY EEI.EQM_CD DESC
+    </select>
+
+    <select id="findAccessory" parameterType="InstManageVO" resultType="InstManageVO">
+        SELECT EEA.PLNT_CD,
+               EEA.EQM_CD,
+               EEA.ACSR_SEQ,
+               EEA.ACSR_NM,
+               EEA.ACSR_MOD_NM,
+               EEA.ACSR_SRL_NO
+        FROM EM_EQM_ACSR EEA
+        WHERE PLNT_CD = #{plntCd}
+          AND EQM_CD = #{eqmCd}
+        ORDER BY EEA.ACSR_SEQ
+    </select>
+
+    <insert id="create" parameterType="InstManageVO">
+        <selectKey keyProperty="eqmCd" resultType="String" order="BEFORE">
+            SELECT 'E' || LPAD(NVL(MAX(SUBSTR(EQM_CD, -5)) + 1, 1), 5, 0)
+            FROM EM_EQM_INFO
+            WHERE PLNT_CD = #{plntCd}
+        </selectKey>
+        INSERT INTO EM_EQM_INFO (PLNT_CD, EQM_CD, EQM_NM, EQM_DIV, EQM_CRST, EQM_STT, IST_PLA, MAK_COMP, SPL_COMP,
+        MOD_NM, SRL_NO, CRG_UID, IQ, OQ, PQ, APR_NO, CHK_CYL, QUA_CYL, CAL_CYL, ETR_DT, IST_DT, DPS_DT,
+        QUAL_APR_DT, CAL_APR_DT, RGL_CHK_APR_DT, USE_RNG, QTT_RNG, RMK, PMS_CHK_TAGT_YN, DEL_YN)
+        VALUES (#{plntCd}, #{eqmCd}, #{eqmNm}, #{eqmDiv}, #{eqmCrst}, #{eqmStt}, #{istPla}, #{makComp}, #{splComp},
+        #{modNm}, #{srlNo}, #{crgUid}, #{iq}, #{oq}, #{pq}, #{aprNo}, #{chkCyl}, #{quaCyl}, #{calCyl}, #{etrDt},
+        #{istDt}, #{dpsDt}, #{qualAprDt}, #{calAprDt}, #{rglChkAprDt}, #{useRng}, #{qttRng}, #{rmk}, 'N', 'N')
+    </insert>
+
+    <insert id="createAccessory" parameterType="InstManageVO">
+        <selectKey resultType="Integer" keyProperty="acsrSeq" order="BEFORE">
+            SELECT NVL(MAX(ACSR_SEQ) + 1, 1)
+            FROM EM_EQM_ACSR
+            WHERE PLNT_CD = #{plntCd}
+            AND EQM_CD = #{eqmCd}
+        </selectKey>
+        INSERT INTO EM_EQM_ACSR (PLNT_CD, EQM_CD, ACSR_SEQ, ACSR_NM, ACSR_MOD_NM, ACSR_SRL_NO, DEL_YN)
+        VALUES (#{plntCd}, #{eqmCd}, #{acsrSeq}, #{acsrNm}, #{acsrModNm}, #{acsrSrlNo}, 'N')
+    </insert>
+
+    <update id="delete" parameterType="InstManageVO">
+        UPDATE EM_EQM_INFO
+        SET DEL_YN = 'Y'
+        WHERE PLNT_CD = #{plntCd}
+          AND EQM_CD = #{eqmCd}
+    </update>
+
+    <update id="update" parameterType="InstManageVO">
+        UPDATE EM_EQM_INFO
+        SET EQM_NM         = #{eqmNm},
+            EQM_DIV        = #{eqmDiv},
+            EQM_CRST       = #{eqmCrst},
+            EQM_STT        = #{eqmStt},
+            IST_PLA        = #{istPla},
+            MAK_COMP       = #{makComp},
+            SPL_COMP       = #{splComp},
+            MOD_NM         = #{modNm},
+            SRL_NO         = #{srlNo},
+            CRG_UID        = #{crgUid},
+            IQ             = #{iq},
+            OQ             = #{oq},
+            PQ             = #{pq},
+            APR_NO         = #{aprNo},
+            CHK_CYL        = #{chkCyl},
+            QUA_CYL        = #{quaCyl},
+            CAL_CYL        = #{calCyl},
+            ETR_DT         = #{etrDt},
+            IST_DT         = #{istDt},
+            DPS_DT         = #{dpsDt},
+            QUAL_APR_DT    = #{qualAprDt},
+            CAL_APR_DT     = #{calAprDt},
+            RGL_CHK_APR_DT = #{rglChkAprDt},
+            USE_RNG        = #{useRng},
+            QTT_RNG        = #{qttRng},
+            RMK            = #{rmk}
+        WHERE PLNT_CD = #{plntCd}
+          AND EQM_CD = #{eqmCd}
+    </update>
+
+    <update id="updateAccessory" parameterType="InstManageVO">
+        UPDATE EM_EQM_ACSR
+        SET ACSR_NM     = #{acsrNm},
+            ACSR_MOD_NM = #{acsrModNm},
+            ACSR_SRL_NO = #{acsrSrlNo}
+        WHERE PLNT_CD = #{plntCd}
+          AND EQM_CD = #{eqmCd}
+          AND ACSR_SEQ = #{acsrSeq}
+    </update>
+
+    <update id="deleteAccessory" parameterType="InstManageVO">
+        UPDATE EM_EQM_ACSR
+        SET DEL_YN = 'Y'
+        WHERE PLNT_CD = #{plntCd}
+          AND EQM_CD = #{eqmCd}
+          AND ACSR_SEQ = #{acsrSeq}
+    </update>
+
+    <update id="deleteAllAccessory" parameterType="InstManageVO">
+        UPDATE EM_EQM_ACSR
+        SET DEL_YN = 'Y'
+        WHERE PLNT_CD = #{plntCd}
+          AND EQM_CD = #{eqmCd}
+    </update>
+
+    <update id="updateFile" parameterType="InstManageVO">
+        UPDATE EM_EQM_INFO
+        SET EQM_FILE_IDX = #{eqmFileIdx}
+        WHERE PLNT_CD = #{plntCd}
+          AND EQM_CD = #{eqmCd}
+    </update>
+</mapper>

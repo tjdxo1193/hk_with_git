@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.common.dao.UserDao">
+
+    <select id="getLoginUserInfo" parameterType="UserVO" resultType="UserVO">
+        SELECT USER_ID,
+               USER_LOGN_ID,
+               PWD AS PASSWORD,
+               DPT_CD,
+               PLNT_CD,
+               USER_NM
+        FROM SY_USER
+        WHERE PLNT_CD = #{plntCd}
+          AND USER_LOGN_ID = #{userLognId}
+    </select>
+
+    <select id="findByUserLoginId" parameterType="String" resultType="UserVO">
+        SELECT USER_ID,
+               PWD AS PASSWORD,
+               DPT_CD,
+               PLNT_CD,
+               LOGN_FAIL_CNT,
+               LOCK_YN
+        FROM SY_USER
+        WHERE USER_LOGN_ID = #{value}
+    </select>
+
+    <select id="findByUserLoginIdAndPlantCode" parameterType="UserVO" resultType="UserVO">
+        SELECT USER_ID,
+               PWD AS PASSWORD,
+               DPT_CD,
+               PLNT_CD,
+               LOGN_FAIL_CNT,
+               LOCK_YN
+        FROM SY_USER
+        WHERE USER_LOGN_ID = #{userLognId}
+          AND PLNT_CD = #{plntCd}
+    </select>
+
+    <update id="updateLognFailCnt" parameterType="UserVO">
+        <selectKey resultType="Integer" keyProperty="lognFailCnt" order="BEFORE">
+            SELECT NVL(LOGN_FAIL_CNT,0)+1 FROM SY_USER WHERE USER_ID = #{userId}
+        </selectKey>
+
+        UPDATE SY_USER SET
+        LOGN_FAIL_CNT = #{lognFailCnt}
+        WHERE USER_LOGN_ID = #{userLognId}
+    </update>
+
+    <update id="updateLockYn" parameterType="UserVO">
+        UPDATE SY_USER
+        SET LOCK_YN = #{lockYn}
+        WHERE USER_LOGN_ID = #{userLognId}
+    </update>
+
+    <!--
+        데이터 구조상 SY_USER_DLG 내 userId와 DLG_UID는 1:N이기 때문에
+        대리자 B에게 위임한 사용자 A의 데이터가 여러 개 일 수 있습니다.
+
+        프로세스 관점에서 A가 위임상태일 때 B가 대리자인 경우는 1개만 있어야 합니다.
+        따라서 아래 쿼리에서 B에게 위임한 사용자 A의 데이터가 여러 개 나올 경우 위임 상태 변경이 잘못 된 이슈일 수 있습니다.
+    -->
+    <select id="findDelegateAssignUserIdsByUserId" parameterType="UserDelegateVO" resultType="UserVO">
+    <![CDATA[
+        SELECT DISTINCT U.ANS_YN,
+                        U.CLLT_YN,
+                        U.REVW_YN,
+                        U.APR_YN,
+                        U.USER_ID,
+                        U.PLNT_CD,
+                        U.DPT_CD,
+                        U.ATH_CD,
+                        U.USER_NM,
+                        U.USER_MAIL,
+                        U.USER_TEL,
+                        U.USER_LOGN_ID,
+                        U.EMID,
+                        U.GRADE_NM,
+                        U.TITLE_NM,
+                        U.PWD,
+                        U.USE_YN,
+                        U.LOCK_YN,
+                        U.LOGN_FAIL_CNT,
+                        U.CRT_IP,
+                        U.CRT_DS,
+                        U.CRT_UID,
+                        U.UDT_IP,
+                        U.UDT_DS,
+                        U.UDT_UID
+        FROM SY_USER_DLG D
+                 JOIN SY_USER U ON D.USER_ID = U.USER_ID
+        WHERE DLG_UID = #{userId}
+          AND DLG_PROC_CD = #{delegateStatus.value}
+          AND DLG_STT_CD = #{delegateApprStatus.value}
+        ]]>
+    </select>
+
+    <select id="getUserInfoToPwdChange" parameterType="pwdChangeVO" resultType="pwdChangeVO">
+        SELECT
+            SU.USER_ID
+             , SU.PLNT_CD
+             , SD.DPT_NM
+             , SU.DPT_CD
+             , SA.ATH_NM
+             , SU.ATH_CD
+             , SU.USER_NM
+             , SU.USER_MAIL
+             , SU.USER_TEL
+             , SU.USER_LOGN_ID
+             , SU.EMID
+             , SU.GRADE_NM
+             , SU.TITLE_NM
+        FROM SY_USER SU
+                 LEFT JOIN SY_ATH SA on SU.PLNT_CD = SA.PLNT_CD and SU.ATH_CD = SA.ATH_CD
+                 LEFT JOIN SY_DPT SD on SU.DPT_CD = SD.DPT_CD
+        WHERE SU.PLNT_CD = #{plntCd}
+          AND SU.USER_ID = #{userId}
+    </select>
+
+    <update id="pwdChange" parameterType="pwdChangeVO">
+        UPDATE SY_USER SET
+            PWD = #{newPwd}
+        WHERE PLNT_CD = #{plntCd}
+          AND USER_ID = #{userId}
+    </update>
+
+    <select id="getPwd" parameterType="pwdChangeVO" resultType="String">
+        SELECT
+            PWD
+        FROM SY_USER
+        WHERE PLNT_CD = #{plntCd}
+          AND USER_ID = #{userId}
+    </select>
+</mapper>

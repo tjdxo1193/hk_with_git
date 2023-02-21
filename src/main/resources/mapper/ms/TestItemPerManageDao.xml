@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.ms.dao.TestItemPerManageDao">
+	<select id="checkDuplicateAmitemCd" parameterType="TestItemPerManageVO" resultType="java.lang.String">
+		SELECT XSTAT
+		FROM IF_INFO
+	 	WHERE IDX =
+	 	      (SELECT IF_INFO_IDX
+	 	       FROM IF_TRS_ELN_TEST_METHOD_BY_ITEM
+	 	       WHERE AMITM_CD = #{amitmCd})
+	</select>
+    <select id="getList" parameterType="TestItemPerManageVO" resultType="TestItemPerManageVO">
+        SELECT
+            AITM_CD
+             , AITM_KN
+			 , AITM_EN
+			 , AITM_ABBR
+			 , CRT_IP
+			 , CRT_DS
+			 , CRT_UID
+			 , (SELECT USER_NM FROM SY_USER B WHERE B.USER_ID = CRT_UID) CRT_USER_NM
+			 , UDT_IP
+			 , UDT_DS
+			 , UDT_UID
+        FROM 
+        	MS_AITM
+        WHERE
+        	1 = 1
+        	<if test="aitmKn != null and aitmKn != ''">
+        		AND UPPER(AITM_KN) LIKE UPPER('%' || #{aitmKn} || '%') 
+        	</if>
+        	<if test="aitmEn != null and aitmEn != ''">
+        		AND UPPER(AITM_EN) LIKE UPPER('%' || #{aitmEn} || '%')
+        	</if>
+        	<if test="aitmAbbr != null and aitmAbbr != ''">
+        		AND UPPER(AITM_ABBR) LIKE UPPER('%' || #{aitmAbbr} || '%')
+        	</if>
+        ORDER BY
+        	AITM_KN DESC NULLS LAST
+    </select>
+    
+    <select id="getPerList" parameterType="TestItemPerManageVO" resultType="TestItemPerManageVO">
+		SELECT
+			A.AMITM_CD
+			 , AITM_CD
+			 , A.VRIA_NO
+			 , DECODE(A.VRIA_KN, NULL, B.AITM_KN, B.AITM_KN || '(' || A.VRIA_KN || ')')AS VRIA_NM
+			 , A.VRIA_KN
+			 , A.VRIA_EN
+			 , A.RMK
+			 , A.USE_YN
+			 , A.CRT_IP
+			 , A.CRT_DS
+			 , A.CRT_UID
+			 , A.UDT_IP
+			 , A.UDT_DS
+		 	 , A.UDT_UID
+		 	 , B.AITM_KN
+		 	 , B.AITM_EN
+		FROM
+			MS_AMITM A
+			LEFT OUTER JOIN MS_AITM B
+			USING (AITM_CD)
+		WHERE
+			1 = 1
+			<if test="aitmCd != null and aitmCd != ''">
+				AND AITM_CD = #{aitmCd}
+			</if>
+			<if test="vriaKn != null and vriaKn != ''">
+				AND UPPER(A.VRIA_KN) LIKE UPPER('%' || #{vriaKn} || '%') 
+			</if>
+			<if test="vriaEn != null and vriaEn != ''">
+				AND UPPER(A.VRIA_EN) LIKE UPPER('%' || #{vriaEn} || '%') 
+			</if>
+			<if test="useYn != null and useYn != ''">
+				AND USE_YN = #{useYn}
+			</if>
+		ORDER BY A.VRIA_NO
+	</select>
+	
+	<insert id="putTestItemPer" parameterType="TestItemPerManageVO">
+		MERGE INTO
+    		MS_AMITM A
+    	USING (
+    		SELECT 
+    			COUNT(AMITM_CD) CNT
+    		FROM
+    			MS_AMITM
+    		WHERE
+    			AMITM_CD = #{amitmCd}
+    	) B
+    	ON 
+    		(B.CNT > 0)
+    	WHEN MATCHED THEN
+    		UPDATE SET
+    			 A.VRIA_KN = #{vriaKn}
+    			 , A.VRIA_EN = #{vriaEn}
+    			 , A.RMK = #{rmk}
+    			 , A.USE_YN = #{useYn}
+    		WHERE
+    			A.AMITM_CD = #{amitmCd}
+    	WHEN NOT MATCHED THEN
+    		INSERT (
+    			AMITM_CD
+    			 , AITM_CD
+    			 , VRIA_NO
+    			 , VRIA_KN
+    			 , VRIA_EN
+    			 , RMK
+    			 , USE_YN
+    			 , CRT_IP
+    			 , CRT_DS
+    			 , CRT_UID
+    			 , UDT_IP
+    			 , UDT_DS
+    			 , UDT_UID
+    		)
+    		VALUES (
+    			(#{aitmCd} || (SELECT NVL(#{vriaNo}, '00') FROM DUAL))
+    			 , #{aitmCd}
+    			 , #{vriaNo}
+    			 , #{vriaKn}
+    			 , #{vriaEn}
+    			 , #{rmk}
+    			 , #{useYn}
+    			 , NULL
+    			 , SYSDATE
+    			 , #{crtUid}
+    			 , NULL
+    			 , SYSDATE
+    			 , #{udtUid}
+    		)
+	</insert>
+</mapper>

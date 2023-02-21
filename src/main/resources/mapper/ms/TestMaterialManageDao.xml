@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.ms.dao.TestMaterialManageDao">
+
+    <select id="findAll" parameterType="TestMaterialVO" resultType="TestMaterialVO">
+        SELECT
+            A.PLNT_CD,
+            A.RITM_CD,
+            B.HIR_TREE_CD AS UPPER_RITM_TREE_CD,
+            (SELECT LTRIM(SYS_CONNECT_BY_PATH(TREE_NM, '.'), '.')
+            FROM SY_CD_TREE
+            WHERE TREE_CD = B.HIR_TREE_CD
+            START WITH HIR_TREE_CD = 'R0000000' AND PLNT_CD = A.PLNT_CD
+            CONNECT BY PRIOR TREE_CD = HIR_TREE_CD AND PLNT_CD = A.PLNT_CD) AS UPPER_RITM_TREE_NM,
+            A.RITM_TREE_CD,
+            B.TREE_NM AS RITM_TREE_NM,
+            A.RITM_KN,
+            A.RITM_EN,
+            A.RITM_ABBR,
+            A.RITM_RMK,
+            A.RITM_CRG_UID,
+            (SELECT USER_NM FROM SY_USER WHERE USER_ID = A.RITM_CRG_UID) AS RITM_CRG_NM,
+            A.RITM_UNIT_CD,
+            (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = A.RITM_UNIT_CD AND PLNT_CD = A.PLNT_CD) AS RITM_UNIT_NM,
+            A.STRG_TERMS,
+            (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = A.STRG_TERMS AND PLNT_CD = A.PLNT_CD) AS STRG_TERMS_NM,
+            A.STRG_PLA,
+            (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = A.STRG_PLA AND PLNT_CD = A.PLNT_CD) AS STRG_PLA_NM,
+            A.MNG_NO,
+            A.CRT_IP,
+            A.CRT_DS,
+            A.CRT_UID,
+            A.UDT_IP,
+            A.UDT_DS,
+            A.UDT_UID,
+            A.SFY_STOK,
+            A.OPN_AFT_EXPIR_TRM,
+            A.SPEC,
+            A.CAS_NO,
+            A.FOMU,
+            A.SHADE_YN,
+            A.MTR_DEDUT_YN,
+            A.POIS_YN,
+            A.DANG_YN,
+            A.USE_YN
+        FROM RM_RITM A
+        JOIN SY_CD_TREE B ON A.RITM_TREE_CD = B.TREE_CD AND A.PLNT_CD = B.PLNT_CD
+        WHERE A.PLNT_CD = #{plntCd}
+            AND A.RITM_TREE_CD IN (
+                SELECT
+                    TREE_CD
+                FROM SY_CD_TREE
+                WHERE PLNT_CD = #{plntCd} AND USE_YN = 'Y'
+                START WITH TREE_CD = #{treeCd}
+                CONNECT BY PRIOR TREE_CD = HIR_TREE_CD
+            )
+            <if test="upperRitmTreeCd != null and upperRitmTreeCd != ''">
+                AND B.HIR_TREE_CD = #{upperRitmTreeCd}
+            </if>
+            <if test="ritmTreeCd != null and ritmTreeCd != ''">
+                AND A.RITM_TREE_CD = #{ritmTreeCd}
+            </if>
+            <if test="ritmKn != null and ritmKn != ''">
+                AND UPPER(A.RITM_KN) LIKE ('%' || TRIM(UPPER(#{ritmKn})) || '%')
+            </if>
+            <if test="mngNo != null and mngNo != ''">
+                AND UPPER(A.MNG_NO) LIKE ('%' || TRIM(UPPER(#{mngNo})) || '%')
+            </if>
+            <if test="casNo != null and casNo != ''">
+                AND UPPER(A.CAS_NO) LIKE ('%' || TRIM(UPPER(#{casNo})) || '%')
+            </if>
+            <if test="useYn != null and useYn != ''">
+                AND A.USE_YN = #{useYn}
+            </if>
+        ORDER BY A.RITM_TREE_CD, A.RITM_KN
+    </select>
+
+    <insert id="create" parameterType="TestMaterialVO">
+        <selectKey resultType="string" keyProperty="ritmCd" order="BEFORE">
+            SELECT 'R'||LPAD(NVL(MAX(SUBSTR(RITM_CD, -5))+1,1),5,0) FROM RM_RITM
+        </selectKey>
+
+        INSERT INTO RM_RITM (
+            PLNT_CD,
+            RITM_CD,
+            RITM_TREE_CD,
+            RITM_KN,
+            RITM_EN,
+            RITM_ABBR,
+            RITM_RMK,
+            RITM_CRG_UID,
+            RITM_UNIT_CD,
+            STRG_TERMS,
+            STRG_PLA,
+            MNG_NO,
+            SFY_STOK,
+            OPN_AFT_EXPIR_TRM,
+            SPEC,
+            CAS_NO,
+            FOMU,
+            SHADE_YN,
+            MTR_DEDUT_YN,
+            POIS_YN,
+            DANG_YN
+        ) VALUES (
+            #{plntCd},
+            #{ritmCd},
+            #{ritmTreeCd},
+            #{ritmKn},
+            #{ritmEn},
+            #{ritmAbbr},
+            #{ritmRmk},
+            #{ritmCrgUid},
+            #{ritmUnitCd},
+            #{strgTerms},
+            #{strgPla},
+            #{mngNo},
+            #{sfyStok},
+            #{opnAftExpirTrm},
+            #{spec},
+            #{casNo},
+            #{fomu},
+            #{shadeYn},
+            #{mtrDedutYn},
+            #{poisYn},
+            #{dangYn}
+        )
+    </insert>
+
+    <update id="update" parameterType="TestMaterialVO">
+        UPDATE RM_RITM SET
+            RITM_KN = #{ritmKn},
+            RITM_EN = #{ritmEn},
+            RITM_ABBR = #{ritmAbbr},
+            RITM_RMK = #{ritmRmk},
+            RITM_CRG_UID = #{ritmCrgUid},
+            RITM_UNIT_CD = #{ritmUnitCd},
+            STRG_TERMS = #{strgTerms},
+            STRG_PLA = #{strgPla},
+            MNG_NO = #{mngNo},
+            SFY_STOK = #{sfyStok},
+            OPN_AFT_EXPIR_TRM = #{opnAftExpirTrm},
+            SPEC = #{spec},
+            CAS_NO = #{casNo},
+            FOMU = #{fomu},
+            SHADE_YN = #{shadeYn},
+            MTR_DEDUT_YN = #{mtrDedutYn},
+            POIS_YN = #{poisYn},
+            DANG_YN = #{dangYn}
+        WHERE RITM_CD = #{ritmCd}
+    </update>
+
+    <update id="delete" parameterType="TestMaterialVO">
+        UPDATE RM_RITM SET
+            USE_YN = 'N'
+        WHERE RITM_CD = #{ritmCd}
+    </update>
+
+</mapper>

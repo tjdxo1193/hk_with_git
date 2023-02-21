@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.pr.dao.PrintLabelDao">
+
+    <!-- 라벨출력 조회 -->
+    <select id="findAll" parameterType="PrintLabelVO" resultType="PrintLabelVO">
+        SELECT QPAP.PLNT_CD
+             , QPAP.ANS_IDX
+             , QPAP.REQ_IDX
+             , QPAP.PITM_SPEC_IDX
+             , QPAP.ANS_PROC_CD
+             , (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QPAP.ANS_PROC_CD) AS ANS_PROC_CD_NM
+             , QPAP.SYT_JDG
+             , (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QPAP.SYT_JDG) AS SYT_JDG_NM
+             , QPAP.ANS_TYP
+             , (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QPAP.ANS_TYP) AS ANS_TYP_NM
+             , QPAP.REQ_DT
+             , QPAP.REQ_DS
+             , QPAP.REQ_DPT_CD
+             , (SELECT SD.DPT_NM FROM SY_DPT SD WHERE SD.PLNT_CD = QPAP.PLNT_CD AND SD.DPT_CD = QPAP.REQ_DPT_CD) AS REQ_DPT_CD_NM
+             , QPAP.REQ_UID
+             , (SELECT SU.USER_NM FROM SY_USER SU WHERE SU.PLNT_CD = QPAP.PLNT_CD AND SU.USER_ID = QPAP.REQ_UID) AS REQ_UID_NM
+             , QPAP.REQ_RMK
+             , QPAP.REQ_CANL_YN
+             , QPAP.REQ_CANL_DS
+             , QPAP.REQ_CANL_UID
+             , (SELECT SU.USER_NM FROM SY_USER SU WHERE SU.PLNT_CD = QPAP.PLNT_CD AND SU.USER_ID = QPAP.REQ_CANL_UID) AS REQ_CANL_UID_NM
+             , QPAP.REQ_CANL_REA
+             , QPAP.ANS_EDT
+             , QPAP.ANS_NO
+             , QPAP.RCP_DT
+             , QPAP.RCP_DPT_CD
+             , (SELECT SD.DPT_NM FROM SY_DPT SD WHERE SD.PLNT_CD = QPAP.PLNT_CD AND SD.DPT_CD = QPAP.RCP_DPT_CD) AS RCP_DPT_CD_NM
+             , QPAP.RCP_UID
+             , (SELECT SU.USER_NM FROM SY_USER SU WHERE SU.PLNT_CD = QPAP.PLNT_CD AND SU.USER_ID = QPAP.RCP_UID) AS RCP_UID_NM
+             , QPAP.RCP_RMK
+             , QPAP.CLLT_DT
+             , QPAP.CLLT_UID
+             , (SELECT SU.USER_NM FROM SY_USER SU WHERE SU.PLNT_CD = QPAP.PLNT_CD AND SU.USER_ID = QPAP.CLLT_UID) AS CLLT_UID_NM
+             , QPAP.CLLT_RMK
+             , QPAP.ASS_NO
+             , QPAP.ASS_DT
+             , QPAP.ASS_SPCC
+             , QPAP.ASS_APR_REQ_IDX
+             , QPAP.CPL_RQM_DT
+             , QPAP.WRK_STT_CD
+             , (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = QPAP.PLNT_CD AND DTL_CD = QPAP.WRK_STT_CD) AS WRK_STT_CD_NM
+             , (NVL(QPAI.SMP_VOL_ANS, 0) + NVL(QPAI.SMP_VOL_ETC, 0) + NVL(QPAI.SMP_VOL_STRG, 0)) AS SMP_VOL_TOT
+             , DECODE(QPI.PITM_TYP, #{pitmCdForDecode}, QPAR.SPL_LOT_NO, QPAR.LOT_NO) AS CRT_NO
+             , QPAR.MTR_CD
+             , QPAR.BATCH_NO
+             , QPAR.ETR_QTY
+             , QPAR.INP_UNIT
+             , QPAR.SPL_CD
+             , QPAR.SPL_NM
+             , QPAR.LOT_NO
+             , QPAR.SPL_LOT_NO
+             , QPAR.MAK_DT
+             , QPAR.USE_LMT
+             , QPAR.CSM_NM
+             , QPAR.ETR_DT
+             , QPAI.SMP_LABEL_PRT_IDX
+             , QSLP.LABEL_PRT_IDX
+             , QSLP.PRT_SEQ
+             , QSLP.LABEL_RPT_IDX
+             , QSLP.LABEL_RE_PRT_RJT_UID
+             , (SELECT SU.USER_NM FROM SY_USER SU WHERE SU.PLNT_CD = QPAP.PLNT_CD AND SU.USER_ID = QSLP.LABEL_RE_PRT_RJT_UID) AS LABEL_RE_PRT_RJT_UID_NM
+             , TO_CHAR(QSLP.LABEL_RE_PRT_RJT_DS, 'YYYY-MM-DD') AS LABEL_RE_PRT_RJT_DT
+             , QSLP.LABEL_RE_PRT_RJT_REA
+             , QPI.PITM_CD
+             , QPI.PITM_TYP
+             , (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QPI.PITM_TYP) AS PITM_TYP_NM
+             , QPI.PITM_NM
+             , SRM.RPT_DIV
+             , (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = SRM.RPT_DIV) AS RPT_DIV_NM
+        FROM QT_PITM_ANS_PROC QPAP
+            INNER JOIN QT_PITM_ANS_INFO QPAI
+                ON QPAP.PLNT_CD = QPAI.PLNT_CD AND QPAP.ANS_IDX = QPAI.ANS_IDX
+            INNER JOIN QT_PITM_ANS_REQ QPAR
+                ON QPAP.PLNT_CD = QPAR.PLNT_CD AND QPAP.REQ_IDX = QPAR.REQ_IDX
+            LEFT OUTER JOIN QM_PITM_SPEC QPS
+                ON QPAP.PLNT_CD = QPS.PLNT_CD AND QPAP.PITM_SPEC_IDX = QPS.PITM_SPEC_IDX
+            LEFT OUTER JOIN QM_PITM_INFO QPI
+                ON QPS.PLNT_CD = QPI.PLNT_CD AND QPS.PITM_CD = QPI.PITM_CD AND QPS.PITM_VER = QPI.PITM_VER
+            LEFT OUTER JOIN QS_SMP_LABEL_PRT QSLP
+                ON QPAI.SMP_LABEL_PRT_IDX = QSLP.LABEL_PRT_IDX
+            LEFT OUTER JOIN SY_RPT_MST SRM
+                ON QSLP.LABEL_RPT_IDX = SRM.RPT_IDX
+        WHERE 1 = 1
+            AND QPAP.PLNT_CD = #{plntCd}
+            AND (
+                    QSLP.LABEL_RPT_IDX IS NULL
+                    OR (
+                        QSLP.LABEL_PRT_PROC = #{labelPrtProc}
+                            AND QSLP.PRT_SEQ = (SELECT MAX(A.PRT_SEQ) FROM QS_SMP_LABEL_PRT A WHERE A.LABEL_PRT_IDX = QSLP.LABEL_PRT_IDX)
+                    )
+            )
+            <if test="pitmTyp != null and pitmTyp != ''">
+                AND QPI.PITM_TYP = #{pitmTyp}
+            </if>
+            <if test="rptDiv != null and rptDiv != ''">
+                AND (SRM.RPT_DIV = #{rptDiv} OR SRM.RPT_DIV IS NULL)
+            </if>
+<!--            <if test="smpDivCd != null and smpDivCd != ''">-->
+<!--                AND QSM.SMP_DIV_CD = #{smpDivCd}-->
+<!--            </if>-->
+            <if test="rptDiv != null and rptDiv != ''">
+                AND (SRM.RPT_DIV = #{rptDiv} OR SRM.RPT_DIV IS NULL)
+            </if>
+            <if test="ansTyp != null and ansTyp != ''">
+                AND QPAP.ANS_TYP = #{ansTyp}
+            </if>
+            <if test="pitmCd != null and pitmCd != ''">
+                AND UPPER(QPI.PITM_CD) LIKE UPPER('%' || #{pitmCd} || '%')
+            </if>
+            <if test="ansProcCd != null and ansProcCd != ''">
+                AND QPAP.ANS_PROC_CD = #{ansProcCd}
+            </if>
+            <if test="ansNo != null and ansNo != ''">
+                AND UPPER(QPAP.ANS_NO) LIKE UPPER('%' || #{ansNo} || '%')
+            </if>
+            <if test="batchNo != null and batchNo != ''">
+                AND UPPER(QPAR.BATCH_NO) LIKE UPPER('%' || #{batchNo} || '%')
+            </if>
+            <if test="lotNo != null and lotNo != ''">
+                AND UPPER(QPAR.LOT_NO) LIKE UPPER('%' || #{lotNo} || '%')
+            </if>
+            <if test="searchRcpDt != null and searchRcpDt != ''">
+                AND QPAP.RCP_DT BETWEEN #{searchRcpDt[0]} AND #{searchRcpDt[1]}
+            </if>
+        ORDER BY QPAR.MTR_NM
+    </select>
+
+    <!-- QS 검체 라벨 출력 (QS_SMP_LABEL_PRT) INSERT -->
+    <insert id="createQsSmpLabelPrt" parameterType="PrintLabelVO">
+        <selectKey resultType="int" keyProperty="labelPrtIdx" order="BEFORE">
+            <!-- SELECT NVL(MAX(LABEL_PRT_IDX), 0) + 1 FROM QS_SMP_LABEL_PRT -->
+            SELECT CASE WHEN #{labelPrtIdx} IS NULL THEN (SELECT TO_NUMBER(NVL(MAX(LABEL_PRT_IDX), 0) + 1) FROM QS_SMP_LABEL_PRT)
+                WHEN #{labelPrtIdx} IS NOT NULL THEN TO_NUMBER(#{labelPrtIdx})
+                END AS LABEL_PRT_IDX
+            FROM DUAL
+        </selectKey>
+        INSERT INTO QS_SMP_LABEL_PRT(
+            LABEL_PRT_IDX
+            , PRT_SEQ
+            , LABEL_RPT_IDX
+            , LABEL_PRT_PROC
+            , PRT_UID
+            , PRT_DS
+        )
+        VALUES (
+            #{labelPrtIdx}
+            , (SELECT NVL(MAX(PRT_SEQ), 0) + 1 FROM QS_SMP_LABEL_PRT WHERE LABEL_PRT_IDX = #{labelPrtIdx})
+            , (SELECT NVL(MAX(RPT_IDX), 0) + 1 FROM SY_RPT_MST)
+            , #{labelPrtProc}
+            , #{prtUid}
+            , SYSDATE
+        )
+    </insert>
+
+    <!-- SY 리포트 마스터 (SY_RPT_MST) 테이블에 대입받은 리포트 IDX(RPT_IDX) 를 이용해서 INSERT -->
+    <insert id="createSyRptMst" parameterType="PrintLabelVO">
+        <selectKey resultType="int" keyProperty="rptIdx" order="BEFORE">
+            SELECT LABEL_RPT_IDX AS RPT_IDX
+            FROM QS_SMP_LABEL_PRT
+            WHERE 1 = 1
+                AND LABEL_PRT_IDX = #{labelPrtIdx}
+                AND PRT_SEQ =
+                    CASE WHEN #{prtSeq} IS NULL THEN 1
+                        WHEN #{prtSeq} IS NOT NULL THEN 1 + TO_NUMBER(#{prtSeq})
+                    END
+        </selectKey>
+        INSERT INTO SY_RPT_MST (
+            RPT_IDX
+            , RPT_DIV
+            , RPT_NM
+            , RPT_RD_PATH
+            , RPT_RMK
+            , ETC_RMK
+        )
+        VALUES (
+            #{rptIdx}
+            , #{rptDiv}
+            , #{rptNm}
+            , #{rptRdPath}
+            , #{rptRmk}
+            , #{etcRmk}
+        )
+    </insert>
+
+    <!-- QT 품목 시험 정보 (QT_PITM_ANS_INFO) 테이블에 대입받은 검체 라벨 출력 IDX(SMP_LABEL_PRT_IDX)를 UPDATE -->
+    <update id="updateQtPitmAnsInfoSmpLabelPrtIdx" parameterType="PrintLabelVO">
+        UPDATE QT_PITM_ANS_INFO SET
+            SMP_LABEL_PRT_IDX = #{smpLabelPrtIdx}
+        WHERE 1 = 1
+            AND PLNT_CD = #{plntCd}
+            AND ANS_IDX = #{ansIdx}
+    </update>
+</mapper>

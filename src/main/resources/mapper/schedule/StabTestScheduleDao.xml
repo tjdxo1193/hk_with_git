@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.schedule.dao.StabTestScheduleDao">
+
+    <select id="findStabs" resultType="StabTestSearchVO" parameterType="StabTestConditionVO">
+        SELECT A.PLNT_CD,
+               A.SBT_ANS_IDX,
+               A.SBT_PLN_IDX,
+               A.ANS_DT,
+               P.ANS_IDX
+        FROM ST_SBT_ANS A
+                 LEFT OUTER JOIN ST_SBT_PLN P ON A.PLNT_CD = P.PLNT_CD AND A.SBT_PLN_IDX = P.SBT_PLN_IDX
+        WHERE A.SBT_ANS_STT = #{sbtAnsStt}
+          AND P.SBT_ANS_PROC = #{sbtAnsProc}
+          AND P.DEL_YN = 'N'
+        ORDER BY SBT_PLN_IDX DESC, ANS_DT DESC
+    </select>
+
+    <update id="beginStabTest" parameterType="StabTestConditionVO">
+        UPDATE ST_SBT_ANS
+        SET SBT_ANS_STT = #{sbtAnsStt},
+            UDT_IP      = #{udtIp},
+            UDT_DS      = SYSDATE,
+            UDT_UID     = #{udtUid}
+        WHERE PLNT_CD = #{plntCd}
+          AND SBT_ANS_IDX = #{sbtAnsIdx}
+    </update>
+
+    <select id="findPlanStatus" resultType="String" parameterType="StabTestVO">
+        SELECT SBT_PLN_STT
+        FROM ST_SBT_PLN
+        WHERE PLNT_CD = #{plntCd}
+          AND SBT_PLN_IDX = #{sbtPlnIdx}
+    </select>
+
+    <update id="beginPlanStatus" parameterType="lims.api.schedule.vo.StabTestVO$StabPlanStatus">
+        UPDATE ST_SBT_PLN
+        SET
+            SBT_PLN_STT = #{updateSbtPlnStt},
+            UDT_UID = #{udtUid},
+            UDT_DS = SYSDATE,
+            UDT_IP = #{udtIp}
+        WHERE PLNT_CD = #{plntCd}
+          AND SBT_PLN_IDX = #{sbtPlnIdx}
+    </update>
+
+
+    <select id="findAitmSpecIdx" resultType="Integer" parameterType="StabTestVO">
+        SELECT AITM_SPEC_IDX
+        FROM QM_PITM_SPEC
+        WHERE (PLNT_CD, PITM_SPEC_IDX) = (
+            SELECT PLNT_CD, PITM_SPEC_IDX
+            FROM QT_PITM_ANS_PROC
+            WHERE PLNT_CD = #{plntCd}
+              AND ANS_IDX = #{ansIdx}
+        )
+    </select>
+
+    <select id="findSpecAitmKeyByAmitmCode" resultType="StabTestSpecAitmVO" parameterType="StabTestVO">
+        SELECT DISTINCT P.PLNT_CD,
+                        P.ANS_IDX,
+                        QA.AITM_SPEC_IDX
+        FROM ST_SBT_PLN P
+                 JOIN ST_SBT_ANS A ON P.PLNT_CD = A.PLNT_CD AND P.SBT_PLN_IDX = A.SBT_PLN_IDX
+                 JOIN ST_SBT_ANS_AITM SA ON A.PLNT_CD = SA.PLNT_CD AND A.SBT_ANS_IDX = SA.SBT_ANS_IDX
+                 JOIN QM_PITM_SPEC_AITM QA ON SA.PLNT_CD = QA.PLNT_CD AND SA.AMITM_CD = QA.AMITM_CD
+        WHERE P.PLNT_CD = #{plntCd}
+          AND p.SBT_PLN_IDX = #{sbtPlnIdx}
+          AND P.ANS_IDX = #{ansIdx}
+          AND QA.AITM_SPEC_IDX = #{aitmSpecIdx}
+    </select>
+
+
+    <insert id="createTestRequestProcess" parameterType="StabTestVO">
+        <selectKey resultType="Integer" keyProperty="newAnsIdx" order="BEFORE">
+            SELECT NVL(MAX(ANS_IDX), 0) + 1
+            FROM QT_PITM_ANS_PROC
+            WHERE PLNT_CD = #{plntCd}
+        </selectKey>
+
+        INSERT INTO QT_PITM_ANS_PROC
+        ( PLNT_CD
+        , ANS_IDX
+        , REQ_IDX
+        , PITM_SPEC_IDX
+        , ANS_PROC_CD
+        , ANS_TYP
+        , ANS_EDT
+        , CPL_RQM_DT
+        , REQ_DT
+        , REQ_DS
+        , SBT_ANS_IDX)
+        VALUES ( #{plntCd}
+        , #{newAnsIdx}
+        , (SELECT REQ_IDX FROM QT_PITM_ANS_PROC WHERE PLNT_CD = #{plntCd} AND ANS_IDX = #{ansIdx})
+        , (SELECT PITM_SPEC_IDX FROM QT_PITM_ANS_PROC WHERE PLNT_CD = #{plntCd} AND ANS_IDX = #{ansIdx})
+        , #{ansProcCd}
+        , #{ansTyp}
+        , #{ansEdt}
+        , #{cplRqmDt}
+        , #{reqDt}
+        , #{reqDs}
+        , #{sbtAnsIdx})
+    </insert>
+
+    <insert id="createTestRequestPitmResult" parameterType="StabTestSpecAitmVO">
+        INSERT INTO QT_PITM_ANS_RST
+        ( PLNT_CD
+        , ANS_IDX
+        , RST_SEQ
+        , RST_PROC_CD
+        , ANS_DPT_CD
+        , AMITM_CD
+        , AITM_ORD
+        , PERSPEC_TXT
+        , OWC_SPEC_TXT
+        , SPEC_TXT_EN
+        , SPEC_TYP
+        , JDG_TYP
+        , PER_SLV_LOW
+        , PER_SLV_UPP
+        , PER_SLV_DESC
+        , OWC_SLV_LOW
+        , OWC_SLV_UPP
+        , OWC_SLV_DESC
+        , SLV_JDG_CFM
+        , SLV_JDG_NON_CFM
+        , RST_UNIT_CD
+        , RST_DPNT
+        , RPT_PRT_SLV_VAL
+        , RPT_PRT_ITM_NM
+        , RPT_PRT_YN
+        , ISP_DPT_CD
+        , SMP_CLLT_QTY
+        , SMP_CLLT_UNIT
+        , ISP_DUR_TM
+        , EQM_USE_TM)
+        SELECT #{plntCd}
+             , #{ansIdx}
+             , AITM_SEQ
+             , #{rstProcCd}
+             , ANS_DPT_CD
+             , AMITM_CD
+             , AITM_ORD
+             , PERSPEC_TXT
+             , OWC_SPEC_TXT
+             , SPEC_TXT_EN
+             , SPEC_TYP
+             , JDG_TYP
+             , PER_SLV_LOW
+             , PER_SLV_UPP
+             , PER_SLV_DESC
+             , OWC_SLV_LOW
+             , OWC_SLV_UPP
+             , OWC_SLV_DESC
+             , SLV_JDG_CFM
+             , SLV_JDG_NON_CFM
+             , RST_UNIT_CD
+             , RST_DPNT
+             , RPT_PRT_SLV_VAL
+             , RPT_PRT_ITM_NM
+             , RPT_PRT_YN
+             , ISP_DPT_CD
+             , SMP_CLLT_QTY
+             , SMP_CLLT_UNIT
+             , ISP_DUR_TM
+             , EQM_USE_TM
+        FROM QM_PITM_SPEC_AITM
+        WHERE PLNT_CD = #{plntCd}
+          AND AITM_SPEC_IDX = #{aitmSpecIdx}
+    </insert>
+
+</mapper>

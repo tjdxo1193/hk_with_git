@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.integration.dao.ELNMasterDao">
+
+    <select id="findStandardSpecAll" resultType="ELNStandardSpecVO">
+        SELECT LAB_NO,
+               PRD_DIV
+        FROM MS_ELN_SPEC
+    </select>
+
+    <delete id="deleteStandardSpec">
+        DELETE
+        FROM MS_ELN_SPEC
+    </delete>
+
+    <insert id="createStandardSpec" parameterType="ELNStandardSpecVO">
+        INSERT INTO MS_ELN_SPEC (LAB_NO, PRD_DIV)
+        VALUES (#{labNo}, #{prdDiv})
+    </insert>
+
+
+    <select id="findStandardSpecDtlAll" resultType="ELNStandardSpecVO">
+        SELECT LAB_NO,
+               PRD_DIV,
+               AMITM_CD,
+               LAB_NO_ERP_CODE,
+               SPEC_TXT    AS STD_TEXT,
+               SPECTYP     AS STD_CTG,
+               MKR_QTY     AS DISPLAY_QTY,
+               PER_SLV_LOW AS PMS_STD_MIN,
+               PER_SLV_UPP AS PMS_STD_MAX,
+               OWC_SLV_LOW AS COM_STD_MIN,
+               OWC_SLV_UPP AS COM_STD_MAX,
+               UNIT,
+               RMK
+        FROM MS_ELN_SPEC_DTL
+    </select>
+
+    <select id="findStandardSpecDtlById" resultType="ELNStandardSpecVO" parameterType="lims.api.util.process.KeyObject">
+        SELECT LAB_NO,
+               PRD_DIV,
+               AMITM_CD,
+               LAB_NO_ERP_CODE,
+               SPEC_TXT    AS STD_TEXT,
+               SPECTYP     AS STD_CTG,
+               MKR_QTY     AS DISPLAY_QTY,
+               PER_SLV_LOW AS PMS_STD_MIN,
+               PER_SLV_UPP AS PMS_STD_MAX,
+               OWC_SLV_LOW AS COM_STD_MIN,
+               OWC_SLV_UPP AS COM_STD_MAX,
+               UNIT,
+               RMK
+        FROM MS_ELN_SPEC_DTL
+        WHERE LAB_NO = #{labNo}
+          AND PRD_DIV = #{prdDiv}
+          AND AMITM_CD = #{amitmCd}
+    </select>
+
+    <delete id="deleteStandardSpecDtl">
+        DELETE
+        FROM MS_ELN_SPEC_DTL
+    </delete>
+
+    <insert id="createStandardSpecDtl" parameterType="ELNStandardSpecVO">
+        INSERT INTO MS_ELN_SPEC_DTL
+        (LAB_NO, PRD_DIV, AMITM_CD, LAB_NO_ERP_CODE, SPEC_TXT, SPECTYP, MKR_QTY, PER_SLV_LOW, PER_SLV_UPP, OWC_SLV_LOW,
+         OWC_SLV_UPP, UNIT, RMK)
+        VALUES (#{labNo},
+                #{prdDiv},
+                #{amitmCd},
+                #{labNoErpCode},
+                #{stdText},
+                #{stdCtg},
+                #{displayQty},
+                #{pmsStdMin},
+                #{pmsStdMax},
+                #{comStdMin},
+                #{comStdMax},
+                #{unit},
+                #{rmk})
+    </insert>
+
+
+    <select id="findCtReport" resultType="lims.api.integration.vo.ELNCtReportVO$Matnr">
+        SELECT CT_ID,
+               CT_SEQ,
+               MATNR AS LAB_NO_MATNR
+        FROM MS_ELN_CT_RPT_MTR
+    </select>
+
+    <insert id="createCtReport" parameterType="lims.api.integration.vo.ELNCtReportVO$Matnr">
+        INSERT INTO MS_ELN_CT_RPT_MTR
+            (CT_ID, CT_SEQ, MATNR, CRT_DS, UDT_DS)
+        VALUES (#{ctId},
+                #{ctSeq},
+                #{labNoMatnr},
+                SYSDATE,
+                SYSDATE)
+    </insert>
+
+
+    <select id="findCtReportFile" resultType="lims.api.integration.vo.ELNCtReportVO$File">
+        SELECT CT_ID,
+               CT_SEQ,
+               FILE_NAME,
+               FILE_DATA
+        FROM MS_ELN_CT_RPT_FILE
+    </select>
+
+    <insert id="createCtReportFile" parameterType="lims.api.integration.vo.ELNCtReportVO$File">
+        INSERT INTO MS_ELN_CT_RPT_FILE
+            (CT_ID, CT_SEQ, FILE_NAME, FILE_DATA, CRT_DS, UDT_DS)
+        VALUES (#{ctId},
+                #{ctSeq},
+                #{fileName},
+                #{fileData},
+                SYSDATE,
+                SYSDATE)
+    </insert>
+
+    <update id="updateCtReportFile" parameterType="lims.api.integration.vo.ELNCtReportVO$File">
+        UPDATE MS_ELN_CT_RPT_FILE
+        SET FILE_NAME = #{fileName},
+            FILE_DATA = #{fileData},
+            UDT_DS    = SYSDATE
+        WHERE CT_ID = #{ctId}
+          AND CT_SEQ = #{ctSeq}
+    </update>
+
+</mapper>

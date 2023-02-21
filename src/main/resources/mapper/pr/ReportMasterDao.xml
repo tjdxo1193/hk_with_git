@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.pr.dao.ReportMasterDao">
+
+    <!-- 레포트마스터 조회 -->
+    <select id="findAll" parameterType="ReportMasterVO" resultType="ReportMasterVO">
+        SELECT SRM.RPT_IDX
+             , SRM.RPT_DIV
+             , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = SRM.RPT_DIV) AS RPT_DIV_NM
+             , SRM.RPT_NM
+             , SRM.RPT_RD_PATH
+             , SRM.RPT_RMK
+             , SRM.ETC_RMK
+             , SRM.CRT_IP
+             , SRM.CRT_DS
+             , (SELECT TO_CHAR(CRT_DS, 'YYYY-MM-DD') FROM DUAL) AS CRT_DT
+             , SRM.CRT_UID
+             , (SELECT USER_NM FROM SY_USER SU WHERE SU.USER_ID = SRM.CRT_UID) AS CRT_UID_NM
+             , SRM.UDT_IP
+             , SRM.UDT_DS
+             , (SELECT TO_CHAR(UDT_DS, 'YYYY-MM-DD') FROM DUAL) AS UDT_DT
+             , SRM.UDT_UID
+             , (SELECT USER_NM FROM SY_USER SU WHERE SU.USER_ID = SRM.UDT_UID) AS UDT_UID_NM
+        FROM SY_RPT_MST SRM
+        WHERE 1 = 1
+        <if test="rptDiv != null and rptDiv != ''">
+            AND SRM.RPT_DIV = #{rptDiv}
+        </if>
+        <if test="rptNm != null and rptNm != ''">
+            AND UPPER(SRM.RPT_NM) LIKE UPPER('%' || #{rptNm} || '%')
+        </if>
+        <if test="rptRdPath != null and rptRdPath != ''">
+            AND UPPER(SRM.RPT_RD_PATH) LIKE UPPER('%' || #{rptRdPath} || '%')
+        </if>
+        ORDER BY RPT_NM
+    </select>
+
+    <!-- 리포트마스터 INSERT -->
+    <insert id="create" parameterType="ReportMasterVO">
+        <selectKey keyProperty="rptIdx" order="BEFORE" resultType="int">
+            SELECT NVL(MAX(RPT_IDX), 0) + 1 FROM SY_RPT_MST
+        </selectKey>
+        INSERT INTO SY_RPT_MST (
+            RPT_IDX,
+            RPT_DIV,
+            RPT_NM,
+            RPT_RD_PATH,
+            RPT_RMK,
+            ETC_RMK
+        )
+        VALUES (
+            #{rptIdx},
+            #{rptDiv},
+            #{rptNm},
+            #{rptRdPath},
+            #{rptRmk},
+            #{etcRmk}
+        )
+    </insert>
+
+    <!-- 리포트마스터 UPDATE -->
+    <update id="update" parameterType="ReportMasterVO">
+        UPDATE SY_RPT_MST 
+        SET RPT_DIV = #{rptDiv},
+            RPT_NM = #{rptNm},
+            RPT_RD_PATH = #{rptRdPath},
+            RPT_RMK = #{rptRmk},
+            ETC_RMK = #{etcRmk}
+        WHERE 1 = 1
+            AND RPT_IDX = #{rptIdx}
+    </update>
+
+    <!-- 리포트마스터 DELETE -->
+    <delete id="delete" parameterType="ReportMasterVO">
+        DELETE FROM SY_RPT_MST
+        WHERE 1 = 1
+            AND RPT_IDX = #{rptIdx}
+    </delete>
+
+</mapper>

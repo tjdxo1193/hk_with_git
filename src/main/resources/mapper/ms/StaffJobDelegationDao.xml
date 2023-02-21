@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.ms.dao.StaffJobDelegationDao">
+    <select id="find" resultType="StaffJobDelegationVO">
+        SELECT SUD.USER_ID,
+               SU.USER_NM,
+               SU.USER_LOGN_ID AS USER_LOGN_ID,
+               SUD.DLG_SEQ,
+               SUD.DLG_UID,
+               (SELECT USER_NM FROM SY_USER WHERE USER_ID = SUD.DLG_UID) AS DLG_NM,
+               (SELECT USER_LOGN_ID FROM SY_USER SU WHERE SU.USER_ID = SUD.DLG_UID) AS DLG_LOGN_ID,
+               TO_CHAR(TO_DATE(DLG_DT), 'YYYY-MM-DD') AS DLG_DT,
+               TO_CHAR(TO_DATE(GBK_DT), 'YYYY-MM-DD') AS GBK_DT,
+               SUD.DLG_REA,
+               SUD.DLG_PROC_CD,
+               CASE WHEN SUD.RJT_DS IS NOT NULL
+                         THEN 'Y' END AS RJT_YN,
+               (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = SUD.DLG_PROC_CD) AS DLG_PROC_NM,
+               SUD.DLG_APR_REQ_IDX,
+               SUD.RJT_UID,
+               SUD.RJT_DS,
+               TO_CHAR(SUD.RJT_DS, 'YYYY-MM-DD') AS RJT_DT,
+               SUD.RJT_REA,
+               SUD.DLG_STT_CD,
+               (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = SUD.DLG_STT_CD) AS DLG_STT_NM
+        FROM SY_USER_DLG SUD
+             LEFT JOIN SY_USER SU ON SUD.USER_ID = SU.USER_ID
+        WHERE 1 = 1
+            <if test="dlgSttCd != null and dlgSttCd != ''">
+                AND SUD.DLG_STT_CD = #{dlgSttCd}
+            </if>
+            <if test="userNm != null and userNm != ''">
+                AND SU.USER_NM LIKE '%' || UPPER(#{userNm}) || '%'
+            </if>
+            <if test="dlgDtList.size() !=  0">
+                AND SUD.DLG_DT BETWEEN TO_DATE(#{dlgDtList[0]}) AND TO_DATE(#{dlgDtList[1]})
+            </if>
+        ORDER BY SUD.DLG_SEQ DESC
+    </select>
+
+    <!-- 업무 위임 -->
+    <insert id="create" parameterType="StaffJobDelegationVO">
+        <selectKey resultType="int" keyProperty="dlgSeq" order="BEFORE">
+            SELECT NVL(MAX(DLG_SEQ+1), 1) FROM SY_USER_DLG WHERE USER_ID = #{userId}
+        </selectKey>
+        INSERT INTO SY_USER_DLG (USER_ID, DLG_SEQ, DLG_UID, DLG_DT, GBK_DT, DLG_REA, DLG_PROC_CD)
+        VALUES (#{userId}, #{dlgSeq}, #{dlgUid}, #{gbkDt}, #{gbkDt}, #{dlgRea}, #{dlgProcCd})
+    </insert>
+
+    <!-- 수정 -->
+    <update id="update" parameterType="StaffJobDelegationVO">
+        UPDATE SY_USER_DLG
+        SET DLG_UID = #{dlgUid},
+            DLG_REA = #{dlgRea}
+        WHERE USER_ID = #{userId}
+          AND DLG_SEQ = #{dlgSeq}
+    </update>
+
+    <!-- 승인 요청 -->
+    <update id="updateApprRequest" parameterType="StaffJobDelegationVO">
+        UPDATE SY_USER_DLG
+        SET DLG_PROC_CD = #{dlgProcCd},
+            DLG_APR_REQ_IDX = #{dlgAprReqIdx}
+        WHERE USER_ID = #{userId}
+          AND DLG_SEQ = #{dlgSeq}
+    </update>
+
+    <!-- 재실 등록 -->
+    <update id="updateGbkRegist" parameterType="StaffJobDelegationVO">
+        UPDATE SY_USER_DLG
+        SET DLG_STT_CD = #{dlgSttCd},
+            GBK_DT     = SYSDATE
+        WHERE USER_ID = #{userId}
+          AND DLG_SEQ = #{dlgSeq}
+    </update>
+</mapper>

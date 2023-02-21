@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.in.dao.InstManageByItemDao">
+    <select id="findItem" parameterType="InstManageByItemVO" resultType="InstManageByItemVO">
+        SELECT QP.PLNT_CD,
+        QP.PITM_CD,
+        QP.PITM_VER,
+        QP.SPEC_PROC_CD,
+        (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QP.SPEC_PROC_CD) AS SPEC_PROC_NM,
+        QP.USE_VER_YN,
+        QP.RVS_NO,
+        QP.DOC_NO,
+        QP.RVS_DT,
+        QP.ENFO_DT,
+        QP.RVS_REA_CD,
+        QP.RVS_CTT,
+        QP.RVS_DIV_PS,
+        QP.REVW_UID,
+        QP.REVW_DS,
+        QP.REVW_IP,
+        QP.PITM_MST_APR_IDX,
+        QP.RJT_UID,
+        QP.RJT_DS,
+        QP.RJT_REA,
+        QPI.PITM_TYP,
+        (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = #{plntCd} AND DTL_CD = QPI.PITM_TYP) AS PITM_TYP_NM,
+        QPI.PITM_NM,
+        QPI.PITM_EN,
+        QPI.SAP_PRDHA,
+        QPI.ANS_DUR_DAY,
+        QPI.CRG_DPT_CD,
+        (SELECT DPT_NM FROM SY_DPT WHERE PLNT_CD = #{plntCd} AND DPT_CD = QPI.CRG_DPT_CD) AS CRG_DPT_NM,
+        QPI.SPCM_NO,
+        QPI.MIC_YN,
+        QPI.CLLT_MTD,
+        QPI.CLLT_MCN,
+        QPI.CLLT_PLA,
+        QPI.SMP_STRG_MTD,
+        QPI.SMP_VOL_UNIT,
+        QPI.SMP_VOL_ANS,
+        QPI.SMP_VOL_ETC,
+        QPI.SMP_VOL_MNG
+        FROM QM_PITM QP,
+        QM_PITM_INFO QPI
+        WHERE QP.PLNT_CD = QPI.PLNT_CD
+        AND QP.PITM_CD = QPI.PITM_CD
+        AND QP.PITM_VER = QPI.PITM_VER
+        AND QP.DEL_YN = 'N'
+        AND QP.USE_VER_YN = 'Y'
+        <if test="pitmTyp != ''">
+            AND QPI.PITM_TYP = #{pitmTyp}
+        </if>
+        <if test="pitmCd != ''">
+            AND UPPER(QP.PITM_CD) LIKE '%' || UPPER(#{pitmCd}) || '%'
+        </if>
+        <if test="pitmNm != ''">
+            AND UPPER(QPI.PITM_NM) LIKE '%' || UPPER(#{pitmNm}) || '%'
+        </if>
+        ORDER BY UDT_DS DESC
+    </select>
+
+    <select id="findDetail" parameterType="InstManageByItemVO" resultType="InstManageByItemVO">
+        SELECT EEI.PLNT_CD,
+               EEI.EQM_CD,
+               EEI.EQM_NM,
+               EEI.EQM_DIV,
+               EEI.EQM_CRST,
+               EEI.EQM_STT,
+               EEI.IST_PLA,
+               EEI.MAK_COMP,
+               EEI.SPL_COMP,
+               EEI.MOD_NM,
+               EEI.SRL_NO,
+               EEI.CRG_UID,
+               EEI.IQ,
+               EEI.OQ,
+               EEI.PQ,
+               EEI.APR_NO,
+               EEI.CHK_CYL,
+               EEI.QUA_CYL,
+               EEI.CAL_CYL,
+               EEI.ETR_DT,
+               EEI.IST_DT,
+               EEI.DPS_DT,
+               EEI.QUAL_APR_DT,
+               EEI.CAL_APR_DT,
+               EEI.RGL_CHK_APR_DT,
+               EEI.USE_RNG,
+               EEI.QTT_RNG,
+               EEI.RMK,
+               EEI.EQM_FILE_IDX,
+               EEI.SAP_AST_NO,
+               EEI.SAP_AST_NM,
+               EEI.SAP_CRT_DT,
+               EEI.SAP_CHG_DT,
+               EEI.SAP_ACQ_DT,
+               EEI.SAP_SALE_DPS_DT,
+               EEI.SAP_ADD_DESC,
+               EEI.SAP_CRG_NM_EMID,
+               EEI.SAP_COSC,
+               EEI.SAP_ORCO,
+               EEI.SAP_ACCD,
+               EEI.PMS_CHK_TAGT_YN,
+               EEU.USE_SEQ,
+               EEU.USE_STR_DS,
+               EEU.USE_END_DS,
+               EEU.PITM_NM,
+               EEU.ANS_NO,
+               EEU.BATCH_NO,
+               EEU.AITM_NM,
+               EEU.ANS_UID,
+               EEU.RMK
+        FROM EM_EQM_INFO EEI,
+             EM_EQM_USE EEU
+        WHERE EEI.PLNT_CD = EEU.PLNT_CD
+          AND EEI.EQM_CD = EEU.EQM_CD
+          AND EEI.DEL_YN = 'N'
+          AND EEU.DEL_YN = 'N'
+    </select>
+
+    <update id="updateInstrument" parameterType="InstManageByItemVO">
+
+    </update>
+</mapper>

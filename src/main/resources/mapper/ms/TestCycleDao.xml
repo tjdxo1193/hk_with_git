@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.ms.dao.TestCycleDao">
+
+    <select id="getList" parameterType="TestCycleVO" resultType="TestCycleVO">
+        SELECT
+            SA.PLNT_CD
+             , SA.ANS_CYL_CD
+             , SA.ANS_CYL_RULE_NM
+             , SA.ANS_CYL_MARK_NM
+             , SA.ANS_CYL_DIV
+             , SD.DTL_NM AS ANS_CYL_DIV_NM
+             , SA.ANS_ITV
+             , SA.DEL_YN
+             , SA.CYL_ORD
+             , SA.CRT_IP
+             , SA.CRT_DS
+             , SA.CRT_UID
+             , SA.UDT_IP
+             , SA.UDT_DS
+             , SA.UDT_UID
+        FROM SY_ANS_CYL SA
+        LEFT JOIN SY_CD_DTL SD ON SA.ANS_CYL_DIV = SD.DTL_CD
+        WHERE DEL_YN = 'N'
+        AND SA.PLNT_CD = #{plntCd}
+        ORDER BY SA.CYL_ORD, UDT_DS DESC
+    </select>
+
+    <insert id="create" parameterType="TestCycleVO">
+        <selectKey resultType="string" keyProperty="ansCylCd" order="BEFORE">
+            SELECT 'AC'||LPAD(NVL(MAX(SUBSTR(ANS_CYL_CD, -4))+1,1),4,0) FROM SY_ANS_CYL WHERE PLNT_CD = #{plntCd}
+        </selectKey>
+
+        INSERT INTO SY_ANS_CYL (
+              PLNT_CD
+            , ANS_CYL_CD
+            , ANS_CYL_RULE_NM
+            , ANS_CYL_MARK_NM
+            , ANS_CYL_DIV
+            , ANS_ITV
+            , DEL_YN
+            , CYL_ORD
+        ) VALUES (
+              #{plntCd}
+            , #{ansCylCd}
+            , #{ansCylRuleNm}
+            , #{ansCylMarkNm}
+            , #{ansCylDiv}
+            , #{ansItv}
+            , 'N'
+            ,#{cylOrd}
+        )
+    </insert>
+
+    <update id="update" parameterType="TestCycleVO">
+        UPDATE SY_ANS_CYL SET
+              ANS_CYL_RULE_NM = #{ansCylRuleNm}
+            , ANS_CYL_MARK_NM = #{ansCylMarkNm}
+            , ANS_CYL_DIV = #{ansCylDiv}
+            , ANS_ITV = #{ansItv}
+            , CYL_ORD = #{cylOrd}
+        WHERE PLNT_CD = #{plntCd}
+        AND ANS_CYL_CD = #{ansCylCd}
+
+    </update>
+
+    <update id="delete" parameterType="TestCycleVO">
+        UPDATE SY_ANS_CYL SET
+            DEL_YN = 'Y'
+        WHERE PLNT_CD = #{plntCd}
+        AND ANS_CYL_CD = #{ansCylCd}
+    </update>
+
+</mapper>

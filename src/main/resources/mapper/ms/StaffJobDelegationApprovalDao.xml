@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.ms.dao.StaffJobDelegationApprovalDao">
+    <select id="find" resultType="StaffJobDelegationVO">
+        SELECT SUD.USER_ID,
+               SU.USER_NM,
+               SUD.DLG_SEQ,
+               SUD.DLG_UID,
+               (SELECT USER_NM FROM SY_USER WHERE USER_ID = SUD.DLG_UID) AS DLG_NM,
+               SUD.DLG_DT,
+               SUD.GBK_DT,
+               SUD.DLG_REA,
+               SUD.DLG_PROC_CD,
+               SUD.DLG_APR_REQ_IDX,
+               SUD.RJT_UID,
+               SUD.RJT_DS,
+               SUD.RJT_REA,
+               SUD.DLG_STT_CD,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = SUD.DLG_PROC_CD) AS DLG_PROC_NM,
+               SU.PLNT_CD,
+               SU.USER_LOGN_ID
+        FROM SY_USER_DLG SUD
+            LEFT JOIN SY_USER SU ON SUD.USER_ID = SU.USER_ID
+        WHERE SUD.DLG_PROC_CD = 'S0150200'
+        <if test="dlgSttCd != ''">
+            AND SUD.DLG_STT_CD = #{dlgSttCd}
+        </if>
+        <if test="userNm != ''">
+            AND SU.USER_NM LIKE '%' || UPPER(#{userNm}) || '%'
+        </if>
+        <if test="dlgDtList.size() != 0">
+            AND SUD.DLG_DT BETWEEN TO_DATE(#{dlgDtList[0]}) AND TO_DATE(#{dlgDtList[1]})
+        </if>
+        ORDER BY SUD.DLG_SEQ DESC
+    </select>
+
+    <!-- 승인 완료 -->
+    <update id="updateApprove" parameterType="StaffJobDelegationVO">
+        UPDATE SY_USER_DLG
+        SET DLG_PROC_CD = #{dlgProcCd}
+        WHERE USER_ID = #{userId}
+          AND DLG_SEQ = #{dlgSeq}
+    </update>
+
+    <!-- 요청 반려 -->
+    <update id="updateReject" parameterType="StaffJobDelegationVO">
+        UPDATE SY_USER_DLG
+        SET DLG_PROC_CD = #{dlgProcCd},
+            RJT_DS = SYSDATE,
+            RJT_REA     = #{rjtRea}
+        WHERE USER_ID = #{userId}
+          AND DLG_SEQ = #{dlgSeq}
+    </update>
+</mapper>

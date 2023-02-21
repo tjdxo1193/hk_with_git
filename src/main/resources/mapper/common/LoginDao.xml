@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.common.dao.LoginDao">
+
+    <select id="getLoginAuditList" resultType="LoginAuditRecordVO">
+        SELECT JNT_IDX,
+               JNT_DIV_IO,
+               JNT_UID,
+               JNT_DS,
+               JNT_IP
+        FROM SY_JNT_LOG
+    </select>
+
+    <insert id="insertLoginAudit" parameterType="LoginAuditRecordVO">
+        INSERT INTO SY_JNT_LOG
+        (PLNT_CD,
+         ACSS_IDX,
+         ACSS_DIV,
+         ACSS_UID,
+         ACSS_DS,
+         ACSS_IP)
+        VALUES (#{plntCd},
+                (SELECT NVL(MAX(ACSS_IDX), 0) + 1 FROM SY_JNT_LOG),
+                #{conectSe},
+                #{conectUid},
+                sysdate,
+                #{conectIp})
+    </insert>
+
+</mapper>

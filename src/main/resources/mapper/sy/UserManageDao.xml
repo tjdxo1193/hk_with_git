@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.sy.dao.UserManageDao">
+    <select id="findAll" parameterType="UserManageVO" resultType="UserManageVO">
+        SELECT SU.USER_ID,
+               SU.PLNT_CD,
+               SU.DPT_CD,
+               SD.DPT_NM,
+               SU.ATH_CD,
+               SA.ATH_NM,
+               SU.USER_NM,
+               SU.USER_MAIL,
+               SU.USER_TEL,
+               SU.USER_LOGN_ID,
+               SU.EMID,
+               SU.GRADE_NM,
+               SU.TITLE_NM,
+               NVL(SU.ANS_YN, 'N') AS ANS_YN,
+               NVL(SU.CLLT_YN, 'N') AS CLLT_YN,
+               NVL(SU.REVW_YN, 'N') AS REVW_YN,
+               NVL(SU.APR_YN, 'N') AS APR_YN,
+               SU.PWD,
+               SU.USE_YN,
+               SU.LOCK_YN,
+               SU.LOGN_FAIL_CNT,
+               SU.USER_NM_EN,
+               SU.USER_COMP_TEL,
+               SU.ORD,
+               SU.WORK_STT
+        FROM SY_USER SU
+            LEFT JOIN SY_ATH SA ON SA.PLNT_CD = SU.PLNT_CD AND SA.ATH_CD = SU.ATH_CD
+            LEFT JOIN SY_DPT SD ON SD.PLNT_CD = SU.PLNT_CD AND SD.DPT_CD = SU.DPT_CD
+        WHERE SU.PLNT_CD = #{plntCd}
+        <if test="userNm != null and userNm != ''">
+            AND SU.USER_NM like ('%'||TRIM(#{userNm})||'%')
+        </if>
+        <if test="userLognId != null and userLognId != ''">
+            AND SU.USER_LOGN_ID like ('%'||TRIM(#{userLognId})||'%')
+        </if>
+        <if test="dptNm != null and dptNm != ''">
+            AND SD.DPT_NM like ('%'||TRIM(#{dptNm})||'%')
+        </if>
+        <if test="userTel != null and userTel != ''">
+            AND SU.USER_TEL like ('%'||TRIM(#{userTel})||'%')
+        </if>
+        <if test="gradeNm != null and gradeNm != ''">
+            AND SU.GRADE_NM like ('%'||TRIM(#{gradeNm})||'%')
+        </if>
+        <if test="titleNm != null and titleNm != ''">
+            AND SU.TITLE_NM like ('%'||TRIM(#{titleNm})||'%')
+        </if>
+        <if test="useYn != null and useYn != ''">
+            AND SU.USE_YN = #{useYn}
+        </if>
+        ORDER BY SU.USER_ID DESC
+    </select>
+
+    <update id="update" parameterType="UserManageVO">
+        UPDATE SY_USER
+        SET ATH_CD = #{athCd},
+            DPT_CD = #{dptCd},
+            USE_YN = #{useYn}
+        WHERE PLNT_CD = #{plntCd}
+          AND USER_ID = #{userId}
+    </update>
+
+    <update id="initPwd" parameterType="UserManageVO">
+    UPDATE SY_USER
+    SET PWD = #{pwd}
+    WHERE PLNT_CD = #{plntCd}
+    AND USER_ID = #{userId}
+    </update>
+</mapper>

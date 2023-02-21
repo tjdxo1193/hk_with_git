@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.ms.dao.MonitorSpecApprDao">
+    <select id="getVersionList" resultType="monitorSpecApprVO" parameterType="monitorSpecApprVO">
+        SELECT
+            MMS.PLNT_CD
+             ,MMS.MITM_SPEC_IDX
+             ,MMS.MITM_CD
+             ,SDPROC.DTL_NM AS SPEC_PROC_NM
+             ,MMS.SPEC_PROC_CD
+             ,MMS.DEL_YN
+             ,MMS.USE_VER_YN
+             ,MMS.RVS_NO
+             ,MMS.DOC_NO
+             ,MMS.RVS_DT
+             ,MMS.ENFO_DT
+             ,MMS.RVS_REA_CD
+             ,MMS.RVS_CTT
+             ,MMS.RVS_DIV_PS
+             ,MMS.REVW_UID
+             ,MMS.REVW_DS
+             ,MMS.REVW_IP
+             ,MMS.MITM_SPEC_APR_IDX
+             ,MMS.RJT_UID
+             ,MMS.RJT_DS
+             ,MMS.RJT_REA
+             ,MMAS.AITM_SPEC_VER
+             ,MMAS.AITM_SPEC_IDX
+             ,MM.MITM_WRK_PLC_DIV
+             ,SCTWRK.TREE_NM AS MITM_WRK_PLC_DIV_NM
+             ,MM.MITM_PITM_DIV
+             ,SCTPITM.TREE_NM AS MITM_PITM_DIV_NM
+             ,MM.POINT
+             ,MM.ROOMNO
+             ,MM.GRADE
+             ,SDGRD.DTL_NM AS GRADE_NM
+             ,MM.ANS_CYL_CD
+             ,SAC.ANS_CYL_MARK_NM AS ANS_CYL_NM
+             ,MM.CRG_DPT_CD
+             ,SDPT.DPT_NM AS CRG_DPT_NM
+             ,MM.ANS_STR_DT
+             ,MM.PER_SPEC
+             ,MM.REVW_DUR_TM
+             ,MM.APR_DUR_TM
+        FROM MM_MITM_SPEC MMS
+                 LEFT JOIN MM_MITM MM ON MM.PLNT_CD = MMS.PLNT_CD AND MM.MITM_CD = MMS.MITM_CD
+                 LEFT JOIN MM_MITM_AITM_SPEC MMAS ON MMS.PLNT_CD = MMAS.PLNT_CD AND MMS.AITM_SPEC_IDX = MMAS.AITM_SPEC_IDX
+                 LEFT JOIN SY_CD_DTL SDPROC ON MMS.SPEC_PROC_CD = SDPROC.DTL_CD
+                 LEFT JOIN SY_CD_DTL SDGRD ON MM.PLNT_CD = SDGRD.PLNT_CD AND MM.GRADE = SDGRD.DTL_CD
+                 LEFT JOIN SY_DPT SDPT ON SDPT.PLNT_CD = MM.PLNT_CD AND SDPT.DPT_CD = MM.CRG_DPT_CD
+                 LEFT JOIN SY_ANS_CYL SAC ON SAC.PLNT_CD = MM.PLNT_CD AND MM.ANS_CYL_CD = SAC.ANS_CYL_CD
+                 LEFT JOIN SY_CD_TREE SCTWRK ON SCTWRK.PLNT_CD = MM.PLNT_CD AND SCTWRK.TREE_CD = MM.MITM_WRK_PLC_DIV
+                 LEFT JOIN SY_CD_TREE SCTPITM ON SCTPITM.PLNT_CD = MM.PLNT_CD AND SCTPITM.TREE_CD = MM.MITM_PITM_DIV
+                LEFT JOIN SY_APR_INFO SAI ON MM.PLNT_CD = SAI.PLNT_CD AND SAI.APR_IDX = MMS.MITM_SPEC_APR_IDX
+        WHERE MMS.PLNT_CD = #{plntCd}
+            AND MMS.DEL_YN = 'N'
+            AND MMS.SPEC_PROC_CD = #{specProcCd}
+            AND MM.USE_YN = 'Y'
+            AND MM.DEL_YN = 'N'
+            AND SAI.APR_UID = #{loginUserUid}
+        ORDER BY MITM_CD
+    </select>
+
+    <select id="getAItmList" parameterType="monitorSpecApprVO" resultType="monitorSpecApprVO">
+        SELECT
+            MMSA.PLNT_CD
+             , MMSA.AITM_SPEC_IDX
+             , MMSA.AITM_SEQ
+             , M.AITM_KN
+             , MA.VRIA_NO
+             , MA.VRIA_KN
+             , MMSA.ANS_DPT_CD
+             , MMSA.AMITM_CD
+             , MMSA.AITM_ORD
+             , MMSA.PERSPEC_TXT
+             , MMSA.OWC_SPEC_TXT
+             , MMSA.SPEC_TXT_EN
+             , MMSA.SPEC_TYP
+             , MMSA.JDG_TYP
+             , MMSA.PER_SLV_LOW
+             , MMSA.PER_SLV_UPP
+             , MMSA.PER_SLV_DESC
+             , MMSA.OWC_SLV_LOW
+             , MMSA.OWC_SLV_UPP
+             , MMSA.OWC_SLV_DESC
+             , MMSA.SLV_JDG_CFM
+             , MMSA.SLV_JDG_NON_CFM
+             , MMSA.RST_UNIT_CD
+             , MMSA.RST_DPNT
+             , MMSA.RPT_PRT_SLV_VAL
+             , MMSA.RPT_PRT_ITM_NM
+             , MMSA.RPT_PRT_YN
+             , MMSA.ISP_DPT_CD
+             , MMSA.SMP_CLLT_QTY
+             , MMSA.SMP_CLLT_UNIT
+             , MMSA.ISP_DUR_TM
+             , MMSA.EQM_USE_TM
+        FROM MM_MITM_SPEC_AITM MMSA
+                 LEFT JOIN MS_AMITM MA ON MMSA.AMITM_CD = MA.AMITM_CD
+                 LEFT JOIN MS_AITM M ON SUBSTR(MMSA.AMITM_CD, 0, 6) = M.AITM_CD
+        WHERE MMSA.PLNT_CD = #{plntCd}
+          AND MMSA.AITM_SPEC_IDX = #{aitmSpecIdx}
+        ORDER BY AITM_ORD
+    </select>
+
+    <update id="updateApproval" parameterType="monitorSpecApprVO">
+        UPDATE MM_MITM_SPEC SET
+            SPEC_PROC_CD = #{specProcCd}
+            , USE_VER_YN = 'Y'
+        WHERE PLNT_CD = #{plntCd}
+          AND MITM_SPEC_IDX = #{mitmSpecIdx}
+    </update>
+
+    <update id="updateReject" parameterType="monitorSpecApprVO">
+        UPDATE MM_MITM_SPEC SET
+            SPEC_PROC_CD = #{specProcCd}
+            ,RJT_DS = SYSDATE
+            ,RJT_REA = #{rjtRea}
+            ,RJT_UID = #{rjtUid}
+        WHERE PLNT_CD = #{plntCd}
+          AND MITM_SPEC_IDX = #{mitmSpecIdx}
+    </update>
+</mapper>

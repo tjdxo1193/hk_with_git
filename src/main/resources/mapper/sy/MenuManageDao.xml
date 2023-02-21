@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.sy.dao.MenuManageDao">
+
+    <resultMap id="menu" type="MenuManage">
+        <result column="p_MENU_CD" property="menuCd" javaType="String"/>
+        <result column="p_MENU_NM" property="menuNm" javaType="String"/>
+
+        <collection property="children" ofType="MenuManage">
+            <result column="c_MENU_CD" property="menuCd" javaType="String"/>
+            <result column="c_MENU_NM" property="menuNm" javaType="String"/>
+            <result column="c_HIR_MENU_CD" property="hirMenuCd" javaType="String"/>
+            <result column="c_MENU_ORD" property="menuOrd" javaType="int"/>
+            <result column="c_MENU_DESC" property="menuDesc" javaType="String"/>
+            <result column="c_MENU_PRT_YN" property="menuPrtYn" javaType="String"/>
+            <result column="c_USE_YN" property="useYn" javaType="String"/>
+        </collection>
+    </resultMap>
+
+    <select id="findAll" parameterType="MenuVO" resultMap="menu">
+        SELECT DISTINCT B.HIR_MENU_CD AS c_HIR_MENU_CD,
+            A.MENU_NM AS p_MENU_NM,
+            B.MENU_CD AS c_MENU_CD,
+            B.MENU_NM AS c_MENU_NM,
+            B.MENU_ORD AS c_MENU_ORD,
+            B.MENU_DESC AS c_MENU_DESC,
+            B.MENU_PRT_YN AS c_MENU_PRT_YN,
+            B.USE_YN AS c_USE_YN
+        FROM SY_MENU A
+        JOIN SY_MENU B ON A.MENU_CD = B.HIR_MENU_CD
+        WHERE A.MENU_CD != 'M001'
+            <if test="menuNm != null and menuNm != ''">
+                AND UPPER(B.MENU_NM) LIKE '%' || UPPER(#{menuNm}) || '%'
+            </if>
+            <if test="useYn != null and useYn != ''">
+                AND B.USE_YN = #{useYn}
+            </if>
+        ORDER BY B.MENU_CD, B.MENU_ORD
+    </select>
+
+    <update id="update" parameterType="MenuVO">
+        UPDATE SY_MENU SET
+            MENU_DESC = #{menuDesc},
+            USE_YN = #{useYn}
+        WHERE MENU_CD = #{menuCd}
+    </update>
+
+</mapper>

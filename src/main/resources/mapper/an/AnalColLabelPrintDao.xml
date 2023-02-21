@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.an.dao.AnalColLabelPrintDao">
+
+    <select id="findAll" parameterType="AnalColMaterialVO" resultType="AnalColMaterialVO">
+        SELECT
+            A.PLNT_CD,
+            A.RITM_ETR_IDX,
+            (SELECT TREE_CD FROM SY_CD_TREE WHERE TREE_CD = C.HIR_TREE_CD AND PLNT_CD = C.PLNT_CD) AS UPPER_RITM_TREE_CD,
+            (SELECT LTRIM(SYS_CONNECT_BY_PATH(TREE_NM, '.'), '.')
+            FROM SY_CD_TREE
+            WHERE TREE_CD = C.HIR_TREE_CD
+            START WITH HIR_TREE_CD = 'R0000000' AND PLNT_CD = A.PLNT_CD
+            CONNECT BY PRIOR TREE_CD = HIR_TREE_CD AND PLNT_CD = A.PLNT_CD) AS UPPER_RITM_TREE_NM,
+            A.RITM_ROOT_CD,
+            (SELECT TREE_NM FROM SY_CD_TREE WHERE TREE_CD = A.RITM_ROOT_CD AND PLNT_CD = A.PLNT_CD) AS RITM_ROOT_NM,
+            A.RITM_CD,
+            A.RITM_KN,
+            A.RITM_EN,
+            A.RITM_ABBR,
+            A.RITM_CRG_UID,
+            (SELECT USER_NM FROM SY_USER WHERE USER_ID = A.RITM_CRG_UID) AS RITM_CRG_NM,
+            A.MNG_NO,
+            A.ETR_PROC_CD,
+            (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = A.ETR_PROC_CD) AS ETR_PROC_NM,
+            A.STRG_TERMS,
+            (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = A.STRG_TERMS AND PLNT_CD = A.PLNT_CD) AS STRG_TERMS_NM,
+            A.STRG_PLA,
+            (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = A.STRG_PLA AND PLNT_CD = A.PLNT_CD) AS STRG_PLA_NM,
+            A.STRG_PLA_DTL,
+            A.RITM_UNIT_CD,
+            (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = A.RITM_UNIT_CD AND PLNT_CD = A.PLNT_CD) AS RITM_UNIT_NM,
+            A.SFY_STOK,
+            A.ETR_QTY,
+            A.ETR_EACH_QTY,
+            A.ETR_TOT_QTY,
+            A.VDR_CD,
+            E.VDR_NM,
+            E.VDR_CRG_NM,
+            E.VDR_CRG_TEL,
+            A.MAK_DT,
+            A.MAK_NO,
+            A.ETR_DT,
+            A.ETR_RMK,
+            A.EXPIR_DT_CHK,
+            A.OPN_BEF_EXPIR_DT,
+            A.OPN_AFT_EXPIR_TRM,
+            A.CURR_LOT_YN,
+            A.ETR_REQ_APR_IDX,
+            A.RJT_UID,
+            A.RJT_DS,
+            A.RJT_REA,
+            A.DEL_UID,
+            A.DEL_DS,
+            A.DEL_REA,
+            A.DEL_YN,
+            A.CRT_IP,
+            A.CRT_DS,
+            A.CRT_UID,
+            A.UDT_IP,
+            A.UDT_DS,
+            A.UDT_UID,
+            A.SPEC,
+            A.CAS_NO,
+            A.FOMU,
+            A.SHADE_YN,
+            A.MTR_DEDUT_YN,
+            A.POIS_YN,
+            A.DANG_YN,
+            A.FILE_IDX,
+            B.ANC_CAT_NO,
+            B.ANC_SRL_NO,
+            B.ANC_ETR_NO,
+            B.ANC_FPAK,
+            B.ANC_LEN,
+            B.ANC_LEN_UNIT_CD,
+            (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = B.ANC_LEN_UNIT_CD AND PLNT_CD = B.PLNT_CD) AS ANC_LEN_UNIT_NM,
+            B.ANC_INS_DIMT,
+            B.ANC_PATCSIZE,
+            B.ANC_USP_CD,
+            D.RITM_MNG_IDX,
+            D.RITM_LABEL_NO,
+            D.RITM_ETR_NO,
+            D.MNG_PROC_CD,
+            DECODE(D.MNG_PROC_CD, NULL, '미출력', '출력') AS MNG_PROC_NM
+        FROM RT_RITM_ETR A
+        JOIN RT_RITM_ETR_INFO_ANC B ON A.RITM_ETR_IDX = B.RITM_ETR_IDX
+        JOIN SY_CD_TREE C ON A.RITM_ROOT_CD = C.TREE_CD AND A.PLNT_CD = C.PLNT_CD
+        LEFT OUTER JOIN RT_RITM_MNG D ON B.RITM_ETR_IDX = D.RITM_ETR_IDX
+        LEFT OUTER JOIN RM_RITM_VDR E ON A.VDR_CD = E.VDR_CD
+        WHERE A.PLNT_CD = #{plntCd} AND A.DEL_YN = 'N'
+        <if test="upperRitmTreeCd != null and upperRitmTreeCd != ''">
+            AND C.HIR_TREE_CD = #{upperRitmTreeCd}
+        </if>
+        <if test="ritmTreeCd != null and ritmTreeCd != ''">
+            AND A.RITM_ROOT_CD = #{ritmTreeCd}
+        </if>
+        <if test="ritmKn != null and ritmKn != ''">
+            AND A.RITM_KN LIKE '%' || UPPER(#{ritmKn}) || '%'
+        </if>
+        <if test="searchEtrDt != null and searchEtrDt != ''">
+            AND A.ETR_DT BETWEEN #{searchEtrDt[0]} AND #{searchEtrDt[1]}
+        </if>
+        <if test="vdrNm != null and vdrNm != ''">
+            AND E.VDR_NM LIKE '%' || UPPER(#{vdrNm}) || '%'
+        </if>
+        ORDER BY A.RITM_ETR_IDX, D.RITM_LABEL_NO, D.RITM_ETR_NO
+    </select>
+
+    <update id="updateEtrState" parameterType="AnalColMaterialVO">
+        UPDATE RT_RITM_ETR SET
+            ETR_PROC_CD = #{etrProcCd}
+        WHERE RITM_ETR_IDX = #{ritmEtrIdx} AND PLNT_CD = #{plntCd}
+    </update>
+
+    <update id="updateMngState" parameterType="AnalColMaterialVO">
+        UPDATE RT_RITM_MNG SET
+            MNG_PROC_CD = #{mngProcCd}
+        WHERE RITM_ETR_IDX = #{ritmEtrIdx} AND PLNT_CD = #{plntCd}
+    </update>
+
+    <insert id="create" parameterType="AnalColMaterialVO">
+        <selectKey resultType="int" keyProperty="ritmMngIdx" order="BEFORE">
+        SELECT NVL(MAX(RITM_MNG_IDX),0)+1 FROM RT_RITM_MNG
+        </selectKey>
+
+        INSERT INTO RT_RITM_MNG(
+            PLNT_CD,
+            RITM_MNG_IDX,
+            RITM_ETR_IDX,
+            RITM_ETR_NO,
+            MNG_PROC_CD,
+            RITM_LABEL_NO
+        ) VALUES(
+            #{plntCd},
+            #{ritmMngIdx},
+            #{ritmEtrIdx},
+            #{ritmEtrNo},
+            #{mngProcCd},
+            (SELECT 'A' || TO_CHAR(SYSDATE, 'YYMM') || LPAD(NVL(MAX(SUBSTR(RITM_LABEL_NO,-5)),0)+1,5,0)
+                FROM RT_RITM_MNG
+                WHERE SUBSTR(RITM_LABEL_NO, 0, 1) = 'A')
+        )
+    </insert>
+
+    <update id="reprint" parameterType="AnalColMaterialVO">
+        UPDATE RT_RITM_MNG SET
+            UDT_DS = SYSDATE
+        WHERE RITM_ETR_IDX = #{ritmEtrIdx} AND PLNT_CD = #{plntCd}
+    </update>
+
+</mapper>

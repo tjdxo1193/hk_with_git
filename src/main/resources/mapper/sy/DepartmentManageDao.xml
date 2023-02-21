@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.sy.dao.DepartmentManageDao">
+
+    <select id="findAll" parameterType="DepartmentManageVO" resultType="DepartmentManageVO">
+        SELECT
+             LEVEL
+             ,DPT_CD
+             ,PLNT_CD
+             ,DPT_NM
+             ,DPT_ABBR
+             ,RMK
+             ,USE_YN
+             ,UDT_UID
+             ,UDT_DS
+             ,UDT_IP
+             ,HIR_DPT_CD
+        FROM SY_DPT
+        WHERE 1=1
+        <if test="dptNm != null and dptNm != ''">
+            AND DPT_CD IN ((SELECT HIR_DPT_CD FROM SY_DPT WHERE DPT_NM LIKE ('%'||TRIM(#{dptNm})||'%') AND PLNT_CD = #{plntCd}))
+            OR DPT_CD IN ((SELECT DPT_CD FROM SY_DPT WHERE DPT_NM LIKE ('%'||TRIM(#{dptNm})||'%') AND PLNT_CD = #{plntCd}))
+            OR LEVEL = 1
+        </if>
+        <if test="useYn != null and useYn != ''">
+            AND USE_YN = #{useYn}
+        </if>
+        START WITH HIR_DPT_CD IS NULL AND PLNT_CD = #{plntCd}
+        CONNECT BY PRIOR DPT_CD = HIR_DPT_CD AND PLNT_CD = #{plntCd}
+    </select>
+
+    <select id="getNextDeptCode" resultType="string" parameterType="departmentManageVO">
+        SELECT CONCAT('D', (TO_CHAR(NVL(MAX(SUBSTR(DPT_CD, 2)), 0000) + 1, 'FM0000')))
+        FROM SY_DPT
+        WHERE PLNT_CD = #{plntCd}
+    </select>
+
+    <insert id="insert" parameterType="DepartmentManageVO">
+        INSERT INTO SY_DPT
+        (PLNT_CD,
+         DPT_CD,
+         HIR_DPT_CD,
+         DPT_NM,
+         DPT_ABBR,
+         RMK,
+         USE_YN)
+        VALUES (#{plntCd},
+                #{dptCd},
+                #{hirDptCd},
+                #{dptNm},
+                #{dptAbbr},
+                #{rmk},
+                #{useYn})
+    </insert>
+
+    <update id="update" parameterType="DepartmentManageVO">
+        UPDATE SY_DPT
+        SET DPT_NM     = #{dptNm},
+            DPT_ABBR   = #{dptAbbr},
+            RMK        = #{rmk},
+            USE_YN     = #{useYn},
+            HIR_DPT_CD = #{hirDptCd}
+        WHERE DPT_CD = #{dptCd}
+        AND PLNT_CD = #{plntCd}
+    </update>
+
+</mapper>

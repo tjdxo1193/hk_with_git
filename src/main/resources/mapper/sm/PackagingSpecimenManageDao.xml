@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.sm.dao.PackagingSpecimenManageDao">
+
+    <select id="getPackagingSpecimenList" parameterType="PackagingSpecimenManageVO" resultType="PackagingSpecimenManageVO">
+        SELECT SPS.PLNT_CD
+            , SPS.PM_SPCM_IDX
+            , SPS.PKG_MTR_DIV
+            , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = SPS.PKG_MTR_DIV) AS PKG_MTR_DIV_NM
+            , SPS.PM_SPCM_NO
+            , SPS.PM_SPCM_DEL_APR_IDX
+            , SPS.RJT_UID
+            , (SELECT USER_NM FROM SY_USER SU WHERE SU.USER_ID = SPS.RJT_UID) AS RJT_UNM
+            , SPS.RJT_DS
+            , SPS.RJT_REA
+            , (SELECT USER_NM FROM SY_USER SU WHERE SU.USER_ID = SPS.CRT_UID) AS CRT_UNM
+            , SPS.CRT_DS
+            , SPS.PM_SPCM_PROC
+            , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = SPS.PM_SPCM_PROC) AS PM_SPCM_PROC_NM
+            , SPSN.DEL_APR_YN
+            , SPSA.ACSR_SEQ
+            , SPSA.PITM_CD
+            , SPSA.ENM_DT
+            , EXPIR_DT
+            , SPSA.MUFT
+            , SPSA.RMK
+            , SPSA.DEL_YN
+            , TO_CHAR(SPSA.UDT_DS, 'YYYY-MM-DD') AS UDT_DS
+            , QPI.PITM_NM
+            , SPSG.MAX_EXPIR_DT
+            , (SELECT MAX(QPAP.RCP_DT) AS RCP_DT
+                FROM QT_PITM_ANS_PROC QPAP
+                JOIN QM_PITM_SPEC QPS ON QPAP.PLNT_CD  = QPS.PLNT_CD AND QPAP.PITM_SPEC_IDX  = QPS.PITM_SPEC_IDX
+                WHERE QPS.PITM_CD = SPSA.PITM_CD
+                GROUP BY QPS.PITM_CD
+            ) AS FIN_RCP_DT
+        FROM SD_PM_SPCM SPS
+        JOIN (SELECT SPS.PLNT_CD
+                , SPS.PM_SPCM_IDX
+                , MAX(SPSA.EXPIR_DT) AS MAX_EXPIR_DT
+            FROM SD_PM_SPCM SPS
+            JOIN SD_PM_SPCM_NO  SPSN ON   SPS.PM_SPCM_NO = SPSN.PM_SPCM_NO AND SPSN.DEL_APR_YN = 'N'
+            LEFT JOIN SD_PM_SPCM_ACSR SPSA ON SPS.PLNT_CD  = SPSA.PLNT_CD AND  SPS.PM_SPCM_IDX = SPSA.PM_SPCM_IDX
+            LEFT JOIN QM_PITM_INFO QPI ON SPSA.PITM_CD = QPI.PITM_CD AND SPSA.PITM_VER = QPI.PITM_VER AND SPS.PLNT_CD = QPI.PLNT_CD
+            WHERE SPS.PLNT_CD = #{plntCd}
+                <if test="pitmNm != null and pitmNm != ''">
+                    AND TRIM(UPPER(QPI.PITM_NM)) LIKE ('%' || TRIM(UPPER(#{pitmNm})) || '%')
+                </if>
+                <if test="pitmCd != null and pitmCd != ''">
+                    AND TRIM(SPSA.PITM_CD) LIKE ('%' || #{pitmCd} || '%')
+                </if>
+                <if test="searchEnmDt != null and searchEnmDt != ''">
+                    AND SPSA.ENM_DT BETWEEN #{searchEnmDt[0]} AND #{searchEnmDt[1]}
+                </if>
+                <if test="searchExpirDt != null and searchExpirDt != ''">
+                    AND SPSA.EXPIR_DT BETWEEN #{searchExpirDt[0]} AND #{searchExpirDt[1]}
+                </if>
+            GROUP BY SPS.PLNT_CD, SPS.PM_SPCM_IDX
+        ) SPSG ON SPS.PLNT_CD  = SPSG.PLNT_CD AND  SPS.PM_SPCM_IDX = SPSG.PM_SPCM_IDX
+        JOIN SD_PM_SPCM_NO  SPSN ON   SPS.PM_SPCM_NO = SPSN.PM_SPCM_NO AND SPSN.DEL_APR_YN = 'N'
+        LEFT JOIN SD_PM_SPCM_ACSR SPSA ON SPS.PLNT_CD  = SPSA.PLNT_CD AND  SPS.PM_SPCM_IDX = SPSA.PM_SPCM_IDX
+        LEFT JOIN QM_PITM_INFO QPI ON SPSA.PITM_CD = QPI.PITM_CD AND SPSA.PITM_VER = QPI.PITM_VER AND SPS.PLNT_CD = QPI.PLNT_CD
+        WHERE 1=1
+            <if test="pkgMtrDiv != null and pkgMtrDiv != ''">
+                AND SPS.PKG_MTR_DIV = #{pkgMtrDiv}
+            </if>
+            <if test="pmSpcmProc != null and pmSpcmProc != ''">
+                AND SPS.PM_SPCM_PROC = #{pmSpcmProc}
+            </if>
+            <if test="pmSpcmNo != null and pmSpcmNo != ''">
+                AND TRIM(UPPER(SPS.PM_SPCM_NO)) LIKE ('%' || TRIM(UPPER(#{pmSpcmNo})) || '%')
+            </if>
+            <if test="delAprYn != null and delAprYn != ''">
+                AND SPSN.DEL_APR_YN = #{delAprYn}
+            </if>
+        ORDER BY SPS.PM_SPCM_NO, SPS.PM_SPCM_IDX, SPSA.ACSR_SEQ
+    </select>
+
+    <select id="getPackagingSpecimenAcsr" parameterType="PackagingSpecimenManageVO" resultType="PackagingSpecimenManageVO">
+        SELECT SPSA.PLNT_CD
+            , SPSA.PM_SPCM_IDX
+            , SPSA.ACSR_SEQ
+            , SPSA.PITM_VER
+            , SPSA.PITM_CD
+            , SPSA.ENM_DT
+            , SPSA.EXPIR_DT
+            , SPSA.APR_UID
+            , (SELECT USER_NM FROM SY_USER SU WHERE SU.USER_ID = SPSA.APR_UID) APR_UNM
+            , SPSA.MUFT
+            , SPSA.RMK
+            , SPSA.DEL_YN
+            , QPI.PITM_NM
+            , QPI.PITM_EN
+            , QPI.PITM_TYP
+            , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = QPI.PITM_TYP) AS PITM_TYP_NM
+        FROM SD_PM_SPCM_ACSR SPSA
+        LEFT JOIN QM_PITM_INFO QPI ON SPSA.PITM_CD = QPI.PITM_CD AND SPSA.PITM_VER = QPI.PITM_VER AND SPSA.PLNT_CD = QPI.PLNT_CD
+        WHERE 1=1
+        AND SPSA.PLNT_CD = #{plntCd}
+        AND SPSA.PM_SPCM_IDX = #{pmSpcmIdx}
+        AND SPSA.DEL_YN = 'N'
+        ORDER BY SPSA.ACSR_SEQ
+    </select>
+
+    <select id="getPackagingSpecimenNoCount" parameterType="PackagingSpecimenManageVO" resultType="integer" >
+        SELECT COUNT(PM_SPCM_NO) FROM SD_PM_SPCM_NO
+        WHERE DEL_APR_YN = 'Y'
+        <choose>
+            <when test='plntCd == "1100"'>
+                <choose>
+                    <when test='pkgMtrDiv == "S0210001"'>
+                        AND PM_SPCM_NO LIKE 'S%'
+                    </when>
+                    <otherwise>
+                        AND PM_SPCM_NO LIKE 'J%'
+                    </otherwise>
+                </choose>
+            </when>
+            <otherwise>
+                AND PM_SPCM_NO LIKE 'B%'
+            </otherwise>
+        </choose>
+    </select>
+
+    <update id="updatePackagingSpecimenNo" parameterType="PackagingSpecimenManageVO">
+        <selectKey resultType="String" keyProperty="pmSpcmNo" order="BEFORE">
+            SELECT MIN(PM_SPCM_NO) FROM SD_PM_SPCM_NO WHERE DEL_APR_YN = 'Y'
+            <choose>
+                <when test='plntCd == "1100"'>
+                    <choose>
+                        <when test='pkgMtrDiv == "S0210001"'>
+                            AND PM_SPCM_NO LIKE 'S%'
+                        </when>
+                        <otherwise>
+                            AND PM_SPCM_NO LIKE 'J%'
+                        </otherwise>
+                    </choose>
+                </when>
+                <otherwise>
+                    AND PM_SPCM_NO LIKE 'B%'
+                </otherwise>
+            </choose>
+        </selectKey>
+        UPDATE SD_PM_SPCM_NO SET
+            DEL_APR_YN = 'N'
+        WHERE PM_SPCM_NO = #{pmSpcmNo}
+    </update>
+
+    <insert id="insertPackagingSpecimenNo" parameterType="PackagingSpecimenManageVO">
+        <selectKey resultType="String" keyProperty="pmSpcmNo" order="BEFORE">
+            SELECT DECODE(#{plntCd}, '1100', DECODE(#{pkgMtrDiv}, 'S0210001', 'S', 'J'), 'B')
+                || LPAD(NVL(MAX(SUBSTR(PM_SPCM_NO, -5))+1,1),5,0)
+            FROM SD_PM_SPCM_NO
+            WHERE 1=1
+            <choose>
+                <when test='plntCd == "1100"'>
+                    <choose>
+                        <when test='pkgMtrDiv == "S0210001"'>
+                            AND PM_SPCM_NO LIKE 'S%'
+                        </when>
+                        <otherwise>
+                            AND PM_SPCM_NO LIKE 'J%'
+                        </otherwise>
+                    </choose>
+                </when>
+                <otherwise>
+                    AND PM_SPCM_NO LIKE 'B%'
+                </otherwise>
+            </choose>
+        </selectKey>
+        INSERT INTO SD_PM_SPCM_NO
+        (
+            PM_SPCM_NO
+            , DEL_APR_YN
+        ) VALUES (
+            #{pmSpcmNo}
+            , 'N'
+        )
+    </insert>
+
+    <insert id="insertPackagingSpecimen" parameterType="PackagingSpecimenManageVO">
+        <selectKey resultType="integer" keyProperty="pmSpcmIdx" order="BEFORE">
+            SELECT NVL(MAX(PM_SPCM_IDX)+1,1) FROM SD_PM_SPCM WHERE PLNT_CD = #{plntCd}
+        </selectKey>
+        INSERT INTO SD_PM_SPCM
+        (
+            PLNT_CD
+            , PM_SPCM_IDX
+            , PKG_MTR_DIV
+            , PM_SPCM_NO
+            , PM_SPCM_PROC
+        ) VALUES (
+            #{plntCd}
+            , #{pmSpcmIdx}
+            , #{pkgMtrDiv}
+            , #{pmSpcmNo}
+            , 'S0220100'
+        )
+    </insert>
+
+    <update id="updatePackagingSpecimen" parameterType="PackagingSpecimenManageVO">
+        UPDATE SD_PM_SPCM SET
+            PM_SPCM_NO = #{pmSpcmNo}
+            , PKG_MTR_DIV = #{pkgMtrDiv}
+        WHERE PLNT_CD = #{plntCd}
+        AND PM_SPCM_IDX = #{pmSpcmIdx}
+    </update>
+
+    <update id="deleteRequest" parameterType="PackagingSpecimenManageVO">
+        UPDATE SD_PM_SPCM SET
+            PM_SPCM_DEL_APR_IDX = #{pmSpcmDelAprIdx}
+            , PM_SPCM_PROC = 'S0220200'
+        WHERE PLNT_CD = #{plntCd}
+        AND PM_SPCM_IDX = #{pmSpcmIdx}
+    </update>
+
+    <insert id="insertPackagingSpecimenAcsr" parameterType="PackagingSpecimenManageVO">
+        <selectKey resultType="integer" keyProperty="acsrSeq" order="BEFORE">
+            SELECT NVL(MAX(ACSR_SEQ)+1,1) FROM SD_PM_SPCM_ACSR WHERE PLNT_CD = #{plntCd} AND PM_SPCM_IDX = #{pmSpcmIdx}
+        </selectKey>
+        INSERT INTO SD_PM_SPCM_ACSR(
+            PLNT_CD
+            , PM_SPCM_IDX
+            , ACSR_SEQ
+            , PITM_CD
+            , PITM_VER
+            , ENM_DT
+            , EXPIR_DT
+            , APR_UID
+            , MUFT
+            , RMK
+            , DEL_YN
+        ) VALUES (
+            #{plntCd}
+            , #{pmSpcmIdx}
+            , #{acsrSeq}
+            , #{pitmCd}
+            , #{pitmVer}
+            , #{enmDt}
+            , #{expirDt}
+            , #{aprUid}
+            , #{muft}
+            , #{rmk}
+            , 'N'
+        )
+    </insert>
+
+    <update id="updatePackagingSpecimenAcsr" parameterType="PackagingSpecimenManageVO">
+        UPDATE SD_PM_SPCM_ACSR SET
+            ENM_DT = #{enmDt}
+            , EXPIR_DT = #{expirDt}
+            , MUFT = #{muft}
+            , RMK = #{rmk}
+        WHERE PLNT_CD = #{plntCd}
+        AND PM_SPCM_IDX = #{pmSpcmIdx}
+        AND ACSR_SEQ = #{acsrSeq}
+    </update>
+
+    <update id="deletePackagingSpecimenAcsr" parameterType="PackagingSpecimenManageVO">
+        UPDATE SD_PM_SPCM_ACSR SET
+            DEL_YN = 'Y'
+        WHERE PLNT_CD = #{plntCd}
+        AND PM_SPCM_IDX = #{pmSpcmIdx}
+        AND ACSR_SEQ = #{acsrSeq}
+    </update>
+
+</mapper>

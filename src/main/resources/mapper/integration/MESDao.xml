@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.integration.dao.MESDao">
+
+    <select id="findFinalOrderByDegree" resultType="MESFinalOrderVO">
+        SELECT IDX,
+               DEGREE,
+               PDT_ORDER_NO,
+               LOT_NO,
+               CRT_DS,
+               IF_INFO_IDX,
+               ORDER_ITM
+        FROM IF_REV_MES_FINAL_ORDER
+        WHERE DEGREE = #{value}
+    </select>
+
+    <select id="nextDegreeInFinalOrder" resultType="int">
+        SELECT NVL(MAX(DEGREE), 0) + 1
+        FROM IF_REV_MES_FINAL_ORDER
+    </select>
+
+    <select id="nextIdxInFinalOrder" resultType="int">
+        SELECT NVL(MAX(IDX), 0) + 1
+        FROM IF_REV_MES_FINAL_ORDER
+    </select>
+
+    <insert id="createFinalOrder" parameterType="MESFinalOrderVO">
+        INSERT INTO IF_REV_MES_FINAL_ORDER (IDX, DEGREE, PDT_ORDER_NO, LOT_NO, ORDER_ITM, CRT_DS, IF_INFO_IDX)
+        VALUES (#{idx},
+                #{degree},
+                #{pdtOrderNo},
+                #{lotNo},
+                #{orderItm},
+                SYSDATE,
+                #{ifInfoIdx})
+    </insert>
+
+
+    <insert id="createTestStatus" parameterType="lims.api.integration.vo.MESSendVO$TestStatus">
+        INSERT INTO IF_TRS_TEST_STATUS
+        (IDX, DEGREE, TARGET_SYSTEM, PDT_ORDER_NO, LOT_NO, BATCH_NO, STATUS, HOLD_REASON, CRT_DS, TRS_STATUS)
+        VALUES (#{idx},
+                #{degree},
+                #{targetSystem},
+                #{pdtOrderNo},
+                #{lotNo},
+                #{batchNo},
+                #{status},
+                #{holdReason},
+                SYSDATE,
+                #{trsStatus})
+    </insert>
+
+
+    <insert id="createTestResult" parameterType="lims.api.integration.vo.MESSendVO$TestResult">
+        INSERT INTO IF_TRS_TEST_RESULT
+        (IDX, DEGREE, TARGET_SYSTEM, PDT_ORDER_NO, LOT_NO, BATCH_NO, SYT_JDG, SPEC_GRV, HARDNESS, RMK, NON_CFM_REASON,
+         CRT_DS, TRS_STATUS)
+        VALUES (#{idx},
+                #{degree},
+                #{targetSystem},
+                #{pdtOrderNo},
+                #{lotNo},
+                #{batchNo},
+                #{sytJdg},
+                #{specGrv},
+                #{hardness},
+                #{rmk},
+                #{nonCfmReason},
+                SYSDATE,
+                #{trsStatus})
+    </insert>
+
+
+    <select id="findPackageSpecByDegree" resultType="MESPackageSpecReportVO">
+        SELECT IDX,
+               DEGREE,
+               MATNR,
+               VERSION,
+               FILE_DATA,
+               CRT_DS,
+               IF_INFO_IDX,
+               FILE_NAME
+        FROM IF_REV_MES_REPORT_PACKAGE_SPEC
+        WHERE DEGREE = #{value}
+    </select>
+
+    <select id="nextDegreeInPackageSpec" resultType="int">
+        SELECT NVL(MAX(DEGREE), 0) + 1
+        FROM IF_REV_MES_REPORT_PACKAGE_SPEC
+    </select>
+
+    <select id="nextIdxInPackageSpec" resultType="int">
+        SELECT NVL(MAX(IDX), 0) + 1
+        FROM IF_REV_MES_REPORT_PACKAGE_SPEC
+    </select>
+
+    <insert id="createPackageSpec" parameterType="MESPackageSpecReportVO">
+        INSERT INTO IF_REV_MES_REPORT_PACKAGE_SPEC (IDX, DEGREE, MATNR, VERSION, FILE_NAME, FILE_DATA, CRT_DS,
+                                                    IF_INFO_IDX)
+        VALUES (#{idx},
+                #{degree},
+                #{matnr},
+                #{version},
+                #{fileName},
+                #{fileData},
+                SYSDATE,
+                #{ifInfoIdx})
+    </insert>
+
+
+    <select id="nextDegreeInNonCfmReport" resultType="int">
+        SELECT NVL(MAX(DEGREE), 0) + 1
+        FROM IF_TRS_MES_REPORT_NON_CFM
+    </select>
+
+    <select id="nextIdxInNonCfmReport" resultType="int">
+        SELECT NVL(MAX(IDX), 0) + 1
+        FROM IF_TRS_MES_REPORT_NON_CFM
+    </select>
+
+    <insert id="createNonCfmReport" parameterType="lims.api.integration.vo.MESSendVO$NonCfmReport">
+        INSERT INTO IF_TRS_MES_REPORT_NON_CFM
+        (IDX, DEGREE, BATCH_NO, ISP_REQ_NO, ANS_NO, PDT_ORDER_NO, ORDER_ITM, LOT_NO, NON_CFM_REASON, EM_ID, FILE_NAME,
+         FILE_DATA, CRT_DS, TRS_STATUS)
+        VALUES (#{idx},
+                #{degree},
+                #{batchNo},
+                #{ispReqNo},
+                #{ansNo},
+                #{pdtOrderNo},
+                #{orderItm},
+                #{lotNo},
+                #{nonCfmReason},
+                #{emId},
+                #{fileName},
+                #{fileData},
+                SYSDATE,
+                #{trsStatus})
+    </insert>
+
+    <update id="updateTrsStatusOfNonCfmReport"
+            parameterType="lims.api.integration.vo.MESSendVO$NonCfmReport">
+        UPDATE IF_TRS_MES_REPORT_NON_CFM
+        SET
+        TRS_STATUS = #{trsStatus}
+        <if test="ifInfoIdx != null and ifInfoIdx != ''">
+            ,IF_INFO_IDX = #{ifInfoIdx}
+        </if>
+        <if test="errorlogId != null and errorlogId != ''">
+            ,ERRORLOG_ID = #{errorlogId}
+        </if>
+        WHERE
+        IDX = #{idx}
+    </update>
+
+</mapper>

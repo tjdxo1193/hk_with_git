@@ -1,0 +1,619 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.st.dao.StabPlanDao">
+
+    <!-- 안정성시험계획 조회 -->
+    <select id="findAll" parameterType="StabPlanVO" resultType="StabPlanVO">
+        SELECT SSP.PLNT_CD
+             , SSP.SBT_PLN_IDX
+             , SSP.SBT_ANS_PROC
+             , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = SSP.SBT_ANS_PROC) AS SBT_ANS_PROC_NM
+             , SSP.SBT_PLN_STT
+             , SSP.DEL_YN
+             , SSP.SBT_ANS_PLN_NO
+             , SSP.SBT_ANS_RPT_NO
+             , SSP.ANS_KND
+             , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = SSP.ANS_KND AND SCD.PLNT_CD = SSP.PLNT_CD) AS ANS_KND_NM
+             , SSP.ANS_PPS
+             , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = SSP.ANS_PPS AND SCD.PLNT_CD = SSP.PLNT_CD) AS ANS_PPS_NM
+             , SSP.ANS_PPS_DTL
+             , SSP.STRG_TERMS
+             , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = SSP.STRG_TERMS AND SCD.PLNT_CD = SSP.PLNT_CD) AS STRG_TERMS_NM
+             , SSP.STRG_PLA
+             , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = SSP.STRG_PLA AND SCD.PLNT_CD = SSP.PLNT_CD) AS STRG_PLA_NM
+             , SSP.SMP_VOL_UNIT
+             , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = SSP.SMP_VOL_UNIT AND SCD.PLNT_CD = SSP.PLNT_CD) AS SMP_VOL_UNIT_NM
+             , SSP.INP_UNIT
+             , SSP.SBT_SMP_VOL
+             , SSP.DOC_NO
+             , SSP.ANS_STR_DT
+             , SSP.ANS_TRM_CD
+             , SAT.ANS_TRM_MARK_NM
+             , SAT.ANS_CYL_DIV
+             , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = SAT.ANS_CYL_DIV AND SCD.PLNT_CD = SSP.PLNT_CD) AS ANS_CYL_DIV_NM
+             , SAT.ANS_TRM
+             , SAT.ANS_ITV
+             , SSP.SBT_CRG_UID
+             , (SELECT USER_NM FROM SY_USER SU WHERE SU.USER_ID = SSP.SBT_CRG_UID) AS SBT_CRG_UID_NM
+             , SSP.RMK
+             , SSP.ANS_IDX
+             , SSP.SBT_ANS_PLN_APR_IDX
+             , SSP.PLN_RJT_UID
+             , (SELECT USER_NM FROM SY_USER SU WHERE SU.USER_ID = SSP.PLN_RJT_UID) AS PLN_RJT_UID_NM
+             , SSP.PLN_RJT_DS
+             , TO_CHAR(SSP.PLN_RJT_DS, 'YYYY-MM-DD') AS PLN_RJT_DT
+             , SSP.PLN_RJT_REA
+             , SSP.SBT_ANS_PLN_CHG_APR_IDX
+             , SSP.PLN_CHG_RJT_UID
+             , (SELECT USER_NM FROM SY_USER SU WHERE SU.USER_ID = SSP.PLN_CHG_RJT_UID) AS PLN_CHG_RJT_UID_NM
+             , SSP.PLN_CHG_RJT_DS
+             , SSP.PLN_CHG_RJT_REA
+             , SSP.SBT_ANS_RST_APR_UID
+             , (SELECT USER_NM FROM SY_USER SU WHERE SU.USER_ID = SSP.SBT_ANS_RST_APR_UID) AS SBT_ANS_RST_APR_UID_NM
+             , SSP.SBT_ANS_RST_APR_DS
+             , SSP.UDT_IP
+             , SSP.UDT_DS
+             , SSP.UDT_UID
+             , (SELECT USER_NM FROM SY_USER SU WHERE SU.USER_ID = SSP.UDT_UID) AS UDT_UID_NM
+             , QPI.PITM_CD
+             , QPI.PITM_NM
+             , QPAR.LOT_NO
+             , QPAR.MAK_DT
+             , QPAP.ANS_IDX
+             , QPAP.ANS_NO
+             , QPAP.CLLT_DT
+             , QPAP.CLLT_UID
+             , QPAP.ANS_EDT
+             , (SELECT SAI.APR_UID FROM SY_APR_INFO SAI WHERE SAI.PLNT_CD = SSP.PLNT_CD AND SAI.APR_IDX = SSP.SBT_ANS_PLN_APR_IDX) AS APR_UID
+             , (SELECT USER_NM FROM SY_USER SU WHERE SU.USER_ID = QPAP.CLLT_UID) AS CLLT_UID_NM
+             , (SELECT TO_CHAR(MAX(TO_DATE(SSA.ANS_DT)), 'YYYY-MM-DD') FROM ST_SBT_ANS SSA WHERE SSP.PLNT_CD = SSA.PLNT_CD AND SSP.SBT_PLN_IDX = SSA.SBT_PLN_IDX) AS ANS_END_DT
+        FROM ST_SBT_PLN SSP
+            LEFT OUTER JOIN QT_PITM_ANS_PROC QPAP
+                ON(QPAP.PLNT_CD = SSP.PLNT_CD AND QPAP.ANS_IDX = SSP.ANS_IDX)
+            LEFT OUTER JOIN QT_PITM_ANS_REQ QPAR
+                ON(QPAR.PLNT_CD = SSP.PLNT_CD AND QPAR.REQ_IDX = QPAP.REQ_IDX)
+            LEFT OUTER JOIN QM_PITM_SPEC QPS
+                ON(QPS.PLNT_CD = QPAP.PLNT_CD AND QPS.PITM_SPEC_IDX = QPAP.PITM_SPEC_IDX)
+            LEFT OUTER JOIN QM_PITM_INFO QPI
+                ON(QPI.PLNT_CD = QPS.PLNT_CD AND QPI.PITM_CD = QPS.PITM_CD AND QPI.PITM_VER = (SELECT MAX(B.PITM_VER) FROM QM_PITM B WHERE B.PLNT_CD = QPI.PLNT_CD AND B.PITM_CD = QPI.PITM_CD))
+            INNER JOIN SY_ANS_TRM SAT
+                ON(SSP.PLNT_CD = SAT.PLNT_CD AND SSP.ANS_TRM_CD = SAT.ANS_TRM_CD)
+        WHERE 1 = 1
+            AND SSP.PLNT_CD = #{plntCd}
+            AND SSP.DEL_YN = 'N'
+            <if test="pitmNm != null and pitmNm != ''">
+                AND UPPER(QPI.PITM_NM) LIKE UPPER('%' || #{pitmNm} || '%')
+            </if>
+            <if test="pitmCd != null and pitmCd != ''">
+                AND UPPER(QPI.PITM_CD) LIKE UPPER('%' || #{pitmCd} || '%')
+            </if>
+            <if test="ansKnd != null and ansKnd != ''">
+                AND ANS_KND = #{ansKnd}
+            </if>
+            <if test="ansPps != null and ansPps != ''">
+                AND SSP.ANS_PPS = #{ansPps}
+            </if>
+            <if test="lotNo != null and lotNo != ''">
+                AND UPPER(QPAR.LOT_NO) LIKE UPPER('%' || #{lotNo} || '%')
+            </if>
+            <if test="sbtCrgUid != null and sbtCrgUid != ''">
+                AND SSP.SBT_CRG_UID = #{sbtCrgUid}
+            </if>
+            <if test="ansEdtBetween != null and ansEdtBetween.size() > 0">
+                AND TO_DATE(QPAP.ANS_EDT) BETWEEN TO_DATE(#{ansEdtBetween[0]}) AND TO_DATE(#{ansEdtBetween[1]})
+            </if>
+        ORDER BY QPI.PITM_NM, SSP.SBT_PLN_IDX
+    </select>
+
+    <!-- 안정성시험계획 품목 조회 -->
+    <select id="findAllItem" parameterType="StabPlanVO" resultType="StabPlanVO">
+        SELECT QPI.PLNT_CD
+             , QPI.PITM_CD
+             , QPI.PITM_VER
+             , QPI.PITM_TYP
+             , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = QPI.PITM_TYP) AS PITM_TYP_NM
+             , QPI.PITM_NM
+             , QPI.PITM_EN
+             , QPI.SAP_PRDHA
+             , QPI.ANS_DUR_DAY
+             , QPI.CRG_DPT_CD
+             , QPI.SPCM_NO
+             , QPI.MIC_YN
+             , QPI.CLLT_MTD
+             , QPI.CLLT_MCN
+             , QPI.CLLT_PLA
+             , QPI.SMP_STRG_MTD
+             , QPI.SMP_VOL_UNIT
+             , QPI.SMP_VOL_ANS
+             , QPI.SMP_VOL_ETC
+             , QPI.SMP_VOL_MNG
+             , QPI.PKG_MTR_SPEC
+             , QPAP.ANS_IDX
+             , QPAP.ANS_NO
+             , QPAP.ANS_TYP
+             , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = QPAP.ANS_TYP) AS ANS_TYP_NM
+             , QPAP.ANS_EDT
+             , QPAP.REQ_DT
+             , QPAP.CLLT_DT
+             , QPAP.CLLT_UID
+             , (SELECT USER_NM FROM SY_USER SU WHERE SU.USER_ID = QPAP.CLLT_UID) AS CLLT_UID_NM
+             , QPAP.REQ_UID
+             , (SELECT USER_NM FROM SY_USER SU WHERE SU.USER_ID = QPAP.REQ_UID) AS REQ_UID_NM
+             , QPAP.REQ_DPT_CD
+             , (SELECT DPT_NM FROM SY_DPT WHERE DPT_CD = QPAP.REQ_DPT_CD AND PLNT_CD = QP.PLNT_CD) AS REQ_DPT_CD_NM
+             , QPAR.LOT_NO
+             , QPAR.MAK_DT
+        FROM QM_PITM QP
+            INNER JOIN QM_PITM_INFO QPI
+                ON(QP.PLNT_CD = QPI.PLNT_CD AND QP.PITM_CD = QPI.PITM_CD AND QP.PITM_VER = QPI.PITM_VER)
+            INNER JOIN QM_PITM_SPEC QPS
+                ON(QP.PLNT_CD = QPS.PLNT_CD AND QP.PITM_CD = QPS.PITM_CD AND QP.PITM_VER = QPS.PITM_VER)
+            INNER JOIN QT_PITM_ANS_PROC QPAP
+                ON(QP.PLNT_CD = QPAP.PLNT_CD AND QPAP.PITM_SPEC_IDX = QPS.PITM_SPEC_IDX)
+            INNER JOIN QT_PITM_ANS_INFO QPAI
+                ON(QPAP.PLNT_CD = QPAI.PLNT_CD AND QPAP.ANS_IDX = QPAI.ANS_IDX)
+            INNER JOIN QT_PITM_ANS_REQ QPAR
+                ON(QPAR.PLNT_CD = QPAP.PLNT_CD AND QPAR.REQ_IDX = QPAP.REQ_IDX)
+        WHERE 1 = 1
+            AND QP.PLNT_CD = #{plntCd}
+            AND QP.DEL_YN = 'N'
+            AND QP.USE_VER_YN = 'Y'
+            AND QPS.DEL_YN = 'N'
+            <!-- AND QPS.USE_VER_YN = 'Y'-->
+            <!-- AND QPS.SPEC_PROC_CD = #{qpsSpecProcCd}      'S0080400' -->
+            AND QPAP.ANS_PROC_CD = #{qpapAnsProcCd}     -- 'S0130900'
+            <if test="pitmTyp != null and pitmTyp != ''">
+                AND QPI.PITM_TYP = #{pitmTyp}
+            </if>
+            <if test="pitmNm != null and pitmNm != ''">
+                AND UPPER(QPI.PITM_NM) LIKE UPPER('%' || #{pitmNm} || '%')
+            </if>
+            <if test="reqDtBetween != null and reqDtBetween[0] != null and reqDtBetween[0] != ''">
+                AND QPAP.REQ_DT <![CDATA[>=]]> #{reqDtBetween[0]}
+            </if>
+            <if test="reqDtBetween != null and reqDtBetween[1] != null and reqDtBetween[1] != ''">
+                AND QPAP.REQ_DT <![CDATA[<=]]> #{reqDtBetween[1]}
+            </if>
+    </select>
+
+    <!-- 시험 기간 조회 -->
+    <select id="findOneSyAnsTrm" parameterType="StabPlanVO" resultType="StabPlanVO">
+        SELECT SAT.PLNT_CD
+             , SAT.ANS_TRM_CD
+             , SAT.ANS_TRM_MARK_NM
+             , SAT.ANS_CYL_DIV
+             , SAT.ANS_TRM
+             , SAT.ANS_ITV
+             , SAT.TRM_ORD
+             , SAT.USE_YN
+             , SAT.DEL_YN
+        FROM SY_ANS_TRM SAT
+        WHERE 1 = 1
+            AND PLNT_CD = #{plntCd}
+            AND ANS_TRM_CD = #{ansTrmCd}
+    </select>
+
+    <!-- 첫 등록 시, ST_SBT_ANS_AITM에 넣을 AMITM_CD 조회 -->
+    <select id="getAmitm" parameterType="StabPlanVO" resultType="StabPlanVO">
+        SELECT QPAP.PITM_SPEC_IDX
+             , MAM.AMITM_CD
+        FROM ST_SBT_PLN SSP
+            INNER JOIN QT_PITM_ANS_PROC QPAP
+            ON(SSP.PLNT_CD = QPAP.PLNT_CD AND SSP.ANS_IDX = QPAP.ANS_IDX)
+            INNER JOIN QM_PITM_SPEC QPS
+            ON(SSP.PLNT_CD = QPS.PLNT_CD AND QPAP.PITM_SPEC_IDX = QPS.PITM_SPEC_IDX)
+            LEFT OUTER JOIN QM_PITM_SPEC_AITM QPSA
+            ON(SSP.PLNT_CD = QPSA.PLNT_CD AND QPS.AITM_SPEC_IDX = QPSA.AITM_SPEC_IDX)
+            INNER JOIN MS_AMITM MAM
+            ON(QPSA.AMITM_CD = MAM.AMITM_CD)
+        WHERE 1 = 1
+            AND SSP.PLNT_CD = #{plntCd}
+            AND SSP.SBT_PLN_IDX = #{sbtPlnIdx}
+        ORDER BY QPSA.AITM_SEQ
+    </select>
+
+    <!-- 안정성상세계획 조회(헤더 디테일, headerDetail) -->
+    <select id="getHeaderDetail" parameterType="StabPlanVO" resultType="StabPlanVO">
+        SELECT SSA.SBT_PLN_IDX
+             , SSA.SBT_ANS_STT
+             , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = SSA.SBT_ANS_STT) AS SBT_ANS_STT_NM
+             , SSA.ANS_DEL_YN
+             , SSA.ANS_DT
+             , SSA.ACC_MARK_NM
+             , SSA.ANS_SMP_VOL
+             , SSA.SBT_ANS_IDX
+        FROM ST_SBT_ANS SSA
+        WHERE 1 = 1
+            AND SSA.PLNT_CD = #{plntCd}
+            AND SSA.ANS_DEL_YN = 'N'
+            AND SSA.SBT_PLN_IDX = #{sbtPlnIdx}
+        ORDER BY
+            CASE WHEN SSA.ACC_MARK_NM = 'Initial' THEN 0 END, SSA.ANS_DT, SSA.SBT_ANS_IDX
+    </select>
+
+    <sql id="findAitmBaseData">
+        WITH BASE_DATA AS (
+            SELECT SSP.PLNT_CD
+                 , SSP.SBT_PLN_IDX
+                 , SSP.SBT_ANS_PROC
+                 , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = SSP.SBT_ANS_PROC) AS SBT_ANS_PROC_NM
+                 , SSP.SBT_PLN_STT
+                 , SSP.DEL_YN
+                 , SSP.SBT_ANS_PLN_NO
+                 , SSP.SBT_ANS_RPT_NO
+                 , SSP.ANS_KND
+                 , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = SSP.ANS_KND AND SCD.PLNT_CD = SSP.PLNT_CD) AS ANS_KND_NM
+                 , SSP.ANS_PPS
+                 , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = SSP.ANS_PPS AND SCD.PLNT_CD = SSP.PLNT_CD) AS ANS_PPS_NM
+                 , SSP.ANS_PPS_DTL
+                 , SSP.STRG_TERMS
+                 , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = SSP.STRG_TERMS AND SCD.PLNT_CD = SSP.PLNT_CD) AS STRG_TERMS_NM
+                 , SSP.STRG_PLA
+                 , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = SSP.STRG_PLA AND SCD.PLNT_CD = SSP.PLNT_CD) AS STRG_PLA_NM
+                 , SSP.SMP_VOL_UNIT
+                 , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = SSP.SMP_VOL_UNIT AND SCD.PLNT_CD = SSP.PLNT_CD) AS SMP_VOL_UNIT_NM
+                 , SSP.INP_UNIT
+                 , SSP.SBT_SMP_VOL
+                 , SSP.DOC_NO
+                 , SSP.ANS_STR_DT
+                 , SSP.ANS_TRM_CD
+                 , SSP.SBT_CRG_UID
+                 , (SELECT USER_NM FROM SY_USER SU WHERE SU.USER_ID = SSP.SBT_CRG_UID) AS SBT_CRG_UID_NM
+                 , SSP.RMK
+                 , SSP.ANS_IDX
+                 , SSP.SBT_ANS_PLN_APR_IDX
+                 , SSP.PLN_RJT_UID
+                 , (SELECT USER_NM FROM SY_USER SU WHERE SU.USER_ID = SSP.PLN_RJT_UID) AS PLN_RJT_UID_NM
+                 , SSP.PLN_RJT_DS
+                 , SSP.PLN_RJT_REA
+                 , SSP.SBT_ANS_PLN_CHG_APR_IDX
+                 , SSP.PLN_CHG_RJT_UID
+                 , (SELECT USER_NM FROM SY_USER SU WHERE SU.USER_ID = SSP.PLN_CHG_RJT_UID) AS PLN_CHG_RJT_UID_NM
+                 , SSP.PLN_CHG_RJT_DS
+                 , SSP.PLN_CHG_RJT_REA
+                 , SSP.SBT_ANS_RST_APR_UID
+                 , (SELECT USER_NM FROM SY_USER SU WHERE SU.USER_ID = SSP.SBT_ANS_RST_APR_UID) AS SBT_ANS_RST_APR_UID_NM
+                 , SSP.SBT_ANS_RST_APR_DS
+                 , SSA.SBT_ANS_IDX
+                 , SSA.SBT_ANS_STT
+                 , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = SSA.SBT_ANS_STT) AS SBT_ANS_STT_NM
+                 , SSA.ANS_DEL_YN
+                 , SSA.ANS_DT
+                 , SSA.ACC_MARK_NM
+                 , SSA.ANS_SMP_VOL
+                 , SSAA.AITM_SEQ
+                 , QPAP.PITM_SPEC_IDX
+                 , MAM.AMITM_CD
+                 , MA.AITM_CD
+                 , MA.AITM_KN
+            FROM ST_SBT_PLN SSP
+                INNER JOIN ST_SBT_ANS SSA
+                ON(SSP.PLNT_CD = SSA.PLNT_CD AND SSP.SBT_PLN_IDX = SSA.SBT_PLN_IDX)
+                LEFT OUTER JOIN ST_SBT_ANS_AITM SSAA
+                ON(SSA.PLNT_CD = SSAA.PLNT_CD AND SSA.SBT_ANS_IDX = SSAA.SBT_ANS_IDX)
+                INNER JOIN QT_PITM_ANS_PROC QPAP
+                ON(SSP.PLNT_CD = QPAP.PLNT_CD AND SSP.ANS_IDX = QPAP.ANS_IDX)
+                INNER JOIN QM_PITM_SPEC QPS
+                ON(SSP.PLNT_CD = QPS.PLNT_CD AND QPAP.PITM_SPEC_IDX = QPS.PITM_SPEC_IDX AND QPS.DEL_YN = 'N'
+--                        AND QPS.USE_VER_YN = 'Y'
+                )
+                LEFT OUTER JOIN QM_PITM_SPEC_AITM QPSA
+                ON(SSP.PLNT_CD = QPSA.PLNT_CD AND QPS.AITM_SPEC_IDX = QPSA.AITM_SPEC_IDX)
+                INNER JOIN MS_AMITM MAM
+--                 ON(QPSA.AMITM_CD = MAM.AMITM_CD)
+                ON(SSAA.AMITM_CD = MAM.AMITM_CD)
+                INNER JOIN MS_AITM MA
+                ON(MAM.AITM_CD = MA.AITM_CD)
+            WHERE 1 = 1
+                AND SSP.PLNT_CD = #{plntCd}
+                AND SSP.SBT_PLN_IDX = #{sbtPlnIdx}
+                AND SSP.DEL_YN = 'N'
+                AND SSA.ANS_DEL_YN = 'N'
+            ORDER BY SSA.ANS_DT, SSA.SBT_ANS_IDX
+        )
+    </sql>
+
+    <!-- 시험일 조회 -->
+    <select id="getAnsDt" parameterType="StabPlanVO" resultType="string">
+        SELECT DISTINCT ANS_DT
+        FROM ST_SBT_ANS
+        WHERE 1 = 1
+            AND PLNT_CD = #{plntCd}
+            AND SBT_PLN_IDX = #{sbtPlnIdx}
+        ORDER BY ANS_DT
+    </select>
+
+    <!-- 시험일 조회 -->
+    <select id="getSbtAnsIdx" parameterType="StabPlanVO" resultType="StabPlanVO">
+        SELECT DISTINCT SBT_ANS_IDX, ANS_DT
+        FROM ST_SBT_ANS
+        WHERE 1 = 1
+            AND PLNT_CD = #{plntCd}
+            AND SBT_PLN_IDX = #{sbtPlnIdx}
+        ORDER BY SBT_ANS_IDX
+    </select>
+
+    <!-- 안정성상세계획 시험항목 조회, validate 용도 -->
+    <select id="getSbtAnsForValidate" parameterType="StabPlanVO" resultType="int">
+        <include refid="findAitmBaseData" />
+        SELECT COUNT(BD.SBT_PLN_IDX) AS ANS_COUNT
+        FROM BASE_DATA BD
+    </select>
+
+    <!-- 안정성상세계획 조회(시험 목록, table1) -->
+    <select id="getAitmData" parameterType="StabPlanVO" resultType="Map">
+        <include refid="findAitmBaseData" />
+        SELECT *
+        FROM (
+            SELECT BD.AITM_CD AS "aitmCd"
+                 , BD.AMITM_CD AS "amitmCd"
+                 , BD.AITM_KN AS "aitmKn"
+                 , BD.SBT_ANS_IDX
+                 , BD.AITM_SEQ
+                 , BD.DEL_YN AS "delYn"
+            FROM BASE_DATA BD
+        )
+        PIVOT (
+            COUNT(AITM_SEQ)
+            FOR SBT_ANS_IDX IN
+            <foreach item="item" index="index" collection="sbtAnsIdxList" separator="," open="(" close=")">
+                '${item}'
+            </foreach>
+        )
+    </select>
+
+    <!-- 안정성 계획 IDX(SBT_PLN_IDX)로 DESC 정렬할 후, 마지막 값 -->
+    <select id="findTop1ByOrderBySbtPlnIdxDesc" parameterType="StabPlanVO" resultType="String">
+        SELECT TO_CHAR(NVL(MAX(SBT_PLN_IDX), 0) + 1, #{numReg}) AS SBT_PLN_IDX
+        FROM ST_SBT_PLN
+        WHERE PLNT_CD = #{plntCd}
+    </select>
+
+    <!-- 안정성시험계획 생성 -->
+    <insert id="save" parameterType="StabPlanVO">
+        <selectKey resultType="Integer" keyProperty="sbtPlnIdx" order="BEFORE">
+            SELECT NVL(MAX(SBT_PLN_IDX), 0) + 1 FROM ST_SBT_PLN WHERE PLNT_CD = #{plntCd}
+        </selectKey>
+        INSERT INTO ST_SBT_PLN(
+            PLNT_CD,
+            SBT_PLN_IDX,
+            SBT_ANS_PROC,
+            SBT_PLN_STT,
+            DEL_YN,
+            SBT_ANS_PLN_NO,
+            SBT_ANS_RPT_NO,
+            ANS_KND,
+            ANS_PPS,
+            ANS_PPS_DTL,
+            STRG_TERMS,
+            STRG_PLA,
+            SMP_VOL_UNIT,
+            INP_UNIT,
+            SBT_SMP_VOL,
+            DOC_NO,
+            ANS_STR_DT,
+            ANS_TRM_CD,
+            SBT_CRG_UID,
+            RMK,
+            ANS_IDX,
+            SBT_ANS_PLN_APR_IDX,
+            PLN_RJT_UID,
+            PLN_RJT_DS,
+            PLN_RJT_REA,
+            SBT_ANS_PLN_CHG_APR_IDX,
+            PLN_CHG_RJT_UID,
+            PLN_CHG_RJT_DS,
+            PLN_CHG_RJT_REA,
+            SBT_ANS_RST_APR_UID,
+            SBT_ANS_RST_APR_DS
+        )
+        VALUES(
+            #{plntCd},
+            #{sbtPlnIdx},
+            #{sbtAnsProc},
+            #{sbtPlnStt},
+            #{delYn},
+            #{sbtAnsPlnNo},
+            #{sbtAnsRptNo},
+            #{ansKnd},
+            #{ansPps},
+            #{ansPpsDtl},
+            #{strgTerms},
+            #{strgPla},
+            #{smpVolUnit},
+            #{inpUnit},
+            #{sbtSmpVol},
+            #{docNo},
+            #{ansStrDt},
+            #{ansTrmCd},
+            #{sbtCrgUid},
+            #{rmk},
+            #{ansIdx},
+            #{sbtAnsPlnAprIdx},
+            #{plnRjtUid},
+            #{plnRjtDs},
+            #{plnRjtRea},
+            #{sbtAnsPlnChgAprIdx},
+            #{plnChgRjtUid},
+            #{plnChgRjtDs},
+            #{plnChgRjtRea},
+            #{sbtAnsRstAprUid},
+            #{sbtAnsRstAprDs}
+        )
+    </insert>
+
+    <!-- 안정성시험 생성 -->
+    <insert id="saveAns" parameterType="StabPlanVO">
+        <selectKey resultType="Integer" keyProperty="sbtAnsIdx" order="BEFORE">
+            SELECT NVL(MAX(SBT_ANS_IDX), 0) + 1 FROM ST_SBT_ANS WHERE PLNT_CD = #{plntCd}
+        </selectKey>
+        INSERT INTO ST_SBT_ANS (
+            PLNT_CD,
+            SBT_ANS_IDX,
+            SBT_PLN_IDX,
+            SBT_ANS_STT,
+            ANS_DEL_YN,
+            ANS_DT,
+            ACC_MARK_NM,
+            ANS_SMP_VOL
+        )
+        VALUES (
+            #{plntCd},
+            #{sbtAnsIdx},
+            #{sbtPlnIdx},
+            #{sbtAnsStt},
+            #{ansDelYn},
+            #{ansDt},
+            #{accMarkNm},
+            #{ansSmpVol}
+       )
+    </insert>
+
+    <!-- 안정성상세계획 수정 -->
+    <update id="updateAns" parameterType="StabPlanVO">
+        UPDATE ST_SBT_ANS SET
+            ANS_DT = #{ansDt},
+            ACC_MARK_NM = #{accMarkNm},
+            ANS_SMP_VOL = #{ansSmpVol}
+        WHERE 1 = 1
+            AND PLNT_CD = #{plntCd}
+            AND SBT_ANS_IDX = #{sbtAnsIdx}
+    </update>
+
+    <!-- 안정성 시험 시험항목 생성 -->
+    <insert id="saveAitm" parameterType="StabPlanVO">
+        <selectKey resultType="Integer" keyProperty="aitmSeq" order="BEFORE">
+            SELECT NVL(MAX(AITM_SEQ), 0) + 1 FROM ST_SBT_ANS_AITM WHERE PLNT_CD = #{plntCd} AND SBT_ANS_IDX = #{sbtAnsIdx}
+        </selectKey>
+        INSERT INTO ST_SBT_ANS_AITM (
+            PLNT_CD,
+            SBT_ANS_IDX,
+            AITM_SEQ,
+            AMITM_CD
+        )
+        VALUES (
+            #{plntCd},
+            #{sbtAnsIdx},
+            #{aitmSeq},
+            #{amitmCd}
+        )
+    </insert>
+
+    <!-- 안정성계획 수정 -->
+    <update id="update" parameterType="StabPlanVO">
+        UPDATE ST_SBT_PLN
+        SET ANS_KND = #{ansKnd},
+            STRG_PLA = #{strgPla},
+<!--        ANS_TRM_CD = #{ansTrmCd}, -->
+<!--        ANS_STR_DT = #{ansStrDt}, -->
+            SBT_ANS_PROC = #{sbtAnsProc},
+            ANS_PPS = #{ansPps},
+            STRG_TERMS = #{strgTerms},
+            SBT_SMP_VOL = #{sbtSmpVol},
+            SMP_VOL_UNIT = #{smpVolUnit},
+            SBT_CRG_UID = #{sbtCrgUid},
+            ANS_PPS_DTL = #{ansPpsDtl},
+            DOC_NO = #{docNo},
+            SBT_ANS_PLN_NO = #{sbtAnsPlnNo},
+            RMK = #{rmk}
+        WHERE 1 = 1
+            AND PLNT_CD = #{plntCd}
+            AND SBT_PLN_IDX = #{sbtPlnIdx}
+    </update>
+
+    <!-- 안정성계획 삭제 -->
+    <update id="delete" parameterType="StabPlanVO">
+        UPDATE ST_SBT_PLN
+        SET DEL_YN = 'Y'
+        WHERE 1 = 1
+            AND PLNT_CD = #{plntCd}
+            AND SBT_PLN_IDX = #{sbtPlnIdx}
+    </update>
+
+    <!-- 안정성시험 삭제를 위한 조회 -->
+    <select id="getAnsForDelete" parameterType="StabPlanVO" resultType="StabPlanVO">
+        SELECT SSA.PLNT_CD,
+               SSA.SBT_ANS_IDX
+        FROM ST_SBT_ANS SSA
+        WHERE 1 = 1
+            AND SSA.PLNT_CD = #{plntCd}
+            AND SSA.SBT_PLN_IDX = #{sbtPlnIdx}
+    </select>
+
+    <!-- 안정성시험 전부 삭제 -->
+    <update id="deleteAllAns" parameterType="StabPlanVO">
+        UPDATE ST_SBT_ANS
+        SET ANS_DEL_YN = 'Y'
+        WHERE 1 = 1
+            AND PLNT_CD = #{plntCd}
+            AND SBT_PLN_IDX = #{sbtPlnIdx}
+    </update>
+
+    <!-- 안정성시험 삭제 -->
+    <update id="deleteAns" parameterType="StabPlanVO">
+        UPDATE ST_SBT_ANS
+        SET ANS_DEL_YN = 'Y'
+        WHERE 1 = 1
+            AND PLNT_CD = #{plntCd}
+            AND SBT_ANS_IDX = #{sbtAnsIdx}
+    </update>
+
+    <!-- 안정성시험항목 삭제를 위한 조회 -->
+    <select id="getAitmForDelete" parameterType="StabPlanVO" resultType="StabPlanVO">
+        SELECT SSAA.PLNT_CD,
+               SSAA.SBT_ANS_IDX,
+               SSAA.AITM_SEQ
+        FROM ST_SBT_ANS_AITM SSAA
+        WHERE 1 = 1
+            AND PLNT_CD = #{plntCd}
+            AND SBT_ANS_IDX IN (SELECT SBT_ANS_IDX FROM ST_SBT_ANS WHERE PLNT_CD = #{plntCd} AND SBT_PLN_IDX = #{sbtPlnIdx})
+    </select>
+
+    <!-- 안정성시험항목 삭제 -->
+    <delete id="deleteAitm" parameterType="StabPlanVO">
+        DELETE FROM ST_SBT_ANS_AITM
+        WHERE 1 = 1
+            AND PLNT_CD = #{plntCd}
+            AND SBT_ANS_IDX = #{sbtAnsIdx}
+            AND AITM_SEQ = #{aitmSeq}
+    </delete>
+
+    <!-- 안정성시험 중단 요청-->
+    <update id="stopRequest" parameterType="StabPlanVO">
+        UPDATE ST_SBT_PLN
+        SET SBT_ANS_PROC = #{sbtAnsProc},
+            SBT_PLN_STT = #{sbtPlnStt}
+        WHERE 1 = 1
+            AND PLNT_CD = #{plntCd}
+            AND SBT_PLN_IDX = #{sbtPlnIdx}
+    </update>
+
+    <!-- 안정성시험 중단취소 요청 -->
+    <update id="stopCancelRequest" parameterType="StabPlanVO">
+        UPDATE ST_SBT_PLN
+        SET SBT_ANS_PROC = #{sbtAnsProc},
+            SBT_PLN_STT = #{sbtPlnStt}
+        WHERE 1 = 1
+            AND PLNT_CD = #{plntCd}
+            AND SBT_PLN_IDX = #{sbtPlnIdx}
+    </update>
+
+    <!-- 안정성시험 승인 요청 -->
+    <update id="approveRequest" parameterType="StabPlanVO">
+        UPDATE ST_SBT_PLN
+        SET SBT_ANS_PROC = #{sbtAnsProc},
+            SBT_PLN_STT = #{sbtPlnStt}
+        WHERE 1 = 1
+            AND PLNT_CD = #{plntCd}
+            AND SBT_PLN_IDX = #{sbtPlnIdx}
+    </update>
+
+    <!-- 안정성상세계획 저장(체크박스)에 따른 항목 초기화 -->
+    <delete id="deleteAitmSideEffect" parameterType="StabPlanVO">
+        DELETE FROM ST_SBT_ANS_AITM
+        WHERE 1 = 1
+            AND PLNT_CD = #{plntCd}
+            AND SBT_ANS_IDX IN (SELECT SBT_ANS_IDX FROM ST_SBT_ANS WHERE PLNT_CD = #{plntCd} AND SBT_PLN_IDX = #{sbtPlnIdx})
+            AND SBT_ANS_IDX != #{sbtAnsIdx}
+    </delete>
+</mapper>

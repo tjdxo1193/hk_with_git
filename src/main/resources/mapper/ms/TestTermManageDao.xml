@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.ms.dao.TestTermManageDao">
+
+    <select id="getTermList" parameterType="TestTermManageVO" resultType="TestTermManageVO">
+        SELECT ST.PLNT_CD
+             , ST.ANS_TRM_CD
+             , ST.ANS_TRM_MARK_NM
+             , ST.ANS_CYL_DIV
+             , SD.DTL_NM AS ANS_CYL_DIV_NM
+             , SD.DTL_EN AS ANS_CYL_DIV_EN
+             , SD.DTL_ABBR AS ANS_CYL_DIV_ABBR
+             , ST.ANS_TRM
+             , ST.ANS_ITV
+             , ST.USE_YN
+             , ST.DEL_YN
+             , ST.TRM_ORD
+        FROM SY_ANS_TRM ST
+        LEFT JOIN  SY_CD_DTL SD ON ST.ANS_CYL_DIV = SD.DTL_CD
+        WHERE ST.DEL_YN = 'N'
+        AND ST.PLNT_CD = #{plntCd}
+        <if test="ansTrmMarkNm != null and ansTrmMarkNm != ''">
+            AND UPPER(ST.ANS_TRM_MARK_NM) LIKE ('%' || TRIM(UPPER(#{ansTrmMarkNm})) || '%')
+        </if>
+        <if test="useYn != null and useYn != ''">
+            AND ST.USE_YN = #{useYn}
+        </if>
+        ORDER BY ST.TRM_ORD
+    </select>
+
+    <select id="getIntervalList" parameterType="TestTermManageVO" resultType="testTermInTerValManageVO">
+        SELECT PLNT_CD
+             , ANS_TRM_CD
+             , ITV_SEQ
+             , ACC_RUL_NM
+             , ACC_MARK_NM
+             , ANS_ACC_VAL
+        FROM SY_ANS_TRM_ITV
+        WHERE PLNT_CD = #{plntCd}
+        AND ANS_TRM_CD = #{ansTrmCd}
+    </select>
+
+    <insert id="createTerm" parameterType="testTermManageVO">
+        <selectKey resultType="string" keyProperty="ansTrmCd" order="BEFORE">
+            SELECT 'AT'||LPAD(NVL(MAX(SUBSTR(ANS_TRM_CD, -4))+1,1),4,0) FROM SY_ANS_TRM WHERE PLNT_CD = #{plntCd}
+        </selectKey>
+        INSERT INTO SY_ANS_TRM (
+            PLNT_CD
+            ,ANS_TRM_CD
+            ,ANS_TRM_MARK_NM
+            ,ANS_CYL_DIV
+            ,ANS_TRM
+            ,ANS_ITV
+            ,USE_YN
+            ,DEL_YN
+            ,TRM_ORD
+        ) VALUES (
+            #{plntCd}
+            ,#{ansTrmCd}
+            ,#{ansTrmMarkNm}
+            ,#{ansCylDiv}
+            ,#{ansTrm}
+            ,#{ansItv}
+            ,#{useYn}
+            ,'N'
+            ,#{trmOrd}
+        )
+    </insert>
+
+    <update id="updateTerm" parameterType="testTermManageVO">
+        UPDATE SY_ANS_TRM SET
+          ANS_TRM_MARK_NM = #{ansTrmMarkNm}
+        , ANS_CYL_DIV = #{ansCylDiv}
+        , ANS_TRM = #{ansTrm}
+        , ANS_ITV = #{ansItv}
+        , USE_YN = #{useYn}
+        , TRM_ORD = #{trmOrd}
+        WHERE PLNT_CD = #{plntCd}
+        AND ANS_TRM_CD = #{ansTrmCd}
+    </update>
+
+    <update id="deleteTerm" parameterType="testTermManageVO">
+        UPDATE SY_ANS_TRM SET
+            DEL_YN = 'Y'
+        WHERE PLNT_CD = #{plntCd}
+        AND ANS_TRM_CD = #{ansTrmCd}
+    </update>
+
+    <insert id="createInterval" parameterType="testTermInTerValManageVO">
+        <selectKey resultType="int" keyProperty="itvSeq" order="BEFORE">
+            SELECT NVL(MAX(ITV_SEQ)+1,1) FROM SY_ANS_TRM_ITV WHERE PLNT_CD = #{plntCd} AND ANS_TRM_CD = #{ansTrmCd}
+        </selectKey>
+        INSERT INTO SY_ANS_TRM_ITV (
+            PLNT_CD
+            , ANS_TRM_CD
+            , ITV_SEQ
+            , ACC_RUL_NM
+            , ACC_MARK_NM
+            , ANS_ACC_VAL
+        ) VALUES (
+            #{plntCd}
+            ,#{ansTrmCd}
+            ,#{itvSeq}
+            ,#{accRulNm}
+            ,#{accMarkNm}
+            ,#{ansAccVal}
+        )
+    </insert>
+
+    <delete id="deleteInterval" parameterType="testTermInTerValManageVO">
+        DELETE FROM SY_ANS_TRM_ITV WHERE PLNT_CD = #{plntCd} AND ANS_TRM_CD = #{ansTrmCd}
+    </delete>
+
+    <select id="getCurrentAnsTrmCd" parameterType="string" resultType="string">
+        SELECT MAX(ANS_TRM_CD) AS ANS_TRM_CD
+        FROM SY_ANS_TRM
+        WHERE PLNT_CD = #{plntCd}
+    </select>
+
+    <select id="getTestCycleDivision" parameterType="TestTermManageCodeVO" resultType="TestTermManageCodeVO">
+        SELECT
+               DTL_CD AS CODE
+             , DTL_EN AS LABEL_EN
+             , DTL_NM AS LABEL_KR
+             , DTL_ABBR AS ABBR
+        FROM SY_CD_DTL
+        WHERE PLNT_CD = #{plntCd}
+        AND HIR_CD = #{code}
+    </select>
+</mapper>

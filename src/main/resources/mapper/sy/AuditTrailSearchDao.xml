@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.sy.dao.AuditTrailSearchDao">
+
+    <select id="findAuditsByPlantCodeAndMenuCode" parameterType="AuditTrailSearchVO" resultType="Map">
+        SELECT A.PLNT_CD,
+               A.AUDIT_IDX,
+               AD.AUDIT_SRLNO,
+               A.MENU_CD,
+               SM.MENU_NM,
+               AD.EVT_NM,
+               A.EVT_URL,
+--                SU.USER_NM                                  AS CRT_USER_NM,
+               A.CRT_UID,
+               A.CRT_IP,
+               TO_CHAR(AD.CRT_DS, 'YYYY-MM-DD HH24:mi:ss') AS CRT_DS,
+               A.REA,
+               AD.CUD_DIV,
+               AD.CHG_BEF,
+               AD.CHG_AFT,
+               A.ELE_SGNT_YN
+            ${selectClauseWithMasters}
+        FROM SY_AUDIT A
+                 JOIN SY_AUDIT_DTL AD
+                      ON A.PLNT_CD = AD.PLNT_CD
+                          AND A.AUDIT_IDX = AD.AUDIT_IDX
+                 LEFT JOIN SY_MENU SM
+                           ON A.MENU_CD = SM.MENU_CD
+--                  LEFT JOIN SY_USER SU
+--                            ON A.CRT_UID = SU.USER_ID
+        WHERE A.PLNT_CD = #{plntCd}
+          <if test="menuCd != null and menuCd != ''">
+            AND A.MENU_CD = #{menuCd}
+          </if>
+        ORDER BY A.PLNT_CD,
+                 A.AUDIT_IDX DESC
+    </select>
+
+</mapper>

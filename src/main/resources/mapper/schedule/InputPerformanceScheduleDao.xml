@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.schedule.dao.InputPerformanceScheduleDao">
+
+    <select id="findManufactureFailedRecord" resultType="lims.api.schedule.vo.InputPerformVO$Manufacture">
+        SELECT ISP_PDT_PFA_IDX,
+               SRL_NO,
+               ISP_PFA_CANL_YN,
+               IF_MTD_DIV,
+               IF_STT
+        FROM QT_PITM_ANS_PDT_PFA
+        WHERE (ISP_PDT_PFA_IDX, SRL_NO) IN (
+            SELECT ISP_PDT_PFA_IDX, MAX(SRL_NO)
+            FROM QT_PITM_ANS_PDT_PFA
+            GROUP BY ISP_PDT_PFA_IDX
+        )
+          AND IF_STT = #{value}
+    </select>
+
+    <select id="findPurchaseFailedRecord" resultType="lims.api.schedule.vo.InputPerformVO$Purchase">
+        SELECT ISP_PHS_PFA_IDX,
+               SRL_NO,
+               IF_MTD_DIV,
+               IF_STT
+        FROM QT_PITM_ANS_PHS_PFA
+        WHERE (ISP_PHS_PFA_IDX, SRL_NO) IN (
+            SELECT ISP_PHS_PFA_IDX, MAX(SRL_NO)
+            FROM QT_PITM_ANS_PHS_PFA
+            GROUP BY ISP_PHS_PFA_IDX
+        )
+          AND IF_STT = #{value}
+    </select>
+
+</mapper>

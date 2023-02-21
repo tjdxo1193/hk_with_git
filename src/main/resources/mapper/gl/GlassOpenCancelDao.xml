@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.gl.dao.GlassOpenCancelDao">
+
+    <select id="findAll" parameterType="GlassMaterialVO" resultType="GlassMaterialVO">
+        SELECT
+            A.PLNT_CD,
+            A.RITM_ETR_IDX,
+            (SELECT TREE_CD FROM SY_CD_TREE WHERE TREE_CD = E.HIR_TREE_CD AND PLNT_CD = E.PLNT_CD) AS UPPER_RITM_TREE_CD,
+            (SELECT LTRIM(SYS_CONNECT_BY_PATH(TREE_NM, '.'), '.')
+            FROM SY_CD_TREE
+            WHERE TREE_CD = E.HIR_TREE_CD
+            START WITH HIR_TREE_CD = 'R0000000' AND PLNT_CD = A.PLNT_CD
+            CONNECT BY PRIOR TREE_CD = HIR_TREE_CD AND PLNT_CD = A.PLNT_CD) AS UPPER_RITM_TREE_NM,
+            A.RITM_ROOT_CD,
+            (SELECT TREE_NM FROM SY_CD_TREE WHERE TREE_CD = A.RITM_ROOT_CD AND PLNT_CD = A.PLNT_CD) AS RITM_ROOT_NM,
+            A.RITM_CD,
+            A.RITM_KN,
+            A.RITM_EN,
+            A.RITM_ABBR,
+            A.RITM_CRG_UID,
+            (SELECT USER_NM FROM SY_USER WHERE USER_ID = A.RITM_CRG_UID) AS RITM_CRG_NM,
+            A.MNG_NO,
+            A.ETR_PROC_CD,
+            (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = A.ETR_PROC_CD) AS ETR_PROC_NM,
+            A.STRG_TERMS,
+            (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = A.STRG_TERMS AND PLNT_CD = A.PLNT_CD) AS STRG_TERMS_NM,
+            A.STRG_PLA,
+            (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = A.STRG_PLA AND PLNT_CD = A.PLNT_CD) AS STRG_PLA_NM,
+            A.STRG_PLA_DTL,
+            A.RITM_UNIT_CD,
+            (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = A.RITM_UNIT_CD AND PLNT_CD = A.PLNT_CD) AS RITM_UNIT_NM,
+            A.SFY_STOK,
+            A.ETR_QTY,
+            A.ETR_EACH_QTY,
+            A.ETR_TOT_QTY,
+            A.VDR_CD,
+            (SELECT VDR_NM FROM RM_RITM_VDR WHERE VDR_CD = A.VDR_CD) AS VDR_NM,
+            (SELECT VDR_CRG_NM FROM RM_RITM_VDR WHERE VDR_CD = A.VDR_CD) AS VDR_CRG_NM,
+            (SELECT VDR_CRG_TEL FROM RM_RITM_VDR WHERE VDR_CD = A.VDR_CD) AS VDR_CRG_TEL,
+            A.MAK_DT,
+            A.MAK_NO,
+            A.ETR_DT,
+            A.ETR_RMK,
+            A.EXPIR_DT_CHK,
+            A.OPN_BEF_EXPIR_DT,
+            A.OPN_AFT_EXPIR_TRM,
+            A.CURR_LOT_YN,
+            A.ETR_REQ_APR_IDX,
+            A.RJT_UID,
+            A.RJT_DS,
+            A.RJT_REA,
+            A.DEL_UID,
+            A.DEL_DS,
+            A.DEL_REA,
+            A.DEL_YN,
+            A.CRT_IP,
+            A.CRT_DS,
+            A.CRT_UID,
+            A.UDT_IP,
+            A.UDT_DS,
+            A.UDT_UID,
+            A.SPEC,
+            A.CAS_NO,
+            A.FOMU,
+            A.SHADE_YN,
+            A.MTR_DEDUT_YN,
+            A.POIS_YN,
+            A.DANG_YN,
+            A.FILE_IDX,
+            B.GLS_VOL,
+            B.GLS_VOL_UNIT_CD,
+            (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = B.GLS_VOL_UNIT_CD AND PLNT_CD = B.PLNT_CD) AS GLS_VOL_UNIT_NM,
+            B.GLS_COLR_MTR,
+            C.RITM_MNG_IDX,
+            C.RITM_LABEL_NO,
+            C.MNG_PROC_CD,
+            C.RITM_ETR_NO,
+            (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = C.MNG_PROC_CD) AS MNG_PROC_NM,
+            C.OPN_DS,
+            C.OPN_DT,
+            C.EXPIR_DT,
+            C.OPN_RMK,
+            C.DPS_REA,
+            D.APR_REQ_UID,
+            D.APR_UID
+        FROM RT_RITM_ETR A
+        JOIN RT_RITM_ETR_INFO_GLS B ON A.RITM_ETR_IDX = B.RITM_ETR_IDX
+        JOIN RT_RITM_MNG C ON B.RITM_ETR_IDX = C.RITM_ETR_IDX
+        JOIN SY_CD_TREE E ON A.RITM_ROOT_CD = E.TREE_CD AND A.PLNT_CD = E.PLNT_CD
+        LEFT OUTER JOIN SY_APR_INFO D ON C.DPS_REQ_APR_IDX = D.APR_IDX
+        WHERE A.PLNT_CD = #{plntCd} AND A.ETR_PROC_CD = #{etrProcCd} AND C.MNG_PROC_CD = #{mngProcCd}
+        <if test="ritmKn != null and ritmKn != ''">
+            AND A.RITM_KN LIKE '%' || UPPER(#{ritmKn}) || '%'
+        </if>
+        <if test="mngNo != null and mngNo != ''">
+            AND A.MNG_NO LIKE '%' || UPPER(#{mngNo}) || '%'
+        </if>
+        <if test="makNo != null and makNo != ''">
+            AND A.MAK_NO LIKE '%' || UPPER(#{makNo}) || '%'
+        </if>
+        <if test="vdrNm != null and vdrNm != ''">
+            AND F.VDR_NM LIKE '%' || UPPER(#{vdrNm}) || '%'
+        </if>
+        ORDER BY A.RITM_ETR_IDX, C.RITM_MNG_IDX
+    </select>
+
+    <update id="cancel" parameterType="GlassMaterialVO">
+        UPDATE RT_RITM_MNG SET
+            MNG_PROC_CD = #{mngProcCd}
+            ,OPN_CANL_UID = #{opnCanlUid}
+            ,OPN_CANL_DS = sysdate
+            ,OPN_CANL_REA = #{opnCanlRea}
+            ,OPN_DT = null
+            ,EXPIR_DT = null
+            ,OPN_RMK = null
+            ,OPN_UID = null
+            ,OPN_DS = null
+            ,RJT_UID = null
+            ,RJT_DS = null
+            ,RJT_REA = null
+        WHERE RITM_MNG_IDX = #{ritmMngIdx} AND PLNT_CD = #{plntCd}
+    </update>
+
+</mapper>

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.st.dao.StabPlanDetailApprDao">
+
+    <!-- 안정성상세계획 승인 조회 -->
+    <select id="findAll" parameterType="StabPlanDetailApprVO" resultType="StabPlanDetailApprVO">
+        SELECT SSP.PLNT_CD
+             , SSP.SBT_PLN_IDX
+             , SSP.SBT_ANS_PROC
+             , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = SSP.SBT_ANS_PROC AND SCD.PLNT_CD = SSP.PLNT_CD) AS SBT_ANS_PROC_NM
+             , SSP.SBT_PLN_STT
+             , SSP.DEL_YN
+             , SSP.SBT_ANS_PLN_NO
+             , SSP.SBT_ANS_RPT_NO
+             , SSP.ANS_KND
+             , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = SSP.ANS_KND AND SCD.PLNT_CD = SSP.PLNT_CD) AS ANS_KND_NM
+             , SSP.ANS_PPS
+             , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = SSP.ANS_PPS AND SCD.PLNT_CD = SSP.PLNT_CD) AS ANS_PPS_NM
+             , SSP.ANS_PPS_DTL
+             , SSP.STRG_TERMS
+             , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = SSP.STRG_TERMS AND SCD.PLNT_CD = SSP.PLNT_CD) AS STRG_TERMS_NM
+             , SSP.STRG_PLA
+             , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = SSP.STRG_PLA AND SCD.PLNT_CD = SSP.PLNT_CD) AS STRG_PLA_NM
+             , SSP.SMP_VOL_UNIT
+             , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = SSP.SMP_VOL_UNIT AND SCD.PLNT_CD = SSP.PLNT_CD) AS SMP_VOL_UNIT_NM
+             , SSP.INP_UNIT
+             , SSP.SBT_SMP_VOL
+             , SSP.DOC_NO
+             , SSP.ANS_STR_DT
+             , SSP.ANS_TRM_CD
+             , SAT.ANS_TRM_MARK_NM
+             , SAT.ANS_CYL_DIV
+             , SAT.ANS_TRM
+             , SAT.ANS_ITV
+             , SSP.SBT_CRG_UID
+             , (SELECT USER_NM FROM SY_USER SU WHERE SU.USER_ID = SSP.SBT_CRG_UID) AS SBT_CRG_UID_NM
+             , SSP.RMK
+             , SSP.ANS_IDX
+             , SSP.SBT_ANS_PLN_APR_IDX
+             , SSP.PLN_RJT_UID
+             , (SELECT USER_NM FROM SY_USER SU WHERE SU.USER_ID = SSP.PLN_RJT_UID) AS PLN_RJT_UID_NM
+             , SSP.PLN_RJT_DS
+             , TO_CHAR(SSP.PLN_RJT_DS, 'YYYY-MM-DD') AS PLN_RJT_DT
+             , SSP.PLN_RJT_REA
+             , SSP.SBT_ANS_PLN_CHG_APR_IDX
+             , SSP.PLN_CHG_RJT_UID
+             , (SELECT USER_NM FROM SY_USER SU WHERE SU.USER_ID = SSP.PLN_CHG_RJT_UID) AS PLN_CHG_RJT_UID_NM
+             , SSP.PLN_CHG_RJT_DS
+             , SSP.PLN_CHG_RJT_REA
+             , SSP.SBT_ANS_RST_APR_UID
+             , (SELECT USER_NM FROM SY_USER SU WHERE SU.USER_ID = SSP.SBT_ANS_RST_APR_UID) AS SBT_ANS_RST_APR_UID_NM
+             , SSP.SBT_ANS_RST_APR_DS
+             , SSP.UDT_IP
+             , SSP.UDT_DS
+             , SSP.UDT_UID
+             , (SELECT USER_NM FROM SY_USER SU WHERE SU.USER_ID = SSP.UDT_UID) AS UDT_UID_NM
+             , QPI.PITM_CD
+             , QPI.PITM_NM
+             , QPAR.LOT_NO
+             , QPAR.MAK_DT
+             , QPAP.ANS_NO
+             , QPAP.CLLT_DT
+             , QPAP.CLLT_UID
+             , QPAP.ANS_EDT
+             , (SELECT USER_NM FROM SY_USER SU WHERE SU.USER_ID = QPAP.CLLT_UID) AS CLLT_UID_NM
+             , (SELECT TO_CHAR(MAX(TO_DATE(SSA.ANS_DT)), 'YYYY-MM-DD') FROM ST_SBT_ANS SSA WHERE SSP.PLNT_CD = SSA.PLNT_CD AND SSP.SBT_PLN_IDX = SSA.SBT_PLN_IDX) AS ANS_END_DT
+        FROM ST_SBT_PLN SSP
+            INNER JOIN SY_APR_INFO SAI
+                ON(SSP.PLNT_CD = SAI.PLNT_CD AND SSP.SBT_ANS_PLN_APR_IDX = SAI.APR_IDX AND SAI.APR_UID = #{loginUserUid})
+            LEFT OUTER JOIN QT_PITM_ANS_PROC QPAP
+               ON(SSP.PLNT_CD = QPAP.PLNT_CD AND SSP.ANS_IDX = QPAP.ANS_IDX)
+            LEFT OUTER JOIN QT_PITM_ANS_REQ QPAR
+                ON(SSP.PLNT_CD = QPAR.PLNT_CD AND QPAP.REQ_IDX = QPAR.REQ_IDX)
+            LEFT OUTER JOIN QM_PITM_SPEC QPS
+               ON(QPAP.PLNT_CD = QPS.PLNT_CD AND QPAP.PITM_SPEC_IDX = QPS.PITM_SPEC_IDX)
+            LEFT OUTER JOIN QM_PITM_INFO QPI
+               ON(QPS.PLNT_CD = QPI.PLNT_CD AND QPS.PITM_CD = QPI.PITM_CD AND QPI.PITM_VER = (SELECT MAX(B.PITM_VER) FROM QM_PITM B WHERE B.PLNT_CD = QPI.PLNT_CD AND B.PITM_CD = QPI.PITM_CD))
+            INNER JOIN SY_ANS_TRM SAT
+                ON(SSP.PLNT_CD = SAT.PLNT_CD AND SSP.ANS_TRM_CD = SAT.ANS_TRM_CD)
+        WHERE 1 = 1
+            AND SSP.PLNT_CD = #{plntCd}
+            AND SSP.SBT_ANS_PROC IN
+            <foreach item="item" index="index" collection="sbtAnsProcList" separator="," open="(" close=")">
+                '${item}'
+            </foreach>
+            <if test="pitmNm != null and pitmNm != ''">
+                AND UPPER(QPI.PITM_NM) LIKE UPPER('%' || #{pitmNm} || '%')
+            </if>
+            <if test="pitmCd != null and pitmCd != ''">
+                AND UPPER(QPI.PITM_CD) LIKE UPPER('%' || #{pitmCd} || '%')
+            </if>
+            <if test="ansKnd != null and ansKnd != ''">
+                 AND SSP.ANS_KND = #{ansKnd}
+            </if>
+            <if test="ansPps != null and ansPps != ''">
+                AND SSP.ANS_PPS = #{ansPps}
+            </if>
+            <if test="sbtAnsPlnNo != null and sbtAnsPlnNo != ''">
+                AND UPPER(SSP.SBT_ANS_PLN_NO) LIKE UPPER('%' || #{sbtAnsPlnNo} || '%')
+            </if>
+            <if test="sbtCrgUid != null and sbtCrgUid != ''">
+                AND SSP.SBT_CRG_UID = #{sbtCrgUid}
+            </if>
+            <if test="ansEdtBetween != null and ansEdtBetween.size() > 0">
+                AND TO_DATE(QPAP.ANS_EDT) BETWEEN TO_DATE(#{ansEdtBetween[0]}) AND TO_DATE(#{ansEdtBetween[1]})
+            </if>
+    </select>
+
+    <!-- 안정성시험계획 승인 -->
+    <update id="approve" parameterType="StabPlanDetailApprVO">
+        UPDATE ST_SBT_PLN
+        SET SBT_ANS_PROC = #{sbtAnsProc},
+            SBT_PLN_STT = #{sbtPlnStt}
+        WHERE 1 = 1
+            AND PLNT_CD = #{plntCd}
+            AND SBT_PLN_IDX = #{sbtPlnIdx}
+    </update>
+
+    <!-- 안정성시험계획 반려 -->
+    <update id="reject" parameterType="StabPlanDetailApprVO">
+        UPDATE ST_SBT_PLN
+            SET SBT_ANS_PROC = #{sbtAnsProc},
+                SBT_PLN_STT = #{sbtPlnStt},
+                PLN_RJT_UID = #{loginUserUid},
+                PLN_RJT_DS = SYSDATE,
+                PLN_RJT_REA = #{plnRjtRea}
+        WHERE 1 = 1
+            AND PLNT_CD = #{plntCd}
+            AND SBT_PLN_IDX = #{sbtPlnIdx}
+    </update>
+</mapper>

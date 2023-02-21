@@ -1,0 +1,5 @@
+{
+  "name": "pwa-vue-app",
+  "start_url": ".",
+  "display": "fullscreen"
+}

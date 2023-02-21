@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.common.dao.ComboDao">
+
+    <select id="getDetailCommonCode" parameterType="ComboSearchVO" resultType="ComboVO">
+        SELECT
+            DTL_CD AS VALUE,
+            DTL_NM AS LABEL
+        FROM SY_CD_DTL
+        WHERE USE_YN = 'Y' AND HIR_CD = #{parentCode}
+        <if test="plantCode != null and plantCode != ''">
+        AND PLNT_CD = #{plantCode}
+        </if>
+        ORDER BY DTL_CD_ORD
+    </select>
+
+    <select id="getTreeComboByParentCode" parameterType="ComboSearchVO" resultType="ComboVO">
+        SELECT TREE_CD AS VALUE,
+               TREE_NM AS LABEL
+        FROM SY_CD_TREE
+        WHERE USE_YN = 'Y'
+          AND PLNT_CD = #{plantCode}
+          AND HIR_TREE_CD = #{parentCode}
+    </select>
+
+    <select id="getUpperMenu" resultType="ComboVO">
+        SELECT MENU_CD AS VALUE,
+               MENU_NM AS LABEL
+        FROM SY_MENU
+        WHERE USE_YN = 'Y'
+          AND HIR_MENU_CD = 'M001'
+    </select>
+
+    <select id="getUserAuth" resultType="ComboVO" parameterType="string">
+        SELECT ATH_CD AS VALUE,
+               ATH_NM AS LABEL
+        FROM SY_ATH
+        WHERE USE_YN = 'Y'
+          AND PLNT_CD = #{plantCd}
+    </select>
+
+    <select id="getUpperTreeCd" resultType="ComboVO">
+        SELECT TREE_CD AS VALUE,
+        TREE_NM AS LABEL
+        FROM SY_CD_TREE
+        WHERE USE_YN = 'Y'
+          AND HIR_TREE_CD = #{value}
+    </select>
+
+    <select id="getUser" resultType="ComboVO">
+        SELECT USER_ID AS VALUE,
+               USER_NM AS LABEL
+        FROM SY_USER
+        WHERE USE_YN = 'Y' AND PLNT_CD = #{plantCd}
+    </select>
+
+    <select id="getDpt" resultType="ComboVO">
+        SELECT DPT_CD AS VALUE,
+               DPT_NM AS LABEL
+        FROM SY_DPT
+        WHERE PLNT_CD = #{plntCd}
+          AND HIR_DPT_CD IS NOT NULL
+    </select>
+
+    <select id="getDptByLevel" resultType="ComboVO" parameterType="ComboSearchVO">
+        SELECT DPT_CD AS VALUE,
+               DPT_NM AS LABEL
+        FROM SY_DPT
+        WHERE PLNT_CD = #{plantCode}
+          AND LEVEL = #{level}
+        START WITH HIR_DPT_CD IS NULL AND PLNT_CD = #{plantCode}
+        CONNECT BY PRIOR DPT_CD = HIR_DPT_CD AND PLNT_CD = #{plantCode}
+    </select>
+
+    <select id="getAnsCyl" resultType="ComboVO">
+        SELECT ANS_CYL_CD      AS VALUE,
+               ANS_CYL_MARK_NM AS LABEL
+        FROM SY_ANS_CYL
+        WHERE DEL_YN = 'N'
+    </select>
+
+    <select id="getAmItmCd" resultType="ComboVO">
+        SELECT AMITM_CD AS VALUE,
+               VRIA_KN AS LABEL
+        FROM MS_AMITM
+    </select>
+
+    <select id="getApproverList" resultType="ComboVO">
+        SELECT
+            A.USER_ID AS VALUE,
+            (B.DPT_NM || '/' || A.USER_NM) AS LABEL
+        FROM SY_USER A
+        JOIN SY_DPT B ON A.DPT_CD = B.DPT_CD
+        WHERE A.USE_YN = 'Y'
+            AND A.PLNT_CD = #{plntCd} AND B.PLNT_CD = #{plntCd}
+            AND A.APR_YN = 'Y'
+    </select>
+
+    <select id="getReviewerList" resultType="ComboVO">
+        SELECT
+        A.USER_ID AS VALUE,
+        (B.DPT_NM || '/' || A.USER_NM) AS LABEL
+        FROM SY_USER A
+        JOIN SY_DPT B ON A.DPT_CD = B.DPT_CD
+        WHERE A.USE_YN = 'Y'
+            AND A.PLNT_CD = #{plntCd} AND B.PLNT_CD = #{plntCd}
+            AND A.REVW_YN = 'Y'
+    </select>
+
+    <select id="getPlntCd" resultType="ComboVO">
+        SELECT PLNT_CD AS VALUE,
+               PLNT_NM AS LABEL
+        FROM SY_PLNT
+        WHERE USE_YN = 'Y'
+        ORDER BY ORD
+    </select>
+
+    <select id="getYearList" resultType="ComboVO">
+        SELECT YEAR AS VALUE,
+               YEAR || '년' AS LABEL
+        FROM SY_CALD
+        GROUP BY YEAR
+        ORDER BY YEAR
+    </select>
+
+    <select id="getTestMaterialTreeCd" resultType="ComboVO">
+        SELECT TREE_CD AS VALUE,
+        LTRIM(SYS_CONNECT_BY_PATH(TREE_NM, '.'), '.') AS LABEL
+        FROM SY_CD_TREE
+        WHERE 1=1
+        <choose>
+            <when test="value != null and value != ''">
+                AND HIR_TREE_CD = #{value}
+            </when>
+            <otherwise>
+                AND HIR_TREE_CD IN ('R1000000','R2000000','R3000000','R4000000')
+            </otherwise>
+        </choose>
+        START WITH HIR_TREE_CD = 'R0000000' AND PLNT_CD = #{plntCd}
+        CONNECT BY PRIOR TREE_CD = HIR_TREE_CD AND PLNT_CD = #{plntCd}
+    </select>
+
+    <select id="getTestTerm" resultType="ComboVO">
+        SELECT ST.ANS_TRM_CD AS VALUE
+             , ST.ANS_TRM_MARK_NM AS LABEL
+        FROM SY_ANS_TRM ST
+        WHERE 1 = 1
+            AND ST.PLNT_CD = #{plntCd}
+            AND ST.DEL_YN = 'N'
+            AND ST.USE_YN = 'Y'
+        ORDER BY ST.TRM_ORD
+    </select>
+
+    <select id="getEquipment" resultType="ComboVO">
+        SELECT
+            EQM_CD AS VALUE
+            ,EQM_NM AS LABEL
+        FROM EM_EQM_INFO
+        WHERE PLNT_CD = #{plntCd}
+    </select>
+
+</mapper>

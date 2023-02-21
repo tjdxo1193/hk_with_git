@@ -1,0 +1,719 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.ms.dao.WrapTestManageDao">
+
+	<select id="getList" parameterType="WrapTestManageVO" resultType="WrapTestManageVO">
+		SELECT QP.PLNT_CD
+			 , QP.PKGA_CD
+			 , QP.PKGA_VER
+			 , QP.AITM_SPEC_IDX
+			 , QP.PKGA_DIV
+			 , NVL(QP.PKGA_TYP_NM, (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QP.PKGA_DIV)) AS PKGA_TYP_NM
+			 , QP.SAP_PRDHA
+			 , QP.SPEC_PROC_CD
+			 , SDGRD.DTL_NM AS SPEC_PROC_CD_NM
+			 , QP.DEL_YN
+			 , CASE
+			   		WHEN QP.DEL_YN = 'N' THEN '사용중'
+					WHEN QP.DEL_YN = 'Y' THEN '사용안함'
+			   END AS DEL_YN_NM
+			 , QP.USE_VER_YN
+			 , QP.RVS_NO
+			 , QP.DOC_NO
+			 , QP.RVS_DT
+			 , QP.ENFO_DT
+			 , QP.RVS_REA_CD
+			 , QP.RVS_CTT
+			 , QP.RVS_DIV_PS
+			 , QP.REVW_UID
+			 , (SELECT USER_NM FROM SY_USER B WHERE B.USER_ID = QP.REVW_UID) REVW_USER_NM
+			 , QP.REVW_DS
+			 , QP.REVW_IP
+			 , QP.PKGA_SPEC_APR_IDX
+			 , QP.RJT_UID
+			 , (SELECT USER_NM FROM SY_USER B WHERE B.USER_ID = QP.RJT_UID) RJT_USER_NM
+			 , QP.RJT_DS
+			 , QP.RJT_REA
+			 , QP.CRT_IP
+			 , QP.CRT_DS
+			 , QP.CRT_UID
+			 , (SELECT USER_NM FROM SY_USER B WHERE B.USER_ID = QP.CRT_UID) CRT_USER_NM
+			 , QP.UDT_IP
+			 , QP.UDT_DS
+			 , QP.UDT_UID
+			 , (SELECT USER_NM FROM SY_USER B WHERE B.USER_ID = QP.UDT_UID) UDT_USER_NM
+		FROM
+			QM_PKGA QP
+			INNER JOIN QM_PITM_AITM_SPEC QPAS
+				ON(QP.PLNT_CD = QPAS.PLNT_CD AND QP.AITM_SPEC_IDX = QPAS.AITM_SPEC_IDX)
+			LEFT JOIN SY_CD_DTL SDGRD
+				ON(QP.SPEC_PROC_CD = SDGRD.DTL_CD)
+		WHERE
+			1 = 1
+			AND QP.PLNT_CD = #{plntCd}
+			AND (QP.PLNT_CD, QP.PKGA_CD, QP.PKGA_VER) IN(SELECT PLNT_CD, PKGA_CD, MAX(PKGA_VER) FROM QM_PKGA WHERE PLNT_CD = #{plntCd} GROUP BY PLNT_CD, PKGA_CD)
+			<if test="sapPrdha != '' and sapPrdha != null">
+				AND UPPER(QP.SAP_PRDHA) LIKE UPPER('%' || #{sapPrdha} || '%')
+			</if>
+			<if test="docNo != '' and docNo != null">
+				AND UPPER(QP.DOC_NO) LIKE UPPER('%' || #{docNo} || '%')
+			</if>
+			<if test="pkgaDiv != '' and pkgaDiv != null">
+				AND QP.PKGA_DIV = #{pkgaDiv}
+			</if>
+			<if test="specProcCd != '' and specProcCd != null">
+				AND QP.SPEC_PROC_CD = #{specProcCd}
+			</if>
+			<if test="delYn != '' and delYn != null">
+				AND QP.DEL_YN = #{delYn}
+			</if>
+		ORDER BY
+			QP.PLNT_CD
+			 , QP.PKGA_CD
+			 , QP.PKGA_VER
+	</select>
+
+	<select id="getOne" parameterType="WrapTestManageVO" resultType="WrapTestManageVO">
+		SELECT QP.PLNT_CD
+			 , QP.PKGA_CD
+			 , QP.PKGA_VER
+			 , QP.AITM_SPEC_IDX
+			 , QP.PKGA_DIV
+			 , QP.SAP_PRDHA
+			 , QP.SPEC_PROC_CD
+			 , QP.DEL_YN
+			 , QP.USE_VER_YN
+			 , QP.RVS_NO
+			 , QP.DOC_NO
+			 , QP.RVS_DT
+			 , QP.ENFO_DT
+			 , QP.RVS_REA_CD
+			 , QP.RVS_CTT
+			 , QP.RVS_DIV_PS
+			 , QP.REVW_UID
+			 , QP.REVW_DS
+			 , QP.REVW_IP
+			 , QP.PKGA_SPEC_APR_IDX
+			 , QP.RJT_UID
+			 , QP.RJT_DS
+			 , QP.RJT_REA
+			 , QP.CRT_IP
+			 , QP.CRT_DS
+			 , QP.CRT_UID
+			 , QP.UDT_IP
+			 , QP.UDT_DS
+			 , QP.UDT_UID
+		FROM
+			QM_PKGA QP
+			INNER JOIN QM_PITM_AITM_SPEC QPAS
+			ON(QP.PLNT_CD = QPAS.PLNT_CD AND QP.AITM_SPEC_IDX = QPAS.AITM_SPEC_IDX)
+		WHERE
+			1 = 1
+			AND QP.PLNT_CD = #{plntCd}
+			AND (QP.PLNT_CD, QP.PKGA_CD, QP.PKGA_VER) IN(SELECT PLNT_CD, PKGA_CD, MAX(PKGA_VER) FROM QM_PKGA WHERE PLNT_CD = #{plntCd} GROUP BY PLNT_CD, PKGA_CD)
+			<if test="sapPrdha != '' and sapPrdha != null">
+				AND QP.SAP_PRDHA = #{sapPrdha}
+			</if>
+	</select>
+
+	<select id="getVersion" parameterType="WrapTestManageVO" resultType="WrapTestManageVO">
+		SELECT QP.PLNT_CD
+			 , QP.PKGA_CD
+			 , QP.PKGA_VER
+			 , QP.AITM_SPEC_IDX
+			 , QP.PKGA_DIV
+			 , QP.PKGA_TYP_NM
+			 , QP.SAP_PRDHA
+			 , SDPROC.DTL_NM AS SPEC_PROC_CD_NM
+			 , QP.SPEC_PROC_CD
+			 , QP.DEL_YN
+			 , CASE
+			 		WHEN QP.DEL_YN = 'N' THEN '사용중'
+			 		WHEN QP.DEL_YN = 'Y' THEN '사용안함'
+			   END AS DEL_YN_NM
+			 , QP.USE_VER_YN
+			 , QP.RVS_NO
+			 , QP.DOC_NO
+			 , QP.RVS_DT
+			 , QP.ENFO_DT
+			 , QP.RVS_REA_CD
+			 , (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QP.RVS_REA_CD)
+			 , QP.RVS_CTT
+			 , QP.RVS_DIV_PS
+			 , QP.REVW_UID
+			 , (SELECT USER_NM FROM SY_USER B WHERE B.USER_ID = QP.REVW_UID) REVW_USER_NM
+			 , QP.REVW_DS
+			 , QP.REVW_IP
+			 , QP.PKGA_SPEC_APR_IDX
+			 , QP.RJT_UID
+			 , (SELECT USER_NM FROM SY_USER B WHERE B.USER_ID = QP.RJT_UID) RJT_USER_NM
+			 , QP.RJT_DS
+			 , QP.RJT_REA
+			 , QP.CRT_IP
+			 , QP.CRT_UID
+			 , (SELECT USER_NM FROM SY_USER B WHERE B.USER_ID = QP.CRT_UID) CRT_USER_NM
+			 , QP.CRT_DS
+			 , QP.UDT_IP
+			 , QP.UDT_UID
+			 , (SELECT USER_NM FROM SY_USER B WHERE B.USER_ID = QP.UDT_UID) UDT_USER_NM
+			 , QP.UDT_DS
+			 , QPAS.AITM_SPEC_IDX
+			 , QPAS.AITM_SPEC_VER
+		FROM
+			QM_PKGA QP
+		INNER JOIN QM_PITM_AITM_SPEC QPAS
+			ON (QP.PLNT_CD = QPAS.PLNT_CD AND QP.AITM_SPEC_IDX = QPAS.AITM_SPEC_IDX)
+		LEFT JOIN SY_CD_DTL SDPROC
+			ON (QP.SPEC_PROC_CD = SDPROC.DTL_CD)
+		WHERE
+			QPAS.PLNT_CD = #{plntCd}
+			AND QP.PKGA_CD = #{pkgaCd}
+		ORDER BY
+			PKGA_VER DESC
+	</select>
+
+	<select id="getTestItem" parameterType="WrapTestManageVO" resultType="WrapTestManageVO">
+		SELECT
+            QPSA.PLNT_CD
+             , QPSA.AITM_SPEC_IDX
+             , QPSA.AITM_SEQ
+             , QPSA.ANS_DPT_CD
+             , QPSA.AMITM_CD
+             , M.AITM_KN
+             , MA.VRIA_NO
+             , MA.VRIA_KN
+             , QPSA.AITM_ORD
+             , QPSA.PERSPEC_TXT
+             , QPSA.OWC_SPEC_TXT
+             , QPSA.SPEC_TXT_EN
+             , QPSA.SPEC_TYP
+             , QPSA.JDG_TYP
+             , QPSA.PER_SLV_LOW
+             , QPSA.PER_SLV_UPP
+             , QPSA.PER_SLV_DESC
+             , QPSA.OWC_SLV_LOW
+             , QPSA.OWC_SLV_UPP
+             , QPSA.OWC_SLV_DESC
+             , QPSA.SLV_JDG_CFM
+             , QPSA.SLV_JDG_NON_CFM
+             , QPSA.RST_UNIT_CD
+             , QPSA.RST_DPNT
+             , QPSA.RPT_PRT_SLV_VAL
+             , QPSA.RPT_PRT_ITM_NM
+             , QPSA.RPT_PRT_YN
+             , QPSA.ISP_DPT_CD
+             , QPSA.SMP_CLLT_QTY
+             , QPSA.SMP_CLLT_UNIT
+             , QPSA.ISP_DUR_TM
+             , QPSA.EQM_USE_TM
+			 , QPSA.AITM_RMK
+			 , QPSA.MKR_QTY
+        FROM
+        	QM_PITM_SPEC_AITM QPSA
+        	LEFT JOIN MS_AMITM MA ON QPSA.AMITM_CD = MA.AMITM_CD
+        	LEFT JOIN MS_AITM M ON SUBSTR(QPSA.AMITM_CD, 0, 6) = M.AITM_CD
+        WHERE
+        	QPSA.PLNT_CD = #{plntCd}
+	        AND QPSA.AITM_SPEC_IDX = #{aitmSpecIdx}
+	    ORDER BY
+	    	QPSA.AITM_ORD
+	</select>
+
+	<select id="getSpec" parameterType="WrapTestManageVO" resultType="WrapTestManageVO">
+		SELECT DISTINCT
+			QPS.PLNT_CD
+			 , QPI.PITM_NM
+			 , QPI.PITM_EN
+			 , QPS.PITM_SPEC_IDX
+			 , QPS.PITM_CD
+			 , QPS.PITM_VER
+			 , QPAS.AITM_SPEC_VER
+			 , QPS.AITM_SPEC_IDX
+			 , QPS.SPEC_PROC_CD
+			 , SDPROC.DTL_NM AS SPEC_PROC_CD_NM
+			 , QPS.DEL_YN
+			 , QPS.USE_VER_YN
+			 , QPS.RVS_NO
+			 , QPS.DOC_NO
+			 , QPS.RVS_DT
+			 , QPS.ENFO_DT
+			 , QPS.RVS_REA_CD
+			 , QPS.RVS_CTT
+			 , QPS.RVS_DIV_PS
+			 , QPS.REVW_UID
+			 , (SELECT USER_NM FROM SY_USER B WHERE B.USER_ID = QPS.REVW_UID) REVW_USER_NM
+			 , QPS.REVW_DS
+			 , QPS.REVW_IP
+			 , QPS.PITM_ANS_SPEC_APR_IDX
+			 , QPS.RJT_UID
+			 , (SELECT USER_NM FROM SY_USER B WHERE B.USER_ID = QPS.RJT_UID) RJT_USER_NM
+			 , QPS.RJT_DS
+			 , QPS.RJT_REA
+			 , QPS.CRT_IP
+			 , QPS.CRT_DS
+			 , QPS.CRT_UID
+			 , (SELECT USER_NM FROM SY_USER B WHERE B.USER_ID = QPS.CRT_UID) CRT_USER_NM
+			 , QPS.UDT_IP
+			 , QPS.UDT_DS
+			 , QPS.UDT_UID
+			 , (SELECT USER_NM FROM SY_USER B WHERE B.USER_ID = QPS.UDT_UID) UDT_USER_NM
+		FROM QM_PITM_SPEC QPS
+			INNER JOIN QM_PKGA QP
+			ON(QPS.PLNT_CD = QP.PLNT_CD AND QPS.AITM_SPEC_IDX = QP.AITM_SPEC_IDX)
+			INNER JOIN QM_PITM_AITM_SPEC QPAS
+			ON(QPS.PLNT_CD = QPAS.PLNT_CD AND QPS.AITM_SPEC_IDX = QPAS.AITM_SPEC_IDX)
+			INNER JOIN QM_PITM_INFO QPI
+            ON(QPS.PLNT_CD = QPI.PLNT_CD AND QPS.PITM_CD = QPI.PITM_CD AND QPS.PITM_VER = QPI.PITM_VER)
+			LEFT JOIN SY_CD_DTL SDPROC
+			ON (QPS.SPEC_PROC_CD = SDPROC.DTL_CD)
+		WHERE
+			QPS.PLNT_CD = #{plntCd}
+			AND QPS.AITM_SPEC_IDX IN(SELECT AITM_SPEC_IDX FROM QM_PKGA WHERE PLNT_CD = #{plntCd} AND PKGA_CD = #{pkgaCd})
+		  	AND QPS.SPEC_PROC_CD != #{specProcCd}
+			AND (QPS.PLNT_CD, QPS.AITM_SPEC_IDX, QPAS.AITM_SPEC_VER) IN
+				(SELECT A.PLNT_CD
+					  , A.AITM_SPEC_IDX
+					  , MAX(B.AITM_SPEC_VER)
+				   FROM QM_PITM_SPEC A
+				   		INNER JOIN QM_PITM_AITM_SPEC B
+				   		ON (A.PLNT_CD = B.PLNT_CD AND A.AITM_SPEC_IDX = B.AITM_SPEC_IDX)
+	   			  WHERE A.PLNT_CD = #{plntCd}
+	   			  GROUP BY A.PLNT_CD, A.AITM_SPEC_IDX)
+		ORDER BY
+			AITM_SPEC_VER DESC, PITM_NM DESC
+	</select>
+
+	<select id="getBeforeVersionList" parameterType="WrapTestManageVO" resultType="WrapTestManageVO">
+		SELECT PLNT_CD
+			 , PKGA_CD
+			 , PKGA_VER
+			 , AITM_SPEC_IDX
+			 , SPEC_PROC_CD
+		FROM QM_PKGA
+		WHERE PLNT_CD = #{plntCd}
+		AND PKGA_CD = #{pkgaCd}
+		AND PKGA_VER <![CDATA[<]]> #{pkgaVer}
+		ORDER BY PKGA_VER DESC
+	</select>
+
+	<insert id="insertVersion" parameterType="WrapTestManageVO">
+		<selectKey keyProperty="searchedAitmSpecIdx" resultType="int" order="BEFORE">
+			SELECT NVL(MAX(AITM_SPEC_IDX), 0) + 1 FROM QM_PITM_AITM_SPEC
+		</selectKey>
+		INSERT INTO
+			QM_PITM_AITM_SPEC(
+				PLNT_CD
+				 , AITM_SPEC_IDX
+				 , AITM_SPEC_VER
+			)
+		VALUES (
+			#{plntCd}
+			 , #{searchedAitmSpecIdx}
+			 , #{aitmSpecVer}
+		)
+	</insert>
+
+	<update id="updateWrapTest" parameterType="WrapTestManageVO">
+		UPDATE QM_PKGA
+		SET PKGA_DIV = #{pkgaDiv}
+			 , PKGA_TYP_NM = #{pkgaTypNm}
+			 , SPEC_PROC_CD = #{specProcCd}
+			 , DEL_YN = #{delYn}
+			 , USE_VER_YN = #{useVerYn}
+		WHERE
+			PLNT_CD = #{plntCd}
+			AND PKGA_CD = #{pkgaCd}
+			AND PKGA_VER = #{pkgaVer}
+	</update>
+
+	<update id="updateWrapTestUseYn" parameterType="WrapTestManageVO">
+		UPDATE
+			QM_PKGA
+		SET
+			USE_VER_YN = #{useVerYn}
+		WHERE
+			PLNT_CD = #{plntCd}
+			AND PKGA_CD = #{pkgaCd}
+			AND SPEC_PROC_CD = 'S0080400'
+	</update>
+
+	<insert id="putTestItem" parameterType="WrapTestManageVO">
+		MERGE INTO QM_PITM_SPEC_AITM A
+		USING (
+			SELECT COUNT(PLNT_CD) CNT
+			FROM QM_PITM_SPEC_AITM
+			WHERE PLNT_CD = #{plntCd}
+				AND AITM_SPEC_IDX = #{aitmSpecIdx}
+				AND AITM_SEQ = #{aitmSeq}
+		) B
+		ON (B.CNT > 0)
+		WHEN MATCHED THEN
+			UPDATE SET
+				A.ANS_DPT_CD = #{ansDptCd},
+				A.AMITM_CD = #{amitmCd},
+				A.AITM_ORD = #{aitmOrd},
+				A.PERSPEC_TXT = #{perspecTxt},
+				A.OWC_SPEC_TXT = #{owcSpecTxt},
+				A.SPEC_TXT_EN = #{specTxtEn},
+				A.SPEC_TYP = #{specTyp},
+				A.JDG_TYP = #{jdgTyp},
+				A.PER_SLV_LOW = #{perSlvLow},
+				A.PER_SLV_UPP = #{perSlvUpp},
+				A.PER_SLV_DESC = #{perSlvDesc},
+				A.OWC_SLV_LOW = #{owcSlvLow},
+				A.OWC_SLV_UPP = #{owcSlvUpp},
+				A.OWC_SLV_DESC = #{owcSlvDesc},
+				A.SLV_JDG_CFM = #{slvJdgCfm},
+				A.SLV_JDG_NON_CFM = #{slvJdgNonCfm},
+				A.RST_UNIT_CD = #{rstUnitCd},
+				A.RST_DPNT = #{rstDpnt},
+				A.RPT_PRT_SLV_VAL = #{rptPrtSlvVal},
+				A.RPT_PRT_ITM_NM = #{rptPrtItmNm},
+				A.RPT_PRT_YN = #{rptPrtYn},
+				A.ISP_DPT_CD = #{ispDptCd},
+				A.SMP_CLLT_QTY = #{smpClltQty},
+				A.SMP_CLLT_UNIT = #{smpClltUnit},
+				A.ISP_DUR_TM = #{ispDurTm},
+				A.EQM_USE_TM = #{eqmUseTm},
+				A.AITM_RMK = #{aitmRmk},
+				A.MKR_QTY = #{mkrQty}
+			WHERE A.PLNT_CD = #{plntCd}
+				AND A.AITM_SPEC_IDX = #{aitmSpecIdx}
+				AND A.AITM_SEQ = #{aitmSeq}
+		WHEN NOT MATCHED THEN
+			INSERT (
+				PLNT_CD
+				 , AITM_SPEC_IDX
+				 , AITM_SEQ
+				 , ANS_DPT_CD
+				 , AMITM_CD
+				 , AITM_ORD
+				 , PERSPEC_TXT
+				 , OWC_SPEC_TXT
+				 , SPEC_TXT_EN
+				 , SPEC_TYP
+				 , JDG_TYP
+				 , PER_SLV_LOW
+				 , PER_SLV_UPP
+				 , PER_SLV_DESC
+				 , OWC_SLV_LOW
+				 , OWC_SLV_UPP
+				 , OWC_SLV_DESC
+				 , SLV_JDG_CFM
+				 , SLV_JDG_NON_CFM
+				 , RST_UNIT_CD
+				 , RST_DPNT
+				 , RPT_PRT_SLV_VAL
+				 , RPT_PRT_ITM_NM
+				 , RPT_PRT_YN
+				 , ISP_DPT_CD
+				 , SMP_CLLT_QTY
+				 , SMP_CLLT_UNIT
+				 , ISP_DUR_TM
+				 , EQM_USE_TM
+			     , AITM_RMK
+			     , MKR_QTY
+			)
+			VALUES(
+				#{plntCd}
+				 , #{aitmSpecIdx}
+				 , (SELECT NVL(MAX(AITM_SEQ), 0) + 1 FROM QM_PITM_SPEC_AITM WHERE PLNT_CD = #{plntCd} AND AITM_SPEC_IDX = #{aitmSpecIdx})
+				 , #{ansDptCd}
+				 , #{amitmCd}
+				 , #{aitmOrd}
+				 , #{perspecTxt}
+				 , #{owcSpecTxt}
+				 , #{specTxtEn}
+				 , #{specTyp}
+				 , #{jdgTyp}
+				 , #{perSlvLow}
+				 , #{perSlvUpp}
+				 , #{perSlvDesc}
+				 , #{owcSlvLow}
+				 , #{owcSlvUpp}
+				 , #{owcSlvDesc}
+				 , #{slvJdgCfm}
+				 , #{slvJdgNonCfm}
+				 , #{rstUnitCd}
+				 , #{rstDpnt}
+				 , #{rptPrtSlvVal}
+				 , #{rptPrtItmNm}
+				 , #{rptPrtYn}
+				 , #{ispDptCd}
+				 , #{smpClltQty}
+				 , #{smpClltUnit}
+				 , #{ispDurTm}
+				 , #{eqmUseTm}
+			     , #{aitmRmk}
+			     , #{mkrQty}
+			)
+	</insert>
+
+	<delete id="deleteTestItem" parameterType="WrapTestManageVO">
+		DELETE FROM QM_PITM_SPEC_AITM
+		WHERE PLNT_CD = #{plntCd}
+				AND AITM_SPEC_IDX = #{aitmSpecIdx}
+				AND AITM_SEQ = #{aitmSeq}
+	</delete>
+
+	<insert id="putWrapTest" parameterType="WrapTestManageVO">
+		MERGE INTO QM_PKGA A
+		USING (
+			SELECT COUNT(PLNT_CD) CNT
+			FROM QM_PKGA
+			WHERE PLNT_CD = #{plntCd}
+				AND PKGA_CD = #{pkgaCd}
+				AND PKGA_VER = #{pkgaVer}
+		) B
+		ON(B.CNT > 0)
+		WHEN MATCHED THEN
+			UPDATE SET
+				A.PKGA_DIV = #{pkgaDiv}
+				 , A.PKGA_TYP_NM = #{pkgaTypNm}
+				 , A.SAP_PRDHA = #{sapPrdha}
+				 , A.SPEC_PROC_CD = #{specProcCd}
+				 , A.DEL_YN = #{delYn}
+				 , A.USE_VER_YN = #{useVerYn}
+				 , A.RVS_NO = #{rvsNo}
+				 , A.DOC_NO = #{docNo}
+				 , A.RVS_DT = #{rvsDt}
+				 , A.ENFO_DT = #{enfoDt}
+				 , A.RVS_REA_CD = #{rvsReaCd}
+				 , A.RVS_CTT = #{rvsCtt}
+				 , A.RVS_DIV_PS = #{rvsDivPs}
+				 , A.REVW_UID = #{revwUid}
+				 , A.REVW_DS = TO_DATE(#{revwDs}, 'YYYY-MM-DD HH24:MI:SS')
+				 , A.REVW_IP = #{revwIp}
+				 , A.PKGA_SPEC_APR_IDX = #{pkgaSpecAprIdx}
+				 , A.RJT_UID = #{rjtUid}
+				 , A.RJT_DS = TO_DATE(#{rjtDs}, 'YYYY-MM-DD HH24:MI:SS')
+				 , A.RJT_REA = #{rjtRea}
+			WHERE A.PLNT_CD = #{plntCd}
+				AND A.PKGA_CD = #{pkgaCd}
+				AND A.PKGA_VER = #{pkgaVer}
+		WHEN NOT MATCHED THEN
+			INSERT (
+					PLNT_CD
+	    			 , PKGA_CD
+					 , PKGA_VER
+					 , AITM_SPEC_IDX
+					 , PKGA_DIV
+					 , PKGA_TYP_NM
+					 , SAP_PRDHA
+					 , SPEC_PROC_CD
+					 , DEL_YN
+					 , USE_VER_YN
+					 , RVS_NO
+					 , DOC_NO
+					 , RVS_DT
+					 , ENFO_DT
+					 , RVS_REA_CD
+					 , RVS_CTT
+					 , RVS_DIV_PS
+					 , REVW_UID
+					 , REVW_DS
+					 , REVW_IP
+					 , PKGA_SPEC_APR_IDX
+					 , RJT_UID
+					 , RJT_DS
+					 , RJT_REA
+				)
+			VALUES (
+				#{plntCd}
+		 		 , (SELECT NVL(#{pkgaCd}, ('P' || (SELECT TRIM(TO_CHAR(TO_NUMBER(NVL(SUBSTR(MAX(PKGA_CD), 4), '00000') + 1), '00000')) FROM QM_PKGA))) FROM DUAL)
+		 		 , #{pkgaVer}
+		 		 , #{aitmSpecIdx}
+		 		 , #{pkgaDiv}
+		 		 , #{pkgaTypNm}
+		 		 , #{sapPrdha}
+		 		 , #{specProcCd}
+		 		 , 'N'
+		 		 , 'N'
+		 		 , #{rvsNo}
+		 		 , #{docNo}
+		 		 , #{rvsDt}
+		 		 , #{enfoDt}
+		 		 , #{rvsReaCd}
+		 		 , #{rvsCtt}
+		 		 , #{rvsDivPs}
+		 		 , #{revwUid}
+		 		 , (SELECT DECODE(#{revwDs}, NULL, NULL, TO_DATE(#{revwDs}, 'YYYY-MM-DD HH24:mi:SS')) FROM DUAL)
+		 		 , #{revwIp}
+		 		 , #{pkgaSpecAprIdx}
+		 		 , #{rjtUid}
+		 		 , #{rjtDs}
+		 		 , #{rjtRea}
+			)
+	</insert>
+
+	<insert id="insertVersionUpBySapPrdha" parameterType="SpecManageVO">
+		<selectKey keyProperty="pitmSpecIdx" resultType="int" order="BEFORE">
+			SELECT NVL(MAX(PITM_SPEC_IDX), 0) + 1 FROM QM_PITM_SPEC WHERE PLNT_CD = #{plntCd}
+		</selectKey>
+		INSERT INTO QM_PITM_SPEC
+		(
+			PLNT_CD
+			, PITM_CD
+			, PITM_VER
+			, AITM_SPEC_IDX
+			, SPEC_PROC_CD
+			, PITM_SPEC_IDX
+			, ENFO_DT
+			, DEL_YN
+			, USE_VER_YN
+			, DOC_NO
+		)
+		VALUES
+		(
+			#{plntCd}
+		, 	#{pitmCd}
+		, 	#{pitmVer}
+		, 	#{newAitmSpecIdx}
+		, 	#{specProcCd}
+		, 	#{pitmSpecIdx}
+		, 	#{enfoDt}
+		, 	'N'
+		, 	'N'
+		, 	#{docNo}
+		)
+	</insert>
+
+	<update id="updateApprovalSideEffect" parameterType="WrapTestManageVO">
+		UPDATE
+			QM_PKGA
+		SET USE_VER_YN = 'N'
+		WHERE
+			PLNT_CD = #{plntCd}
+			AND PKGA_CD = #{pkgaCd}
+			AND PKGA_VER = #{pkgaVer}
+	</update>
+
+	<update id="approval" parameterType="WrapTestManageVO">
+        UPDATE
+        	QM_PKGA
+       	SET
+			SPEC_PROC_CD = #{specProcCd}
+			 , REVW_UID = #{loginUserUid}
+			 , REVW_DS = SYSDATE
+			 , REVW_IP = #{loginUserIp}
+			 , PKGA_SPEC_APR_IDX = #{pkgaSpecAprIdx}
+			 , USE_VER_YN = #{useVerYn}
+			 , DEL_YN = #{delYn}
+        WHERE
+        	PLNT_CD = #{plntCd}
+        	AND PKGA_CD = #{pkgaCd}
+        	AND PKGA_VER = #{pkgaVer}
+    </update>
+
+	<update id="updateAitmIdxByTemporaryStorage" parameterType="SpecManageVO">
+		UPDATE QM_PITM_SPEC
+			SET AITM_SPEC_IDX = #{newAitmSpecIdx}
+		WHERE PITM_CD = #{pitmCd}
+	    AND PLNT_CD = #{plntCd}
+		AND PITM_VER = #{pitmVer}
+		AND PITM_SPEC_IDX = #{pitmSpecIdx}
+	</update>
+
+	<update id="updateProcessCodeToSpecRemove" parameterType="SpecManageVO">
+		UPDATE QM_PITM_SPEC
+			SET SPEC_PROC_CD = #{specProcCd}
+		WHERE PITM_CD = #{pitmCd}
+		AND PLNT_CD = #{plntCd}
+	    AND PITM_VER = #{pitmVer}
+	    AND PITM_SPEC_IDX = #{pitmSpecIdx}
+	</update>
+
+	<update id="updateSpecUseVerYnN" parameterType="SpecManageVO">
+		UPDATE QM_PITM_SPEC
+		SET USE_VER_YN = 'N'
+		WHERE PITM_CD = #{pitmCd}
+
+	</update>
+
+	<select id="getSapList" parameterType="WrapTestManageVO" resultType="WrapTestManageVO">
+		SELECT
+			IDX
+			 , DEGREE
+			 , MATNR
+			 , MEINS
+			 , MATKL
+			 , BISMT
+			 , PRDHA
+			 , SPART
+			 , MSTAE
+			 , WRKST
+			 , ZEINR
+			 , TAKLV
+			 , BSTME
+			 , XCHPF
+			 , EKWSL
+			 , MHDHB
+			 , ZLABNO
+			 , ZPROD_ABBR
+			 , CRT_DS
+			 , IF_INFO_IDX
+		FROM
+			IF_REV_SAP_MATERIAL_MARA
+		WHERE
+			1 = 1
+			<if test="sapPrdhaList != null and sapPrdhaList.size > 0">
+				AND PRDHA NOT IN
+					<foreach collection="sapPrdhaList" item="item" index="index" separator="," open="(" close=")">
+						#{item}
+					</foreach>
+			</if>
+			<if test="matnr != '' and matnr != null">
+				AND UPPER(MATNR) LIKE UPPER('%' || #{matnr} || '%')
+			</if>
+			<if test="matkl != '' and matkl != null">
+				AND UPPER(MATKL) LIKE UPPER('%' || #{matkl} || '%')
+			</if>
+			<if test="bismt != '' and bismt != null">
+				AND UPPER(BISMT) LIKE UPPER('%' || #{bismt} || '%')
+			</if>
+			<if test="spart != '' and spart != null">
+				AND UPPER(SPART) LIKE UPPER('%' || #{spart} || '%')
+			</if>
+		ORDER BY
+			PRDHA NULLS LAST
+	</select>
+
+	<select id="getSapPrdhaDuplicateCheck" parameterType="WrapTestManageVO" resultType="java.lang.String">
+		SELECT MAX(PKGA_CD) FROM QM_PKGA WHERE SAP_PRDHA = #{sapPrdha} AND PLNT_CD = #{plntCd}
+	</select>
+
+	<select id="getItemListBySapPrdha" parameterType="WrapTestManageVO" resultType="ItemManageVO">
+			SELECT
+			    QPI.PLNT_CD,
+				QPI.PITM_CD,
+				QPI.PITM_VER,
+			    #{aitmSpecIdx} AS AITM_SPEC_IDX
+			FROM QM_PITM_INFO QPI
+			LEFT JOIN QM_PITM QP ON QP.PLNT_CD = QPI.PLNT_CD AND QP.PITM_VER = QPI.PITM_VER AND QP.PITM_CD = QPI.PITM_CD
+			WHERE QPI.PLNT_CD = #{plntCd}
+		  	AND PITM_TYP NOT IN (${pitmTyp})
+			AND QP.USE_VER_YN = 'Y'
+		    AND QP.DEL_YN = 'N'
+			AND QP.SPEC_PROC_CD = #{specProcCd}
+			AND SAP_PRDHA = #{sapPrdha}
+	</select>
+
+	<select id="findSpecListByItemInfo" parameterType="WrapTestManageVO" resultType="SpecManageVO">
+		SELECT
+			PLNT_CD
+			,PITM_SPEC_IDX
+			,PITM_CD
+            ,PITM_VER
+            ,AITM_SPEC_IDX
+            ,SPEC_PROC_CD
+            ,DEL_YN
+            ,USE_VER_YN
+            ,DOC_NO
+            ,ENFO_DT
+			, #{aitmSpecIdx} AS NEW_AITM_SPEC_IDX
+		FROM QM_PITM_SPEC
+		WHERE PLNT_CD = #{plntCd}
+		AND PITM_CD = #{pitmCd}
+		AND PITM_VER = #{pitmVer}
+	</select>
+</mapper>

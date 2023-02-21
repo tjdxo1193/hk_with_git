@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.sy.dao.AuthManageDao">
+    <select id="find" parameterType="AuthManageVO" resultType="AuthManageVO">
+        SELECT SA.PLNT_CD,
+               SA.ATH_CD,
+               SA.ATH_NM,
+               SA.ATHDESC,
+               SA.ORD,
+               SA.USE_YN,
+               SA.ANS_YN,
+               SA.REVW_YN,
+               SA.APR_YN
+        FROM SY_ATH SA
+        WHERE SA.PLNT_CD = #{plntCd}
+            <if test="athNm != ''">
+                AND ATH_NM LIKE '%' || #{athNm} || '%'
+            </if>
+            <if test="useYn != ''">
+                AND USE_YN = #{useYn}
+            </if>
+        ORDER BY SA.ORD
+    </select>
+
+    <update id="update">
+        UPDATE SY_ATH
+        SET ATH_NM  = #{athNm},
+            ATHDESC = #{athdesc},
+            ORD     = #{ord},
+            USE_YN  = #{useYn},
+            ANS_YN  = #{ansYn},
+            REVW_YN = #{revwYn},
+            APR_YN  = #{aprYn}
+        WHERE PLNT_CD = #{plntCd}
+          AND ATH_CD = #{athCd}
+    </update>
+
+    <insert id="insert">
+        <selectKey resultType="string" keyProperty="athCd" order="BEFORE">
+            SELECT 'A'||LPAD(NVL(MAX(SUBSTR(ATH_CD, -4))+1,1),4,0) FROM SY_ATH WHERE PLNT_CD = #{plntCd}
+        </selectKey>
+        INSERT INTO SY_ATH (PLNT_CD, ATH_CD, ATH_NM, ATHDESC, ORD, USE_YN, ANS_YN, REVW_YN, APR_YN)
+        VALUES (#{plntCd}, #{athCd}, #{athNm}, #{athdesc}, #{ord}, #{useYn}, #{ansYn}, #{revwYn}, #{aprYn})
+    </insert>
+
+    <select id="findNotAthGp" parameterType="AuthManageVO" resultType="AuthManageVO">
+        SELECT SM1.MENU_CD AS MENU_CD,
+               SM1.MENU_URL,
+               SM2.MENU_NM AS HIR_MENU_NM,
+               SM1.MENU_NM AS MENU_NM,
+               SM1.MENU_ORD,
+               SM1.MENU_DESC,
+               SM1.MENU_PRT_YN,
+               SM1.USE_YN,
+               #{athCd}    AS ATH_CD
+        FROM SY_MENU SM1,
+             SY_MENU SM2
+        WHERE SM1.HIR_MENU_CD = SM2.MENU_CD
+          AND SM2.HIR_MENU_CD != 'MOO1'
+          AND SM1.MENU_CD NOT IN (SELECT SM.MENU_CD
+                                  FROM SY_ATH_GP SAG,
+                                       SY_MENU SM
+                                  WHERE SAG.MENU_CD = SM.MENU_CD
+                                    AND SAG.PLNT_CD = #{plntCd}
+                                    AND ATH_CD = #{athCd})
+        ORDER BY SM1.MENU_CD
+    </select>
+
+    <select id="findAthGp" parameterType="AuthManageVO" resultType="AuthManageVO">
+        SELECT SM1.MENU_CD AS MENU_CD,
+               SM1.MENU_URL,
+               SM2.MENU_NM AS HIR_MENU_NM,
+               SM1.MENU_NM AS MENU_NM,
+               SM1.MENU_ORD,
+               SM1.MENU_DESC,
+               SM1.MENU_PRT_YN,
+               SM1.USE_YN,
+               #{athCd}    AS ATH_CD
+        FROM SY_MENU SM1,
+             SY_MENU SM2
+        WHERE SM1.HIR_MENU_CD = SM2.MENU_CD
+          AND SM2.HIR_MENU_CD != 'MOO1'
+          AND SM1.MENU_CD IN (SELECT SM.MENU_CD
+                              FROM SY_ATH_GP SAG,
+                                   SY_MENU SM
+                              WHERE SAG.MENU_CD = SM.MENU_CD
+                                AND SAG.PLNT_CD = #{plntCd}
+                                AND ATH_CD = #{athCd})
+        ORDER BY SM1.MENU_CD
+    </select>
+
+    <delete id="deleteAthGp">
+        DELETE SY_ATH_GP
+        WHERE PLNT_CD = #{plntCd}
+          AND ATH_CD = #{athCd}
+          AND MENU_CD = #{menuCd}
+    </delete>
+
+    <!-- 하나의 권한 그룹의 새로운 메뉴 접근 권한 생성-->
+    <insert id="insertAthGp">
+        INSERT INTO SY_ATH_GP (PLNT_CD, ATH_CD, MENU_CD, USE_YN)
+        VALUES (#{plntCd}, #{athCd}, #{menuCd}, 'Y')
+    </insert>
+
+    <!-- 유틸 -->
+    <!-- 권한 메뉴 중복 검사용-->
+    <select id="findMenuCdByAthCd" parameterType="AuthManageVO" resultType="String">
+        SELECT MENU_CD
+        FROM SY_ATH_GP
+        WHERE ATH_CD = #{athCd}
+          AND PLNT_CD = #{plntCd}
+        ORDER BY MENU_CD
+    </select>
+</mapper>

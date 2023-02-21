@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.in.dao.InstHisApprDao">
+
+    <select id="findAll" parameterType="InstHisApprVO" resultType="InstHisApprVO">
+        SELECT
+            A.PLNT_CD,
+            A.EQM_HIS_DIV,
+            A.HIS_SEQ,
+            (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = A.PLNT_CD AND DTL_CD = A.EQM_HIS_DIV) AS EQM_HIS_DIV_NM,
+            A.EQM_HIS_APR_IDX,
+            B.APR_REQ_UID,
+            (SELECT USER_NM FROM SY_USER WHERE PLNT_CD = B.PLNT_CD AND USER_ID = B.APR_REQ_UID) AS APR_REQ_NM,
+            TO_CHAR(B.APR_REQ_DS, 'YYYY-MM-DD') AS APR_REQ_DS
+        FROM EM_EQM_HIS A
+        JOIN SY_APR_INFO B ON A.PLNT_CD = B.PLNT_CD AND A.EQM_HIS_APR_IDX = B.APR_IDX
+        WHERE A.EQM_HIS_PROC_CD = #{eqmHisProcCd} AND B.APR_UID = #{aprUid}
+        <if test="eqmHisDiv != null and eqmHisDiv != ''">
+            AND A.EQM_HIS_DIV = #{eqmHisDiv}
+        </if>
+    </select>
+
+    <select id="findByHisSeq" parameterType="InstHisApprVO" resultType="InstHisApprVO">
+        SELECT
+            A.PLNT_CD,
+            A.EQM_CD,
+            A.EQM_NM,
+            A.EQM_DIV,
+            (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = A.PLNT_CD AND DTL_CD = A.EQM_DIV) AS EQM_DIV_NM,
+            A.EQM_CRST,
+            (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = A.PLNT_CD AND DTL_CD = A.EQM_CRST) AS EQM_CRST_NM,
+            A.SRL_NO,
+            A.MAK_COMP,
+            A.SPL_COMP,
+            A.MOD_NM,
+            A.SAP_AST_NO,
+            B.HIS_SEQ,
+            B.EQM_HIS_DIV,
+            (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = B.PLNT_CD AND DTL_CD = B.EQM_HIS_DIV) AS EQM_HIS_DIV_NM,
+            B.EQM_HIS_PROC_CD,
+            (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = A.PLNT_CD AND DTL_CD = B.EQM_HIS_PROC_CD) AS EQM_HIS_PROC_NM,
+            B.EQM_HIS_APR_IDX,
+            B.ANS_DT,
+            B.RMK,
+            B.HIS_FILE_IDX
+        FROM EM_EQM_INFO A
+        JOIN EM_EQM_HIS B ON A.PLNT_CD = B.PLNT_CD AND A.EQM_CD = B.EQM_CD
+        WHERE B.HIS_SEQ = #{hisSeq}
+    </select>
+
+    <update id="approve" parameterType="InstHisApprVO">
+        UPDATE EM_EQM_HIS SET
+            EQM_HIS_PROC_CD = #{eqmHisProcCd}
+        WHERE PLNT_CD = #{plntCd} AND EQM_HIS_APR_IDX = #{eqmHisAprIdx}
+    </update>
+
+    <update id="reject" parameterType="InstHisApprVO">
+        UPDATE EM_EQM_HIS SET
+            EQM_HIS_PROC_CD = #{eqmHisProcCd},
+            RJT_UID = #{rjtUid},
+            RJT_DS = SYSDATE,
+            RJT_REA = #{rjtRea}
+        WHERE PLNT_CD = #{plntCd} AND EQM_HIS_APR_IDX = #{eqmHisAprIdx}
+    </update>
+
+</mapper>

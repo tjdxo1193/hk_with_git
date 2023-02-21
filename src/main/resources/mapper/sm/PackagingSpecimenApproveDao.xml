@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.sm.dao.PackagingSpecimenApproveDao">
+
+    <select id="getPackagingSpecimenList" parameterType="PackagingSpecimenApproveVO" resultType="PackagingSpecimenApproveVO">
+        SELECT SPS.PLNT_CD
+        , SPS.PM_SPCM_IDX
+        , SPS.PKG_MTR_DIV
+        , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = SPS.PKG_MTR_DIV) AS PKG_MTR_DIV_NM
+        , SPS.PM_SPCM_NO
+        , SPS.PM_SPCM_DEL_APR_IDX
+        , SAI.APR_UID AS PM_SPCM_DEL_APR_UID
+        , (SELECT USER_NM FROM SY_USER SU WHERE SU.USER_ID = SAI.APR_UID) AS PM_SPCM_DEL_APR_UNM
+        , SPS.RJT_UID
+        , (SELECT USER_NM FROM SY_USER SU WHERE SU.USER_ID = SPS.RJT_UID) AS RJT_UNM
+        , SPS.RJT_DS
+        , SPS.RJT_REA
+        , (SELECT USER_NM FROM SY_USER SU WHERE SU.USER_ID = SPS.CRT_UID) AS CRT_UNM
+        , SPS.CRT_DS
+        , SPSN.DEL_APR_YN
+        , SPSA.ACSR_SEQ
+        , SPSA.PITM_CD
+        , SPSA.ENM_DT
+        , SPSA.EXPIR_DT
+        , SPSA.MUFT
+        , SPSA.RMK
+        , SPSA.DEL_YN
+        , TO_CHAR(SPSA.UDT_DS, 'YYYY-MM-DD') AS UDT_DS
+        , QPI.PITM_NM
+        FROM SD_PM_SPCM SPS
+        LEFT JOIN SD_PM_SPCM_NO SPSN ON SPS.PM_SPCM_NO = SPSN.PM_SPCM_NO
+        LEFT JOIN SD_PM_SPCM_ACSR SPSA ON SPS.PM_SPCM_IDX = SPSA.PM_SPCM_IDX AND SPSA.DEL_YN = 'N'
+        LEFT JOIN QM_PITM_INFO QPI ON SPSA.PITM_CD = QPI.PITM_CD AND SPSA.PITM_VER = QPI.PITM_VER AND SPSA.PLNT_CD = QPI.PLNT_CD
+        LEFT JOIN SY_APR_INFO SAI ON SAI.PLNT_CD = SPS.PLNT_CD AND SAI.APR_IDX = SPS.PM_SPCM_DEL_APR_IDX
+        WHERE SPS.PM_SPCM_PROC = 'S0220200' AND SPS.PLNT_CD = #{plntCd}
+            AND SAI.APR_UID IN ( ${withDelegateUserIds} )
+        <if test="pkgMtrDiv != null and pkgMtrDiv != ''">
+            AND SPS.PKG_MTR_DIV = #{pkgMtrDiv}
+        </if>
+        <if test="pmSpcmNo != null and pmSpcmNo != ''">
+            AND TRIM(UPPER(SPS.PM_SPCM_NO)) LIKE ('%' || TRIM(UPPER(#{pmSpcmNo})) || '%')
+        </if>
+        <if test="pitmNm != null and pitmNm != ''">
+            AND TRIM(UPPER(QPI.PITM_NM)) LIKE ('%' || TRIM(UPPER(#{pitmNm})) || '%')
+        </if>
+        <if test="pitmCd != null and pitmCd != ''">
+            AND TRIM(UPPER(SPSA.PITM_CD)) LIKE ('%' || TRIM(UPPER(#{pitmCd})) || '%')
+        </if>
+        <if test="searchEnmDt != null and searchEnmDt != ''">
+            AND SPSA.ENM_DT BETWEEN #{searchEnmDt[0]} AND #{searchEnmDt[1]}
+        </if>
+        <if test="searchExpirDt != null and searchExpirDt != ''">
+            AND SPSA.EXPIR_DT BETWEEN #{searchExpirDt[0]} AND #{searchExpirDt[1]}
+        </if>
+        ORDER BY SPS.PM_SPCM_IDX, SPSA.ACSR_SEQ
+    </select>
+
+    <select id="getPackagingSpecimenAcsr" parameterType="PackagingSpecimenApproveVO" resultType="PackagingSpecimenApproveVO">
+        SELECT SPSA.PLNT_CD
+            , SPSA.PM_SPCM_IDX
+            , SPSA.ACSR_SEQ
+            , SPSA.PITM_VER
+            , SPSA.PITM_CD
+            , SPSA.ENM_DT
+            , SPSA.EXPIR_DT
+            , SPSA.APR_UID
+            , (SELECT USER_NM FROM SY_USER SU WHERE SU.USER_ID = SPSA.APR_UID) APR_UNM
+            , SPSA.MUFT
+            , SPSA.RMK
+            , SPSA.DEL_YN
+            , QPI.PITM_NM
+            , QPI.PITM_EN
+            , QPI.PITM_TYP
+            , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = QPI.PITM_TYP) AS PITM_TYP_NM
+        FROM SD_PM_SPCM_ACSR SPSA
+        LEFT JOIN QM_PITM_INFO QPI ON SPSA.PITM_CD = QPI.PITM_CD AND SPSA.PITM_VER = QPI.PITM_VER AND SPSA.PLNT_CD = QPI.PLNT_CD
+        WHERE 1=1
+        AND SPSA.PLNT_CD = #{plntCd}
+        AND SPSA.PM_SPCM_IDX = #{pmSpcmIdx}
+        AND SPSA.DEL_YN = 'N'
+        ORDER BY SPSA.ACSR_SEQ
+    </select>
+
+    <update id="approve" parameterType="PackagingSpecimenApproveVO">
+        UPDATE SD_PM_SPCM_NO SET
+            DEL_APR_YN = 'Y'
+        WHERE PM_SPCM_NO = #{pmSpcmNo}
+    </update>
+
+    <update id="updatePackagingSpecimenProcess" parameterType="PackagingSpecimenApproveVO">
+        UPDATE SD_PM_SPCM SET
+            PM_SPCM_PROC = 'S0220300'
+        WHERE PLNT_CD = #{plntCd}
+        AND PM_SPCM_IDX = #{pmSpcmIdx}
+    </update>
+
+    <update id="deletePackagingSpecimenAcsr" parameterType="PackagingSpecimenApproveVO">
+        UPDATE SD_PM_SPCM_ACSR SET
+            DEL_YN = 'Y'
+        WHERE PLNT_CD = #{plntCd}
+        AND PM_SPCM_IDX = #{pmSpcmIdx}
+    </update>
+
+    <update id="reject" parameterType="PackagingSpecimenApproveVO">
+        UPDATE SD_PM_SPCM SET
+            RJT_UID = #{rjtUid}
+            , RJT_DS = SYSDATE
+            , RJT_REA = #{rjtRea}
+            , PM_SPCM_PROC = 'S0220210'
+        WHERE PLNT_CD = #{plntCd}
+        AND PM_SPCM_IDX = #{pmSpcmIdx}
+    </update>
+
+</mapper>

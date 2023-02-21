@@ -1,0 +1,1030 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.integration.dao.SAPDao">
+
+    <select id="findBOMByDegree" resultType="SAPBomVO">
+        SELECT IDX,
+               DEGREE,
+               GUID,
+               SEQ,
+               MATNR,
+               MAKTX,
+               MTART,
+               WERKS,
+               NAME1,
+               DISPO,
+               DSNAM,
+               STLAL,
+               STKTX,
+               BMENG,
+               BMEIN,
+               VALID_FROM,
+               VALID_TO,
+               STLNR,
+               ZTEXT,
+               LKENZ,
+               STLST,
+               POSTP,
+               PTEXT,
+               POSNR,
+               IDNRK,
+               IDNRK_MAKT,
+               POTX1,
+               MENGE,
+               MEINS,
+               FMNGE,
+               BEIKZ,
+               CRT_DS,
+               IF_INFO_IDX,
+               PARENT_GUID
+        FROM IF_REV_SAP_BOM
+        WHERE DEGREE = #{value}
+    </select>
+
+    <select id="nextDegreeInBOM" resultType="int">
+        SELECT NVL(MAX(DEGREE), 0) + 1
+        FROM IF_REV_SAP_BOM
+    </select>
+
+    <select id="nextIdxInBOM" resultType="int">
+        SELECT NVL(MAX(IDX), 0) + 1
+        FROM IF_REV_SAP_BOM
+    </select>
+
+    <insert id="createBOM" parameterType="SAPBomVO">
+        INSERT INTO IF_REV_SAP_BOM (IDX, DEGREE, PARENT_GUID, GUID, SEQ, MATNR, MAKTX, MTART, WERKS, NAME1, DISPO,
+                                    DSNAM, STLAL,
+                                    STKTX, BMENG,
+                                    BMEIN, VALID_FROM, VALID_TO, STLNR, ZTEXT, LKENZ, STLST, POSTP, PTEXT, POSNR, IDNRK,
+                                    IDNRK_MAKT, POTX1, MENGE, MEINS, FMNGE, BEIKZ, CRT_DS, IF_INFO_IDX)
+        VALUES (#{idx},
+                #{degree},
+                #{parentGuid},
+                #{guid},
+                #{seq},
+                #{matnr},
+                #{maktx},
+                #{mtart},
+                #{werks},
+                #{name1},
+                #{dispo},
+                #{dsnam},
+                #{stlal},
+                #{stktx},
+                #{bmeng},
+                #{bmein},
+                #{validFrom},
+                #{validTo},
+                #{stlnr},
+                #{ztext},
+                #{lkenz},
+                #{stlst},
+                #{postp},
+                #{ptext},
+                #{posnr},
+                #{idnrk},
+                #{idnrkMakt},
+                #{potx1},
+                #{menge},
+                #{meins},
+                #{fmnge},
+                #{beikz},
+                SYSDATE,
+                #{ifInfoIdx})
+    </insert>
+
+
+    <select id="nextDegreeInMaterial" resultType="int">
+        SELECT MAX(DEGREE)
+        FROM (
+                 SELECT NVL(MAX(DEGREE), 0) + 1 AS DEGREE
+                 FROM IF_REV_SAP_MATERIAL_MARA
+                 UNION ALL
+                 SELECT NVL(MAX(DEGREE), 0) + 1 AS DEGREE
+                 FROM IF_REV_SAP_MATERIAL_MARC
+                 UNION ALL
+                 SELECT NVL(MAX(DEGREE), 0) + 1 AS DEGREE
+                 FROM IF_REV_SAP_MATERIAL_MVKE
+                 UNION ALL
+                 SELECT NVL(MAX(DEGREE), 0) + 1 AS DEGREE
+                 FROM IF_REV_SAP_MATERIAL_ZMDV
+                 UNION ALL
+                 SELECT NVL(MAX(DEGREE), 0) + 1 AS DEGREE
+                 FROM IF_REV_SAP_MATERIAL_MAKT
+             )
+    </select>
+
+    <select id="findMaraAllByDegree" resultType="lims.api.integration.vo.SAPMaterialVO$Mara">
+        SELECT IDX,
+               DEGREE,
+               MATNR,
+               MTART,
+               MEINS,
+               MATKL,
+               BISMT,
+               PRDHA,
+               SPART,
+               MSTAE,
+               WRKST,
+               ZEINR,
+               TAKLV,
+               BSTME,
+               XCHPF,
+               EKWSL,
+               MHDHB,
+               ZLABNO,
+               ZPROD_ABBR,
+               CRT_DS,
+               IF_INFO_IDX
+        FROM IF_REV_SAP_MATERIAL_MARA
+        WHERE DEGREE = #{value}
+    </select>
+
+    <select id="nextIdxInMaterialMara" resultType="int">
+        SELECT NVL(MAX(IDX), 0) + 1
+        FROM IF_REV_SAP_MATERIAL_MARA
+    </select>
+
+    <insert id="createMaterialMara" parameterType="lims.api.integration.vo.SAPMaterialVO$Mara">
+        INSERT INTO IF_REV_SAP_MATERIAL_MARA
+        (IDX, DEGREE, MATNR, MTART, MEINS, MATKL, BISMT, PRDHA, SPART, MSTAE, WRKST, ZEINR, TAKLV, BSTME, XCHPF, EKWSL,
+         MHDHB,
+         ZLABNO, ZPROD_ABBR, CRT_DS, IF_INFO_IDX)
+        VALUES (#{idx},
+                #{degree},
+                #{matnr},
+                #{mtart},
+                #{meins},
+                #{matkl},
+                #{bismt},
+                #{prdha},
+                #{spart},
+                #{mstae},
+                #{wrkst},
+                #{zeinr},
+                #{taklv},
+                #{bstme},
+                #{xchpf},
+                #{ekwsl},
+                #{mhdhb},
+                #{zlabno},
+                #{zprodAbbr},
+                SYSDATE,
+                #{ifInfoIdx})
+    </insert>
+
+
+    <select id="findMarcAllByDegree" resultType="lims.api.integration.vo.SAPMaterialVO$Marc">
+        SELECT IDX,
+               DEGREE,
+               MATNR,
+               WERKS,
+               LADGR,
+               MMSTA,
+               EKGRP,
+               INSMK,
+               DISMM,
+               FXHOR,
+               DISPO,
+               DISLS,
+               BSTRF,
+               BSTMI,
+               BESKZ,
+               SOBSL,
+               LGPRO,
+               LGFSB,
+               PLIFZ,
+               WEBAZ,
+               ELSLO,
+               STRGR,
+               MTVFP,
+               FEVOR,
+               KZECH,
+               AWSLS,
+               PRCTR,
+               LOSGR,
+               SOBSK,
+               FVIDK,
+               ZFIRST_GI_DATE,
+               CRT_DS,
+               IF_INFO_IDX
+        FROM IF_REV_SAP_MATERIAL_MARC
+        WHERE DEGREE = #{value}
+    </select>
+
+    <select id="nextIdxInMaterialMarc" resultType="int">
+        SELECT NVL(MAX(IDX), 0) + 1
+        FROM IF_REV_SAP_MATERIAL_MARC
+    </select>
+
+    <insert id="createMaterialMarc" parameterType="lims.api.integration.vo.SAPMaterialVO$Marc">
+        INSERT INTO IF_REV_SAP_MATERIAL_MARC
+        (IDX, DEGREE, MATNR, WERKS, LADGR, MMSTA, EKGRP, INSMK, DISMM, FXHOR, DISPO, DISLS, BSTRF, BSTMI, BESKZ, SOBSL,
+         LGPRO, LGFSB,
+         PLIFZ, WEBAZ, ELSLO, STRGR, MTVFP, FEVOR, KZECH, AWSLS, PRCTR, LOSGR, SOBSK, FVIDK, ZFIRST_GI_DATE, CRT_DS,
+         IF_INFO_IDX)
+        VALUES (#{idx},
+                #{degree},
+                #{matnr},
+                #{werks},
+                #{ladgr},
+                #{mmsta},
+                #{ekgrp},
+                #{insmk},
+                #{dismm},
+                #{fxhor},
+                #{dispo},
+                #{disls},
+                #{bstrf},
+                #{bstmi},
+                #{beskz},
+                #{sobsl},
+                #{lgpro},
+                #{lgfsb},
+                #{plifz},
+                #{webaz},
+                #{elslo},
+                #{strgr},
+                #{mtvfp},
+                #{fevor},
+                #{kzech},
+                #{awsls},
+                #{prctr},
+                #{losgr},
+                #{sobsk},
+                #{fvidk},
+                #{zfirstGiDate},
+                SYSDATE,
+                #{ifInfoIdx})
+    </insert>
+
+
+    <select id="findMvkeAllByDegree" resultType="lims.api.integration.vo.SAPMaterialVO$Mvke">
+        SELECT IDX,
+               DEGREE,
+               MATNR,
+               VKORG,
+               VTWEG,
+               DWERK,
+               AUMNG,
+               KTGRM,
+               CRT_DS,
+               IF_INFO_IDX
+        FROM IF_REV_SAP_MATERIAL_MVKE
+        WHERE DEGREE = #{value}
+    </select>
+
+    <select id="nextIdxInMaterialMvke" resultType="int">
+        SELECT NVL(MAX(IDX), 0) + 1
+        FROM IF_REV_SAP_MATERIAL_MVKE
+    </select>
+
+    <insert id="createMaterialMvke" parameterType="lims.api.integration.vo.SAPMaterialVO$Mvke">
+        INSERT INTO IF_REV_SAP_MATERIAL_MVKE
+        (IDX, DEGREE, MATNR, VKORG, VTWEG, DWERK, AUMNG, KTGRM, CRT_DS, IF_INFO_IDX)
+        VALUES (#{idx},
+                #{degree},
+                #{matnr},
+                #{vkorg},
+                #{vtweg},
+                #{dwerk},
+                #{aumng},
+                #{ktgrm},
+                SYSDATE,
+                #{ifInfoIdx})
+    </insert>
+
+
+    <select id="findZmdvAllByDegree" resultType="lims.api.integration.vo.SAPMaterialVO$Zmdv">
+        SELECT IDX,
+               DEGREE,
+               MATNR,
+               CLASS_TYPE,
+               CLAZZ,
+               CHAR_CODE,
+               CHAR_DATA_TYP,
+               CHAR_VAL_CHAR,
+               CHAR_VAL_NUM,
+               CRT_DS,
+               IF_INFO_IDX
+        FROM IF_REV_SAP_MATERIAL_ZMDV
+        WHERE DEGREE = #{value}
+    </select>
+
+    <select id="nextIdxInMaterialZmdv" resultType="int">
+        SELECT NVL(MAX(IDX), 0) + 1
+        FROM IF_REV_SAP_MATERIAL_ZMDV
+    </select>
+
+    <insert id="createMaterialZmdv" parameterType="lims.api.integration.vo.SAPMaterialVO$Zmdv">
+        INSERT INTO IF_REV_SAP_MATERIAL_ZMDV
+        (IDX, DEGREE, MATNR, CLASS_TYPE, CLAZZ, CHAR_CODE, CHAR_DATA_TYP, CHAR_VAL_CHAR, CHAR_VAL_NUM, CRT_DS,
+         IF_INFO_IDX)
+        VALUES (#{idx},
+                #{degree},
+                #{matnr},
+                #{classType},
+                #{clazz},
+                #{charCode},
+                #{charDataTyp},
+                #{charValChar},
+                #{charValNum},
+                SYSDATE,
+                #{ifInfoIdx})
+    </insert>
+
+
+    <select id="findMaktAllByDegree" resultType="lims.api.integration.vo.SAPMaterialVO$Makt">
+        SELECT IDX, DEGREE, MATNR, SPRAS, MAKTX, CRT_DS, IF_INFO_IDX
+        FROM IF_REV_SAP_MATERIAL_MAKT
+        WHERE DEGREE = #{value}
+    </select>
+
+    <select id="nextIdxInMaterialMakt" resultType="int">
+        SELECT NVL(MAX(IDX), 0) + 1
+        FROM IF_REV_SAP_MATERIAL_MAKT
+    </select>
+
+    <insert id="createMaterialMakt" parameterType="lims.api.integration.vo.SAPMaterialVO$Makt">
+        INSERT INTO IF_REV_SAP_MATERIAL_MAKT
+            (IDX, DEGREE, MATNR, SPRAS, MAKTX, CRT_DS, IF_INFO_IDX)
+        VALUES (#{idx},
+                #{degree},
+                #{matnr},
+                #{spras},
+                #{maktx},
+                SYSDATE,
+                #{ifInfoIdx})
+    </insert>
+
+
+    <select id="nextDegreeInCharacteristic" resultType="int">
+        SELECT MAX(DEGREE)
+        FROM (
+                 SELECT NVL(MAX(DEGREE), 0) + 1 AS DEGREE
+                 FROM IF_REV_SAP_CHARACTERISTIC_CABN
+                 UNION ALL
+                 SELECT NVL(MAX(DEGREE), 0) + 1 AS DEGREE
+                 FROM IF_REV_SAP_CHARACTERISTIC_KSML
+             )
+    </select>
+
+    <select id="nextIdxInCharacteristicCabn" resultType="int">
+        SELECT NVL(MAX(IDX), 0) + 1
+        FROM IF_REV_SAP_CHARACTERISTIC_CABN
+    </select>
+
+    <select id="findCabnAllByDegree" resultType="lims.api.integration.vo.SAPCharacteristicVO$Cabn">
+        SELECT IDX,
+               DEGREE,
+               CHAR_CODE,
+               CHAR_CODE_DESC,
+               CHAR_DATA_TYPE,
+               CHAR_VAL_CHAR,
+               CHAR_VAL_NUM,
+               CHAR_VAL_DESC,
+               CRT_DS,
+               IF_INFO_IDX
+        FROM IF_REV_SAP_CHARACTERISTIC_CABN
+        WHERE DEGREE = #{value}
+    </select>
+
+    <insert id="createCharacteristicCabn" parameterType="lims.api.integration.vo.SAPCharacteristicVO$Cabn">
+        INSERT INTO IF_REV_SAP_CHARACTERISTIC_CABN (IDX, DEGREE, CHAR_CODE, CHAR_CODE_DESC, CHAR_DATA_TYPE,
+                                                    CHAR_VAL_CHAR, CHAR_VAL_NUM, CHAR_VAL_DESC, CRT_DS, IF_INFO_IDX)
+        VALUES (#{idx},
+                #{degree},
+                #{charCode},
+                #{charCodeDesc},
+                #{charDataType},
+                #{charValChar},
+                #{charValNum},
+                #{charValDesc},
+                SYSDATE,
+                #{ifInfoIdx})
+    </insert>
+
+
+    <select id="nextIdxInCharacteristicKsml" resultType="int">
+        SELECT NVL(MAX(IDX), 0) + 1
+        FROM IF_REV_SAP_CHARACTERISTIC_KSML
+    </select>
+
+    <select id="findKsmlAllbyDegree" resultType="lims.api.integration.vo.SAPCharacteristicVO$Ksml">
+        SELECT IDX,
+               DEGREE,
+               CLASS_TYPE,
+               CLAZZ,
+               CLASS_NAME,
+               CHAR_CODE,
+               CRT_DS,
+               IF_INFO_IDX
+        FROM IF_REV_SAP_CHARACTERISTIC_KSML
+        WHERE DEGREE = #{value}
+    </select>
+
+    <insert id="createCharacteristicKsml" parameterType="lims.api.integration.vo.SAPCharacteristicVO$Ksml">
+        INSERT INTO IF_REV_SAP_CHARACTERISTIC_KSML (IDX, DEGREE, CLASS_TYPE, CLAZZ, CLASS_NAME, CHAR_CODE, CRT_DS,
+                                                    IF_INFO_IDX)
+        VALUES (#{idx},
+                #{degree},
+                #{classType},
+                #{clazz},
+                #{className},
+                #{charCode},
+                SYSDATE,
+                #{ifInfoIdx})
+    </insert>
+
+
+    <select id="findOneTestReqByDegree" resultType="lims.api.integration.vo.SAPTestRequestVO$RequestHeader">
+        SELECT IDX,
+               DEGREE,
+               ZQCREQNO,
+               GUID,
+               WERKS,
+               MATNR,
+               MAKTX,
+               CHARG,
+               ERFMG,
+               ERFME,
+               LGORT,
+               BUDAT,
+               BSART,
+               EBELN,
+               EBELP,
+               PSTYP,
+               NETPR,
+               PEINH,
+               WAERS,
+               DMBTR,
+               MENGE,
+               MEINS,
+               LIFNR,
+               NAME1,
+               AFNAM,
+               ZPARCEL,
+               LFDAT,
+               ZDELIVERYTIME,
+               ZCOA,
+               ZLOT_NO,
+               ZALT_BOM_NO,
+               ZVND_LOT_NO,
+               HSDAT,
+               ZSTORING_END_DATE,
+               ZSHELF_LIFE_END_DATE,
+               AUART,
+               AUFNR,
+               ZSUBCONNO,
+               ZSUBCONNAME,
+               ZEQUNR,
+               ZWORKER,
+               MBLNR,
+               MJAHR,
+               ZEILE,
+               ZCUSTOMER,
+               ZCUSTOMERNAME,
+               ZEXFIELD1,
+               ZEXFIELD2,
+               ZEXFIELD3,
+               ZEXFIELD4,
+               ZEXFIELD5,
+               CRT_DS,
+               IF_INFO_IDX
+        FROM IF_REV_SAP_TEST_REQUEST_HEADER
+        WHERE DEGREE = #{value}
+    </select>
+
+    <select id="findAllTestReqDetailsByDegree" resultType="lims.api.integration.vo.SAPTestRequestVO$RequestDetails">
+        SELECT IDX,
+               DEGREE,
+               ZQCNO_BLK,
+               ZQCREQNO,
+               GUID,
+               ZEXFIELD1,
+               ZEXFIELD2,
+               ZEXFIELD3,
+               ZEXFIELD4,
+               ZEXFIELD5,
+               CRT_DS,
+               IF_INFO_IDX
+        FROM IF_REV_SAP_TEST_REQUEST_DETAIL
+        WHERE DEGREE = #{value}
+    </select>
+
+    <select id="nextDegreeInTestRequest" resultType="int">
+        SELECT MAX(DEGREE)
+        FROM (
+                 SELECT NVL(MAX(DEGREE), 0) + 1 AS DEGREE
+                 FROM IF_REV_SAP_TEST_REQUEST_HEADER
+                 UNION ALL
+                 SELECT NVL(MAX(DEGREE), 0) + 1 AS DEGREE
+                 FROM IF_REV_SAP_TEST_REQUEST_DETAIL
+             )
+    </select>
+
+    <select id="nextIdxInTestRequestHeaders" resultType="int">
+        SELECT NVL(MAX(IDX), 0) + 1
+        FROM IF_REV_SAP_TEST_REQUEST_HEADER
+    </select>
+
+    <insert id="createTestRequestHeader" parameterType="lims.api.integration.vo.SAPTestRequestVO$RequestHeader">
+        INSERT INTO IF_REV_SAP_TEST_REQUEST_HEADER (IDX, DEGREE, GUID, ZQCREQNO, WERKS, MATNR, MAKTX, CHARG, ERFMG,
+                                                    ERFME, LGORT,
+                                                    BUDAT, BSART, EBELN, EBELP, PSTYP, NETPR, PEINH, WAERS, DMBTR,
+                                                    MENGE, MEINS, LIFNR, NAME1, AFNAM, ZPARCEL, LFDAT, ZDELIVERYTIME,
+                                                    ZCOA, ZLOT_NO, ZALT_BOM_NO, ZVND_LOT_NO, HSDAT, ZSTORING_END_DATE,
+                                                    ZSHELF_LIFE_END_DATE, AUART, AUFNR, ZSUBCONNO, ZSUBCONNAME, ZEQUNR,
+                                                    ZWORKER, MBLNR, MJAHR, ZEILE, ZCUSTOMER, ZCUSTOMERNAME, ZEXFIELD1,
+                                                    ZEXFIELD2, ZEXFIELD3, ZEXFIELD4, ZEXFIELD5, CRT_DS, IF_INFO_IDX)
+        VALUES (#{idx},
+                #{degree},
+                #{guid},
+                #{zqcreqno},
+                #{werks},
+                #{matnr},
+                #{maktx},
+                #{charg},
+                #{erfmg},
+                #{erfme},
+                #{lgort},
+                #{budat},
+                #{bsart},
+                #{ebeln},
+                #{ebelp},
+                #{pstyp},
+                #{netpr},
+                #{peinh},
+                #{waers},
+                #{dmbtr},
+                #{menge},
+                #{meins},
+                #{lifnr},
+                #{name1},
+                #{afnam},
+                #{zparcel},
+                #{lfdat},
+                #{zdeliverytime},
+                #{zcoa},
+                #{zlotNo},
+                #{zaltBomNo},
+                #{zvndLotNo},
+                #{hsdat},
+                #{zstoringEndDate},
+                #{zshelfLifeEndDate},
+                #{auart},
+                #{aufnr},
+                #{zsubconno},
+                #{zsubconname},
+                #{zequnr},
+                #{zworker},
+                #{mblnr},
+                #{mjahr},
+                #{zeile},
+                #{zcustomer},
+                #{zcustomername},
+                #{zexfield1},
+                #{zexfield2},
+                #{zexfield3},
+                #{zexfield4},
+                #{zexfield5},
+                SYSDATE,
+                #{ifInfoIdx})
+    </insert>
+
+
+    <select id="nextIdxInTestRequestDetails" resultType="int">
+        SELECT NVL(MAX(IDX), 0) + 1
+        FROM IF_REV_SAP_TEST_REQUEST_DETAIL
+    </select>
+
+    <insert id="createTestRequestDetails" parameterType="lims.api.integration.vo.SAPTestRequestVO$RequestDetails">
+        INSERT INTO IF_REV_SAP_TEST_REQUEST_DETAIL
+        (IDX, DEGREE, GUID, ZQCREQNO, ZQCNO_BLK, ZEXFIELD1, ZEXFIELD2, ZEXFIELD3, ZEXFIELD4, ZEXFIELD5, CRT_DS,
+         IF_INFO_IDX)
+        values (#{idx},
+                #{degree},
+                #{guid},
+                #{zqcreqno},
+                #{zqcnoBlk},
+                #{zexfield1},
+                #{zexfield2},
+                #{zexfield3},
+                #{zexfield4},
+                #{zexfield5},
+                SYSDATE,
+                #{ifInfoIdx})
+    </insert>
+
+
+    <select id="findCalendarAllByDegree" resultType="SAPCalendarVO">
+        SELECT IDX,
+               DEGREE,
+               GUID,
+               SEQ,
+               IDENT,
+               LTEXT,
+               YEAR,
+               MONTH,
+               DAY,
+               DAY AS "DATE",
+               WORK,
+               CRT_DS,
+               IF_INFO_IDX
+        FROM IF_REV_SAP_CALENDAR
+        WHERE DEGREE = #{value}
+    </select>
+
+    <select id="nextIdxInCalendar" resultType="int">
+        SELECT NVL(MAX(IDX), 0) + 1
+        FROM IF_REV_SAP_CALENDAR
+    </select>
+
+    <select id="nextDegreeInCalendar" resultType="int">
+        SELECT NVL(MAX(DEGREE), 0) + 1
+        FROM IF_REV_SAP_CALENDAR
+    </select>
+
+    <insert id="createCalendar" parameterType="SAPCalendarVO">
+        INSERT INTO IF_REV_SAP_CALENDAR
+        (IDX, DEGREE, GUID, SEQ, IDENT, LTEXT, YEAR, MONTH, DAY, WORK, CRT_DS, IF_INFO_IDX)
+        VALUES (#{idx},
+                #{degree},
+                #{guid},
+                #{seq},
+                #{ident},
+                #{ltext},
+                #{year},
+                #{month},
+                #{date},
+                #{work},
+                SYSDATE,
+                #{ifInfoIdx})
+    </insert>
+
+
+    <insert id="createTestResult" parameterType="lims.api.integration.vo.SAPSendVO$TestResult">
+        INSERT INTO IF_TRS_TEST_RESULT
+        (IDX, DEGREE, TARGET_SYSTEM, ZQCREQNO, ZQCNO, STATUS, SYT_JDG, SPEC_GRV, RMK, NON_CFM_REASON, MENGE, CRT_DS,
+         TRS_STATUS)
+        VALUES (#{idx},
+                #{degree},
+                #{targetSystem},
+                #{zqcreqno},
+                #{zqcno},
+                #{status},
+                #{sytJdg},
+                #{specGrv},
+                #{rmk},
+                #{nonCfmReason},
+                #{menge},
+                SYSDATE,
+                #{trsStatus})
+    </insert>
+
+
+    <insert id="createTestStatus" parameterType="lims.api.integration.vo.SAPSendVO$TestStatus">
+        INSERT INTO IF_TRS_TEST_STATUS
+        (IDX, DEGREE, TARGET_SYSTEM, REQNO, STATUS, HOLD_REASON, ZEXFIELD2, ZEXFIELD3, ZEXFIELD4, ZEXFIELD5, CRT_DS,
+         TRS_STATUS)
+        VALUES (#{idx},
+                #{degree},
+                #{targetSystem},
+                #{reqno},
+                #{status},
+                #{holdReason},
+                #{zexfield2},
+                #{zexfield3},
+                #{zexfield4},
+                #{zexfield5},
+                SYSDATE,
+                #{trsStatus})
+    </insert>
+
+
+    <select id="nextIdxInTestPerformanceOfPurchaseInbound" resultType="int">
+        SELECT NVL(MAX(IDX), 0) + 1
+        FROM IF_TRS_SAP_TEST_PERFORM_PCH_IN
+    </select>
+
+    <select id="nextDegreeInTestPerformanceOfPurchaseInbound" resultType="int">
+        SELECT NVL(MAX(DEGREE), 0) + 1
+        FROM IF_TRS_SAP_TEST_PERFORM_PCH_IN
+    </select>
+
+    <insert id="createTestPerformanceOfPurchaseInbound"
+            parameterType="lims.api.integration.vo.SAPSendVO$TestPerformanceOfPurchaseInbound">
+        INSERT INTO IF_TRS_SAP_TEST_PERFORM_PCH_IN
+        (IDX, DEGREE, KOKRS, GJAHR, POPER, WERKS, MATNR, EBELN, ZPO_QTY, ZQC_QTY, CRT_DS, TRS_STATUS)
+        VALUES (#{idx},
+                #{degree},
+                #{kokrs},
+                #{gjahr},
+                #{poper},
+                #{werks},
+                #{matnr},
+                #{ebeln},
+                #{zpoQty},
+                #{zqcQty},
+                SYSDATE,
+                #{trsStatus})
+    </insert>
+
+    <update id="updateTrsStatusOfTestPerformanceOfPurchaseInbound"
+            parameterType="lims.api.integration.vo.SAPSendVO$TestPerformanceOfPurchaseInbound">
+        UPDATE IF_TRS_SAP_TEST_PERFORM_PCH_IN
+        SET
+        TRS_STATUS = #{trsStatus},
+        XSTAT = #{responseStatus},
+        XMSG = #{responseMessage}
+        <if test="ifInfoIdx != null and ifInfoIdx != ''">
+            ,IF_INFO_IDX = #{ifInfoIdx}
+        </if>
+        <if test="errorlogId != null and errorlogId != ''">
+            ,ERRORLOG_ID = #{errorlogId}
+        </if>
+        WHERE
+        IDX = #{idx}
+    </update>
+
+
+    <select id="nextIdxInTestPerformanceOfManufactureInbound" resultType="int">
+        SELECT NVL(MAX(IDX), 0) + 1
+        FROM IF_TRS_SAP_TEST_PERFORM_MNF_IN
+    </select>
+
+    <select id="nextDegreeInTestPerformanceOfManufactureInbound" resultType="int">
+        SELECT NVL(MAX(DEGREE), 0) + 1
+        FROM IF_TRS_SAP_TEST_PERFORM_MNF_IN
+    </select>
+
+    <insert id="createTestPerformanceOfManufactureInbound"
+            parameterType="lims.api.integration.vo.SAPSendVO$TestPerformanceOfManufactureInbound">
+        INSERT INTO IF_TRS_SAP_TEST_PERFORM_MNF_IN
+        (IDX, DEGREE, GUID, SEQ, MATNR, WERKS, CHARG, ZQIDATE, ZQICOUNT, ZCANCEL, CRT_DS, TRS_STATUS)
+        VALUES (#{idx},
+                #{degree},
+                #{guid},
+                #{seq},
+                #{matnr},
+                #{werks},
+                #{charg},
+                #{zqidate},
+                #{zqicount},
+                #{zcancel},
+                SYSDATE,
+                #{trsStatus})
+    </insert>
+
+    <update id="updateTrsStatusOfTestPerformanceOfManufactureInbound"
+            parameterType="lims.api.integration.vo.SAPSendVO$TestPerformanceOfManufactureInbound">
+        UPDATE IF_TRS_SAP_TEST_PERFORM_MNF_IN
+        SET
+        TRS_STATUS = #{trsStatus}
+        <if test="ifInfoIdx != null and ifInfoIdx != ''">
+            ,IF_INFO_IDX = #{ifInfoIdx}
+        </if>
+        <if test="errorlogId != null and errorlogId != ''">
+            ,ERRORLOG_ID = #{errorlogId}
+        </if>
+        WHERE
+        IDX = #{idx}
+    </update>
+
+
+    <select id="nextIdxInAssetsMovementHistory" resultType="int">
+        SELECT NVL(MAX(IDX), 0) + 1
+        FROM IF_TRS_SAP_ASSETS_MOVEMENT_HIS
+    </select>
+
+    <select id="nextDegreeInAssetsMovementHistory" resultType="int">
+        SELECT NVL(MAX(DEGREE), 0) + 1
+        FROM IF_TRS_SAP_ASSETS_MOVEMENT_HIS
+    </select>
+
+    <insert id="createAssetsMovementHistory" parameterType="lims.api.integration.vo.SAPSendVO$AssetsMovementHistory">
+        INSERT INTO IF_TRS_SAP_ASSETS_MOVEMENT_HIS
+        (IDX, DEGREE, BUKRS, ANLN_FROM, BZDAT, ZZPIC_FROM, ZZPIC_TO, KOSTL_FROM, KOSTL_TO, CRT_DS, TRS_STATUS)
+        VALUES (#{idx},
+                #{degree},
+                #{bukrs},
+                #{anlnFrom},
+                #{bzdat},
+                #{zzpicFrom},
+                #{zzpicTo},
+                #{kostlFrom},
+                #{kostlTo},
+                SYSDATE,
+                #{trsStatus})
+    </insert>
+
+    <update id="updateTrsStatusOfAssetsMovementHistory"
+            parameterType="lims.api.integration.vo.SAPSendVO$AssetsMovementHistory">
+        UPDATE IF_TRS_SAP_ASSETS_MOVEMENT_HIS
+        SET
+        TRS_STATUS = #{trsStatus}
+        <if test="ifInfoIdx != null and ifInfoIdx != ''">
+            ,IF_INFO_IDX = #{ifInfoIdx}
+        </if>
+        <if test="errorlogId != null and errorlogId != ''">
+            ,ERRORLOG_ID = #{errorlogId}
+        </if>
+        WHERE
+        IDX = #{idx}
+    </update>
+
+
+    <select id="findInputPerformHeaderAllByDegree"
+            resultType="lims.api.integration.vo.SAPInputPerformanceByBatchVO$InputPerformanceHeader">
+        SELECT IDX,
+               DEGREE,
+               GUID,
+               WERKS,
+               MATNR,
+               CHARG,
+               LOT_NO,
+               MAKTX,
+               DISPO,
+               BWART,
+               ERFMG,
+               ERFME,
+               LGORT,
+               BUDAT,
+               EBELN,
+               EBELP,
+               AUFNR,
+               ZEXFIELD1,
+               ZEXFIELD2,
+               ZEXFIELD3,
+               ZEXFIELD4,
+               ZEXFIELD5,
+               CRT_DS,
+               IF_INFO_IDX
+        FROM IF_REV_SAP_INPUT_PERFORM_HEAD
+        WHERE DEGREE = #{value}
+    </select>
+
+    <select id="nextDegreeInInputPerformance" resultType="int">
+        SELECT MAX(DEGREE)
+        FROM (
+                 SELECT NVL(MAX(DEGREE), 0) + 1 AS DEGREE
+                 FROM IF_REV_SAP_INPUT_PERFORM_HEAD
+                 UNION ALL
+                 SELECT NVL(MAX(DEGREE), 0) + 1 AS DEGREE
+                 FROM IF_REV_SAP_INPUT_PERFORM_DTL
+             )
+    </select>
+
+    <select id="nextIdxInInputPerformanceHeader" resultType="int">
+        SELECT NVL(MAX(IDX), 0) + 1
+        FROM IF_REV_SAP_INPUT_PERFORM_HEAD
+    </select>
+
+    <insert id="createInputPerformanceHeader"
+            parameterType="lims.api.integration.vo.SAPInputPerformanceByBatchVO$InputPerformanceHeader">
+        INSERT INTO IF_REV_SAP_INPUT_PERFORM_HEAD
+        (IDX, DEGREE, GUID, WERKS, MATNR, CHARG, LOT_NO, MAKTX, DISPO,
+         BWART, ERFMG, ERFME, LGORT, BUDAT, EBELN, EBELP, AUFNR,
+         ZEXFIELD1, ZEXFIELD2, ZEXFIELD3, ZEXFIELD4, ZEXFIELD5, CRT_DS,
+         IF_INFO_IDX)
+        VALUES (#{idx},
+                #{degree},
+                #{guid},
+                #{werks},
+                #{matnr},
+                #{charg},
+                #{lotNo},
+                #{maktx},
+                #{dispo},
+                #{bwart},
+                #{erfmg},
+                #{erfme},
+                #{lgort},
+                #{budat},
+                #{ebeln},
+                #{ebelp},
+                #{aufnr},
+                #{zexfield1},
+                #{zexfield2},
+                #{zexfield3},
+                #{zexfield4},
+                #{zexfield5},
+                SYSDATE,
+                #{ifInfoIdx})
+    </insert>
+
+
+    <select id="findInputPerformDetailAllByDegree"
+            resultType="lims.api.integration.vo.SAPInputPerformanceByBatchVO$InputPerformanceDetail">
+        SELECT IDX,
+               DEGREE,
+               GUID,
+               WERKS,
+               MATNR,
+               CHARG,
+               MATNR_INPUT,
+               CHARG_INPUT,
+               LOT_NO_INPUT,
+               MAKTX,
+               DISPO,
+               BWART,
+               ERFMG,
+               ERFME,
+               LGORT,
+               EBELN,
+               EBELP,
+               AUFNR,
+               ZEXFIELD1,
+               ZEXFIELD2,
+               ZEXFIELD3,
+               ZEXFIELD4,
+               ZEXFIELD5,
+               CRT_DS,
+               IF_INFO_IDX
+        FROM IF_REV_SAP_INPUT_PERFORM_DTL
+        WHERE DEGREE = #{value}
+    </select>
+
+    <select id="nextIdxInInputPerformanceDetail" resultType="int">
+        SELECT NVL(MAX(IDX), 0) + 1
+        FROM IF_REV_SAP_INPUT_PERFORM_DTL
+    </select>
+
+    <insert id="createInputPerformanceDetail"
+            parameterType="lims.api.integration.vo.SAPInputPerformanceByBatchVO$InputPerformanceDetail">
+        INSERT INTO IF_REV_SAP_INPUT_PERFORM_DTL
+        (IDX, DEGREE, GUID, WERKS, MATNR, CHARG, MATNR_INPUT, CHARG_INPUT, LOT_NO_INPUT, MAKTX, DISPO, BWART, ERFMG,
+         ERFME, LGORT, EBELN, EBELP, AUFNR, ZEXFIELD1, ZEXFIELD2, ZEXFIELD3, ZEXFIELD4, ZEXFIELD5, CRT_DS, IF_INFO_IDX)
+        VALUES (#{idx},
+                #{degree},
+                #{guid},
+                #{werks},
+                #{matnr},
+                #{charg},
+                #{matnrInput},
+                #{chargInput},
+                #{lotNoInput},
+                #{maktx},
+                #{dispo},
+                #{bwart},
+                #{erfmg},
+                #{erfme},
+                #{lgort},
+                #{ebeln},
+                #{ebelp},
+                #{aufnr},
+                #{zexfield1},
+                #{zexfield2},
+                #{zexfield3},
+                #{zexfield4},
+                #{zexfield5},
+                SYSDATE,
+                #{ifInfoIdx})
+    </insert>
+
+
+    <select id="findBusinessPartner" resultType="SAPBusinessPartnerVO">
+        SELECT COMPANY_CODE,
+               PARTNER_NO,
+               PARTNER_GROUP,
+               NAME_ORG1,
+               NAME_ORG2,
+               COMPANY_NUMBER
+        FROM IF_RFC_BUSINESS_PARTNER
+    </select>
+
+    <insert id="createBusinessPartner" parameterType="SAPBusinessPartnerVO">
+        INSERT INTO IF_RFC_BUSINESS_PARTNER
+        (COMPANY_CODE,
+         PARTNER_NO,
+         PARTNER_GROUP,
+         NAME_ORG1,
+         NAME_ORG2,
+         COMPANY_NUMBER,
+         CRT_DS,
+         UDT_DS,
+         IF_INFO_IDX)
+        VALUES (#{companyCode},
+                #{partnerNo},
+                #{partnerGroup},
+                #{nameOrg1},
+                #{nameOrg2},
+                #{companyNumber},
+                SYSDATE,
+                SYSDATE,
+                #{ifInfoIdx})
+    </insert>
+
+    <update id="updateBusinessPartner" parameterType="SAPBusinessPartnerVO">
+        UPDATE IF_RFC_BUSINESS_PARTNER
+        SET PARTNER_GROUP  = #{partnerGroup},
+            NAME_ORG1      = #{nameOrg1},
+            NAME_ORG2      = #{nameOrg2},
+            COMPANY_NUMBER = #{companyNumber},
+            UDT_DS         = SYSDATE,
+            IF_INFO_IDX    = #{ifInfoIdx}
+        WHERE COMPANY_CODE = #{companyCode}
+          AND PARTNER_NO = #{partnerNo}
+    </update>
+
+</mapper>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.common.dao.ApproveDao">
+
+    <insert id="create" parameterType="ApproveVO">
+        <selectKey resultType="int" keyProperty="aprIdx" order="BEFORE">
+            SELECT NVL(MAX(APR_IDX),0)+1 FROM SY_APR_INFO
+        </selectKey>
+
+        INSERT INTO SY_APR_INFO(
+            PLNT_CD,
+            APR_IDX,
+            APR_REQ_DIV,
+            APR_REQ_UID,
+            APR_REQ_DS,
+            APR_REQ_IP,
+            APR_REQ_REA,
+            APR_UID
+        )VALUES(
+            #{plntCd},
+            #{aprIdx},
+            #{aprReqDiv},
+            #{aprReqUid},
+            sysdate,
+            #{aprReqIp},
+            #{aprReqRea},
+            #{aprUid}
+        )
+    </insert>
+
+    <update id="update" parameterType="ApproveVO">
+        UPDATE SY_APR_INFO SET
+            PLNT_CD = #{plntCd},
+            APR_REQ_UID = #{aprReqUid},
+            APR_REQ_DS = sysdate,
+            APR_REQ_IP = #{aprReqIp},
+            APR_REQ_REA = #{aprReqRea},
+            APR_UID = #{aprUid}
+        WHERE APR_IDX = #{aprIdx}
+    </update>
+
+    <update id="approve" parameterType="ApproveVO">
+        UPDATE SY_APR_INFO SET
+            APR_YN = 'Y',
+            APR_DS = sysdate,
+            APR_IP = #{aprIp},
+            APR_REA = #{aprRea}
+        WHERE APR_IDX = #{aprIdx} AND PLNT_CD = #{plntCd}
+    </update>
+
+</mapper>

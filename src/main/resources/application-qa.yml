@@ -1,0 +1,36 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+    url: jdbc:log4jdbc:oracle:thin:@10.225.35.53:1521/orcl
+    username: LIMS
+    password: LIMS_APP
+  mail:
+    protocol: smtp
+    host: mail.kolmar.kr
+    port: 25
+    username: kolmar_lims@kolmar.co.kr
+    password: kkmlims123!@#
+
+report-designer:
+  service-name: LIMS
+  repository-path: http://10.225.35.53/mrd
+  user: admin
+  password: iit3274!@
+  reporting-server:
+    url: http://10.225.35.53:8070/ReportingServer/service
+  data-server:
+    url: http://10.225.35.53:8070/DataServer/rdagent.jsp
+
+auth:
+  token:
+    secret: R0iNN6wSxunNsnYS4fYiHKYz745AyTmwI2riqhEsCwk=
+
+logging:
+  logback:
+    rollingpolicy:
+      max-history: 60
+  file:
+    path: D:/LOG/jeuslog/LIMS_80/spring

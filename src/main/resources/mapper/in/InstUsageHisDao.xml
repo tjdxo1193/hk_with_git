@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.in.dao.InstUsageHisDao">
+    <select id="find" parameterType="InstUsageHisVO" resultType="InstUsageHisVO">
+        SELECT EEU.PLNT_CD,
+               EEU.EQM_CD,
+               EEI.EQM_NM,
+               EEI.CRG_UID,
+               (SELECT USER_NM FROM SY_USER WHERE PLNT_CD = #{plntCd} AND USER_ID = EEI.CRG_UID) AS CRG_NM,
+               EEU.USE_SEQ,
+               EEU.USE_STR_DS,
+               EEU.USE_END_DS,
+               EEU.PITM_NM,
+               EEU.ANS_NO,
+               EEU.BATCH_NO,
+               EEU.AITM_NM,
+               EEU.ANS_UID,
+               (SELECT USER_NM FROM SY_USER WHERE PLNT_CD = #{plntCd} AND USER_ID = EEU.ANS_UID) AS ANS_NM,
+               EEU.RMK,
+               NVL(EEI.EQM_FILE_IDX, 0) AS EQM_FILE_IDX
+        FROM EM_EQM_USE EEU
+            LEFT JOIN EM_EQM_INFO EEI ON EEI.PLNT_CD = EEU.PLNT_CD AND EEI.EQM_CD = EEU.EQM_CD
+            LEFT JOIN SY_USER SU ON EEI.PLNT_CD = SU.PLNT_CD AND EEI.CRG_UID = SU.USER_ID
+        WHERE EEU.PLNT_CD = #{plntCd}
+            AND EEU.DEL_YN = 'N'
+        <if test="eqmCd != ''">
+            AND UPPER(EEI.EQM_CD) LIKE '%' || UPPER(#{eqmCd}) || '%'
+        </if>
+        <if test="eqmNm != ''">
+            AND UPPER(EEI.EQM_NM) LIKE '%' || UPPER(#{eqmNm}) || '%'
+        </if>
+        <if test="makComp != ''">
+            AND UPPER(EEI.MAK_COMP) LIKE '%' || UPPER(#{makComp}) || '%'
+        </if>
+        <if test="pitmNm != ''">
+            AND UPPER(EEU.PITM_NM) LIKE '%' || UPPER(#{pitmNm}) || '%'
+        </if>
+        <if test="crgNm != ''">
+            AND UPPER(SU.USER_NM) LIKE '%' || UPPER(#{crgNm}) || '%'
+        </if>
+        <if test="splComp != ''">
+            AND UPPER(EEI.SPL_COMP) LIKE '%' || UPPER(#{splComp}) || '%'
+        </if>
+        <if test="srlNo != ''">
+            AND UPPER(EEI.SRL_NO) LIKE '%' || UPPER(#{srlNo}) || '%'
+        </if>
+        <if test="useStrDs != null">
+            AND EEU.USE_STR_DS BETWEEN TO_DATE(#{useStrDs}) AND TO_DATE(#{useEndDs})
+        </if>
+        <if test="useEndDs != null">
+            AND EEU.USE_END_DS BETWEEN TO_DATE(#{useStrDs}) AND TO_DATE(#{useEndDs})
+        </if>
+        ORDER BY EEU.UDT_DS DESC
+    </select>
+
+    <select id="findInstrument" parameterType="InstUsageHisVO" resultType="InstUsageHisVO">
+        SELECT EEI.PLNT_CD,
+               EEI.EQM_CD,
+               EEI.EQM_NM,
+               EEI.EQM_DIV,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_Cd = #{plntCd} AND DTL_CD = EEI.EQM_DIV) AS EQM_DIV_NM,
+               EEI.EQM_CRST,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = #{plntCd} AND DTL_CD = EEI.EQM_CRST) AS EQM_CRST_NM,
+               EEI.EQM_STT,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = #{plntCd} AND DTL_CD = EEI.EQM_STT) AS EQM_STT_NM,
+               EEI.IST_PLA,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = #{plntCd} AND DTL_CD = EEI.IST_PLA) AS IST_PLA_NM,
+               EEI.MAK_COMP,
+               EEI.SPL_COMP,
+               EEI.MOD_NM,
+               EEI.SRL_NO,
+               EEI.CRG_UID,
+               (SELECT USER_NM FROM SY_USER WHERE PLNT_CD = #{plntCd} AND USER_ID = EEI.CRG_UID) AS CRG_NM,
+               EEI.IQ,
+               EEI.OQ,
+               EEI.PQ,
+               EEI.APR_NO,
+               EEI.CHK_CYL,
+               EEI.QUA_CYL,
+               EEI.CAL_CYL,
+               EEI.ETR_DT,
+               EEI.IST_DT,
+               EEI.DPS_DT,
+               EEI.QUAL_APR_DT,
+               EEI.CAL_APR_DT,
+               EEI.RGL_CHK_APR_DT,
+               EEI.USE_RNG,
+               EEI.QTT_RNG,
+               EEI.RMK,
+               EEI.SAP_AST_NO,
+               EEI.SAP_AST_NM,
+               EEI.SAP_CRT_DT,
+               EEI.SAP_CHG_DT,
+               EEI.SAP_ACQ_DT,
+               EEI.SAP_SALE_DPS_DT,
+               EEI.SAP_ADD_DESC,
+               EEI.SAP_CRG_NM_EMID,
+               EEI.SAP_COSC,
+               EEI.SAP_ORCO,
+               EEI.SAP_ACCD,
+               EEI.PMS_CHK_TAGT_YN,
+               NVL(EEI.EQM_FILE_IDX, 0) AS EQM_FILE_IDX
+        FROM EM_EQM_INFO EEI
+        WHERE PLNT_CD = #{plntCd}
+          AND DEL_YN = 'N'
+        <if test="eqmCd != ''">
+            AND UPPER(EEI.EQM_CD) LIKE '%' || UPPER(#{eqmCd}) || '%'
+        </if>
+        <if test="eqmNm != ''">
+            AND UPPER(EEI.EQM_NM) LIKE '%' || UPPER(#{eqmNm}) || '%'
+        </if>
+    </select>
+
+    <insert id="create" parameterType="InstUsageHisVO">
+        <selectKey resultType="Integer" order="BEFORE" keyProperty="useSeq">
+            SELECT NVL(MAX(USE_SEQ) + 1, 1)
+            FROM EM_EQM_USE
+            WHERE PLNT_CD = #{plntCd}
+            AND EQM_CD = #{eqmCd}
+        </selectKey>
+        INSERT INTO EM_EQM_USE (PLNT_CD, EQM_CD, USE_SEQ, USE_STR_DS, USE_END_DS, PITM_NM, ANS_NO, BATCH_NO, AITM_NM,
+        ANS_UID, RMK, DEL_YN)
+        VALUES (#{plntCd}, #{eqmCd}, #{useSeq}, #{useStrDs}, #{useEndDs}, #{pitmNm}, #{ansNo}, #{batchNo}, #{aitmNm},
+        #{ansUid}, #{rmk}, 'N')
+    </insert>
+
+    <update id="update" parameterType="InstUsageHisVO">
+        UPDATE EM_EQM_USE
+        SET USE_STR_DS = TO_DATE(#{useStrDs}, 'YYYY-MM-DD HH24:mi:ss'),
+            USE_END_DS = TO_DATE(#{useEndDs}, 'YYYY-MM-DD HH24:mi:ss'),
+            PITM_NM    = #{pitmNm},
+            ANS_NO     = #{ansNo},
+            BATCH_NO   = #{batchNo},
+            RMK        = #{rmk},
+            UDT_DS     = SYSDATE
+        WHERE PLNT_CD = #{plntCd}
+          AND EQM_CD = #{eqmCd}
+          AND USE_SEQ = #{useSeq}
+    </update>
+
+    <update id="delete" parameterType="InstUsageHisVO">
+        UPDATE EM_EQM_USE
+        SET DEL_YN = 'Y',
+            UDT_DS = SYSDATE
+        WHERE PLNT_CD = #{plntCd}
+          AND EQM_CD = #{eqmCd}
+          AND USE_SEQ = #{useSeq}
+    </update>
+
+    <update id="updateFile" parameterType="InstUsageHisVO">
+        UPDATE EM_EQM_INFO
+        SET EQM_FILE_IDX = #{eqmFileIdx}
+        WHERE PLNT_CD = #{plntCd}
+          AND EQM_CD = #{eqmCd}
+    </update>
+</mapper>

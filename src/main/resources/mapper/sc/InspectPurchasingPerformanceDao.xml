@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.sc.dao.InspectPurchasingPerformanceDao">
+    <select id="find" parameterType="InspectPurchasingPerformanceVO" resultType="InspectPurchasingPerformanceVO">
+        SELECT
+            TO_CHAR(TO_DATE(MAX(PAR.ISP_REQ_DT)), 'YYYY') AS FISCAL_YR,
+            TO_CHAR(TO_DATE(MAX(PAR.ISP_REQ_DT)), 'MM') AS MONTH,
+            PAR.PLNT_CD,
+            MAX(SP.PLNT_NM) AS PLNT_NM,
+            MAX(QPI.PITM_TYP) AS PITM_TYP,
+            MAX(SCD.DTL_NM) AS PITM_TYP_NM,
+            PAR.MTR_CD AS PITM_CD,
+            MAX(QPI.PITM_NM) AS PITM_NM,
+            PAR.PHS_ORDER_NO AS PHS_ORDER_NO,
+            SUM(PAR.ETR_QTY) AS ETR_QTY,
+            SUM(SCD.EXT_CD2) AS ISP_SCR,
+            MAX(QPAPHP.IF_DS) AS IF_DATE,
+            MAX(QPAPHP.IF_STT) AS IF_STT,
+            NVL(MAX(SCDT.DTL_NM),'미전송') AS IF_STT_NM,
+            MAX(QPAPHP.ISP_PHS_PFA_IDX) AS ISP_PHS_PFA_IDX
+        FROM QT_PITM_ANS_PROC PAP
+            JOIN QT_PITM_ANS_REQ PAR ON PAP.PLNT_CD = PAR.PLNT_CD AND PAP.REQ_IDX = PAR.REQ_IDX
+            JOIN QT_PITM_ANS_INFO PAI ON PAP.PLNT_CD = PAI.PLNT_CD AND PAP.ANS_IDX = PAI.ANS_IDX
+            JOIN QM_PITM_SPEC QPS ON PAP.PLNT_CD = QPS.PLNT_CD AND PAP.PITM_SPEC_IDX = QPS.PITM_SPEC_IDX
+            JOIN QM_PITM_INFO QPI ON QPS.PLNT_CD = QPI.PLNT_CD AND QPS.PITM_CD = QPI.PITM_CD AND QPS.PITM_VER = QPI.PITM_VER
+            JOIN SY_CD_DTL SCD ON SCD.HIR_CD = 'S018' AND QPI.PITM_TYP = SCD.DTL_CD
+            JOIN SY_PLNT SP ON SP.PLNT_CD = PAI.PLNT_CD
+            LEFT OUTER JOIN QT_PITM_ANS_PHS_PFA QPAPHP ON PAI.ISP_PHS_PFA_IDX = QPAPHP.ISP_PHS_PFA_IDX
+                AND QPAPHP.SRL_NO = (SELECT MAX(SRL_NO) FROM QT_PITM_ANS_PHS_PFA WHERE ISP_PHS_PFA_IDX = QPAPHP.ISP_PHS_PFA_IDX)
+            LEFT OUTER JOIN SY_CD_DTL SCDT ON SCDT.HIR_CD = 'S034' AND QPAPHP.IF_STT = SCDT.DTL_CD
+        WHERE PAP.PLNT_CD = #{plntCd}
+            AND QPI.PITM_TYP IN ('S0180100', 'S0180101', 'S0180201', 'S0180202', 'S0180203')
+            AND PAR.ISP_REQ_DT IS NOT NULL
+            AND PAR.MTR_CD IS NOT NULL
+            AND PAR.PHS_ORDER_NO IS NOT NULL
+            AND TO_CHAR(TO_DATE(PAR.ISP_REQ_DT), 'YYYY') = #{fiscalYr}
+            AND TO_CHAR(TO_DATE(PAR.ISP_REQ_DT), 'MM') = #{month}
+        GROUP BY PAR.PLNT_CD, PAR.MTR_CD, PAR.PHS_ORDER_NO, TO_CHAR(TO_DATE(PAR.ISP_REQ_DT), 'YYYY-MM')
+        ORDER BY PAR.PLNT_CD, PAR.MTR_CD, PAR.PHS_ORDER_NO, TO_CHAR(TO_DATE(PAR.ISP_REQ_DT), 'YYYY-MM')
+    </select>
+
+    <select id="findDetail" parameterType="InspectPurchasingPerformanceVO" resultType="InspectPurchasingPerformanceVO">
+        SELECT
+            PAR.PLNT_CD,
+            SP.PLNT_NM,
+            QPI.PITM_TYP,
+            SCD.DTL_NM AS PITM_TYP_NM,
+            PAR.MTR_CD AS PITM_CD,
+            QPI.PITM_NM,
+            PAR.PHS_ORDER_NO,
+            PAR.ETR_QTY,
+            SCD.EXT_CD2 AS ISP_SCR,
+            PAR.PLNT_CD,
+            PAR.REQ_IDX,
+            PAR.ISP_REQ_NO,
+            PAR.ISP_REQ_DT,
+            PAR.MTR_NM,
+            PAR.BATCH_NO,
+            PAR.ETR_QTY,
+            PAR.INP_UNIT,
+            PAR.SAVE_PLA,
+            PAR.ETR_DT,
+            PAR.AMT_UNIT,
+            PAR.LOT_NO,
+            PAR.PHS_ORDER_TYP,
+            PAR.PHS_ORDER_NO,
+            PAR.UDT_DS,
+            PAR.REV_DS,
+            PAR.SPL_LOT_NO,
+            PAP.RCP_DT
+        FROM QT_PITM_ANS_PROC PAP
+        JOIN QT_PITM_ANS_REQ PAR ON PAP.PLNT_CD = PAR.PLNT_CD AND PAP.REQ_IDX = PAR.REQ_IDX
+        JOIN QT_PITM_ANS_INFO PAI ON PAP.PLNT_CD = PAI.PLNT_CD AND PAP.ANS_IDX = PAI.ANS_IDX
+        JOIN QM_PITM_SPEC QPS ON PAP.PLNT_CD = QPS.PLNT_CD AND PAP.PITM_SPEC_IDX = QPS.PITM_SPEC_IDX
+        JOIN QM_PITM_INFO QPI ON QPS.PLNT_CD = QPI.PLNT_CD AND QPS.PITM_CD = QPI.PITM_CD AND QPS.PITM_VER = QPI.PITM_VER
+        JOIN SY_CD_DTL SCD ON SCD.HIR_CD = 'S018' AND QPI.PITM_TYP = SCD.DTL_CD
+        JOIN SY_PLNT SP ON SP.PLNT_CD = PAR.PLNT_CD
+        WHERE 1=1
+            AND QPI.PITM_TYP IN ('S0180100', 'S0180101', 'S0180201', 'S0180202', 'S0180203')
+            AND PAP.PLNT_CD = #{plntCd}
+            AND PAR.MTR_CD = #{pitmCd}
+            AND PAR.PHS_ORDER_NO = #{phsOrderNo}
+        ORDER BY PAR.ISP_REQ_DT
+    </select>
+
+    <select id="getRecord" parameterType="int" resultType="InspectPurchasingPerformanceVO">
+        SELECT
+            ISP_PHS_PFA_IDX
+            ,SRL_NO
+            ,IF_MTD_DIV
+            ,SC.DTL_NM AS IF_MTD_DIV_NM
+            ,IF_STT
+            ,SCD.DTL_NM AS IF_STT_NM
+            ,HOPR_IF_UID
+            ,SU.USER_NM AS HOPR_IF_NM
+            ,IF_DS AS IF_DATE
+            ,IF_INFO_IDX
+            ,DEGREE
+        FROM QT_PITM_ANS_PHS_PFA
+        JOIN SY_USER SU ON SU.USER_ID = HOPR_IF_UID
+        LEFT OUTER JOIN SY_CD_DTL SC ON SC.DTL_CD = IF_MTD_DIV
+        LEFT OUTER JOIN SY_CD_DTL SCD ON SCD.DTL_CD = IF_STT
+        WHERE ISP_PHS_PFA_IDX = #{ispPhsPfaIdx}
+        ORDER BY SRL_NO
+    </select>
+
+    <select id="findIspPhsPfaIdx" resultType="int">
+        SELECT NVL(MAX(ISP_PHS_PFA_IDX),0)+1 FROM QT_PITM_ANS_PHS_PFA
+    </select>
+
+    <insert id="insertPhsRecord" parameterType="InspectPurchasingPerformanceVO">
+        INSERT INTO QT_PITM_ANS_PHS_PFA (
+             ISP_PHS_PFA_IDX
+            ,SRL_NO
+            ,IF_MTD_DIV
+            ,IF_STT
+            ,HOPR_IF_UID
+            ,IF_DS
+            ,IF_INFO_IDX
+            ,DEGREE
+        ) VALUES (
+            #{ispPhsPfaIdx}
+            ,(SELECT NVL(MAX(SRL_NO),0)+1 FROM QT_PITM_ANS_PHS_PFA WHERE ISP_PHS_PFA_IDX = #{ispPhsPfaIdx})
+            ,#{ifMtdDiv}
+            ,#{ifStt}
+            ,#{hoprIfUid}
+            ,#{ifDs}
+            ,#{ifInfoIdx}
+            ,#{degree}
+        )
+    </insert>
+
+    <update id="updatePhsIdx" parameterType="InspectPurchasingPerformanceVO">
+        UPDATE QT_PITM_ANS_INFO SET
+            ISP_PHS_PFA_IDX = #{ispPhsPfaIdx}
+        WHERE ANS_IDX IN (
+            SELECT PAI.ANS_IDX
+            FROM QT_PITM_ANS_PROC PAP
+                JOIN QT_PITM_ANS_REQ PAR ON PAP.PLNT_CD = PAR.PLNT_CD AND PAP.REQ_IDX = PAR.REQ_IDX
+                JOIN QT_PITM_ANS_INFO PAI ON PAP.PLNT_CD = PAI.PLNT_CD AND PAP.ANS_IDX = PAI.ANS_IDX
+            WHERE PAR.MTR_CD = #{pitmCd}
+                AND PAR.PHS_ORDER_NO = #{phsOrderNo}
+                AND PAP.PLNT_CD = #{plntCd}
+                AND TO_CHAR(TO_DATE(PAR.ISP_REQ_DT), 'YYYY') = #{fiscalYr}
+                AND TO_CHAR(TO_DATE(PAR.ISP_REQ_DT), 'MM') = #{month}
+        )
+    </update>
+</mapper>

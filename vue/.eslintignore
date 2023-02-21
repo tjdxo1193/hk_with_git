@@ -1,0 +1,12 @@
+.git
+.gitignore
+
+package-lock.json
+package.json
+
+/node_modules
+/dist
+/src/assets
+/lib
+
+*.md

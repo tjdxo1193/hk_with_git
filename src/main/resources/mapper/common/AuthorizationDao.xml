@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.common.dao.AuthorizationDao">
+
+    <select id="findAuthorityByUserLoginId" resultType="AuthorityVO">
+        SELECT A.ATH_CD
+        FROM SY_USER U
+                 JOIN SY_ATH A ON U.PLNT_CD = A.PLNT_CD AND U.ATH_CD = A.ATH_CD AND A.USE_YN = 'Y'
+        WHERE U.USER_LOGN_ID = #{value}
+    </select>
+
+    <select id="findMenuByLoginId" resultType="String">
+        SELECT G.MENU_CD
+        FROM SY_USER U
+                 JOIN SY_ATH A ON U.PLNT_CD = A.PLNT_CD AND U.ATH_CD = A.ATH_CD AND A.USE_YN = 'Y'
+                 JOIN SY_ATH_GP G ON A.ATH_CD = G.ATH_CD AND G.USE_YN = 'Y'
+        WHERE U.USER_LOGN_ID = #{value}
+    </select>
+
+    <select id="hasAuthMenu" resultType="boolean">
+        SELECT CASE WHEN COUNT(G.MENU_CD) > 0 THEN 1 ELSE 0 END
+        FROM SY_USER U
+                 JOIN SY_ATH A ON U.PLNT_CD = A.PLNT_CD AND U.ATH_CD = A.ATH_CD AND A.USE_YN = 'Y'
+                 JOIN SY_ATH_GP G ON A.ATH_CD = G.ATH_CD AND G.USE_YN = 'Y'
+        WHERE U.USER_ID = #{userId}
+          AND G.MENU_CD = #{menuCd}
+    </select>
+
+</mapper>

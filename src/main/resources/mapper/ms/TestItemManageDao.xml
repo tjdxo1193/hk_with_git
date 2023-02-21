@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="lims.api.ms.dao.TestItemManageDao">
+
+	<select id="getList" parameterType="TestItemManageVO" resultType="TestItemManageVO">
+        SELECT
+            AITM_CD
+             , AITM_KN
+			 , AITM_EN
+			 , AITM_ABBR
+			 , CRT_IP
+			 , CRT_DS
+			 , CRT_UID
+			 , (SELECT USER_NM FROM SY_USER B WHERE B.USER_ID = CRT_UID) CRT_USER_NM
+			 , UDT_IP
+			 , UDT_DS
+			 , UDT_UID
+        FROM 
+        	MS_AITM
+        WHERE
+        	1 = 1
+			<if test="aitmCd != null and aitmCd != ''">
+				AND UPPER(AITM_CD) LIKE UPPER('%' || #{aitmCd} || '%')
+			</if>
+        	<if test="aitmKn != null and aitmKn != ''">
+        		AND UPPER(AITM_KN) LIKE UPPER('%' || #{aitmKn} || '%') 
+        	</if>
+        	<if test="aitmEn != null and aitmEn != ''">
+        		AND UPPER(AITM_EN) LIKE UPPER('%' || #{aitmEn} || '%')
+        	</if>
+        	<if test="aitmAbbr != null and aitmAbbr != ''">
+        		AND UPPER(AITM_ABBR) LIKE UPPER('%' || #{aitmAbbr} || '%')
+        	</if>
+        ORDER BY
+        	AITM_CD
+    </select>
+    
+    <insert id="putTestItem" parameterType="TestItemManageVO">
+    	MERGE INTO
+    		MS_AITM A
+    	USING (
+    		SELECT
+    			COUNT(AITM_CD) CNT
+   			FROM 
+   				MS_AITM
+   			WHERE
+   				AITM_CD = #{aitmCd}
+    	) B
+    	ON
+    		(B.CNT > 0)
+    	WHEN MATCHED THEN
+    		UPDATE SET
+    			A.AITM_KN = #{aitmKn}
+    			 , A.AITM_EN = #{aitmEn}
+    			 , A.AITM_ABBR = #{aitmAbbr}
+    		WHERE
+    			A.AITM_CD = #{aitmCd}
+    	WHEN NOT MATCHED THEN
+	    	INSERT ( 
+	    			AITM_CD
+		             , AITM_KN
+					 , AITM_EN
+					 , AITM_ABBR
+					 , CRT_IP
+					 , CRT_DS
+					 , CRT_UID
+					 , UDT_IP
+					 , UDT_DS
+				 	 , UDT_UID
+			 	) 
+		 	VALUES (
+		 		#{aitmCd}<!-- ('TM' || (SELECT TRIM(TO_CHAR(TO_NUMBER(NVL(SUBSTR(MAX(AITM_CD), 3), '0000') + 1), '0000')) FROM MS_AITM)) -->
+		 		, #{aitmKn}
+		 		, #{aitmEn}
+		 		, #{aitmAbbr}
+		 		, NULL
+		 		, SYSDATE
+		 		, #{crtUid}
+		 		, NULL
+		 		, SYSDATE
+		 		, #{udtUid}
+		 	)
+    </insert>
+</mapper>
