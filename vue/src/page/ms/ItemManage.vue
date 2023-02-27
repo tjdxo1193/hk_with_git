@@ -99,7 +99,6 @@ export default {
               event.position - event.oldPosition > 0 &&
               this.currentValueForScroll.loadListFlag == true
             ) {
-              // TODO 여기서 검색 조건 캐싱
               this.currentValueForScroll.loadListFlag = false;
               const isNotEnd = await this.addNextListGridData();
               this.currentValueForScroll.loadListFlag = isNotEnd;
@@ -192,6 +191,7 @@ export default {
 
       // 스크롤 이벤트 파라미터 초기화
       this.currentValueForScroll.searchParam = param;
+      this.currentValueForScroll.loadListFlag = true;
 
       param.offset = 0;
       param.limit = 100;
@@ -221,18 +221,16 @@ export default {
 
     async addNextListGridData() {
       const { $grid } = this.searchGridWithForm;
-
+      
       this.currentValueForScroll.searchParam.offset = this.currentValueForScroll.gridRowCnt;
       this.currentValueForScroll.searchParam.limit = 100;
 
-      const data = await $grid
-        ._useLoader(() => this.$axios.get('/ms/itemManage/pItem', this.currentValueForScroll.searchParam, { _progress: false }))
-        .then(({ data }) => data);
-      this.currentValueForScroll.gridRowCnt += data.length;
-      $grid.addRow(data.resultList, 'last');
+      const { data } = await this.$axios.get('/ms/itemManage/pItem', this.currentValueForScroll.searchParam, { _progress: false });
 
-      // offset이 total보다 같거나 크면 더이상 로딩하지 않도록 처리..
-      return data.offset < data.total;
+      this.currentValueForScroll.gridRowCnt += data.resultList.length;
+      $grid.addRow(data.resultList, 'last');
+      
+      return this.currentValueForScroll.gridRowCnt <= data.total;
     },
 
     async onClickCommonInfoFormButtons({ name }) {
@@ -270,15 +268,6 @@ export default {
         return;
       }
     },
-    isWrap() {
-      const { pitmTyp } = FormUtil.getData(this.codeWithSearchGrid.forms);
-      return (
-        pitmTyp == pitemType.FINISHED_SET ||
-        pitmTyp == pitemType.FINISHED_SINGLE ||
-        pitmTyp == pitemType.PACKAGING_MATERIAL
-      );
-    },
-
     async firstReg() {
       let param = this.formToParam();
       await this.$axios

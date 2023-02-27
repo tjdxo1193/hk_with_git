@@ -9,6 +9,7 @@ import lims.api.integration.service.impl.IntegrationSender;
 import lims.api.integration.vo.intergation.InterfaceSendVO;
 import lims.api.ts.dao.TestResultInputDao;
 import lims.api.ts.enums.TestProcess;
+import lims.api.ts.enums.TestType;
 import lims.api.ts.service.TestResultInputService;
 import lims.api.ts.vo.TestResultInputVO;
 import lombok.RequiredArgsConstructor;
@@ -144,6 +145,7 @@ public class TestResultInputServiceImpl implements TestResultInputService {
                 .ispReqNo(param.getIspReqNo())
                 .phsOrderNo(param.getPhsOrderNo())
                 .pdtOrderNo(param.getPdtOrderNo())
+                .testType(TestType.of(param.getAnsTyp()))
                 .build();
         sender.sendTestStatus(data);
 

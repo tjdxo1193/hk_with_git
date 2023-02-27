@@ -123,4 +123,6 @@ public class TestResultReviewVO implements UpdateDetect {
     private String ispReqNo; //검사 요청 번호
     private String phsOrderNo; //구매 오더 번호
     private String pdtOrderNo; //생산 오더 번호
+    private String addCol1;
+    private String ansTyp;
 }

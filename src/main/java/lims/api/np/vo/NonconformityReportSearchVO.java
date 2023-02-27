@@ -105,6 +105,7 @@ public class NonconformityReportSearchVO implements UpdateDetect {
     private String smpVolTot; //총검체량
     private Integer nonCfmAprReqIdx;
     private String userId;
+    private Integer rptCnt;
 
     private String pdtOrderNo; //생산 오더 번호
     private String phsOrderNo; //구매 오더 번호

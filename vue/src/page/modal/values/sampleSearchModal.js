@@ -11,10 +11,10 @@ const sampleGrid = {
   },
   forms: () =>
     FormBuilder.builder()
-      .Select('smpDiv', '검체구분', {
+      .Select('smpDivCd', '검체구분', {
         async: () => api.combo.systemCommon.getSmpDivCombo(),
       })
-      .Select('pitmDiv', '자재구분', {
+      .Select('pitmTyp', '자재구분', {
         async: () => api.combo.systemCommon.getPitmDivCombo(),
       })
       .Input('ansNo', '시험번호')

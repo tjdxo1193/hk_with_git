@@ -90,6 +90,17 @@ export default [
           },
         },
       },
+      {
+        path: 'printIntegratedReport',
+        name: 'printIntegratedReport',
+        component: PrintManage.PrintIntegratedReport,
+        meta: {
+          menu: {
+            code: 'M159',
+            title: '통합리포트출력',
+          },
+        },
+      },
     ],
   },
 ];

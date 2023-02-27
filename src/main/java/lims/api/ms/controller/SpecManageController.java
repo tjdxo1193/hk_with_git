@@ -57,20 +57,36 @@ public class SpecManageController {
         return ResponseEntity.ok(service.getItemMethodList(param));
     }
 
-    @PostMapping("/updateVersion")
-    public ResponseEntity<CommonResponse> updateVersion(@AuthToken Token token, @RequestBody SpecManageVO param) {
+    @PostMapping("/createFirstVersion")
+    public ResponseEntity<CommonResponse> createFirstVersion(@AuthToken Token token, @RequestBody SpecManageVO param) {
         String jwt = token.getJwt();
         param.setPlntCd(jwtResolver.getPlantCode(jwt));
-        service.updateVersion(param);
+        service.createFirstVersion(param);
         return ResponseEntity.ok(new CommonResponse());
     }
 
-    @PostMapping("/aItem")
-    public ResponseEntity<CommonResponse> createAItem(@AuthToken Token token, @RequestBody SpecManageVO param) {
+    @PostMapping("/createNewVersion")
+    public ResponseEntity<CommonResponse> createNewVersion(@AuthToken Token token, @RequestBody SpecManageVO param) {
+        String jwt = token.getJwt();
+        param.setPlntCd(jwtResolver.getPlantCode(jwt));
+        service.createNewVersion(param);
+        return ResponseEntity.ok(new CommonResponse());
+    }
+
+    @PostMapping("/updateNewVersion")
+    public ResponseEntity<CommonResponse> updateNewVersion(@AuthToken Token token, @RequestBody SpecManageVO param) {
+        String jwt = token.getJwt();
+        param.setPlntCd(jwtResolver.getPlantCode(jwt));
+        service.updateNewVersion(param);
+        return ResponseEntity.ok(new CommonResponse());
+    }
+
+    @PostMapping("/saveAItemList")
+    public ResponseEntity<CommonResponse> saveAItemList(@AuthToken Token token, @RequestBody SpecManageVO param) {
         String jwt = token.getJwt();
         param.setPlntCd(jwtResolver.getPlantCode(jwt));
         log.info("[bug report] create A item. rows count: {}, edited rows count: {}.", param.getAddedRowItems().size(), param.getEditedRowItems().size());
-        service.makeAItem(param);
+        service.saveAItemList(param);
         return ResponseEntity.ok(new CommonResponse());
     }
 
@@ -124,5 +140,12 @@ public class SpecManageController {
         String jwt = token.getJwt();
         param.setPlntCd(jwtResolver.getPlantCode(jwt));
         return ResponseEntity.ok(service.getSemiAItemListToModal(param));
+    }
+
+    @PutMapping("/putPkgaCd")
+    public ResponseEntity<Integer> putPkgaCd(@AuthToken Token token, @RequestBody SpecManageVO param) {
+        String jwt = token.getJwt();
+        param.setPlntCd(jwtResolver.getPlantCode(jwt));
+        return ResponseEntity.ok(service.putPkgaCd(param));
     }
 }

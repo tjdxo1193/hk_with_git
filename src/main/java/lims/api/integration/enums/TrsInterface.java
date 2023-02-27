@@ -17,7 +17,8 @@ public enum TrsInterface {
 
     ELN_METHOD_BY_ITEM(InterfaceSystemType.ELN, "IF_ELN_0008", "/RESTAdapter/PIF_ELN_0008", InterfaceSendType.ASYNC),
 
-    QMS_SHIPT(InterfaceSystemType.QMS, null, null, InterfaceSendType.SYNC);
+    QMS_MATERIAL(InterfaceSystemType.QMS, null, null, InterfaceSendType.SYNC),
+    QMS_SHIPT(InterfaceSystemType.QMS, null, "/interface/lims/shipt.qms", InterfaceSendType.SYNC);
 
     private final InterfaceSystemType systemType;
     private final String interfaceId;
@@ -39,7 +40,7 @@ public enum TrsInterface {
         return interfaceId;
     }
 
-    public String getEaiServicePath() {
+    public String getServicePath() {
         return eaiServicePath;
     }
 

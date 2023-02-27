@@ -67,11 +67,9 @@ export default {
     async getUserList() {
       const { $grid, forms } = this.userGrid;
       const parameter = FormUtil.getData(forms);
-
       const data = await $grid
         ._useLoader(() => this.$axios.get('/sy/userManage', parameter))
         .then(({ data }) => data);
-
       $grid.setGridData(data);
       this.initUserForm();
     },
@@ -108,9 +106,7 @@ export default {
         .then(() => {
           this.update();
         })
-        .catch(() => {
-          this.$error(this.$message.error.updateData);
-        });
+        .catch(() => {});
     },
     changePwd() {
       this.userForm.forms
@@ -122,10 +118,10 @@ export default {
           this.$error(this.$message.error.updateData);
         });
     },
-    update() {
+    async update() {
       const { forms } = this.userForm;
       const parameter = FormUtil.getData(forms);
-      this.$axios
+      await this.$axios
         .put('/sy/userManage', parameter)
         .then(() => {
           this.$info(this.$message.info.saved);
@@ -158,10 +154,10 @@ export default {
     enableSaveButtonInUserForm() {
       this.userForm.buttons = FormUtil.mapButtonsType(this.userForm.buttons, ['save'], 'default');
     },
-    initPwd() {
+    async initPwd() {
       const { forms } = this.userForm;
       const parameter = FormUtil.getData(forms);
-      this.$axios
+      await this.$axios
         .put('/sy/userManage/initPwd', parameter)
         .then(() => {
           this.$info(this.$message.info.saved);

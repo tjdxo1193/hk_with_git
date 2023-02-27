@@ -1,8 +1,13 @@
 package lims.api.ts.vo;
 
+import lims.api.common.domain.FileKey;
 import lims.api.common.domain.UpdateDetect;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -13,7 +18,7 @@ public class TestIFModalVO implements UpdateDetect {
     private String phsOrderNo;
     private String pdtOrderNo;
     private String orderItm;
-    private String lotNo;
+    private String lotNo; //제조번호
     private String finlStt;
     private String crtDs;
     private Integer ifInfoIdx;
@@ -35,6 +40,7 @@ public class TestIFModalVO implements UpdateDetect {
     private String makNo;
     private String name;
     private Integer fileIdx;
+    private Integer seq;
     private Integer fileSrlno;
     private String fileId;
     private byte[] src;
@@ -42,6 +48,7 @@ public class TestIFModalVO implements UpdateDetect {
     private Long size;
     private String rptDiv;
     private Integer ver;
+    private String delYn;
 
     /*투입실적*/
     private String mtrCd;
@@ -59,4 +66,9 @@ public class TestIFModalVO implements UpdateDetect {
     private String zexfield3;
     private String zexfield4;
     private String zexfield5;
+
+    //추가 파일
+    private List<MultipartFile> addedFiles = new ArrayList<>();
+    private List<FileKey> removedFileIds = new ArrayList<>();
+
 }

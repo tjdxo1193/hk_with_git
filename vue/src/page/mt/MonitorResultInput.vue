@@ -247,7 +247,6 @@ export default {
     inputSytJdg() {
       const gridData = this.itemList.$grid.getGridData();
       const cnt = gridData.filter((row) => row.rstJdg !== null).length;
-      console.log(cnt, 'cnt');
       if (cnt !== gridData.length) {
         return;
       }

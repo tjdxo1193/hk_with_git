@@ -279,7 +279,7 @@
         #{rvsReaCd}, #{rvsCtt}, #{rvsDivPs})
     </insert>
 
-    <insert id="createQmPitmInfo">
+    <insert id="createQmPitmInfo" parameterType="itemManageVO">
         <selectKey resultType="int" keyProperty="pitmVer" order="BEFORE">
             SELECT NVL(MAX(PITM_VER + 1), 1)
             FROM QM_PITM_INFO

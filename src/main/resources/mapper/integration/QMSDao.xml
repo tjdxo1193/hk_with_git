@@ -11,7 +11,8 @@
                A.PHS_ORDER_NO,
                A.PHS_ORDER_ITM,
                A.PDT_ORDER_TYP,
-               A.PDT_ORDER_NO
+               A.PDT_ORDER_NO,
+               A.ETR_QTY
         FROM QT_PITM_ANS_REQ A
         WHERE A.BATCH_NO = #{batchNo}
           AND (PLNT_CD, REQ_IDX) IN (
@@ -256,10 +257,10 @@
                         REQ.MTR_CD,
                         QPI.PITM_NM AS MTR_NM,
                         REQ.CSM_NM,
-                        REQ.ADD_COL1,
                         QPAP.ANS_NO,
                         QPAP.ANS_TYP,
-                        QPAP.ANS_PROC_CD
+                        QPAP.ANS_PROC_CD,
+                        QPAP.SYT_JDG AS PITM_JDG_DIV
         FROM QT_PITM_ANS_REQ REQ
                  LEFT JOIN QT_PITM_ANS_PROC QPAP ON REQ.REQ_IDX = QPAP.REQ_IDX AND REQ.PLNT_CD = QPAP.PLNT_CD
             -- 자재명 가져오기 위한 JOIN
@@ -285,10 +286,10 @@
                         REQ.MTR_CD,
                         QPI.PITM_NM AS MTR_NM,
                         REQ.CSM_NM,
-                        REQ.ADD_COL1,
                         QPAP.ANS_NO,
                         QPAP.ANS_TYP,
-                        QPAP.ANS_PROC_CD
+                        QPAP.ANS_PROC_CD,
+                        QPAP.SYT_JDG AS PITM_JDG_DIV
         FROM QT_PITM_ANS_REQ REQ
                  LEFT JOIN QT_PITM_ANS_PROC QPAP ON REQ.REQ_IDX = QPAP.REQ_IDX AND REQ.PLNT_CD = QPAP.PLNT_CD
             -- 자재명 가져오기 위한 JOIN

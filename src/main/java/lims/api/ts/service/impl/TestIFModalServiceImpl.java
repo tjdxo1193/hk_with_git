@@ -1,10 +1,13 @@
 package lims.api.ts.service.impl;
 
+import lims.api.common.domain.FileKey;
 import lims.api.ts.dao.TestIFModalDao;
 import lims.api.ts.service.TestIFModalService;
 import lims.api.ts.vo.TestIFModalVO;
+import lims.api.util.FileUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -70,5 +73,39 @@ public class TestIFModalServiceImpl implements TestIFModalService {
     @Override
     public List<TestIFModalVO> getInpPerformanceList(TestIFModalVO request) {
         return dao.getInpPerformanceList(request);
+    }
+
+    @Override
+    public void savePrvRcrReport(TestIFModalVO request) {
+        for (FileKey removedFileId : request.getRemovedFileIds()) {
+            TestIFModalVO param = new TestIFModalVO();
+            param.setBatchNo(request.getBatchNo());
+            param.setFileSrlno(removedFileId.getFileSrlno());
+
+            int result = dao.deletePrvRcrReport(param);
+
+            if (result == 0) {
+                throw new RuntimeException("Failed delete a file. BatchNo: " + param.getBatchNo() + ", Seq: " + param.getFileSrlno());
+            }
+        }
+        List<MultipartFile> files = request.getAddedFiles();
+        for (int i = 0; i < files.size(); i++) {
+            MultipartFile file = files.get(i);
+            int seq = dao.getSeq(request);
+            TestIFModalVO param = new TestIFModalVO();
+            param.setBatchNo(request.getBatchNo());
+            param.setSeq(seq);
+            param.setPhsOrderNo(request.getPhsOrderNo());
+            param.setPdtOrderNo(request.getPdtOrderNo());
+            param.setLotNo(request.getLotNo());
+            param.setName(file.getOriginalFilename());
+            param.setSrc(FileUtil.toBytes(file));
+
+            int result = dao.savePrvRcrReport(param);
+
+            if (result == 0) {
+                throw new RuntimeException("Not saved file" + file.getName());
+            }
+        }
     }
 }

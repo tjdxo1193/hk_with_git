@@ -31,6 +31,7 @@ async function initializeStore() {
   const isSSOLogin = currentRouteFullPath.startsWith('/sso-login');
 
   if (isSSOLogin) {
+    console.warn("Current path is sso path.");
     return;
   }
 

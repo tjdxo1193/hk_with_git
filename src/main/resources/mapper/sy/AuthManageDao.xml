@@ -14,10 +14,10 @@
         FROM SY_ATH SA
         WHERE SA.PLNT_CD = #{plntCd}
             <if test="athNm != ''">
-                AND ATH_NM LIKE '%' || #{athNm} || '%'
+                AND SA.ATH_NM LIKE '%' || #{athNm} || '%'
             </if>
             <if test="useYn != ''">
-                AND USE_YN = #{useYn}
+                AND SA.USE_YN = #{useYn}
             </if>
         ORDER BY SA.ORD
     </select>
@@ -63,7 +63,7 @@
                                   WHERE SAG.MENU_CD = SM.MENU_CD
                                     AND SAG.PLNT_CD = #{plntCd}
                                     AND ATH_CD = #{athCd})
-        ORDER BY SM1.MENU_CD
+        ORDER BY SM1.HIR_MENU_CD, SM1.MENU_CD
     </select>
 
     <select id="findAthGp" parameterType="AuthManageVO" resultType="AuthManageVO">
@@ -86,7 +86,7 @@
                               WHERE SAG.MENU_CD = SM.MENU_CD
                                 AND SAG.PLNT_CD = #{plntCd}
                                 AND ATH_CD = #{athCd})
-        ORDER BY SM1.MENU_CD
+        ORDER BY SM1.HIR_MENU_CD, SM1.MENU_CD
     </select>
 
     <delete id="deleteAthGp">

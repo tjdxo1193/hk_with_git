@@ -52,14 +52,19 @@
         <if test="useYn != null and useYn != ''">
             AND SU.USE_YN = #{useYn}
         </if>
-        ORDER BY SU.USER_ID DESC
+        ORDER BY SU.ORD
     </select>
 
     <update id="update" parameterType="UserManageVO">
         UPDATE SY_USER
-        SET ATH_CD = #{athCd},
-            DPT_CD = #{dptCd},
-            USE_YN = #{useYn}
+        SET ATH_CD   = #{athCd},
+            DPT_CD   = #{dptCd},
+            USE_YN   = #{useYn},
+            ANS_YN   = #{ansYn},
+            CLLT_YN  = #{clltYn},
+            REVW_YN  = #{revwYn},
+            APR_YN   = #{aprYn},
+            WORK_STT = #{workStt}
         WHERE PLNT_CD = #{plntCd}
           AND USER_ID = #{userId}
     </update>

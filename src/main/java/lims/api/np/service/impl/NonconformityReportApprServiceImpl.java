@@ -16,6 +16,7 @@ import lims.api.np.dao.NonconformityReportApprDao;
 import lims.api.np.enums.NonCfmProcess;
 import lims.api.np.service.NonconformityReportApprService;
 import lims.api.np.vo.NonconformityReportApprVO;
+import lims.api.ts.enums.TestType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -64,6 +65,7 @@ public class NonconformityReportApprServiceImpl implements NonconformityReportAp
                 .phsOrderNo(param.getPhsOrderNo())
                 .pdtOrderNo(param.getPdtOrderNo())
                 .orderItm(param.getPhsOrderItm())
+                .testType(TestType.of(param.getAnsTyp()))
                 .build();
         //IFData, 부적합통보서, 재발방지대책서
         sender.sendNonconformityReport(data,

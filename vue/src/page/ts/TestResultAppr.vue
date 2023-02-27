@@ -173,7 +173,7 @@ export default {
       this.$confirm(this.$message.confirm.hold).then(() => {
         this.$eSignWithReason(() => this.$axios.put('/ts/testResultAppr/requestHold', parameter))
           .then(() => {
-            this.$info(this.$message.info.reject);
+            this.$info(this.$message.info.hold);
             this.init();
             this.getTestResultApprList();
           })

@@ -34,12 +34,14 @@ const list = {
   columns: () =>
     ColumnBuilder.builder()
       .col('dptNm', '부서 명', { width: '25%' })
-      .col('plntCd', false)
-      .col('dptCd', '부서 코드', false)
+      .col('plntCd', { visible: false })
+      .col('dptCd', { visible: false })
       .col('dptAbbr', '부서 약어', { width: '25%' })
-      .col('rmk', '비고', { width: '40%' })
+      .col('rmk', '비고', { width: '20%' })
       .col('useYn', '사용여부', { width: '10%' })
-      .col('hirDptCd', false)
+      .col('hirDptCd', { visible: false })
+      .col('ord', '정렬순서', { width: '10%' })
+      .col('seq', '순번', { width: '10%' })
       .build(),
 };
 
@@ -78,6 +80,8 @@ const detail = {
         ],
         gap: 60,
       })
+      .InputNumber('ord', '정렬순서')
+      .InputNumber('seq', '순번')
       .Input('rmk', '비고', { maxLength: 100 })
       .spanCol(2)
       .build(),

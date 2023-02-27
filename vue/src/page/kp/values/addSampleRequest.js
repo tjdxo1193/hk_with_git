@@ -36,7 +36,7 @@ const addSampleGrid = {
       .col('smpVolUnit', { visible: false })
       .col('smpReqRea', { visible: false })
       .col('rjtUid', { visible: false })
-      .col('addSmpProcNm', '진행상태')
+      .col('addSmpProcNm', '진행상태', { width: '10%' })
       .col('pitmCd', '자재번호')
       .col('pitmNm', '자재내역')
       .col('pitmTypNm', '자재구분')

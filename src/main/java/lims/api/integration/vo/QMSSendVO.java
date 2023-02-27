@@ -2,12 +2,16 @@ package lims.api.integration.vo;
 
 import lims.api.integration.annotation.EnumType;
 import lims.api.integration.domain.eai.TrsStateful;
-import lims.api.integration.enums.SAPPItemType;
+import lims.api.integration.enums.DMRItemDiv;
 import lims.api.integration.enums.FinalOrderStatus;
-import lims.api.integration.enums.TestRequestType;
+import lims.api.integration.enums.SAPPItemType;
+import lims.api.ts.enums.TestJudgement;
 import lims.api.ts.enums.TestProcess;
 import lims.api.ts.enums.TestType;
-import lombok.*;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +33,9 @@ public class QMSSendVO {
         private String pdtOrderNo;
         private String mtrTyp;
         private String mtrMrp;
+        @EnumType(TestJudgement.class)
+        private String shiptJdgDiv;
+        private String etrQty;
 
         private List<ShiptTest> tests = new ArrayList<>();
 
@@ -53,7 +60,9 @@ public class QMSSendVO {
         private String mtrNm;
         private String csmNm;
         private String ansNo;
-        private String addCol1;
+        @EnumType(TestJudgement.class)
+        private String pitmJdgDiv;
+        private String smpQty;
 
         @EnumType(TestType.class)
         transient private String ansTyp;
@@ -101,6 +110,49 @@ public class QMSSendVO {
         private String phsOrderNo;
         private String phsOrderItm;
         private Integer finlStt;
+    }
+
+    @Getter
+    @Builder
+    @EqualsAndHashCode
+    public static class Material {
+        private final String werks;
+        private final String matnr;
+        private final String dispo;
+        private final DMRItemDiv itemDiv;
+    }
+
+    @Getter
+    @Builder
+    public static class MaterialAll {
+        private List<CosmeticFinishedMaterial> cosmeticFinisheds;
+        private List<CosmeticBulkMaterial> cosmeticBulks;
+        private List<QuasiDrugFinishedMaterial> drugFinisheds;
+        private List<QuasiDrugBulkMaterial> drugBulks;
+    }
+
+    @Getter
+    @Builder
+    public static class CosmeticFinishedMaterial {
+
+    }
+
+    @Getter
+    @Builder
+    public static class CosmeticBulkMaterial {
+
+    }
+
+    @Getter
+    @Builder
+    public static class QuasiDrugFinishedMaterial {
+
+    }
+
+    @Getter
+    @Builder
+    public static class QuasiDrugBulkMaterial {
+
     }
 
 }

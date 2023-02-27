@@ -21,9 +21,13 @@ public interface SpecManageService {
 
     List<SpecManageDptVO> getDepartmentList(SpecManageVO param);
 
-    void updateVersion(SpecManageVO param);
+    void createFirstVersion(SpecManageVO param);
 
-    void makeAItem(SpecManageVO param);
+    void saveAItemList(SpecManageVO param);
+
+    void createNewVersion(SpecManageVO param);
+
+    void updateNewVersion(SpecManageVO param);
 
     void updateRequestReview(SpecManageVO param);
 
@@ -36,4 +40,6 @@ public interface SpecManageService {
     List<SpecManageVO> getSemiPItemListToModal(SpecManageVO param);
 
     List<SpecManageAitmVO> getSemiAItemListToModal(SpecManageVO param);
+
+    int putPkgaCd(SpecManageVO param);
 }

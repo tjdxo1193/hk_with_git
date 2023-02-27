@@ -1,4 +1,5 @@
 import LabelSearch from './LabelSearch';
+import PrintIntegratedReport from './PrintIntegratedReport.vue';
 import PrintLabel from './PrintLabel';
 import PrintReport from './PrintReport';
 import ReportMaster from './ReportMaster';
@@ -12,4 +13,5 @@ export default {
   RePrintLabelAppr,
   LabelSearch,
   ReportMaster,
+  PrintIntegratedReport,
 };

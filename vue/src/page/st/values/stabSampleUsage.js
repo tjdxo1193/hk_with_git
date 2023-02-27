@@ -88,7 +88,7 @@ const sampleUsageGrid = {
       .col('usePps', '사용목적')
       .col('irgYn', '이상여부')
       .col('smpDpsNm', '검체상태')
-      .col('smpUseNm', '사용이력진행상태')
+      .col('smpUseNm', '사용이력진행상태', { width: '8%' })
       .col('rjtNm', '반려자')
       .col('rjtRea', '반려사유')
       .build(),

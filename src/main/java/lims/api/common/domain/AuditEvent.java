@@ -247,6 +247,7 @@ public interface AuditEvent {
         String updateSpecUseVerYn = "규격서 버전 사용여부 수정";
         String updateSpecPitmVer = "규격서 품목 버전 수정";
         String createSpec = "규격서 생성";
+        String updateSpec = "규격서 수정";
 
         String createAitemSpec = "규격 생성";
 
@@ -314,7 +315,7 @@ public interface AuditEvent {
     }
 
     interface ReportEvent {
-        String updateReportInfo = "리포트정보 수정";
+        String createReportInfo = "리포트정보 저장";
     }
 
     interface RptMst {
@@ -335,6 +336,8 @@ public interface AuditEvent {
         String requestApprove = "재발방지대책서 승인요청";
         String approve = "재발방지대책서 승인";
         String reject = "재발방지대책서 반려";
+        String saveReport = "재발방지대책서 파일 저장";
+        String deleteReport = "재발방지대책서 파일 삭제";
     }
 
     interface StabPln {

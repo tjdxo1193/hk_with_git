@@ -7,7 +7,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class DepartmentManageVO implements UpdateDetect {
-
     private String plntCd;
     private String dptCd;
     private int level;
@@ -16,4 +15,6 @@ public class DepartmentManageVO implements UpdateDetect {
     private String dptAbbr;
     private String rmk;
     private String useYn;
+    private Integer ord;
+    private Integer seq;
 }

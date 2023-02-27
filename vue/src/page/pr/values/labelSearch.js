@@ -16,18 +16,15 @@ const labelSearchGridWithForms = {
       editable: false,
       showRowCheckColumn: false,
       rowStyleFunction: function (rowIndex, item) {
-        if (item.useVerYn === 'N' || item.specUseVerYn === 'N') {
-          return 'standardNoSet';
-        }
-        if (item.oosYn === 'Y') {
-          return 'oosReTest';
+        if (item.labelPrtProc === 'S0350500') {
+          return 'testStop';
         }
         return null;
       },
     }, //TODO EDITABLE: TRUE 컬럼 확인
     legends: [
-      { value: '안정성시험', className: 'stabilityTest' },
-      { value: 'OOS 재시험', className: 'oosReTest' },
+      { value: '출력완료', className: '' },
+      { value: '출력취소', className: 'testStop' },
     ],
   },
   forms: () =>

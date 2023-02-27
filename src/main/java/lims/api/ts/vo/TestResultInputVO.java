@@ -125,6 +125,8 @@ public class TestResultInputVO implements UpdateDetect {
     private String aitmRmk; //시험항목 비고
     private String nonCfmRea; //부적합사유
     private String pitmSpcc; //품목 특이사항
+    private String addCol1;
+    private String ansTyp;
     /*보류정보*/
     private String hldUid;
     private String hldRea;

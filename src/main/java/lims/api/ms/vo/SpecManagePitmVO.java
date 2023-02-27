@@ -82,4 +82,10 @@ public class SpecManagePitmVO implements UpdateDetect {
 
     private String qpSpecProcCd;
     private String qpSpecProcNm;
+
+    // added
+    private String opsSepcUseVerYn;
+    // 포장시험, 자재계층 테이블
+    private String pkgaCd;
+    private String opsSpecSapPrdha;     // 포장시험에 등록된 SAP 계층코드
 }

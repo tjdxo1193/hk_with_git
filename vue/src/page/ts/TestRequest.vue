@@ -44,6 +44,9 @@ export default {
             FormUtil.setData(this.requestInfo.forms, e.item);
             FormUtil.setData(this.testInfo.forms, e.item);
             this.enableButtons(['init', 'save']);
+            this.disableButtons(['requestRegist']);
+            FormUtil.disable(this.testInfo.forms, ['search']);
+            this.setTxtinfo();
           },
         },
       },
@@ -284,11 +287,22 @@ export default {
       const item = FormUtil.getData(this.testInfo.forms);
       return item.ansTyp === null || item.ansTyp === '' ? true : false;
     },
+    setTxtinfo(){
+      const item1 = this.list.$grid.getSelectedItems();
+      const item = this.list.$grid.getParentColumnByDataField('nbr').children.filter(
+        (row) => row.visible === true,
+      );
+      const txt = item.map(
+        (row) => {
+          if(item1[0].item[row.dataField] !== null){
+            return row.headerText+" : "+item1[0].item[row.dataField]
+          }else{
+            return row.headerText+" : "
+          }
+        }
+      );
+    },
     searchFormEvent(event) {
-      if (event.type === 'input' && event.item.name === 'pitmTyp') {
-        const list = event.item.elements;
-        //console.log(event,'event');
-      }
       if (event.type === 'keydown' && event.originEvent.key === 'Enter') {
         this.getTestRequestList();
       }
@@ -324,6 +338,7 @@ export default {
     testModalReturnDataEvent(data) {
       FormUtil.setData(this.requestInfo.forms, data);
       FormUtil.setData(this.testInfo.forms, data);
+      FormUtil.setData(this.testInfo.forms, {ansTyp : 'S0230005'});
       this.hideModal('testModal');
       this.enableButtons(['init', 'requestRegist']);
     },

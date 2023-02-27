@@ -158,7 +158,7 @@ public class SRMServiceImpl implements SRMService {
 
                     @Override
                     public InterfaceTrsResponse send() {
-                        return publisher.postEAI(TrsInterface.SRM_TEST_RESULT.getEaiServicePath(), Map.of("dataList", data));
+                        return publisher.postEAI(TrsInterface.SRM_TEST_RESULT.getServicePath(), Map.of("dataList", data));
                     }
 
                     @Override
@@ -188,7 +188,7 @@ public class SRMServiceImpl implements SRMService {
 
                     @Override
                     public InterfaceTrsResponse send() {
-                        return publisher.postEAI(TrsInterface.SRM_TEST_STATUS.getEaiServicePath(), Map.of("dataList", data));
+                        return publisher.postEAI(TrsInterface.SRM_TEST_STATUS.getServicePath(), Map.of("dataList", data));
                     }
 
                     @Override
@@ -220,7 +220,7 @@ public class SRMServiceImpl implements SRMService {
 
                     @Override
                     public InterfaceTrsResponse send() {
-                        return publisher.postEAIForFile(TrsInterface.SRM_NON_CFM_REPORT.getEaiServicePath(), Map.of("dataList", data), fileName, fileBytes);
+                        return publisher.postEAIForFile(TrsInterface.SRM_NON_CFM_REPORT.getServicePath(), Map.of("dataList", data), fileName, fileBytes);
                     }
 
                     @Override

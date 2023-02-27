@@ -3,6 +3,7 @@
     <AUIGridSearch
       v-bind="sampleGrid"
       @grid-created="(proxy) => $setState('sampleGrid.$grid', proxy)"
+      @button-click="fetchSampleGrid"
     />
     <template #footer>
       <ButtonBase @click="onSelect">{{ selectText }}</ButtonBase>

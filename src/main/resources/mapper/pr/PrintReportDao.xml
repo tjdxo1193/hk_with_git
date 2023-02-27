@@ -3,58 +3,66 @@
 <mapper namespace="lims.api.pr.dao.PrintReportDao">
 
     <select id="getTestReportList" parameterType="PrintReportVO" resultType="PrintReportVO">
-        SELECT QPAR.PLNT_CD
-            , QPAR.REQ_IDX
-            , QPAR.ISP_REQ_NO
-            , QPAR.ISP_REQ_DT
-            , QPAR.MTR_CD
-            , QPAR.MTR_NM
-            , QPAR.BATCH_NO
-            , QPAR.ETR_QTY
-            , QPAR.INP_UNIT
-            , QPAR.ETR_DT
-            , QPAR.SPL_CD
-            , QPAR.SPL_NM
-            , QPAR.LOT_NO
-            , QPAR.SPL_LOT_NO
-            , QPAR.MAK_DT
-            , QPAR.CSM_NM
-            , QPAR.UDT_DS
-            , QPAR.REV_DS
-            , QP.PITM_CD
-            , QPI.PITM_NM
-            , QPI.PITM_EN
-            , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = QPI.PITM_TYP) AS PITM_TYP_NM
-            , QP.PITM_VER
-            , QPAP.ANS_IDX
-            , QPAP.ANS_NO
-            , QPAP.OOS_YN
-            , QPAP.SYT_JDG
-            , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = QPAP.SYT_JDG) AS SYT_JDG_NM
-            , QPAP.REQ_DT
-            , QPAP.RCP_DT
-            , QPAP.RCP_UID
-            , (SELECT USER_NM FROM SY_USER SU WHERE SU.USER_ID = QPAP.RCP_UID AND SU.PLNT_CD = QPAP.PLNT_CD) AS RCP_UNM
-            , DECODE(QPAP.CLLT_DT, NULL, SYSDATE, QPAP.CLLT_DT) AS CLLT_DT
-            , QPAP.CLLT_UID
-            , (SELECT USER_NM FROM SY_USER SU WHERE SU.USER_ID = QPAP.CLLT_UID AND SU.PLNT_CD = QPAP.PLNT_CD) AS CLLT_UNM
-            , QPAI.SMP_STRG_MTD
-            , QPAI.SMP_VOL_UNIT
-            , (NVL(QPAI.SMP_VOL_ANS, 0) + NVL(QPAI.SMP_VOL_ETC, 0) + NVL(QPAI.SMP_VOL_STRG, 0)) AS SMP_VOL_TOT
-            , QPAI.PKG_MTR_SPEC
-            , QPAI.RMTR_SPEC
-            , QPAI.RMTR_CFMUL
-            , QPAI.RPT_SPCC
-            , QPAI.ARPT_SPCC
+        SELECT QPAR.PLNT_CD,
+               QPAR.REQ_IDX,
+               QPAR.ISP_REQ_NO,
+               QPAR.ISP_REQ_DT,
+               QPAR.MTR_CD,
+               QPAR.MTR_NM,
+               QPAR.BATCH_NO,
+               QPAR.ETR_QTY,
+               QPAR.INP_UNIT,
+               QPAR.ETR_DT,
+               QPAR.SPL_CD,
+               QPAR.SPL_NM,
+               QPAR.LOT_NO,
+               QPAR.SPL_LOT_NO,
+               QPAR.MAK_DT,
+               QPAR.CSM_NM,
+               QPAR.UDT_DS,
+               QPAR.REV_DS,
+               QP.PITM_CD,
+               QPI.PITM_NM,
+               QPI.PITM_EN,
+               (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = QPI.PITM_TYP) AS PITM_TYP_NM,
+               QP.PITM_VER,
+               QPAP.ANS_IDX,
+               QPAP.ANS_NO,
+               QPAP.OOS_YN,
+               QPAP.SYT_JDG,
+               (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = QPAP.SYT_JDG) AS SYT_JDG_NM,
+               QPAP.REQ_DT,
+               QPAP.RCP_DT,
+               QPAP.RCP_UID,
+               (SELECT USER_NM FROM SY_USER SU
+               WHERE SU.USER_ID = QPAP.RCP_UID
+                 AND SU.PLNT_CD = QPAP.PLNT_CD) AS RCP_UNM,
+               DECODE(QPAP.CLLT_DT, NULL, SYSDATE, QPAP.CLLT_DT) AS CLLT_DT,
+               QPAP.CLLT_UID,
+               (SELECT USER_NM FROM SY_USER SU
+               WHERE SU.USER_ID = QPAP.CLLT_UID
+                 AND SU.PLNT_CD = QPAP.PLNT_CD) AS CLLT_UNM,
+               QPAI.SMP_STRG_MTD,
+               QPAI.SMP_VOL_UNIT,
+               (NVL(QPAI.SMP_VOL_ANS, 0) + NVL(QPAI.SMP_VOL_ETC, 0) + NVL(QPAI.SMP_VOL_STRG, 0)) AS SMP_VOL_TOT,
+               QPAI.PKG_MTR_SPEC,
+               QPAI.RMTR_SPEC,
+               QPAI.RMTR_CFMUL,
+               QPAI.RPT_SPCC,
+               QPAI.ARPT_SPCC
         FROM QT_PITM_ANS_REQ QPAR
-        LEFT JOIN QT_PITM_ANS_PROC QPAP ON QPAR.REQ_IDX = QPAP.REQ_IDX AND QPAR.PLNT_CD = QPAP.PLNT_CD
-        LEFT JOIN QT_PITM_ANS_INFO QPAI ON QPAP.ANS_IDX = QPAI.ANS_IDX AND QPAP.PLNT_CD = QPAI.PLNT_CD
-        LEFT JOIN QM_PITM_SPEC QPS ON QPAP.PITM_SPEC_IDX = QPS.PITM_SPEC_IDX AND QPAR.MTR_CD = QPS.PITM_CD AND QPAP.PLNT_CD = QPS.PLNT_CD
-        LEFT JOIN QM_PITM QP ON QPS.PITM_CD = QP.PITM_CD AND QPS.PITM_VER = QP.PITM_VER AND QPS.PLNT_CD = QP.PLNT_CD
-        LEFT JOIN QM_PITM_INFO QPI ON QP.PITM_CD = QPI.PITM_CD AND QP.PITM_VER = QPI.PITM_VER AND QP.PLNT_CD = QPI.PLNT_CD
-        LEFT JOIN QM_PITM_INFO_SAP QPIS ON QP.PITM_CD = QPIS.PITM_CD AND QP.PITM_VER = QPIS.PITM_VER AND QP.PLNT_CD = QPIS.PLNT_CD
-        WHERE QPAR.PLNT_CD = '1100'
-        AND QPAP.HLD_YN = 'N'
+            LEFT JOIN QT_PITM_ANS_PROC QPAP ON QPAR.REQ_IDX = QPAP.REQ_IDX AND QPAR.PLNT_CD = QPAP.PLNT_CD
+            LEFT JOIN QT_PITM_ANS_INFO QPAI ON QPAP.ANS_IDX = QPAI.ANS_IDX AND QPAP.PLNT_CD = QPAI.PLNT_CD
+            LEFT JOIN QM_PITM_SPEC QPS ON QPAP.PITM_SPEC_IDX = QPS.PITM_SPEC_IDX
+                                              AND QPAR.MTR_CD = QPS.PITM_CD AND QPAP.PLNT_CD = QPS.PLNT_CD
+            LEFT JOIN QM_PITM QP ON QPS.PITM_CD = QP.PITM_CD
+                                        AND QPS.PITM_VER = QP.PITM_VER AND QPS.PLNT_CD = QP.PLNT_CD
+        LEFT JOIN QM_PITM_INFO QPI ON QP.PITM_CD = QPI.PITM_CD
+                                          AND QP.PITM_VER = QPI.PITM_VER AND QP.PLNT_CD = QPI.PLNT_CD
+        LEFT JOIN QM_PITM_INFO_SAP QPIS ON QP.PITM_CD = QPIS.PITM_CD
+                                               AND QP.PITM_VER = QPIS.PITM_VER AND QP.PLNT_CD = QPIS.PLNT_CD
+        WHERE QPAR.PLNT_CD = #{plntCd}
+            AND QPAP.HLD_YN = 'N'
         <if test="sytJdg != null and sytJdg != ''">
             AND QPAP.SYT_JDG = #{sytJdg}
         </if>
@@ -142,23 +150,28 @@
             C.MKR_QTY,
             C.AITM_RMK
         FROM QT_PITM_ANS_PROC A
-        JOIN QT_PITM_ANS_INFO B ON A.PLNT_CD = B.PLNT_CD AND A.ANS_IDX = B.ANS_IDX
-        JOIN QT_PITM_ANS_RST C ON A.PLNT_CD = C.PLNT_CD AND A.ANS_IDX = C.ANS_IDX
-        JOIN QM_PITM_SPEC D ON A.PLNT_CD = D.PLNT_CD AND A.PITM_SPEC_IDX = D.PITM_SPEC_IDX
-        JOIN QM_PITM E ON D.PLNT_CD = E.PLNT_CD AND D.PITM_CD = E.PITM_CD AND D.PITM_VER = E.PITM_VER
-        JOIN QM_PITM_INFO F ON E.PLNT_CD = F.PLNT_CD AND E.PITM_CD = F.PITM_CD AND E.PITM_VER = F.PITM_VER
-        JOIN QT_PITM_ANS_REQ G ON A.PLNT_CD = G.PLNT_CD AND A.REQ_IDX = G.REQ_IDX
-        JOIN MS_AMITM H ON C.AMITM_CD = H.AMITM_CD
-        JOIN MS_AITM I ON H.AITM_CD = I.AITM_CD
+            JOIN QT_PITM_ANS_INFO B ON A.PLNT_CD = B.PLNT_CD AND A.ANS_IDX = B.ANS_IDX
+            JOIN QT_PITM_ANS_RST C ON A.PLNT_CD = C.PLNT_CD AND A.ANS_IDX = C.ANS_IDX
+            JOIN QM_PITM_SPEC D ON A.PLNT_CD = D.PLNT_CD AND A.PITM_SPEC_IDX = D.PITM_SPEC_IDX
+            JOIN QM_PITM E ON D.PLNT_CD = E.PLNT_CD AND D.PITM_CD = E.PITM_CD AND D.PITM_VER = E.PITM_VER
+            JOIN QM_PITM_INFO F ON E.PLNT_CD = F.PLNT_CD AND E.PITM_CD = F.PITM_CD AND E.PITM_VER = F.PITM_VER
+            JOIN QT_PITM_ANS_REQ G ON A.PLNT_CD = G.PLNT_CD AND A.REQ_IDX = G.REQ_IDX
+            JOIN MS_AMITM H ON C.AMITM_CD = H.AMITM_CD
+            JOIN MS_AITM I ON H.AITM_CD = I.AITM_CD
         WHERE A.ANS_IDX = #{ansIdx} AND C.DEL_YN = 'N'
         ORDER BY C.RST_SEQ
     </select>
 
-    <update id="updateRptInfo" parameterType="PrintReportVO">
-        UPDATE QT_PITM_ANS_INFO SET
-            RPT_SPCC = #{rptSpcc}
-            , ARPT_SPCC = #{arptSpcc}
-        WHERE PLNT_CD = #{plntCd} AND ANS_IDX = #{ansIdx}
+    <update id="createReportInfo" parameterType="PrintReportVO">
+        <selectKey resultType="Integer" order="BEFORE" >
+            SELECT NVL(MAX(ARPT_SEQ) + 1, 1) AS ARPT_SEQ
+            FROM QT_PITM_ANS_ARPT QPAA
+            WHERE QPAA.PLNT_CD = #{plntCd}
+            AND QPAA.ANS_IDX = #{ansIdx}
+        </selectKey>
+
     </update>
+
+
 
 </mapper>

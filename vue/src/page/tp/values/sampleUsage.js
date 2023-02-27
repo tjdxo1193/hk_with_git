@@ -130,7 +130,7 @@ const inputForm = {
       .Input('remains', '재고량', { readonly: true })
       .Datepicker('useDt', '사용일자', { value: todayDate, _required: true })
       .Input('inpUnit', '입력단위', { readonly: true })
-      .InputNumber('useSmpVol', '사용검체량', { _required: true })
+      .InputNumber('useSmpVol', '사용량', { _required: true })
       .Input('strgPla', '보관장소', { maxLength: 18 })
       .Textarea('usePps', '사용목적', { maxLength: 4000 })
       .build(),

@@ -45,6 +45,8 @@ const list = {
       .col('fileIdx', false)
       .col('fileCnt', '첨부파일', { colSpan: 2, width: 50 })
       .button('fileAttacher', '첨부', { width: 50 })
+      .col('rptCnt', '재발방지대책서', { colSpan: 2, width: 50 })
+      .button('prvRcrReport', '첨부', { width: 50 })
       .col('rcpDt', '접수일자')
       .col('emgYn', '긴급')
       .col('ansNo', '시험번호', { width: 90 })

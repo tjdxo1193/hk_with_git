@@ -1,6 +1,7 @@
 package lims.api.ms.dao;
 
 import lims.api.common.domain.AuditEvent;
+import lims.api.ms.entity.QmPitm;
 import lims.api.ms.entity.QmPitmAitmSpec;
 import lims.api.ms.entity.QmPitmSpec;
 import lims.api.ms.entity.QmPitmSpecAitm;
@@ -62,4 +63,12 @@ public interface SpecManageDao {
     List<SpecManageVO> getSemiPItemListToModal(SpecManageVO param);
 
     List<SpecManageAitmVO> getSemiAItemListToModal(SpecManageVO param);
+
+    @Audit(target = QmPitm.class, label = AuditEvent.Item.update)
+    int updatePkgaCd(SpecManageVO param);
+
+    @Audit(target = QmPitmSpec.class, label = AuditEvent.Item.updateSpec)
+    int updateAitmSpecIdx(SpecManageVO param);
+
+    int checkPreviousAItemIdx(SpecManageVO param);
 }

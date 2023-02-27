@@ -9,6 +9,7 @@ import lims.api.integration.service.impl.IntegrationSender;
 import lims.api.integration.vo.intergation.InterfaceSendVO;
 import lims.api.ts.dao.TestReceiptDao;
 import lims.api.ts.enums.TestProcess;
+import lims.api.ts.enums.TestType;
 import lims.api.ts.service.TestReceiptService;
 import lims.api.ts.vo.TestReceiptVO;
 import lombok.RequiredArgsConstructor;
@@ -43,8 +44,8 @@ public class TestReceiptServiceImpl implements TestReceiptService {
         for (TestReceiptVO item : request) {
             item.setAnsProcCd(TestProcess.TEST_COLLECTION.getProcessCode());
             if(item.getAnsIdx() == 0){
-                String etrDt = item.getEtrDt();
-                LocalDate nextDate = calculator.plusWorkdays(etrDt, item.getAnsDurDay(), TimeUnit.DAY);
+                String ispReqDt = item.getIspReqDt();
+                LocalDate nextDate = calculator.plusWorkdays(ispReqDt, item.getAnsDurDay(), TimeUnit.DAY);
                 item.setCplRqmDt(nextDate.toString());
                 int ansIdx = dao.getAnsIdx(item.getPlntCd());
                 item.setAnsIdx(ansIdx);
@@ -53,7 +54,7 @@ public class TestReceiptServiceImpl implements TestReceiptService {
             }else{
                 LocalDate nextDate;
                 String ansEdt = item.getAnsEdt();
-                if(item.getAnsTyp().equals("S0230004")){
+                if(item.getAnsTyp().equals(TestType.STABILITY.getValue())){
                     nextDate = calculator.plusWorkdays(ansEdt, 5, TimeUnit.DAY);
                 }else{
                     nextDate = calculator.plusWorkdays(ansEdt, item.getAnsDurDay(), TimeUnit.DAY);
@@ -74,6 +75,7 @@ public class TestReceiptServiceImpl implements TestReceiptService {
                     .ispReqNo(item.getIspReqNo())
                     .phsOrderNo(item.getPhsOrderNo())
                     .pdtOrderNo(item.getPdtOrderNo())
+                    .testType(TestType.of(item.getAnsTyp()))
                     .build();
             sender.sendTestStatus(data);
         }

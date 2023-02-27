@@ -8,6 +8,7 @@ import lims.api.integration.service.impl.IntegrationSender;
 import lims.api.integration.vo.intergation.InterfaceSendVO;
 import lims.api.ts.dao.TestResultCancelDao;
 import lims.api.ts.enums.TestProcess;
+import lims.api.ts.enums.TestType;
 import lims.api.ts.service.TestResultCancelService;
 import lims.api.ts.vo.TestResultCancelVO;
 import lombok.RequiredArgsConstructor;
@@ -122,6 +123,7 @@ public class TestResultCancelServiceImpl implements TestResultCancelService {
                 .ispReqNo(item.getIspReqNo())
                 .phsOrderNo(item.getPhsOrderNo())
                 .pdtOrderNo(item.getPdtOrderNo())
+                .testType(TestType.of(item.getAnsTyp()))
                 .build();
         return data;
     }

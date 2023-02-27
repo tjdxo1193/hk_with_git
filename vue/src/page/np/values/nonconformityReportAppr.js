@@ -91,6 +91,8 @@ const testInfo = {
     $grid: null,
     props: { editable: false },
     buttons: [
+      { name: 'noncfmReport', label: '부적합통보서', disabled: true },
+      { name: 'prvRcrReport', label: '재발방지대책서', disabled: true },
       { name: 'reject', label: '반려', disabled: true },
       { name: 'approve', label: '승인', disabled: true },
       { name: 'init', label: '초기화', disabled: true },
@@ -104,6 +106,7 @@ const testInfo = {
       .Hidden('phsOrderNo', '구매오더번호')
       .Hidden('pdtOrderNo', '생산오더번호')
       .Hidden('phsOrderItm', '구매오더항목')
+      .Hidden('ansTyp')
       .Input('pitmTyp', '자재구분', { readonly: true })
       .Input('pitmNm', '자재내역', { readonly: true })
       .Input('pitmCd', '자재번호', { readonly: true })

@@ -11,7 +11,7 @@ const prdDivList = [
   { value: 'S', label: '반제품' },
 ];
 
-const pItemSpecList = {
+const pItemSpecForm = {
   static: {
     title: 'ELN규격목록',
     $grid: null,
@@ -32,6 +32,17 @@ const pItemSpecList = {
       .required()
       .DatepickerTwin('ifDt', '연계일시', { value: [monthAgoDate, todayDate] })
       .build(),
+};
+
+const pItemSpecList = {
+  static: {
+    title: '자재목록',
+    $grid: null,
+    props: {
+      editable: false,
+      showRowCheckColumn: false,
+    },
+  },
   columns: () =>
     ColumnBuilder.builder()
       .col('plntCd', '공장코드')
@@ -39,7 +50,7 @@ const pItemSpecList = {
       .col('prdDiv', '반제품구분')
       .col('ifDt', '연계일시')
       .build(),
-};
+}
 
 const aItemList = {
   static: {
@@ -118,6 +129,7 @@ const aItemList = {
 };
 
 export default {
+  pItemSpecForm,
   pItemSpecList,
   aItemList,
 };

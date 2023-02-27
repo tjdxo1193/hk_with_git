@@ -119,6 +119,7 @@ const requestInfo = {
       .Hidden('lotNo')
       .Hidden('batchNo')
       .Hidden('ispReqNo')
+      .Hidden('ansTyp')
       .Input('pitmNm', '자재내역', { readonly: true })
       .spanCol(2)
       .Input('ansNo', '시험번호', { readonly: true })

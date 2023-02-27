@@ -5,6 +5,7 @@ import lims.api.integration.enums.*;
 import lims.api.integration.vo.MESSendVO;
 import lims.api.integration.vo.SAPSendVO;
 import lims.api.integration.vo.SRMSendVO;
+import lims.api.ts.enums.TestType;
 import lims.api.util.StringUtil;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -46,6 +47,8 @@ public class InterfaceSendVO {
         private String phsOrderNo;          // 구매오더번호
         @Getter
         private String pdtOrderNo;          // 생산오더번호
+        @Getter
+        private TestType testType;          // 시험 유형
 
         public SAPSendVO.TestStatus toSAP() {
             return SAPSendVO.TestStatus.builder()
@@ -96,6 +99,8 @@ public class InterfaceSendVO {
         private String phsOrderNo;          // 구매오더번호
         @Getter
         private String pdtOrderNo;          // 생산오더번호
+        @Getter
+        private TestType testType;          // 시험 유형
 
         public SAPSendVO.TestResult toSAP() {
             return SAPSendVO.TestResult.builder()
@@ -152,6 +157,8 @@ public class InterfaceSendVO {
         @Getter
         private String pdtOrderNo;
         private String orderItm;
+        @Getter
+        private TestType testType;          // 시험 유형
 
         public SRMSendVO.NonCfmReport toSRM(ReportDivOfNonCfm reportDiv) {
             return SRMSendVO.NonCfmReport.builder()

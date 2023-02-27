@@ -15,7 +15,7 @@ public class SyUser {
     private String userTel;
     private String userLognId;
     private String emid;
-    private String graderNm;
+    private String gradeNm;
     private String titleNm;
     private Character ansYn;
     private Character clltYn;

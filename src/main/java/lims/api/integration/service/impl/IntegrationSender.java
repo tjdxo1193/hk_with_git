@@ -9,13 +9,16 @@ import lims.api.integration.vo.SAPSendVO;
 import lims.api.integration.vo.intergation.ConvertMrd;
 import lims.api.integration.vo.intergation.InterfaceSendVO;
 import lims.api.integration.vo.intergation.TempFile;
+import lims.api.ts.enums.TestType;
 import lims.api.util.FileUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class IntegrationSender {
@@ -32,10 +35,14 @@ public class IntegrationSender {
      * 품질 시험의 특정 상태마다 연계 시스템으로 현재 시험 상태 정보를 보낸다.
      */
     public void sendTestStatus(InterfaceSendVO.TestStatus data) {
-        sapService.publishTestStatus(data.toSAP());
-        if (data.isMES()) {
-            mesService.publishTestStatus(data.toMES());
+        if (TestType.byNotSAP(data.getTestType())) {
+            log.info("[sendTestStatus] This test is not by SAP");
+            return;
         }
+        sapService.publishTestStatus(data.toSAP());
+//        if (data.isMES()) {
+//            mesService.publishTestStatus(data.toMES());
+//        }
         if (data.isSRM()) {
             srmService.publishTestStatus(data.toSRM());
         }
@@ -45,10 +52,14 @@ public class IntegrationSender {
      * 품질 시험의 결과 판정 정보를 보낸다.
      */
     public void sendTestResult(InterfaceSendVO.TestResult data) {
-        sapService.publishTestResultJudgment(data.toSAP());
-        if (data.isMES()) {
-            mesService.publishTestResultJudgment(data.toMES());
+        if (TestType.byNotSAP(data.getTestType())) {
+            log.info("[sendTestResult] This test is not by SAP");
+            return;
         }
+        sapService.publishTestResultJudgment(data.toSAP());
+//        if (data.isMES()) {
+//            mesService.publishTestResultJudgment(data.toMES());
+//        }
         if (data.isSRM()) {
             srmService.publishTestResultJudgment(data.toSRM());
         }
@@ -59,19 +70,23 @@ public class IntegrationSender {
      * SRM. MES -> 부적합 보고서(PDF), 재발방지대책서 (DOC) 전송
      */
     public void sendNonconformityReport(InterfaceSendVO.NonconformityReport data, ConvertMrd nonconformityReport, ConvertMrd reoccurReport) {
-        if (nonconformityReport != null) {
-            sendNonconformityReportToSRMAndMES(data, nonconformityReport, ReportDivOfNonCfm.A);
+        if (TestType.byNotSAP(data.getTestType())) {
+            log.info("[sendNonconformityReport] This test is not by SAP");
+            return;
         }
-        if (reoccurReport != null) {
+//        if (nonconformityReport != null && data.isMES()) {
+//            sendNonconformityReportToSRMAndMES(data, nonconformityReport, ReportDivOfNonCfm.A);
+//        }
+        if (reoccurReport != null && data.isSRM()) {
             sendNonconformityReportToSRMAndMES(data, reoccurReport, ReportDivOfNonCfm.B);
         }
     }
 
     private void sendNonconformityReportToSRMAndMES(InterfaceSendVO.NonconformityReport data, ConvertMrd convertMrd, ReportDivOfNonCfm reportDiv) {
         TempFile tempFile = rdHelper.toTempFile(convertMrd.getName(), convertMrd.getParameter(), convertMrd.getTargetFullName());
-        if (data.isMES()) {
-            mesService.publishNonCfmReport(data.toMES(), FileUtil.getName(tempFile.getFile()), FileUtil.toBytes(tempFile.getFile()));
-        }
+//        if (data.isMES()) {
+//            mesService.publishNonCfmReport(data.toMES(), FileUtil.getName(tempFile.getFile()), FileUtil.toBytes(tempFile.getFile()));
+//        }
         if (data.isSRM()) {
             srmService.publishNonCfmReport(data.toSRM(reportDiv), FileUtil.getName(tempFile.getFile()), FileUtil.toBytes(tempFile.getFile()));
         }

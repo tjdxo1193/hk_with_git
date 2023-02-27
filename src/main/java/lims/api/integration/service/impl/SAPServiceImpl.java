@@ -7,6 +7,7 @@ import lims.api.integration.enums.*;
 import lims.api.integration.exception.IntegrationNoSavedException;
 import lims.api.integration.model.InterfaceTrsResponse;
 import lims.api.integration.model.interfaceTrsSAPPurchasePerformResponse;
+import lims.api.integration.service.QMSService;
 import lims.api.integration.service.SAPService;
 import lims.api.integration.service.TrsService;
 import lims.api.integration.service.impl.postProcessor.InterfacePostProcessorMap;
@@ -32,18 +33,21 @@ public class SAPServiceImpl implements SAPService {
     private final InterfaceCommonDao commonDao;
     private final TrsService trsService;
     private final InterfacePostProcessorMap postProcessorMap;
+    private final QMSService qmsService;
 
     public SAPServiceImpl(InterfaceSystemFactory factory,
                           HttpEntityFactory entityFactory,
                           SAPDao sapDao,
                           InterfaceCommonDao commonDao,
                           TrsService trsService,
-                          InterfacePostProcessorMap postProcessorMap) {
+                          InterfacePostProcessorMap postProcessorMap,
+                          QMSService qmsService) {
         this.publisher = new Publisher(factory.createSystem(InterfaceSystemType.SAP), entityFactory);
         this.sapDao = sapDao;
         this.commonDao = commonDao;
         this.trsService = trsService;
         this.postProcessorMap = postProcessorMap;
+        this.qmsService = qmsService;
     }
 
     @Override
@@ -127,6 +131,9 @@ public class SAPServiceImpl implements SAPService {
             throw new IntegrationNoSavedException();
         }
 
+        new Thread(() -> qmsService
+                .publishMaterial(param))
+                .start();
         new Thread(() -> postProcessorMap
                 .get(revInterface)
                 .execute(new RevStateful(degree, infoIdx)))
@@ -299,7 +306,7 @@ public class SAPServiceImpl implements SAPService {
 
                     @Override
                     public InterfaceTrsResponse send() {
-                        return publisher.postEAI(TrsInterface.SAP_TEST_RESULT.getEaiServicePath(), Map.of("dataList", data));
+                        return publisher.postEAI(TrsInterface.SAP_TEST_RESULT.getServicePath(), Map.of("dataList", data));
                     }
 
                     @Override
@@ -329,7 +336,7 @@ public class SAPServiceImpl implements SAPService {
 
                     @Override
                     public InterfaceTrsResponse send() {
-                        return publisher.postEAI(TrsInterface.SAP_TEST_STATUS.getEaiServicePath(), Map.of("dataList", data));
+                        return publisher.postEAI(TrsInterface.SAP_TEST_STATUS.getServicePath(), Map.of("dataList", data));
                     }
 
                     @Override
@@ -359,7 +366,7 @@ public class SAPServiceImpl implements SAPService {
                     @Override
                     public InterfaceTrsResponse send() {
                         interfaceTrsSAPPurchasePerformResponse response = publisher.postEAI(
-                                TrsInterface.SAP_TEST_PERFORM_OF_INBOUND_PURCHASE.getEaiServicePath(),
+                                TrsInterface.SAP_TEST_PERFORM_OF_INBOUND_PURCHASE.getServicePath(),
                                 Map.of("dataList", data),
                                 interfaceTrsSAPPurchasePerformResponse.class);
                         return response.toTrsResponse();
@@ -417,7 +424,7 @@ public class SAPServiceImpl implements SAPService {
                     @Override
                     public InterfaceTrsResponse send() {
                         return publisher.postEAI(
-                                TrsInterface.SAP_TEST_PERFORM_OF_INBOUND_MANUFACTURE.getEaiServicePath(),
+                                TrsInterface.SAP_TEST_PERFORM_OF_INBOUND_MANUFACTURE.getServicePath(),
                                 Map.of("dataList", data)
                         );
                     }
@@ -454,7 +461,7 @@ public class SAPServiceImpl implements SAPService {
                         body.put("xsysid", "LIMS");
                         body.put("dataList", data);
                         return publisher.postEAI(
-                                TrsInterface.SAP_ASSETS_MOVEMENT_HISTORY.getEaiServicePath(),
+                                TrsInterface.SAP_ASSETS_MOVEMENT_HISTORY.getServicePath(),
                                 body
                         );
                     }

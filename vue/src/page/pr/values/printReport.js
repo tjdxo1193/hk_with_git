@@ -15,7 +15,6 @@ const list = {
     props: {
       editable: false,
       showRowCheckColumn: false,
-      //headerHeight:'40px',
       rowStyleFunction: function (rowIndex, item) {
         if (item.useVerYn === 'N' || item.specUseVerYn === 'N') {
           return 'standardNoSet';
@@ -46,8 +45,8 @@ const list = {
       .build(),
   columns: () =>
     ColumnBuilder.builder()
-      .col('reqIdx', false)
-      .col('plntCd', '플랜트코드')
+      .col('reqIdx', { visible: false })
+      .col('plntCd', { visible: false })
       .col('pitmCd', '자재번호')
       .col('pitmNm', '자재내역')
       .col('pitmEn', '자재내역(영문)')

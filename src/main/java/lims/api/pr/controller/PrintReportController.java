@@ -37,9 +37,9 @@ public class PrintReportController {
         return ResponseEntity.ok(service.getTestItmList(request));
     }
 
-    @PutMapping("/updateRptInfo")
+    @PostMapping
     public ResponseEntity<CommonResponse> updateRptInfo(@AuthToken Token token, @RequestBody PrintReportVO request) {
-        service.updateRptInfo(request);
+        //service.updateRptInfo(request);
         return ResponseEntity.ok(new CommonResponse());
     }
 }

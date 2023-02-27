@@ -129,4 +129,6 @@ public class TestResultCancelVO implements UpdateDetect {
     private String pdtOrderNo; //생산 오더 번호
     private String nonCfmRea; //부적합사유
     private String pitmSpcc; //품목 특이사항
+    private String addCol1;
+    private String ansTyp;
 }

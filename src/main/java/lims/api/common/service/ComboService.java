@@ -13,7 +13,7 @@ public interface ComboService {
     List<ComboVO> getTreeComboByParentCode(ComboSearchVO param);
     List<ComboVO> getUser(String plntCd);
     List<ComboVO> getDpt(String plntCd);
-    List<ComboVO> getAnsCyl();
+    List<ComboVO> getAnsCyl(String plntCd);
     List<ComboVO> getAmItmCd();
     List<ComboVO> getApproverList(String plntCd);
     List<ComboVO> getReviewerList(String plntCd);

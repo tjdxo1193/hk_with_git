@@ -55,7 +55,9 @@
             A.SYT_JDG,
             B.NON_CFM_REA,
             B.PITM_SPCC,
-            G.ISP_REQ_NO
+            G.ADD_COL1,
+            G.ISP_REQ_NO,
+            A.ANS_TYP
         FROM QT_PITM_ANS_PROC A
         JOIN QT_PITM_ANS_INFO B ON A.PLNT_CD = B.PLNT_CD AND A.ANS_IDX = B.ANS_IDX
         JOIN QM_PITM_SPEC D ON A.PLNT_CD = D.PLNT_CD AND A.PITM_SPEC_IDX = D.PITM_SPEC_IDX

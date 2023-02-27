@@ -91,6 +91,8 @@ const testInfo = {
     $grid: null,
     props: { editable: false },
     buttons: [
+      { name: 'noncfmReport', label: '부적합통보서', disabled: true },
+      { name: 'prvRcrReport', label: '재발방지대책서', disabled: true },
       { name: 'save', label: '저장', disabled: true },
       { name: 'request', label: '승인요청', disabled: true },
       { name: 'init', label: '초기화', disabled: true },

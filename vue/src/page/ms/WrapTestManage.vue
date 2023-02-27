@@ -302,8 +302,7 @@ export default {
       const { forms } = this.versionForm;
 
       if (boolean) {
-        FormUtil.enable(forms, 'pkgaDiv');
-        FormUtil.enable(forms, 'sapPrdha');
+        FormUtil.enable(forms, ['pkgaDiv', 'sapPrdha', 'pkgaTypNm']);
       } else {
         FormUtil.disable(forms);
       }

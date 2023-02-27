@@ -440,7 +440,7 @@
             , SMP_VOL_UNIT
             , SMP_VOL_ANS
             , SMP_VOL_ETC
-            , SMP_VOL_MNG
+            , SMP_VOL_STRG
             , ANS_NEW_YN
             , MIC_YN
             , EMG_YN
@@ -461,7 +461,7 @@
             , SMP_VOL_UNIT
             , SMP_VOL_ANS
             , SMP_VOL_ETC
-            , SMP_VOL_MNG
+            , SMP_VOL_STRG
             , (SELECT DECODE(COUNT(*),0,'Y','N') FROM QT_PITM_ANS_PROC QPAP
                 LEFT JOIN QM_PITM_SPEC QPS ON QPAP.PITM_SPEC_IDX = QPS.PITM_SPEC_IDX AND QPS.PITM_CD = #{pitmCd}) AS ANS_NEW_YN
             , MIC_YN

@@ -14,12 +14,15 @@ import lims.api.ms.vo.ItemApprSpecVO;
 import lims.api.ms.vo.ItemManageVO;
 import lims.api.ms.vo.MsElnCtRptFileVO;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 
+import java.io.OptionalDataException;
+import java.text.Format;
 import java.util.List;
 import java.util.Optional;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ItemManageServiceImpl implements ItemManageService {
@@ -43,14 +46,6 @@ public class ItemManageServiceImpl implements ItemManageService {
         int result = 0;
         result += dao.updateQmPitm(param);
         result += dao.updateQmPitmInfo(param);
-
-        if(isWrap(param)){
-            param.setSpecProcCd(SpecProgress.APPROVED.getCode());
-            param.setAitmSpecIdx(dao.findAItemSpecIdxBySapCode(param));
-            if(param.getAitmSpecIdx() != null){
-                result += dao.updateSpecNewAitemIdxBySapCode(param);
-            }
-        }
 
         if (result == 0) {
             throw new NoUpdatedDataException();
@@ -84,7 +79,7 @@ public class ItemManageServiceImpl implements ItemManageService {
         result += dao.createQmPitmInfoSap(param);
 
         param.setPitmVer(param.getPitmVer() - 1);
-        result += updateMatchedSpec(param);
+        result += specRevision(param);
 
         if (result != 5) {
             throw new NoCreatedDataException();
@@ -92,42 +87,50 @@ public class ItemManageServiceImpl implements ItemManageService {
 
     }
 
-    private boolean isWrap(ItemManageVO param) {
-        String pitmTyp = param.getPitmTyp();
-        return pitmTyp.equals(PItemType.PACKAGING_MATERIAL.getCode())
-                || pitmTyp.equals(PItemType.FINISHED_SET.getCode())
-                || pitmTyp.equals(PItemType.FINISHED_SINGLE.getCode());
+    private boolean isWrapItemType(ItemManageVO param) {
+        String itemType = param.getPitmTyp();
+        return itemType.equals(PItemType.PACKAGING_MATERIAL.getCode())
+                || itemType.equals(PItemType.FINISHED_SET.getCode())
+                || itemType.equals(PItemType.FINISHED_SINGLE.getCode());
     }
 
-    public int updateMatchedSpec(ItemManageVO param){
-        ItemApprSpecVO itemSpecVO = Optional.ofNullable(dao.findOldSpecInfo(param)).orElse(new ItemApprSpecVO());
-        Integer oldPItemSpecIdx = Optional.ofNullable(itemSpecVO.getPitmSpecIdx()).orElse(0);
-        Integer oldAItemSpecIdx = Optional.ofNullable(itemSpecVO.getOldAitmSpecIdx()).orElse(0);
-        String specProcCode = Optional.ofNullable(itemSpecVO.getSpecProcCd()).orElse("");
+    private boolean isElnItemType(ItemManageVO param) {
+        String itemType = param.getPitmTyp();
+        return itemType.equals(PItemType.SEMI_MANUFACTURES_FILLING_FOAM.getCode())
+                || itemType.equals(PItemType.SEMI_MANUFACTURES_OTHER_PRODUCT.getCode())
+                || itemType.equals(PItemType.SEMI_MANUFACTURES_BULK.getCode())
+                || itemType.equals(PItemType.SEMI_MANUFACTURES_BASE.getCode());
+    }
+
+    public int specRevision(ItemManageVO param) {
+        ItemApprSpecVO itemSpecVO = Optional.ofNullable(dao.findOldSpecInfo(param))
+                .orElseThrow(() -> new IllegalArgumentException("No previous specifications found. vo is empty."));
+        Integer oldAItemSpecIdx = Optional.ofNullable(itemSpecVO.getOldAitmSpecIdx())
+                .orElseThrow(() -> new IllegalArgumentException(String.format("oldAItemSpecIdx => %s , is Invalid value.", itemSpecVO.getOldAitmSpecIdx())));
+        String specProcCode = Optional.ofNullable(itemSpecVO.getSpecProcCd())
+                .orElseThrow(() -> new IllegalArgumentException(String.format("specProcCode => %s , is Invalid value.", itemSpecVO.getSpecProcCd())));
+
+        if (oldAItemSpecIdx == 0 || specProcCode.equals(SpecProgress.TEMPORARY_STORAGE.getCode())){
+            throw new IllegalArgumentException(String.format("specProcCode => %s , oldAItemSpecIdx => %s, Data not suitable for revision", itemSpecVO.getSpecProcCd(), itemSpecVO.getOldAitmSpecIdx()));
+        }
 
         itemSpecVO.setDelYn("N");
         itemSpecVO.setUseVerYn("N");
         itemSpecVO.setPlntCd(param.getPlntCd());
         itemSpecVO.setPitmCd(param.getPitmCd());
         itemSpecVO.setPitmVer(param.getPitmVer() + 1);
+        itemSpecVO.setAitmSpecIdx(null);
         itemSpecVO.setSpecProcCd(SpecProgress.TEMPORARY_STORAGE.getCode());
-        ItemManageVO newVO = dao.findNewAitmSpecIdx(itemSpecVO);
-        itemSpecVO.setAitmSpecVer(newVO.getAitmSpecVer());
-
-        if (oldAItemSpecIdx == 0 || specProcCode.equals(SpecProgress.TEMPORARY_STORAGE.getCode())){
-            return dao.updateSpecNewPItemVer(itemSpecVO);
-        }
 
         if (specProcCode.equals(SpecProgress.APPROVED.getCode())){
-            if(!isWrap(param)){
-                itemSpecVO.setAitmSpecIdx(newVO.getAitmSpecIdx());
-                dao.createQmPitmAitmSpec(itemSpecVO);
-                dao.createQmPitmSpecAitm(itemSpecVO);
-            }else{
+            dao.updateOldSpecUseVerN(itemSpecVO);
+            if(!isWrapItemType(param) || !isElnItemType(param)){
                 itemSpecVO.setAitmSpecIdx(itemSpecVO.getOldAitmSpecIdx());
             }
-            dao.updateOldSpecUseVerN(itemSpecVO);
+        }else{
+            log.info("[bug report] param is not specApproved code. code: {}.", specProcCode);
         }
+
         return dao.createQmPitmSpec(itemSpecVO);
     }
 

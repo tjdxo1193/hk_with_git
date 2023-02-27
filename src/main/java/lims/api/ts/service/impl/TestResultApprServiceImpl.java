@@ -10,6 +10,7 @@ import lims.api.integration.service.impl.IntegrationSender;
 import lims.api.integration.vo.intergation.InterfaceSendVO;
 import lims.api.ts.dao.TestResultApprDao;
 import lims.api.ts.enums.TestProcess;
+import lims.api.ts.enums.TestType;
 import lims.api.ts.service.TestResultApprService;
 import lims.api.ts.vo.TestResultApprVO;
 import lombok.RequiredArgsConstructor;
@@ -81,6 +82,7 @@ public class TestResultApprServiceImpl implements TestResultApprService {
                     .menge(row.getSmpVolTot())
                     .phsOrderNo(row.getPhsOrderNo())
                     .pdtOrderNo(row.getPdtOrderNo())
+                    .testType(TestType.of(row.getAnsTyp()))
                     .build();
             sender.sendTestResult(data);
         }
@@ -106,6 +108,7 @@ public class TestResultApprServiceImpl implements TestResultApprService {
                     .ispReqNo(row.getIspReqNo())
                     .phsOrderNo(row.getPhsOrderNo())
                     .pdtOrderNo(row.getPdtOrderNo())
+                    .testType(TestType.of(row.getAnsTyp()))
                     .build();
             sender.sendTestStatus(data);
         }

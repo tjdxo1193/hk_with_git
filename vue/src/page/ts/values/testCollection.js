@@ -153,7 +153,7 @@ const testCollectionInfo = {
           .build(),
       )
       .Select('clltMtd', '채취방법', {
-        async: () => api.combo.userCommon.getStrgPlaCombo(),
+        async: () => api.combo.userCommon.getClltMtdCombo(),
       })
       .InputNumber('smpVolAns', '시험검체량')
       .required()

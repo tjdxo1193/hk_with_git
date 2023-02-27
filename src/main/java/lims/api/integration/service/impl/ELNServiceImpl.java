@@ -123,7 +123,7 @@ public class ELNServiceImpl implements ELNService {
 
                     @Override
                     public InterfaceTrsResponse send() {
-                        return publisher.postEAI(TrsInterface.ELN_METHOD_BY_ITEM.getEaiServicePath(), Map.of("dataList", data));
+                        return publisher.postEAI(TrsInterface.ELN_METHOD_BY_ITEM.getServicePath(), Map.of("dataList", data));
                     }
 
                     @Override

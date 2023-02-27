@@ -72,11 +72,12 @@
         CONNECT BY PRIOR DPT_CD = HIR_DPT_CD AND PLNT_CD = #{plantCode}
     </select>
 
-    <select id="getAnsCyl" resultType="ComboVO">
+    <select id="getAnsCyl" resultType="ComboVO" parameterType="String">
         SELECT ANS_CYL_CD      AS VALUE,
                ANS_CYL_MARK_NM AS LABEL
         FROM SY_ANS_CYL
-        WHERE DEL_YN = 'N'
+        WHERE PLNT_CD = #{plntCd}
+          AND DEL_YN = 'N'
     </select>
 
     <select id="getAmItmCd" resultType="ComboVO">

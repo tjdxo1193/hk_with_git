@@ -51,8 +51,8 @@ public class ComboServiceImpl implements ComboService {
     }
 
     @Override
-    public List<ComboVO> getAnsCyl() {
-        return dao.getAnsCyl();
+    public List<ComboVO> getAnsCyl(String plntCd) {
+        return dao.getAnsCyl(plntCd);
     }
 
     @Override

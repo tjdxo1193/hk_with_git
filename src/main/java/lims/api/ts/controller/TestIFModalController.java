@@ -3,11 +3,13 @@ package lims.api.ts.controller;
 import lims.api.auth.annotation.AuthToken;
 import lims.api.auth.domain.Token;
 import lims.api.auth.service.impl.JwtResolver;
+import lims.api.common.model.CommonResponse;
 import lims.api.ts.service.TestIFModalService;
 import lims.api.ts.vo.TestIFModalVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -62,5 +64,11 @@ public class TestIFModalController {
         String jwt = token.getJwt();
         request.setPlntCd(jwtResolver.getPlantCode(jwt));
         return ResponseEntity.ok(service.getPackingSpecList(request));
+    }
+
+    @PostMapping("/savePrvRcrReport")
+    public ResponseEntity<CommonResponse> savePrvRcrReport(TestIFModalVO request){
+        service.savePrvRcrReport(request);
+        return ResponseEntity.ok(new CommonResponse());
     }
 }

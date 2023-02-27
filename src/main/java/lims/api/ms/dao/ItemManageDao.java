@@ -62,8 +62,7 @@ public interface ItemManageDao {
 
     Integer findAItemSpecIdxBySapCode(ItemManageVO param);
 
-    int
-    firstSave(ItemManageVO request);
+    int firstSave(ItemManageVO request);
 
     Integer saveCtrptNo(ItemManageVO request);
 

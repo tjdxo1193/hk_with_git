@@ -45,7 +45,8 @@
             FROM QS_SMP_USE QSU
                 LEFT JOIN QS_SMP_MNG QSM
                     ON QSU.PLNT_CD = QSM.PLNT_CD and QSU.SMP_MNG_IDX = QSM.SMP_MNG_IDX
-            WHERE QSU.DEL_YN = 'N'
+            WHERE QSU.PLNT_CD = #{plntCd}
+              AND QSU.DEL_YN = 'N'
               AND QSM.SMP_DPS_PROC = 'S0270300'
               AND QSM.ANS_TYP NOT IN ('S0230004')
             GROUP BY QSU.PLNT_CD, QSU.SMP_MNG_IDX, QSM.MNG_SMP_VOL) QS
@@ -72,7 +73,7 @@
                QSM.PITM_TYP,
                (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.ANS_TYP)                          AS ANS_TYP_NM,
                QSM.PITM_CD,
-               (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = #{plntCd} AND DTL_CD = QSM.PITM_TYP) AS PITM_TYP_NM,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.PITM_TYP) AS PITM_TYP_NM,
                QSM.PITM_NM,
                QSM.ANS_TYP,
                (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.ANS_TYP)                          AS ANS_TYP_NM,
@@ -114,8 +115,11 @@
           AND QSM.ANS_TYP != 'S0230004'
           AND QSM.DEL_YN = 'N'
           AND QSM.DPS_YN = 'N'
-        <if test="smpDivCd != null and SmpDivCd != ''">
+        <if test="smpDivCd != null and smpDivCd != ''">
             AND QSM.SMP_DIV_CD = #{smpDivCd}
+        </if>
+        <if test="pitmTyp != null and pitmTyp != ''">
+            AND QSM.PITM_TYP = #{pitmTyp}
         </if>
         <if test="ansTyp != null and ansTyp != ''">
             AND QSM.ANS_TYP = #{ansTyp}

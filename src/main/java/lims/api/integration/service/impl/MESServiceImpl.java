@@ -118,7 +118,7 @@ public class MESServiceImpl implements MESService {
 
                     @Override
                     public InterfaceTrsResponse send() {
-                        return publisher.postEAI(TrsInterface.MES_TEST_RESULT.getEaiServicePath(), Map.of("dataList", data));
+                        return publisher.postEAI(TrsInterface.MES_TEST_RESULT.getServicePath(), Map.of("dataList", data));
                     }
 
                     @Override
@@ -148,7 +148,7 @@ public class MESServiceImpl implements MESService {
 
                     @Override
                     public InterfaceTrsResponse send() {
-                        return publisher.postEAI(TrsInterface.MES_TEST_STATUS.getEaiServicePath(), Map.of("dataList", data));
+                        return publisher.postEAI(TrsInterface.MES_TEST_STATUS.getServicePath(), Map.of("dataList", data));
                     }
 
                     @Override
@@ -180,7 +180,7 @@ public class MESServiceImpl implements MESService {
 
                     @Override
                     public InterfaceTrsResponse send() {
-                        return publisher.postEAIForFile(TrsInterface.MES_NON_CFM_REPORT.getEaiServicePath(), Map.of("dataList", data), fileName, fileBytes);
+                        return publisher.postEAIForFile(TrsInterface.MES_NON_CFM_REPORT.getServicePath(), Map.of("dataList", data), fileName, fileBytes);
                     }
 
                     @Override

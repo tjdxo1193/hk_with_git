@@ -7,11 +7,22 @@
 
   <FormBase v-bind="valueWithPitmGrid" />
 
-  <AUIGridWithHeader
-    v-bind="versionList"
-    @grid-created="(proxy) => $setState('versionList.$grid', proxy)"
-    @button-click="onClickBtnEvent"
-  />
+  <!-- <Horizontal :spans="[2.6, 7.4]"> -->
+  <Horizontal :spans="[5, 5]">
+    <AUIGridWithHeader
+      v-bind="versionList"
+      :height="versionList.height"
+      @grid-created="(proxy) => $setState('versionList.$grid', proxy)"
+      @button-click="onClickBtnEvent"
+    />
+
+    <FormWithHeader
+      v-bind="commonInfoForm"
+      :height="commonInfoForm.height"
+      @button-click="onClickBtnEvent"
+      @form-event="onClickCommonInfoFormButtons"
+    />
+  </Horizontal>
 
   <FormBase v-bind="valueWithVersionGrid" />
 
@@ -42,8 +53,16 @@
 
   <ElnSpecCopyForTestMethodModal
     :show="elnSpecCopyForTestMethodModal.show"
+    :labNo="elnSpecCopyForTestMethodModal.labNo"
     @close="hideElnSpecCopyForTestMethodModal()"
     @select="copyRowElnTestItem"
+  />
+
+  <SapPrdhaSearchModal
+    :show="sapPrdhaSearchModal.show"
+    :sapPrdha="sapPrdhaSearchModal.sapPrdha"
+    @close="() => (sapPrdhaSearchModal.show = false)"
+    @modalReturnDataEvent="sapPrdhaModalReturnDataEvent"
   />
 </template>
 
@@ -53,6 +72,7 @@ import {
   ItemsByTestMethodModal,
   ItemsCopyByTestMethodModal,
   RequestReviewerModal,
+  SapPrdhaSearchModal,
 } from '@/page/modal';
 import { FormUtil, GridUtil, StringUtil } from '@/util';
 
@@ -68,10 +88,17 @@ export default {
     RequestReviewerModal,
     ItemsCopyByTestMethodModal,
     ElnSpecCopyForTestMethodModal,
+    SapPrdhaSearchModal,
   },
   data() {
-    const { pitmList, versionList, testItemList, valueWithPitmGrid, valueWithVersionGrid } =
-      this.$copy(values);
+    const {
+      pitmList,
+      versionList,
+      commonInfoForm,
+      testItemList,
+      valueWithPitmGrid,
+      valueWithVersionGrid,
+    } = this.$copy(values);
     return {
       pitmList: {
         ...pitmList.static,
@@ -83,6 +110,7 @@ export default {
             await this.fetchVersionList(e.item);
             this.settingDepartmentList(e.item);
             this.setPitmInfoToPitmGridValueForm(e.item);
+            this.setCommonInfoForm(e.item);
             this.focusFirstRowItemOfVersionGrid();
           },
         },
@@ -98,8 +126,13 @@ export default {
             this.setVersionInfoToVersionGridValueForm(e.item);
             this.changeButtonDisabledAll();
             this.changeButtonWhenSelectedVersion();
+            this.changeCommonInfoFormButtons();
           },
         },
+      },
+      commonInfoForm: {
+        ...commonInfoForm.static,
+        forms: commonInfoForm.forms(),
       },
       testItemList: {
         ...testItemList.static,
@@ -127,6 +160,7 @@ export default {
       },
       elnSpecCopyForTestMethodModal: {
         show: false,
+        labNo: '',
       },
       processCode: {
         temporarySave: 'S0080100',
@@ -152,6 +186,10 @@ export default {
       },
       valueWithVersionGrid: {
         forms: valueWithVersionGrid.forms(),
+      },
+      sapPrdhaSearchModal: {
+        show: false,
+        sapPrdha: null,
       },
     };
   },
@@ -229,7 +267,9 @@ export default {
           ? this.$error(this.$message.warn.noSaveGridData)
           : this.isSelectedItemHasNotVersion()
           ? this.saveFirstVersion()
-          : this.saveAllRow();
+          : this.equalPreviousVersion()
+          ? this.updateNewVersion()
+          : this.saveAitemList();
         return;
       }
       if (name == 'requestReview') {
@@ -240,7 +280,7 @@ export default {
         return;
       }
       if (name == 'updateVersion') {
-        this.updateVersion();
+        this.createNewVersion();
       }
       if (name == 'addRow') {
         this.showItemsByTestMethodModal();
@@ -260,6 +300,9 @@ export default {
         this.showElnSpecCopyForTestMethodModal();
         return;
       }
+      if (name == 'putPkgaCd') {
+        this.putPkgaCd();
+      }
     },
 
     initAll() {
@@ -268,6 +311,7 @@ export default {
       this.valueWithPitmGrid.forms = values.valueWithPitmGrid.forms();
       this.valueWithVersionGrid.forms = values.valueWithVersionGrid.forms();
       this.changeButtonDisabledAll();
+      this.resetCommonInfoForm();
     },
 
     initVersion() {
@@ -295,6 +339,7 @@ export default {
         // 반제품 일 경우, Eln규격 버튼 활성화
         if (this.isSemiManufactures()) {
           this.fetchPItemSpecSemiAItemList({ pitmCd, pitmVer });
+          this.elnSpecCopyForTestMethodModal.labNo = FormUtil.getValue(this.commonInfoForm.forms, 'labNo');
           this.activateElnSpecButton();
         }
 
@@ -346,6 +391,15 @@ export default {
       return this.testItemList.$grid.getRowCount() == 0;
     },
 
+    equalPreviousVersion(){
+      const {aitmSpecIdx} = FormUtil.getData(this.valueWithVersionGrid.forms);
+      const aitmIdxArray = this.versionList.$grid.getColumnValues('aitmSpecIdx', true);
+      if(aitmSpecIdx != aitmIdxArray.shift()){
+        return false;
+      }
+      return aitmIdxArray.includes(aitmSpecIdx);
+    },
+
     changeButtonWhenSelectedVersion() {
       const buttons = this.testItemList.buttons;
 
@@ -375,9 +429,96 @@ export default {
         if (this.isSelectedItemHasVersion()) {
           FormUtil.enableButtons(buttons, ['requestReview']);
         }
-
         return;
       }
+    },
+
+    setCommonInfoForm(item) {
+      const { forms } = this.commonInfoForm;
+      const { opsSepcUseVerYn, specProcCd, pitmTyp } = item;
+      const validateFlag =
+        this.isOkayToSaveCommonInfoForm(opsSepcUseVerYn, specProcCd) &&
+        this.isFinishedOrPackaging(pitmTyp);
+
+      if (!validateFlag) {
+        this.disableCommonInfoForm();
+      } else {
+        this.enableCommonInfoForm();
+        this.disableTestItemListUpdatableButtons();
+      }
+
+      const sapPrdha = item.opsSpecSapPrdha;
+      FormUtil.setData(forms, { ...item, sapPrdha });
+    },
+
+    resetCommonInfoForm() {
+      this.commonInfoForm.forms = values.commonInfoForm.forms();
+    },
+
+    isOkayToSaveCommonInfoForm(opsSepcUseVerYn, specProcCd) {
+      return !(opsSepcUseVerYn != 'N' || specProcCd != 'S0080100');
+    },
+
+    isFinishedOrPackaging(pitmTyp = null) {
+      const targetArray = ['S0180100', 'S0180101', 'S0180500'];
+      return targetArray.includes(pitmTyp);
+    },
+
+    disableCommonInfoForm() {
+      const { forms } = this.commonInfoForm;
+      FormUtil.disable(forms, 'pkgaCdSearch');
+      FormUtil.disableButtons(this.commonInfoForm.buttons, ['putPkgaCd']);
+    },
+
+    enableCommonInfoForm() {
+      const { forms } = this.commonInfoForm;
+      FormUtil.enable(forms, 'pkgaCdSearch');
+      FormUtil.enableButtons(this.commonInfoForm.buttons, ['putPkgaCd']);
+    },
+
+    disableTestItemListUpdatableButtons() {
+      FormUtil.disableButtons(this.testItemList.buttons, [
+        'up',
+        'down',
+        'addRow',
+        'copyRow',
+        'removeRow',
+      ]);
+    },
+
+    changeCommonInfoFormButtons() {
+      if (this.isSelectedTemporaryVersion()) {
+        this.enableCommonInfoForm();
+      } else {
+        this.disableCommonInfoForm();
+      }
+    },
+
+    onClickCommonInfoFormButtons({ originEvent }) {
+      if (originEvent === 'pkgaCdSearch') {
+        this.sapPrdhaSearchModal.show = true;
+      }
+    },
+
+    sapPrdhaModalReturnDataEvent(item = null) {
+      const { aitmSpecIdx, pkgaCd, sapPrdha } = item;
+      const { forms } = this.commonInfoForm;
+
+      FormUtil.setData(forms, { aitmSpecIdx, pkgaCd, sapPrdha });
+    },
+
+    putPkgaCd() {
+      const { forms } = this.commonInfoForm;
+      const parameter = FormUtil.getData(forms);
+
+      forms.validate().then(() =>
+        this.$eSign(() => this.$axios.put('/ms/specManage/putPkgaCd', parameter))
+          .then(() => {
+            this.$info(this.$message.info.updated);
+            this.fetchPItemSpecList();
+          })
+          .catch(() => this.$error(this.$message.error.updateData)),
+      );
     },
 
     changeButtonWhenSelectedTestItem() {
@@ -433,15 +574,6 @@ export default {
         .catch(() => {
           this.$error(this.$message.error.createData);
         });
-    },
-
-    addRowVersion() {
-      const { pitmCd, pitmVer } = FormUtil.getData(this.valueWithPitmGrid.forms);
-      this.versionList.$grid.addRow({
-        aitmSpecVer: 1,
-        pitmCd,
-        pitmVer,
-      });
     },
 
     showItemsByTestMethodModal() {
@@ -501,7 +633,7 @@ export default {
       return useVerYn == 'Y';
     },
 
-    updateVersion() {
+    createNewVersion() {
       if (this.isNotExistJdgType()) {
         return;
       }
@@ -511,7 +643,6 @@ export default {
       }
 
       const versionParam = FormUtil.getData(this.valueWithVersionGrid.forms);
-      versionParam.aitmSpecVer++;
 
       const parameter = {
         ...versionParam,
@@ -521,7 +652,7 @@ export default {
       };
 
       this.$confirm(this.$message.warn.updateAprrovedSpec).then(() => {
-        this.$eSignWithReason(() => this.$axios.post('/ms/specManage/updateVersion', parameter))
+        this.$eSignWithReason(() => this.$axios.post('/ms/specManage/createNewVersion', parameter))
           .then(() => {
             this.$info(this.$message.info.saved);
             this.initAll();
@@ -551,8 +682,6 @@ export default {
         pitmCd,
         pitmVer,
         pitmSpecIdx,
-        specProcCd: this.processCode.temporarySave,
-        aitmSpecVer: 1,
         addedRowItems: $grid.getAddedRowItems(),
         editedRowItems: $grid.getEditedRowItems(),
         removedRowItems: $grid.getRemovedItems(),
@@ -566,7 +695,7 @@ export default {
         return this.$warn(this.$message.warn.noSaveGridData);
       }
 
-      this.$eSign(() => this.$axios.post('/ms/specManage/updateVersion', parameter))
+      this.$eSign(() => this.$axios.post('/ms/specManage/createFirstVersion', parameter))
         .then(() => {
           this.$info(this.$message.info.saved);
           this.initAll();
@@ -577,7 +706,7 @@ export default {
         });
     },
 
-    async saveAllRow() {
+    async saveAitemList() {
       if (this.isNotExistJdgType()) {
         return;
       }
@@ -599,7 +728,46 @@ export default {
         return this.$warn(this.$message.warn.noSaveGridData);
       }
 
-      await this.$eSign(() => this.$axios.post('/ms/specManage/aItem', parameter))
+      await this.$eSign(() => this.$axios.post('/ms/specManage/saveAItemList', parameter))
+        .then(() => {
+          this.$info(this.$message.info.saved);
+          this.initAll();
+          this.fetchPItemSpecList();
+        })
+        .catch(() => {
+          this.$error(this.$message.error.createData);
+        });
+    },
+
+    async updateNewVersion(){
+      if (this.isNotExistJdgType()) {
+        return;
+      }
+
+      if (this.isNotExistStandardValueByJdgType()) {
+        return;
+      }
+
+      const { $grid } = this.testItemList;
+      const { pitmSpecIdx } = FormUtil.getData(this.valueWithVersionGrid.forms);
+      const { pitmCd, pitmVer } = FormUtil.getData(this.valueWithPitmGrid.forms);
+      const { aitmSpecIdx, aitmSpecVer } = FormUtil.getData(this.valueWithVersionGrid.forms);
+      const parameter = {
+        aitmSpecIdx,
+        pitmSpecIdx,
+        pitmCd,
+        pitmVer,
+        aitmSpecVer,
+        addedRowItems: $grid.getGridData(),
+        editedRowItems: [],
+        removedRowItems: [],
+      };
+
+      if (this.isNotUpdateTestItemList()) {
+        return this.$warn(this.$message.warn.noSaveGridData);
+      }
+
+      await this.$eSign(() => this.$axios.post('/ms/specManage/updateNewVersion', parameter))
         .then(() => {
           this.$info(this.$message.info.saved);
           this.initAll();

@@ -109,6 +109,9 @@ const pitmList = {
       .col('useVerYn', '사용버전여부')
       .col('delYn', '삭제여부', false)
       .col('pitmMstAprIdx', '자재마스터승인IDX', false)
+      .col('opsSpecSapPrdha', '포장시험에 등록된 SAP 계층코드', false)
+      .col('labNo', 'LAB NO', false)
+      .col('ctrptNo', 'CT 성적서 번호', false)
       .build(),
 };
 
@@ -147,6 +150,46 @@ const versionList = {
       .col('rjtUid', '반려자', false)
       .col('rjtUnm', '반려자')
       .col('rjtRea', '반려사유')
+      .build(),
+};
+
+const commonInfoForm = {
+  static: {
+    title: '자재정보',
+    countPerRow: 2,
+    height: '268px',
+    buttons: [{ name: 'putPkgaCd', label: '저장', disabled: true }],
+  },
+  forms: () =>
+    FormBuilder.builder()
+      .Input('pitmCd', '자재번호')
+      .readonly()
+      .Select('pitmTyp', '자재유형', {
+        async: () => api.combo.systemCommon.getPitmDivCombo(),
+      })
+      .disabled()
+      .multiple(
+        'pkgaCdModal',
+        '자재계층',
+        FormBuilder.builder()
+          .Input('pkgaCd', '자재계층', { readonly: true })
+          .required()
+          .Button('pkgaCdSearch', 'pkgaCdModal2', { type: 'search', disabled: true })
+          .build(),
+      )
+      .Input('sapPrdha', '자재계층코드')
+      .readonly()
+      .Input('pitmNm', '자재내역')
+      .readonly()
+      .Input('labNo', 'LAB NO')
+      .readonly()
+      .Input('ctrptNo', 'CT 성적서 번호')
+      .readonly()
+      .Hidden('plntCd', '사업장 코드')
+      .Hidden('pitmCd', '품목 코드')
+      .Hidden('pitmVer', '품목 버전')
+      .Hidden('pitmSpecIdx', '품목 규격서 IDX')
+      .Hidden('aitmSpecIdx', '시험항목 규격 IDX')
       .build(),
 };
 
@@ -307,6 +350,7 @@ const testItemList = {
 export default {
   pitmList,
   versionList,
+  commonInfoForm,
   testItemList,
   valueWithPitmGrid,
   valueWithVersionGrid,

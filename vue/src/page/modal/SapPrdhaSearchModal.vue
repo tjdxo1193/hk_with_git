@@ -144,12 +144,12 @@ export default {
       }
     },
     selectSapCode() {
-      const selectItem = this.searchForm.$grid.getSelectedRows()[0];
-      if (!selectItem.sapPrdha) {
+      const selectItem = this.searchForm.$grid.getSelectedRows()?.[0];
+      if (!selectItem?.sapPrdha) {
         return this.$warn(this.$message.warn.unSelectedData);
       }
 
-      this.$emit('modalReturnDataEvent', { sapPrdha: selectItem.sapPrdha });
+      this.$emit('modalReturnDataEvent', selectItem);
       this.close();
     },
   },

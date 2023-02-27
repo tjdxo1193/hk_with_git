@@ -2,9 +2,10 @@ package lims.api.integration.domain.qms;
 
 import lims.api.integration.enums.FinalOrderStatus;
 import lims.api.integration.enums.SAPPItemType;
-import lims.api.integration.enums.TestRequestType;
 import lims.api.integration.vo.QMSSendVO;
+import lims.api.ts.enums.TestJudgement;
 import lims.api.ts.enums.TestProcess;
+import lims.api.ts.enums.TestType;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 
@@ -34,9 +35,13 @@ public class ShiptHandler {
         for (QMSSendVO.ShiptReq req : data) {
             List<QMSSendVO.ShiptTest> tests = repository.findTestAllByOrderNoAndLotNo(req)
                     .stream()
-                    .filter(test -> TestRequestType.isShiptTarget(test.getAddCol1()))
+                    .filter(test -> TestType.bySAP(test.getAnsTyp()))
+                    .peek(test -> test.setSmpQty(req.getEtrQty()))
                     .collect(Collectors.toList());
             req.setTests(tests);
+
+            TestJudgement finalJudgement = getFinalJudgement(tests);
+            req.setShiptJdgDiv(finalJudgement.getJudgementCode());
 
             for (QMSSendVO.ShiptTest test : tests) {
                 List<QMSSendVO.ShiptPerform> performs = repository.findShiptPerformByKey(test);
@@ -94,6 +99,14 @@ public class ShiptHandler {
 
     private boolean emptyData() {
         return CollectionUtils.isEmpty(data);
+    }
+
+    private TestJudgement getFinalJudgement(List<QMSSendVO.ShiptTest> tests) {
+        TestJudgement finalJdg = TestJudgement.SUITABLE;
+        for (QMSSendVO.ShiptTest test : tests) {
+            finalJdg = TestJudgement.min(finalJdg, TestJudgement.of(test.getPitmJdgDiv()));
+        }
+        return finalJdg;
     }
 
 }

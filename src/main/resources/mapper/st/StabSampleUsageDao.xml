@@ -140,7 +140,7 @@
                QSM.PITM_TYP,
                (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.ANS_TYP)                          AS ANS_TYP_NM,
                QSM.PITM_CD,
-               (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = #{plntCd} AND DTL_CD = QSM.PITM_TYP) AS PITM_TYP_NM,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.PITM_TYP) AS PITM_TYP_NM,
                QSM.PITM_NM,
                QSM.ANS_TYP,
                (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QSM.ANS_TYP)                          AS ANS_TYP_NM,

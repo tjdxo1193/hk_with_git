@@ -49,7 +49,7 @@ const userGrid = {
       .col('gradeNm', '직급')
       .col('titleNm', '직책')
       .col('userTel', '전화번호')
-      .col('userCompTel', '회사연락처')
+      .col('userCompTel', '회사전화번호')
       .col('userMail', '이메일')
       .col('workStt', '업무수행상태')
       .col('useYn', '사용여부')
@@ -84,7 +84,7 @@ const userForm = {
       .Input('gradeNm', '직급', { disabled: true })
       .Input('titleNm', '직책', { disabled: true })
       .Input('userTel', '전화번호', { disabled: true })
-      .Input('userCompTel', '회사연락처', { disabled: true })
+      .Input('userCompTel', '회사전화번호', { disabled: true })
       .Select('athCd', '사용권한', {
         value: null,
         async: api.combo.auth.getUserAuthList,
@@ -105,28 +105,28 @@ const userForm = {
         ],
       })
       .RadioGroup('ansYn', '시험자여부', {
-        value: 'Y',
+        value: '',
         groups: [
           { checkedValue: 'Y', label: '예' },
           { checkedValue: 'N', label: '아니오' },
         ],
       })
       .RadioGroup('clltYn', '채취자여부', {
-        value: 'Y',
+        value: '',
         groups: [
           { checkedValue: 'Y', label: '예' },
           { checkedValue: 'N', label: '아니오' },
         ],
       })
       .RadioGroup('revwYn', '검토자여부', {
-        value: 'Y',
+        value: '',
         groups: [
           { checkedValue: 'Y', label: '예' },
           { checkedValue: 'N', label: '아니오' },
         ],
       })
       .RadioGroup('aprYn', '검토자여부', {
-        value: 'Y',
+        value: '',
         groups: [
           { checkedValue: 'Y', label: '예' },
           { checkedValue: 'N', label: '아니오' },

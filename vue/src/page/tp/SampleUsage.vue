@@ -268,7 +268,7 @@ export default {
       if (status === TEMP_SAVE || status === REJECT_USE) {
         FormUtil.enableButtons(buttons, ['init', 'requestApproveUse', 'update', 'delete']);
         FormUtil.disableButtons(buttons, ['save', 'requestApproveCancelUse']);
-        FormUtil.enable(forms, ['useSmpVol', 'useDt', 'strgPla', 'usePps']);
+        FormUtil.enable(forms, ['useSmpVol', 'useDt', 'strgPla', 'usePps', 'search']);
       }
       if (
         status === REQUEST_USE ||
@@ -284,11 +284,13 @@ export default {
           'requestApproveCancelUse',
         ]);
         FormUtil.enable(forms, ['useSmpVol', 'useDt', 'strgPla', 'usePps']);
+        FormUtil.disable(forms, ['search']);
       }
       if (status === APPROVE_USE || status === REJECT_CANCEL_USE) {
         FormUtil.enableButtons(buttons, ['init', 'requestApproveCancelUse']);
         FormUtil.disableButtons(buttons, ['requestApproveUse', 'update', 'delete', 'save']);
         FormUtil.readonly(forms, ['useSmpVol', 'useDt', 'strgPla', 'usePps']);
+        FormUtil.disable(forms, ['search']);
       }
     },
     showModal(name) {

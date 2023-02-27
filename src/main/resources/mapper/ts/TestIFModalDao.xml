@@ -67,6 +67,7 @@
     <select id="getPrvRcrReportList" parameterType="TestIFModalVO" resultType="TestIFModalVO">
         SELECT BATCH_NO
             , PHS_ORDER_NO
+            , PDT_ORDER_NO
             , MAK_NO
             , IF_INFO_IDX AS FILE_IDX
             , SEQ AS FILE_SRLNO
@@ -77,6 +78,7 @@
             , IF_INFO_IDX
         FROM MS_SRM_REO_PREV
         WHERE 1=1
+        AND DEL_YN = 'N'
         AND BATCH_NO = #{batchNo}
         <if test="phsOrderNo != null and phsOrderNo != ''">
             AND PHS_ORDER_NO = #{phsOrderNo}
@@ -86,10 +88,52 @@
         </if>
     </select>
 
+    <update id="deletePrvRcrReport" parameterType="TestIFModalVO">
+        UPDATE MS_SRM_REO_PREV SET
+            DEL_YN = 'Y'
+        WHERE BATCH_NO = #{batchNo}
+        AND SEQ = #{fileSrlno}
+    </update>
+
+    <select id="getSeq" parameterType="TestIFModalVO" resultType="int">
+        SELECT NVL(MAX(SEQ), 0) + 1 AS SEQ
+        FROM MS_SRM_REO_PREV
+        WHERE BATCH_NO = #{batchNo}
+    </select>
+
+    <insert id="savePrvRcrReport" parameterType="TestIFModalVO">
+        <selectKey resultType="Integer" keyProperty="ifInfoIdx" order="BEFORE">
+            SELECT NVL(MAX(IF_INFO_IDX),0) FROM MS_SRM_REO_PREV WHERE BATCH_NO = #{batchNo}
+        </selectKey>
+        INSERT INTO MS_SRM_REO_PREV(
+            BATCH_NO,
+            SEQ,
+            PHS_ORDER_NO,
+            PDT_ORDER_NO,
+            MAK_NO,
+            FILE_NAME,
+            FILE_DATA,
+            IF_INFO_IDX,
+            CRT_DS,
+            DEL_YN
+        ) VALUES (
+            #{batchNo},
+            #{seq},
+            #{phsOrderNo},
+            #{pdtOrderNo},
+            #{lotNo},
+            #{name},
+            #{src},
+            SYSDATE,
+            'N'
+        )
+    </insert>
+
     <select id="getSrmReportList" parameterType="TestIFModalVO" resultType="TestIFModalVO">
         SELECT BATCH_NO
             , RPT_DIV
             , PHS_ORDER_NO
+            , PDT_ORDER_NO
             , MAK_NO
             , IF_INFO_IDX AS FILE_IDX
             , SEQ AS FILE_SRLNO

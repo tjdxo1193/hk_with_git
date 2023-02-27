@@ -24,7 +24,7 @@
 
 <script>
 import { FileAttacherModal } from '@/page/modal';
-import { FormUtil } from '@/util';
+import { FormUtil, RdUtil } from '@/util';
 
 import values from './values/nonconformityReportAppr';
 
@@ -46,7 +46,7 @@ export default {
         event: {
           cellDoubleClick: (e) => {
             this.getResultDetail(e);
-            this.enableButtons(['reject', 'approve', 'init']);
+            this.enableButtons(['reject', 'approve', 'init', 'noncfmReport', 'prvRcrReport']);
           },
         },
       },
@@ -134,6 +134,20 @@ export default {
       if (name === 'reject') {
         return this.reject();
       }
+      if (name === 'noncfmReport') {
+        const parameter = FormUtil.getData(this.testInfo.forms);
+        RdUtil.openReport(
+          '/NONCONFORMITY_REPORT.mrd',
+          `/rp [${parameter.plntCd}] [${parameter.ansIdx}]`,
+        );
+      }
+      if (name === 'prvRcrReport') {
+        const parameter = FormUtil.getData(this.testInfo.forms);
+        RdUtil.openReport(
+          '/MEASURES_TO_PREVENT_RECURRENCE.mrd',
+          `/rp [${parameter.plntCd}] [${parameter.ansIdx}]`,
+        );
+      }
       if (name === 'init') {
         this.init();
       }
@@ -141,7 +155,7 @@ export default {
     init() {
       this.testInfo.forms = values.testInfo.forms();
       this.testInfo.$grid.clearGridData();
-      this.disableButtons(['reject', 'approve', 'init']);
+      this.disableButtons(['reject', 'approve', 'init', 'noncfmReport', 'prvRcrReport']);
     },
     gridButtonClick(event) {
       if (event.dataField === 'fileAttacher') {

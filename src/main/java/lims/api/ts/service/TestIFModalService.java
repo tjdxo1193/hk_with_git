@@ -17,4 +17,6 @@ public interface TestIFModalService {
     List<TestIFModalVO> getPackingSpecList(TestIFModalVO request) throws IOException;
 
     List<TestIFModalVO> getInpPerformanceList(TestIFModalVO request);
+
+    void savePrvRcrReport(TestIFModalVO request);
 }

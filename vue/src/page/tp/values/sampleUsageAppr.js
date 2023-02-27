@@ -30,7 +30,7 @@ const sampleUsageGrid = {
       .col('smpMngIdx', { visible: false })
       .col('useSeq', { visible: false })
       .col('pitmTyp', { visible: false })
-      .col('smpDiv', { visible: false })
+      .col('smpDivCd', { visible: false })
       .col('smpUseProc', { visible: false })
       .col('usePps', { visible: false })
       .col('useUid', { visible: false })
@@ -73,11 +73,12 @@ const inputForm = {
       .Input('smpDivNm', '검체구분', { readonly: true })
       .Input('smpUseNm', '검체상태', { readonly: true })
       .Input('mngSmpVol', '관리검체량', { readonly: true })
-      .Input('useSmpVol', '사용검체량', { readonly: true })
+      .Input('useSmpVol', '사용량', { readonly: true })
       .Input('inpUnit', '입력단위', { readonly: true })
       .Input('useNm', '사용자', { readonly: true })
       .Input('strgPla', '보관장소', { readonly: true })
       .Input('useDt', '사용일자', { readonly: true })
+      .Textarea('usePps', '사용목적', { readonly: true, _colSpan: 2 })
       .build(),
 };
 

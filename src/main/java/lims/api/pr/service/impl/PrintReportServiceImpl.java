@@ -28,7 +28,7 @@ public class PrintReportServiceImpl implements PrintReportService {
 
     @Override
     public void updateRptInfo(PrintReportVO request) {
-        int result = dao.updateRptInfo(request);
+        int result = dao.createReportInfo(request);
         if (result == 0) {
             throw new NoUpdatedDataException();
         }

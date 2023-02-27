@@ -109,6 +109,7 @@ public class PreventRecurrenceApprVO implements UpdateDetect {
     private String pdtOrderNo; //생산 오더 번호
     private String phsOrderNo; //구매 오더 번호
     private String phsOrderItm; //구매 오더 항목
+    private Integer rptCnt;
 
     /*승인정보*/
     private ApproveVO approveInfo;

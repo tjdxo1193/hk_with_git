@@ -164,6 +164,7 @@ public class TrsTemplate implements TrsService {
     private void updateSuccessStatusInfoBySync(Integer infoIdx, IfInfoVO infoVO) {
         IfInfoVO info = IfInfoVO.builder()
                 .idx(infoIdx)
+                .xtid(infoVO.getXtid())
                 .xdate(infoVO.getXdate())
                 .xtime(infoVO.getXtime())
                 .xstat(InterfaceResponseStatus.S)

@@ -10,6 +10,7 @@ import lims.api.integration.service.impl.IntegrationSender;
 import lims.api.integration.vo.intergation.InterfaceSendVO;
 import lims.api.ts.dao.TestResultReviewDao;
 import lims.api.ts.enums.TestProcess;
+import lims.api.ts.enums.TestType;
 import lims.api.ts.service.TestResultReviewService;
 import lims.api.ts.vo.TestResultReviewVO;
 import lombok.RequiredArgsConstructor;
@@ -77,6 +78,7 @@ public class TestResultReviewServiceImpl implements TestResultReviewService {
                 .ispReqNo(param.getIspReqNo())
                 .phsOrderNo(param.getPhsOrderNo())
                 .pdtOrderNo(param.getPdtOrderNo())
+                .testType(TestType.of(param.getAnsTyp()))
                 .build();
         sender.sendTestStatus(data);
 

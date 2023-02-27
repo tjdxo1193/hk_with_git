@@ -27,6 +27,9 @@
         UPDATE IF_INFO
         SET XSTAT = #{xstat}
             ,XMSG = #{xmsg}
+            <if test="xtid != null and xtid != ''">
+                ,XTID = #{xtid}
+            </if>
             <if test="errorLogId != null and errorLogId != ''">
                 ,ERRORLOG_ID = #{errorLogId}
             </if>

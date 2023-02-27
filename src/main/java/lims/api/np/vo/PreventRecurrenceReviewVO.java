@@ -114,4 +114,6 @@ public class PreventRecurrenceReviewVO implements UpdateDetect {
     /*승인정보*/
     private ApproveVO approveInfo;
     private Integer reoPrevAprReqIdx;
+
+    private Integer rptCnt;
 }

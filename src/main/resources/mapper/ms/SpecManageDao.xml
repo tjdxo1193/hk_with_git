@@ -33,6 +33,10 @@
             , QPI.CLLT_PLA
             , QPI.SMP_STRG_MTD
             , QPI.SMP_VOL_UNIT
+            , QP.PKGA_CD
+            , QPK.SAP_PRDHA AS OPS_SPEC_SAP_PRDHA   <!-- 임의 별칭 -->
+            , QPIS.LAB_NO
+            , QPIS.CTRPT_NO
         FROM QM_PITM QP
         LEFT JOIN QM_PITM_INFO QPI ON QP.PLNT_CD = QPI.PLNT_CD AND QP.PITM_CD = QPI.PITM_CD AND QP.PITM_VER = QPI.PITM_VER
         LEFT JOIN QM_PITM_INFO_SAP QPIS ON QP.PLNT_CD = QPIS.PLNT_CD AND QP.PITM_CD = QPIS.PITM_CD AND QP.PITM_VER = QPIS.PITM_VER
@@ -47,6 +51,7 @@
         LEFT JOIN SY_CD_DTL PSPC ON QP.SPEC_PROC_CD = PSPC.DTL_CD
         LEFT JOIN SY_CD_DTL PT ON QPI.PITM_TYP = PT.DTL_CD
         LEFT JOIN SY_DPT SD ON SD.PLNT_CD = QP.PLNT_CD AND QPI.CRG_DPT_CD = SD.DPT_CD
+        LEFT JOIN QM_PKGA QPK ON QPK.PLNT_CD = QP.PLNT_CD AND QPK.PKGA_CD = QP.PKGA_CD AND QPK.PKGA_VER = (SELECT MAX(A.PKGA_VER) FROM QM_PKGA A WHERE A.PLNT_CD = QP.PLNT_CD AND A.PKGA_CD = QP.PKGA_CD AND A.USE_VER_YN = 'Y')
         WHERE QP.PLNT_CD = #{plntCd}
         AND QP.DEL_YN = 'N'
         AND QP.USE_VER_YN = 'Y'
@@ -370,7 +375,6 @@
         UPDATE QM_PITM_SPEC SET
           AITM_SPEC_IDX = #{aitmSpecIdx}
         , SPEC_PROC_CD = #{specProcCd}
-        , DEL_YN = 'N'
         WHERE PLNT_CD = #{plntCd}
         AND PITM_SPEC_IDX = #{pitmSpecIdx}
     </update>
@@ -668,4 +672,31 @@
         ORDER BY PITM_CD, PITM_SPEC_IDX
     </select>
 
+    <!-- 품목 테이블에 PKGA_CD 저장 -->
+    <update id="updatePkgaCd" parameterType="SpecManageVO">
+        UPDATE QM_PITM SET
+            PKGA_CD = #{pkgaCd}
+        WHERE 1 = 1
+            AND PLNT_CD = #{plntCd}
+            AND PITM_CD = #{pitmCd}
+            AND PITM_VER = #{pitmVer}
+    </update>
+
+    <!-- 규격서 테이블에 AITM_SPEC_IDX 저장 -->
+    <update id="updateAitmSpecIdx" parameterType="SpecManageVO">
+        UPDATE QM_PITM_SPEC SET
+            AITM_SPEC_IDX = #{aitmSpecIdx}
+        WHERE PLNT_CD = #{plntCd}
+        AND PITM_SPEC_IDX = #{pitmSpecIdx}
+    </update>
+
+    <select id="checkPreviousAItemIdx" parameterType="specManageVO" resultType="int">
+        SELECT
+            COUNT(*)
+        FROM QM_PITM_SPEC
+        WHERE PLNT_CD = #{plntCd}
+        AND PITM_CD = #{pitmCd}
+        AND AITM_SPEC_IDX = #{aitmSpecIdx}
+        AND PITM_VER NOT IN (#{pitmVer})
+    </select>
 </mapper>

@@ -79,15 +79,15 @@ export default {
           this.testItemList.$grid.setGridData(data);
         });
     },
-    save() {
+    async save() {
       const parameter = FormUtil.getData(this.reportInfo.forms);
-      this.$eSignWithReason(() => this.$axios.put('/pr/printReport/updateRptInfo', parameter))
+      await this.$eSignWithReason(() => this.$axios.post('/pr/printReport', parameter))
         .then(() => {
           this.$info(this.$message.info.saved);
           this.init();
           this.getTestReportList();
         })
-        .catch(() => this.$error(this.$message.error.updateData));
+        .ckatch(() => this.$error(this.$message.error.updateData));
     },
     searchFormEvent(event) {
       if (event.type === 'keydown' && event.originEvent.key === 'Enter') {

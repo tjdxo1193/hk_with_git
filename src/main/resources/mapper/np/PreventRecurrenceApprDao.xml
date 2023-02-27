@@ -61,7 +61,8 @@
             B.NON_CFM_REF,
             B.NON_CFM_ETC,
             B.REO_PREV_RPY_CTT,
-            (NVL(B.SMP_VOL_ANS, 0) + NVL(B.SMP_VOL_ETC, 0) + NVL(B.SMP_VOL_STRG, 0)) AS SMP_VOL_TOT
+            (NVL(B.SMP_VOL_ANS, 0) + NVL(B.SMP_VOL_ETC, 0) + NVL(B.SMP_VOL_STRG, 0)) AS SMP_VOL_TOT,
+            (SELECT COUNT(SEQ) FROM MS_SRM_REO_PREV MSRP WHERE MSRP.BATCH_NO = G.BATCH_NO AND DEL_YN = 'N') AS RPT_CNT
         FROM QT_PITM_ANS_PROC A
         JOIN QT_PITM_ANS_INFO B ON A.PLNT_CD = B.PLNT_CD AND A.ANS_IDX = B.ANS_IDX
         JOIN QM_PITM_SPEC D ON A.PLNT_CD = D.PLNT_CD AND A.PITM_SPEC_IDX = D.PITM_SPEC_IDX
@@ -71,6 +72,7 @@
         LEFT JOIN SY_APR_INFO SAI ON SAI.PLNT_CD = A.PLNT_CD AND SAI.APR_IDX = B.REO_PREV_APR_REQ_IDX
         WHERE A.PLNT_CD = #{plntCd} AND A.ANS_PROC_CD = #{ansProcCd} AND A.SYT_JDG = #{sytJdg} AND A.HLD_YN = 'N'
         AND B.NON_CFM_PROC_CD = #{nonCfmProcCd}
+        AND SAI.APR_UID = #{userId}
         <if test="pitmTyp != null and pitmTyp != ''">
             AND F.PITM_TYP = #{pitmTyp}
         </if>

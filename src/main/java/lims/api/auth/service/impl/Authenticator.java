@@ -66,7 +66,7 @@ public class Authenticator {
     private TokenAuthentication createAuthentication(Claims customClaims) {
         Token accessToken = tokenProvider.generateAccessToken(customClaims);
         Token refreshToken = tokenProvider.generateRefreshToken(customClaims);
-        Claims jwtCustomClaims = jwtResolver.getCustomClaims(accessToken.getJwt());
+        Claims jwtCustomClaims = jwtResolver.getCustomClaims(refreshToken.getJwt());
         return new TokenAuthentication(accessToken, refreshToken, jwtCustomClaims);
     }
 

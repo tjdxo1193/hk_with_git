@@ -15,6 +15,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+import javax.validation.ValidationException;
+import javax.ws.rs.NotFoundException;
 import java.util.List;
 
 @Slf4j
@@ -63,35 +66,38 @@ public class SpecManageServiceImpl implements SpecManageService {
     }
 
     @Override
-    public void updateVersion(SpecManageVO param) {
-        // 시험 항목 규격을 먼저 INSERT
+    public void createFirstVersion(SpecManageVO param) {
         log.info("[bug report] added rows count: {}, edited rows count: {}.", param.getAddedRowItems().size(), param.getEditedRowItems().size());
-        dao.createAitmSpec(param);
-        String specProgressCode = param.getSpecProcCd();
+        int createResult = 0;
+        int updateResult = 0;
+        int addRowResult = 0;
+        param.setAitmSpecVer(1); // 첫번째 버전이기 때문에 1 부터 시작
 
-        // 규격서진행상태 , 시험 항목 규격 IDX 값을 리스트에 넣어주고
-        param.setSpecProcCd(SpecProgress.TEMPORARY_STORAGE.getCode());
-        int result = 1;
-
-        // 규격서 이전버전 사용버전 N으로 업데이트 및 만들어진 규격서에 임시저장이면 업데이트, 수정(개정)이면 insert
-        if (specProgressCode.equals(SpecProgress.APPROVED.getCode())) {
-            log.info("[bug report] approved");
-            result *= dao.updateUseVerN(param);
-            result *= dao.createPItemSpec(param);
-        } else if (specProgressCode.equals(SpecProgress.TEMPORARY_STORAGE.getCode())) {
-            log.info("[bug report] temporary storage");
-            result = dao.updatePItemSpec(param);
-        }
-
-        if (result == 0) {
+        createResult = dao.createAitmSpec(param);
+        if (createResult == 0) {
             throw new NoCreatedDataException();
         }
 
-        makeAItem(param);
+        updateResult = dao.updateAitmSpecIdx(param);
+        if (updateResult == 0) {
+            throw new NoUpdatedDataException();
+        }
+
+        for (SpecManageAitmVO svo : param.getAddedRowItems()) {
+            log.info("[bug report] create spec aitm. aitmSpecIdx: {}.", svo.getAitmSpecIdx());
+            svo.setPlntCd(param.getPlntCd());
+            svo.setAitmSpecIdx(param.getAitmSpecIdx());
+            addRowResult += dao.createPItemSpecAItem(svo);
+        }
+
+        if (addRowResult != param.getAddedRowItems().size()) {
+            throw new NoUpdatedDataException();
+        }
+
     }
 
     @Override
-    public void makeAItem(SpecManageVO param) {
+    public void saveAItemList(SpecManageVO param) {
         log.info("[bug report] added rows count: {}, edited rows count: {}.", param.getAddedRowItems().size(), param.getEditedRowItems().size());
         int isQueryCompleted = 0;
         for (SpecManageAitmVO svo : param.getRemovedRowItems()) {
@@ -116,6 +122,72 @@ public class SpecManageServiceImpl implements SpecManageService {
         if (isQueryCompleted != param.getRemovedRowItems().size()
                 + param.getAddedRowItems().size()
                 + param.getEditedRowItems().size()) {
+            throw new NoUpdatedDataException();
+        }
+    }
+
+    @Override
+    public void createNewVersion(SpecManageVO param) {
+        log.info("[bug report] added rows count: {}, edited rows count: {}.", param.getAddedRowItems().size(), param.getEditedRowItems().size());
+        int createAitmSpecResult = 0;
+        int createPItemSpecResult = 0;
+        int updateResult = 0;
+
+        // 시험 항목 규격을 먼저 INSERT
+        param.setAitmSpecVer(param.getAitmSpecVer() + 1);
+        param.setSpecProcCd(SpecProgress.TEMPORARY_STORAGE.getCode());
+
+        createAitmSpecResult = dao.createAitmSpec(param);
+        if (createAitmSpecResult == 0) {
+            throw new NoCreatedDataException();
+        }
+
+        updateResult = dao.updateUseVerN(param);
+        if (updateResult == 0) {
+            throw new NoCreatedDataException();
+        }
+
+        createPItemSpecResult = dao.createPItemSpec(param);
+        if (createPItemSpecResult == 0) {
+            throw new NoCreatedDataException();
+        }
+
+        saveAItemList(param);
+    }
+
+    @Override
+    public void updateNewVersion(SpecManageVO param) {
+        int equalPreviousVersion = dao.checkPreviousAItemIdx(param);
+        if(equalPreviousVersion == 0 ){
+            throw new NotFoundException("I couldn't find the spec sheet where the previous version had the same aitmIdx value.");
+        }
+
+        log.info("[bug report] added rows count: {}, edited rows count: {}.", param.getAddedRowItems().size(), param.getEditedRowItems().size());
+        int createAitmSpecResult = 0;
+        int updateAitmSpecIdxResult = 0;
+        int addRowResult = 0;
+
+        // 시험 항목 규격을 먼저 INSERT
+        param.setAitmSpecVer(param.getAitmSpecVer() + 1);
+
+        createAitmSpecResult = dao.createAitmSpec(param);
+        if (createAitmSpecResult == 0) {
+            throw new NoCreatedDataException();
+        }
+
+        updateAitmSpecIdxResult = dao.updateAitmSpecIdx(param);
+        if (updateAitmSpecIdxResult == 0) {
+            throw new NoUpdatedDataException();
+        }
+
+        for (SpecManageAitmVO svo : param.getAddedRowItems()) {
+            log.info("[bug report] create spec aitm. aitmSpecIdx: {}.", svo.getAitmSpecIdx());
+            svo.setPlntCd(param.getPlntCd());
+            svo.setAitmSpecIdx(param.getAitmSpecIdx());
+            addRowResult += dao.createPItemSpecAItem(svo);
+        }
+
+        if (addRowResult != param.getAddedRowItems().size()) {
             throw new NoUpdatedDataException();
         }
     }
@@ -156,5 +228,32 @@ public class SpecManageServiceImpl implements SpecManageService {
     @Override
     public List<SpecManageAitmVO> getSemiAItemListToModal(SpecManageVO param) {
         return dao.getSemiAItemListToModal(param);
+    }
+
+    @Override
+    @Transactional
+    public int putPkgaCd(SpecManageVO param) {
+        int result = 0;
+
+        // 품목 테이블에는 pkgaCd가 저장되어야 한다.
+        SpecManageVO qmPitmDto = new SpecManageVO();
+        qmPitmDto.setPlntCd(param.getPlntCd());
+        qmPitmDto.setPitmCd(param.getPitmCd());
+        qmPitmDto.setPitmVer(param.getPitmVer());
+        qmPitmDto.setPkgaCd(param.getPkgaCd());
+        result += dao.updatePkgaCd(qmPitmDto);
+
+        // 규격서 테이블에는 aitmSpecIdx가 저장되어야 한다.
+        SpecManageVO qmPitmSpecDto = new SpecManageVO();
+        qmPitmSpecDto.setPlntCd(param.getPlntCd());
+        qmPitmSpecDto.setPitmSpecIdx(param.getPitmSpecIdx());
+        qmPitmSpecDto.setAitmSpecIdx(param.getAitmSpecIdx());
+        result += dao.updateAitmSpecIdx(qmPitmSpecDto);
+
+        if (result == 0) {
+            throw new NoCreatedDataException();
+        }
+
+        return result;
     }
 }

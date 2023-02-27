@@ -76,4 +76,6 @@ public class SpecManageVO implements UpdateDetect {
     private List<SpecManageAitmVO> editedRowItems = new ArrayList<>();
     private List<SpecManageAitmVO> removedRowItems = new ArrayList<>();
 
+    // 포장시험, 자재계층 테이블
+    private String pkgaCd;
 }

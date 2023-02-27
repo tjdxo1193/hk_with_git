@@ -113,7 +113,10 @@ public class TestResultApprVO implements UpdateDetect {
     private String pitmSpcc; //특이사항
     private String nonCfmRea; //부적합사유
     private String smpVolTot; //총검체량
+    private String addCol1;
     /*보류정보*/
     private String hldUid;
     private String hldRea;
+
+    private String ansTyp;
 }

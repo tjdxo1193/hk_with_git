@@ -27,10 +27,16 @@
     :readonly="fileAttacherModal.readonly"
     @close="hideModal('fileAttacherModal')"
   />
+  <PreventRecurrenceReportModal
+    :show="preventRecurrenceReportModal.show"
+    :readonly="preventRecurrenceReportModal.readonly"
+    :parameter="preventRecurrenceReportModal.parameter"
+    @close="hideModal('preventRecurrenceReportModal')"
+  ></PreventRecurrenceReportModal>
 </template>
 
 <script>
-import { RequestApproverModal, FileAttacherModal } from '@/page/modal';
+import { RequestApproverModal, FileAttacherModal, PreventRecurrenceReportModal } from '@/page/modal';
 import { FormUtil } from '@/util';
 
 import values from './values/preventRecurrenceReview';
@@ -40,6 +46,7 @@ export default {
   components: {
     RequestApproverModal,
     FileAttacherModal,
+    PreventRecurrenceReportModal,
   },
   mounted() {
     this.getNonconformityTestList();
@@ -72,6 +79,11 @@ export default {
         show: false,
         fileIdx: 0,
         readonly: true,
+      },
+      preventRecurrenceReportModal: {
+        show: false,
+        readonly: false,
+        parameter: {},
       },
     };
   },
@@ -158,6 +170,10 @@ export default {
         const rstSeq = Number(event.item.rstSeq);
         return this.showModal('fileAttacherModal', { ansIdx, rstSeq });
       }
+      if (event.dataField === 'prvRcrReport') {
+        const parameter = event.item;
+        return this.showModal('preventRecurrenceReportModal', parameter);
+      }
     },
     showModal(name, parameter = {}) {
       if (name === 'requestApproverModal') {
@@ -167,6 +183,10 @@ export default {
         this.fileAttacherModal.fileIdx = this.getFildIdx(parameter);
         return (this.fileAttacherModal.show = true);
       }
+      if (name === 'preventRecurrenceReportModal') {
+        this.preventRecurrenceReportModal.parameter = parameter;
+        return (this.preventRecurrenceReportModal.show = true);
+      }
     },
     hideModal(name) {
       if (name === 'requestApproverModal') {
@@ -174,6 +194,10 @@ export default {
       }
       if (name === 'fileAttacherModal') {
         return (this.fileAttacherModal.show = false);
+      }
+      if (name === 'preventRecurrenceReportModal') {
+        this.getNonconformityTestList();
+        return (this.preventRecurrenceReportModal.show = false);
       }
     },
     enableButtons(buttons) {

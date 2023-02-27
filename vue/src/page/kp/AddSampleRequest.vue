@@ -92,25 +92,18 @@ export default {
     },
     setDataToForm(data) {
       const addSmpProc = data.addSmpProc;
+      const { forms, buttons } = this.inputForm;
       if (addSmpProc === TEMP_SAVE || addSmpProc === REJECTED) {
-        FormUtil.disableButtons(this.inputForm.buttons, ['save']);
-        FormUtil.enableButtons(this.inputForm.buttons, [
-          'requestApprove',
-          'update',
-          'delete',
-          'init',
-        ]);
+        FormUtil.disableButtons(buttons, ['save']);
+        FormUtil.enableButtons(buttons, ['requestApprove', 'update', 'delete', 'init']);
+        FormUtil.enable(forms, ['search']);
       }
       if (addSmpProc === REQUEST_APPROVE || addSmpProc === APPROVED) {
-        FormUtil.disableButtons(this.inputForm.buttons, [
-          'requestApprove',
-          'save',
-          'update',
-          'delete',
-        ]);
-        FormUtil.enableButtons(this.inputForm.buttons, ['init']);
+        FormUtil.disableButtons(buttons, ['requestApprove', 'save', 'update', 'delete']);
+        FormUtil.enableButtons(buttons, ['init']);
+        FormUtil.disable(forms, ['search']);
       }
-      FormUtil.setData(this.inputForm.forms, data);
+      FormUtil.setData(forms, data);
     },
     async save() {
       const param = FormUtil.getData(this.inputForm.forms);
@@ -215,7 +208,7 @@ export default {
       this.requestApprove(param);
     },
     inputFormEvent(event) {
-      const forms = this.inputForm.forms;
+      const { forms } = this.inputForm;
       if (event.originEvent === 'search') {
         this.showModal('testSearchModal');
       }

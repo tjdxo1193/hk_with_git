@@ -1,8 +1,13 @@
 <template>
   <ModalBase v-bind="$props" @close="close">
-    <AUIGridSearch
-      v-bind="pItemSpecList"
+
+    <FormBase
+      v-bind="pItemSpecForm"
       @button-click="onClickButton"
+    />
+
+    <AUIGridSearch
+       v-bind="pItemSpecList"
       @grid-created="(proxy) => $setState('pItemSpecList.$grid', proxy)"
     />
 
@@ -39,24 +44,32 @@ export default {
       type: Boolean,
       default: false,
     },
+    labNo: {
+      type: String,
+    }
   },
   watch: {
     show: function () {
       if (this.$props.show) {
         this.pItemSpecList.$grid.clearGridData();
         this.aItemList.$grid.clearGridData();
-        this.pItemSpecList.forms = values.pItemSpecList.forms();
+        this.pItemSpecForm.forms = values.pItemSpecForm.forms();
+        FormUtil.setData(this.pItemSpecForm.forms, {labNo : this.$props.labNo});
       }
     },
   },
   data() {
-    const { pItemSpecList, aItemList } = this.$copy(values);
+    const { pItemSpecList, aItemList, pItemSpecForm } = this.$copy(values);
     return {
+      pItemSpecForm: {
+        ...pItemSpecForm.static,
+        forms: pItemSpecForm.forms(),
+        buttons: pItemSpecForm.static.buttons,
+      },
+
       pItemSpecList: {
         ...pItemSpecList.static,
-        forms: pItemSpecList.forms(),
         columns: pItemSpecList.columns(),
-        buttons: pItemSpecList.static.buttons,
         event: {
           cellClick: (e) => {
             this.fetchAItemList(e.item);
@@ -71,7 +84,8 @@ export default {
   },
   methods: {
     async fetchPItemSpecList() {
-      const { $grid, forms } = this.pItemSpecList;
+      const { forms } = this.pItemSpecForm;
+      const { $grid } = this.pItemSpecList;
       const formData = FormUtil.getData(forms);
       const parameter = {
         labNo: formData.labNo,
@@ -98,7 +112,7 @@ export default {
 
     onClickButton({ name }) {
       if (name === 'search') {
-        this.pItemSpecList.forms.validate().then(() => {
+        this.pItemSpecForm.forms.validate().then(() => {
           this.fetchPItemSpecList();
         });
       }

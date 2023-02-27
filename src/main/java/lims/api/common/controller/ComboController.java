@@ -85,8 +85,9 @@ public class ComboController {
         return ResponseEntity.ok(service.getDptByLevel(ComboSearchVO.ofLevel(plantCode, Integer.parseInt(param.getValue()))));
     }
     @GetMapping("/ansCyl")
-    public ResponseEntity<List<ComboVO>> getAnsCyl() {
-        return ResponseEntity.ok(service.getAnsCyl());
+    public ResponseEntity<List<ComboVO>> getAnsCyl(@AuthToken Token token) {
+        String plntCd = jwtResolver.getPlantCode(token.getJwt());
+        return ResponseEntity.ok(service.getAnsCyl(plntCd));
     }
 
     @GetMapping("/amItmCd")

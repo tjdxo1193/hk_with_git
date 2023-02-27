@@ -36,4 +36,12 @@ public enum MaterialMRP {
         return mrp == null ? null : mrp.type;
     }
 
+    public static boolean isDMRFinished(String mrpCode) {
+        return FINISHED_SET.mrpCode.equals(mrpCode) || FINISHED_SINGLE.mrpCode.equals(mrpCode);
+    }
+
+    public static boolean isBulk(String mrpCode) {
+        return SEMI_MANUFACTURES_BULK.mrpCode.equals(mrpCode);
+    }
+
 }
