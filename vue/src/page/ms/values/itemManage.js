@@ -142,6 +142,7 @@ const searchGridWithForm = {
       .col('prbInYn', { visible: false })
       .col('prbFeYn', { visible: false })
       .col('pnxFeYn', { visible: false })
+      .col('pitmSpecIdx', {visible: false})
       .build(),
 };
 
@@ -225,6 +226,7 @@ const itemVersionGrid = {
       .col('prbInYn', { visible: false })
       .col('prbFeYn', { visible: false })
       .col('pnxFeYn', { visible: false })
+      .col('pitmSpecIdx', {visible: false})
       .build(),
 };
 
@@ -283,6 +285,7 @@ const commonInfoForm = {
       .Hidden('plntCd')
       .Hidden('specProcCd')
       .Hidden('qpSpecProcCd')
+      .Hidden('pitmSpecIdx')
       .build(),
 };
 

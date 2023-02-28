@@ -1,7 +1,7 @@
 <template>
   <AUIGridSearch
     v-bind="list"
-    @button-click="onClickButton"
+    @button-click="getTestReportList"
     @grid-created="(proxy) => $setState('list.$grid', proxy)"
     @form-event="searchFormEvent"
   />
@@ -10,10 +10,15 @@
       <template #tab-testInfo>
         <FormWithHeader v-bind="testInfo" />
         <Horizontal align-items="top" :spans="[5, 5]">
-          <FormWithHeader v-bind="reportInfo" @button-click="onClickButton" />
-          <AUIGridWithHeader 
+          <FormWithHeader
+            v-bind="reportInfo"
+            @button-click="onClickReportInfo"
+            @form-event="onChangeReportDivision"
+          />
+          <AUIGridWithHeader
             v-bind="reportHistoryGrid"
             @grid-created="(proxy) => $setState('reportHistoryGrid.$grid', proxy)"
+            @button-click="onClickReportInfo"
           />
         </Horizontal>
       </template>
@@ -37,9 +42,11 @@ export default {
   components: {},
   mounted() {
     this.getTestReportList();
+    this.init();
   },
   data() {
-    const { list, testInfo, reportInfo, testItemList, tabs, reportHistoryGrid } = this.$copy(values);
+    const { list, testInfo, reportInfo, testItemList, tabs, reportHistoryGrid } =
+      this.$copy(values);
     return {
       list: {
         ...list.static,
@@ -47,7 +54,7 @@ export default {
         columns: list.columns(),
         event: {
           cellDoubleClick: (e) => {
-            this.setDataToForms(e);
+            this.setDataToForms(e.item);
           },
         },
       },
@@ -67,6 +74,11 @@ export default {
       reportHistoryGrid: {
         ...reportHistoryGrid.static,
         columns: reportHistoryGrid.columns(),
+        event: {
+          cellDoubleClick: (e) => {
+            this.setDataToReportInfo(e.item);
+          },
+        },
       },
     };
   },
@@ -77,58 +89,95 @@ export default {
       $grid.clearGridData();
       this.disableButtons();
     },
+    initReportForm() {
+      this.reportInfo.forms = values.reportInfo.forms();
+      const { $grid } = this.reportHistoryGrid;
+      $grid.clearGridData();
+      this.disableButtons();
+    },
+    disableButtons() {
+      FormUtil.disableButtons(this.reportInfo.buttons, ['save', 'init']);
+      FormUtil.disableButtons(this.reportHistoryGrid.buttons, ['print']);
+    },
     async getTestReportList() {
       const { forms, $grid } = this.list;
       const parameter = FormUtil.getData(forms);
       await $grid
         ._useLoader(() => this.$axios.get('/pr/printIntegratedReport', parameter))
-        .then(({ data }) => this.list.$grid.setGridData(data));
+        .then(({ data }) => $grid.setGridData(data));
+      this.init();
     },
     async getTestItmList(event) {
       const { $grid } = this.testItemList;
-      const parameter = { ansIdx: event.item.ansIdx };
+      const parameter = { ansIdx: event.ansIdx };
       await $grid
         ._useLoader(() => this.$axios.get('/pr/printIntegratedReport/testItem', parameter))
         .then(({ data }) => {
-          this.testItemList.$grid.setGridData(data);
+          $grid.setGridData(data);
         });
     },
     async getReportHistory(event) {
       const { $grid } = this.reportHistoryGrid;
-      const param = { ansIdx: event.item.ansIdx };
+      const param = { ansIdx: event.ansIdx };
       await $grid
         ._useLoader(() => this.$axios.get('/pr/printIntegratedReport/reportHistory', param))
         .then(({ data }) => {
-          this.reportHistoryGrid.$grid.setGridData(data);
+          $grid.setGridData(data);
         });
     },
     async save() {
-      const parameter = FormUtil.getData(this.reportInfo.forms);
-      await this.$eSignWithReason(() => this.$axios.post('/pr/printReport', parameter))
+      const { forms } = this.reportInfo;
+      const param = FormUtil.getData(forms);
+      await this.$eSignWithReason(() => this.$axios.post('/pr/printIntegratedReport', param))
         .then(() => {
           this.$info(this.$message.info.saved);
-          this.init();
           this.getTestReportList();
+          this.getReportHistory(param);
         })
-        .ckatch(() => this.$error(this.$message.error.updateData));
+        .catch(() => this.$error(this.$message.error.updateData));
     },
-    setDataToForms(event) {
-      FormUtil.setData(this.testInfo.forms, event.item);
-      FormUtil.setData(this.reportInfo.forms, event.item);
-      this.getTestItmList(event);
-      this.getReportHistory(event);
+    async onChangeReportDivision(event) {
+      if (event.type === 'change' && event.item.name === 'rptDiv' && event.item.value !== '') {
+        const param = { rptIdx: event.item.value };
+        await this.$axios
+          .get('/pr/printIntegratedReport/integratedReport', param)
+          .then(({ data }) => {
+            FormUtil.setData(this.reportInfo.forms, {
+              rptRdPath: data.rptRdPath,
+              arptSpcc: data.arptSpcc,
+            });
+          })
+          .catch();
+      }
+    },
+    onClickReportInfo({ name }) {
+      if (name === 'save') {
+        this.reportInfo.forms
+          .validate()
+          .then(() => this.save())
+          .catch(() => {});
+      }
+      if (name === 'init') {
+        this.init();
+        this.initReportForm();
+      }
+    },
+    setDataToForms(data) {
+      FormUtil.setData(this.testInfo.forms, data);
+      FormUtil.setData(this.reportInfo.forms, data);
+      this.getTestItmList(data);
+      this.getReportHistory(data);
+      FormUtil.enableButtons(this.reportInfo.buttons, ['save', 'init']);
+      FormUtil.enableButtons(this.reportHistoryGrid.buttons, ['print']);
+    },
+    setDataToReportInfo(data) {
+      const { forms } = this.reportInfo;
+      FormUtil.setData(forms, data);
     },
     searchFormEvent(event) {
       if (event.type === 'keydown' && event.originEvent.key === 'Enter') {
         this.getTestReportList();
       }
-    },
-
-    showModal(name) {
-      this.$setState(name, { show: true });
-    },
-    hideModal(name) {
-      this.$setState(name, { show: false });
     },
   },
 };

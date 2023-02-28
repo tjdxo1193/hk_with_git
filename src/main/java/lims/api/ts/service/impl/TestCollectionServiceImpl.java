@@ -26,6 +26,7 @@ public class TestCollectionServiceImpl implements TestCollectionService {
 
     @Override
     public List<TestCollectionVO> getTestCollectionList(TestCollectionVO request) {
+        request.setAnsProcCd(TestProcess.TEST_COLLECTION.getProcessCode());
         return dao.getTestCollectionList(request);
     }
 

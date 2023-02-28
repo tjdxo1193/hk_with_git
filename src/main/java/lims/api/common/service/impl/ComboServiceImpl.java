@@ -99,4 +99,9 @@ public class ComboServiceImpl implements ComboService {
     public List<ComboVO> getEquipment(String plntCd) {
         return dao.getEquipment(plntCd);
     }
+
+    @Override
+    public List<ComboVO> getIntegratedReport() {
+        return dao.getIntegratedReport();
+    }
 }

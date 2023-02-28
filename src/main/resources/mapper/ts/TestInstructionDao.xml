@@ -112,8 +112,8 @@
         LEFT JOIN QM_PITM_INFO_SAP QPIS ON QP.PITM_CD = QPIS.PITM_CD AND QP.PITM_VER = QPIS.PITM_VER AND QP.PLNT_CD = QPIS.PLNT_CD
         LEFT JOIN SY_APR_INFO SAI ON SAI.PLNT_CD = QPAP.PLNT_CD AND SAI.APR_IDX = QPAP.ASS_APR_REQ_IDX
         WHERE QPAR.PLNT_CD = #{plntCd}
-        AND QPAP.ANS_PROC_CD = 'S0130400'
-        AND SAI.APR_UID = #{userId}
+        AND QPAP.ANS_PROC_CD = #{ansProcCd} AND QPAP.HLD_YN = 'N'
+        AND SAI.APR_UID IN ( ${withDelegateUserIds} )  AND SAI.APR_YN = 'N'
         <if test="pitmTyp != '' and pitmTyp != null">
             AND QPI.PITM_TYP = #{pitmTyp}
         </if>

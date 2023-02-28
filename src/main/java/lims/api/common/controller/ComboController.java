@@ -140,4 +140,9 @@ public class ComboController {
         String plntCd = jwtResolver.getPlantCode(jwt);
         return ResponseEntity.ok(service.getEquipment(plntCd));
     }
+
+    @GetMapping("/integratedReport")
+    public ResponseEntity<List<ComboVO>> integratedReport() {
+        return ResponseEntity.ok(service.getIntegratedReport());
+    }
 }

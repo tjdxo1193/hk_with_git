@@ -25,6 +25,7 @@
                QPI.PITM_NM,
                QPI.PITM_EN,
                (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = QPI.PITM_TYP) AS PITM_TYP_NM,
+               QPI.PITM_TYP,
                QP.PITM_VER,
                QPAP.ANS_IDX,
                QPAP.ANS_NO,

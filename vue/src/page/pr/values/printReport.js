@@ -6,6 +6,20 @@ import { ColumnBuilder, FormBuilder } from '@/util/builder';
 const todayDate = dayjs().format('YYYY-MM-DD');
 const weekAgoDate = dayjs().add(-7, 'd').format('YYYY-MM-DD');
 
+const pitemType = {
+  FINISHED_SET: 'S0180100',
+  FINISHED_SINGLE: 'S0180101',
+  BEAUTIFUL_PACKAGING: 'S0180102',
+  SEMI_MANUFACTURES_FILLING_FOAM: 'S0180201',
+  SEMI_MANUFACTURES_OTHER_PRODUCT: 'S0180202',
+  SEMI_MANUFACTURES_BULK: 'S0180203',
+  SEMI_MANUFACTURES_BASE: 'S0180204',
+  RAW_MATERIAL: 'S0180400',
+  PACKAGING_MATERIAL: 'S0180500',
+  GOODS: 'S0180600',
+}
+
+
 const list = {
   static: {
     title: '조회',
@@ -15,7 +29,7 @@ const list = {
     props: {
       editable: false,
       showRowCheckColumn: false,
-      rowStyleFunction: function (rowIndex, item) {
+      rowStyleFunction: (rowIndex, item) => {
         if (item.useVerYn === 'N' || item.specUseVerYn === 'N') {
           return 'standardNoSet';
         }
@@ -50,6 +64,7 @@ const list = {
       .col('pitmCd', '자재번호')
       .col('pitmNm', '자재내역')
       .col('pitmEn', '자재내역(영문)')
+      .col('pitmTyp', '자재구분')
       .col('ansNo', '시험번호', { width: 90 })
       .col('reqDt', '의뢰일자')
       .col('reqDt', '지시일자')
@@ -115,19 +130,15 @@ const testInfo = {
 const reportInfo = {
   static: {
     title: '리포트정보',
-    countPerRow: 4,
+    countPerRow: 2,
     buttons: [{ name: 'save', label: '저장', disabled: true }],
   },
   forms: () =>
     FormBuilder.builder()
       .Hidden('plntCd')
       .Hidden('ansIdx')
-      .Select('pmSpcmNo', '통합성적서구분')
-      .spanCol(2)
+      .Hidden('pitmTyp')
       .Textarea('rptSpcc', '성적서특이사항', { rows: 5 })
-      .spanCol(2)
-      .spanRow(2)
-      .Textarea('arptSpcc', '통합성적서특이사항', { rows: 3 })
       .spanCol(2)
       .build(),
 };
@@ -147,10 +158,6 @@ const testItemList = {
       .col('ansIdx', false)
       .col('rstSeq', false)
       .col('ansProcCd', false)
-      // .col('fileIdx', false)
-      // .col('fileCnt', '첨부파일', { colSpan: 2, width: 50 })
-      // .button('fileAttacher', '첨부', { width: 50 })
-      // .button('resultHistory', '결과이력')
       .col('aitmCd', false)
       .col('aitmKn', '항목명', { width: 150 })
       .col('vriaNo', 'VARIANT NO', { width: 100 })
@@ -206,7 +213,6 @@ const tabs = {
     { name: 'itemInfo', label: '항목정보' },
   ],
   buttons: [
-    { name: 'printIntegratedReport', label: '통합성적서', disabled: true },
     { name: 'printTestReport', label: '시험성적서', disabled: true },
     { name: 'printTestInstruction', label: '시험지시서', disabled: true },
     { name: 'init', label: '초기화', disabled: true },
@@ -219,4 +225,5 @@ export default {
   reportInfo,
   testItemList,
   tabs,
+  pitemType,
 };

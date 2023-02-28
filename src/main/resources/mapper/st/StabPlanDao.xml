@@ -55,6 +55,7 @@
              , SSP.UDT_DS
              , SSP.UDT_UID
              , (SELECT USER_NM FROM SY_USER SU WHERE SU.USER_ID = SSP.UDT_UID) AS UDT_UID_NM
+             , SSP.STRG_FRM
              , QPI.PITM_CD
              , QPI.PITM_NM
              , QPAR.LOT_NO
@@ -405,7 +406,8 @@
             PLN_CHG_RJT_DS,
             PLN_CHG_RJT_REA,
             SBT_ANS_RST_APR_UID,
-            SBT_ANS_RST_APR_DS
+            SBT_ANS_RST_APR_DS,
+            STRG_FRM
         )
         VALUES(
             #{plntCd},
@@ -438,7 +440,8 @@
             #{plnChgRjtDs},
             #{plnChgRjtRea},
             #{sbtAnsRstAprUid},
-            #{sbtAnsRstAprDs}
+            #{sbtAnsRstAprDs},
+            #{strgFrm}
         )
     </insert>
 
@@ -515,7 +518,8 @@
             ANS_PPS_DTL = #{ansPpsDtl},
             DOC_NO = #{docNo},
             SBT_ANS_PLN_NO = #{sbtAnsPlnNo},
-            RMK = #{rmk}
+            RMK = #{rmk},
+            STRG_FRM = #{strgFrm}
         WHERE 1 = 1
             AND PLNT_CD = #{plntCd}
             AND SBT_PLN_IDX = #{sbtPlnIdx}

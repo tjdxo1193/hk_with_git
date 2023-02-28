@@ -270,6 +270,7 @@ export default {
     },
     async firstReg() {
       let param = this.formToParam();
+      console.log(param);
       await this.$axios
         .put('/ms/itemManage/firstSave', param)
         .then(() => {

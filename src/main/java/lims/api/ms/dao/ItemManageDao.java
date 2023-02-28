@@ -2,10 +2,8 @@ package lims.api.ms.dao;
 
 import lims.api.common.domain.AuditEvent;
 import lims.api.ms.entity.*;
-import lims.api.ms.enums.ItemManage;
 import lims.api.ms.vo.ItemApprSpecVO;
 import lims.api.ms.vo.ItemManageVO;
-import lims.api.ms.vo.MsElnCtRptFileVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 import spring.audit.annotation.Audit;
@@ -60,11 +58,15 @@ public interface ItemManageDao {
 
     int updateSpecNewAitemIdxBySapCode(ItemManageVO param);
 
-    Integer findAItemSpecIdxBySapCode(ItemManageVO param);
+    ItemManageVO findAitmSpecIdxAndPkgaCdBySapCode(ItemManageVO param);
 
     int firstSave(ItemManageVO request);
 
     Integer saveCtrptNo(ItemManageVO request);
 
     List<ItemManageVO> getBomList(ItemManageVO ctrptNo);
+
+    int updatePkgaCd(ItemManageVO param);
+
+    int updateAitmIdx(ItemManageVO param);
 }

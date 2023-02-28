@@ -1,6 +1,29 @@
 import api from '@/api';
 import { ColumnBuilder, FormBuilder } from '@/util';
 
+const processCode = {
+  TEMPORARY_SAVE: 'S0080100',
+  REVIEW_RETURN: 'S0080110',
+  REQUEST_REVIEW: 'S0080200',
+  APPROVAL_REJECTION: 'S0080210',
+  APPROVAL_REQUEST: 'S0080300',
+  APPROVED: 'S0080400',
+  SPEC_REMOVE: 'S0080900',
+}
+
+const pitemtype = {
+  FINISHED_SET: 'S0180100',
+  FINISHED_SINGLE: 'S0180101',
+  BEAUTIFUL_PACKAGING: 'S0180102',
+  SEMI_MANUFACTURES_FILLING_FOAM: 'S0180201',
+  SEMI_MANUFACTURES_OTHER_PRODUCT: 'S0180202',
+  SEMI_MANUFACTURES_BULK: 'S0180203',
+  SEMI_MANUFACTURES_BASE: 'S0180204',
+  RAW_MATERIAL: 'S0180400',
+  PACKAGING_MATERIAL: 'S0180500',
+  GOODS: 'S0180600',
+}
+
 const rvsDivPsComboList = [
   { value: 'P', label: '자재' },
   { value: 'S', label: '규격서' },
@@ -112,6 +135,8 @@ const pitmList = {
       .col('opsSpecSapPrdha', '포장시험에 등록된 SAP 계층코드', false)
       .col('labNo', 'LAB NO', false)
       .col('ctrptNo', 'CT 성적서 번호', false)
+      .col('pkgaCd', '포장재시험코드', false)
+      .col('pkgaTypNm', '포장재유형명', false)
       .build(),
 };
 
@@ -158,7 +183,6 @@ const commonInfoForm = {
     title: '자재정보',
     countPerRow: 2,
     height: '268px',
-    buttons: [{ name: 'putPkgaCd', label: '저장', disabled: true }],
   },
   forms: () =>
     FormBuilder.builder()
@@ -169,15 +193,17 @@ const commonInfoForm = {
       })
       .disabled()
       .multiple(
-        'pkgaCdModal',
-        '자재계층',
+        'pkgaCdMulti',
+        '포장자재 유형',
         FormBuilder.builder()
-          .Input('pkgaCd', '자재계층', { readonly: true })
+          .Hidden('pkgaCd', '포장자재 유형코드')
           .required()
-          .Button('pkgaCdSearch', 'pkgaCdModal2', { type: 'search', disabled: true })
+          .Input('pkgaTypNm', '포장자재 유형', { readonly: true })
+          .required()
+          .Button('pkgaCdSearch', 'pkgaCdModal', { type: 'search', disabled: true })
           .build(),
       )
-      .Input('sapPrdha', '자재계층코드')
+      .Input('sapPrdha', '포장자재 유형코드')
       .readonly()
       .Input('pitmNm', '자재내역')
       .readonly()
@@ -348,6 +374,8 @@ const testItemList = {
 };
 
 export default {
+  pitemtype,
+  processCode,
   pitmList,
   versionList,
   commonInfoForm,

@@ -160,4 +160,11 @@
         WHERE PLNT_CD = #{plntCd}
     </select>
 
+    <select id="getIntegratedReport" resultType="ComboVO">
+        SELECT SRM.RPT_IDX AS VALUE,
+               SRM.RPT_NM  AS LABEL
+        FROM SY_RPT_MST SRM
+        WHERE SRM.RPT_DIV = 'S0240002'
+        ORDER BY RPT_NM
+    </select>
 </mapper>

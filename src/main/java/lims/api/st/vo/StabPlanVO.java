@@ -58,6 +58,7 @@ public class StabPlanVO implements UpdateDetect {
     private String udtDs;                   // 수정 일시
     private String udtUid;                  // 수정 UID
     private String udtUidNm;                // 수정자(임의추가)
+    private String strgFrm;                 // U027, 보관형태
 
     // ST_SBT_ANS
     private Integer sbtAnsIdx;               // 안정성 시험 IDX

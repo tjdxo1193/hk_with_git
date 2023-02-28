@@ -122,160 +122,8 @@ export default {
         if (data.length !== 0) {
           this.list.$grid.setColumnPropByDataField('group_detail', { headerText: data[0].label });
         }
-        let showColumns;
-        if (item.pitmTyp === 'S0180100' || item.pitmTyp === 'S0180101') {
-          //완제품 - 세트, 단품
-          showColumns = [
-            'nbr',
-            'mkrVol',
-            'mkrVolUnit',
-            'useTrm',
-            'useLmt',
-            'csmBpCd',
-            'csmNm',
-            'brdAbbr',
-            'repBomNo',
-            'nomMtr',
-            'chagVol',
-            'chagVolUnit',
-            'pdtOrderTyp',
-            'pdtOrderNo',
-            'itnPrsCompCd',
-            'itnPrsCompNm',
-            'itmCtg',
-            'otcPrd',
-            'dmsEptYn',
-            'ctrptNo',
-            'perNo',
-          ];
-        } else if (item.pitmTyp === 'S0180201' || item.pitmTyp === 'S0180202') {
-          //반제품 - 충전품, 타정품
-          showColumns = [
-            'nbr',
-            'mkrVol',
-            'mkrVolUnit',
-            'useTrm',
-            'useLmt',
-            'csmBpCd',
-            'csmNm',
-            'brdAbbr',
-            'repBomNo',
-            'nomMtr',
-            'chagVol',
-            'chagVolUnit',
-            'pdtOrderTyp',
-            'pdtOrderNo',
-            'itnPrsCompCd',
-            'itnPrsCompNm',
-            'itmCtg',
-            'otcPrd',
-            'dmsEptYn',
-            'ctrptNo',
-            'perNo',
-            'labNo',
-            'ftnYn',
-            'qdrugYn',
-            'pearDiv',
-            'dioYn',
-            'prbInYn',
-            'prbFeYn',
-            'pnxFeYn',
-          ];
-        } else if (item.pitmTyp === 'S0180203') {
-          //반제품 - bulk
-          showColumns = [
-            'nbr',
-            'useTrm',
-            'useLmt',
-            'csmBpCd',
-            'csmNm',
-            'brdAbbr',
-            'pdtOrderTyp',
-            'pdtOrderNo',
-            'itnPrsCompCd',
-            'itnPrsCompNm',
-            'itmCtg',
-            'otcPrd',
-            'dmsEptYn',
-            'perNo',
-            'vdrRptRcpCrst',
-            'strgLmt',
-            'labNo',
-            'ftnYn',
-            'qdrugYn',
-            'pcs01',
-            'pcs02',
-            'pcs03',
-            'pcs04',
-            'makEqp',
-            'wrkNm',
-            'pearDiv',
-            'dioYn',
-            'prbInYn',
-            'prbFeYn',
-            'pnxFeYn',
-            'etnAnsReq',
-          ];
-        } else if (item.pitmTyp === 'S0180204') {
-          //반제품 - base
-          showColumns = [
-            'useTrm',
-            'useLmt',
-            'csmBpCd',
-            'csmNm',
-            'brdAbbr',
-            'pdtOrderTyp',
-            'pdtOrderNo',
-            'itnPrsCompCd',
-            'itnPrsCompNm',
-            'labNo',
-            'otcPrd',
-          ];
-        } else if (item.pitmTyp === 'S0180400') {
-          //원료
-          showColumns = [
-            'useTrm',
-            'useLmt',
-            'vdrRptRcpCrst',
-            'dlvYn',
-            'vdrCtrtDt',
-            'vdrRsvTm',
-            'etrCtnQty',
-            'rmtrSpec',
-            'rmtrCfmul',
-            'ftnYn',
-            'qdrugYn',
-            'phsUnitPre',
-            'amtUnit',
-            'currCd',
-          ];
-        } else if (item.pitmTyp === 'S0180102') {
-          //미품포장재
-          showColumns = ['useTrm', 'useLmt', 'brdAbbr', 'vdrRptRcpCrst'];
-        } else if (item.pitmTyp === 'S0180500') {
-          //포장재
-          showColumns = [
-            'mkrVol',
-            'mkrVolUnit',
-            'nomMtr',
-            'phsOrderQty',
-            'phsOrderUnit',
-            'vdrRptRcpCrst',
-            'strgLmt',
-            'dlvYn',
-            'vdrCtrtDt',
-            'vdrRsvTm',
-            'pkgMtrSpec',
-            'ctrptNo',
-            'phsUnitPre',
-            'amtUnit',
-            'currCd',
-            'amtLoccurr',
-          ];
-        } else if (item.pitmTyp === 'S0180600') {
-          //상품
-          showColumns = ['useTrm', 'useLmt', 'brdAbbr', 'vdrRptRcpCrst', 'ftnYn', 'qdrugYn'];
-        }
+        let showColumns = this.setColmn(item.pitmTyp);
+        console.log(showColumns,'showColumns');
         this.list.$grid.hideColumnGroup('group_detail');
         this.list.$grid.showColumnByDataField(showColumns);
       } else {
@@ -287,20 +135,178 @@ export default {
       const item = FormUtil.getData(this.testInfo.forms);
       return item.ansTyp === null || item.ansTyp === '' ? true : false;
     },
+    setColmn(pitmTyp){
+      let columns;
+      if (pitmTyp === 'S0180100' || pitmTyp === 'S0180101') {
+        //완제품 - 세트, 단품
+        columns = [
+          'nbr',
+          'mkrVol',
+          'mkrVolUnit',
+          'useTrm',
+          'useLmt',
+          'csmBpCd',
+          'csmNm',
+          'brdAbbr',
+          'repBomNo',
+          'nomMtr',
+          'chagVol',
+          'chagVolUnit',
+          'pdtOrderTyp',
+          'pdtOrderNo',
+          'itnPrsCompCd',
+          'itnPrsCompNm',
+          'itmCtg',
+          'otcPrd',
+          'dmsEptYn',
+          'ctrptNo',
+          'perNo',
+        ];
+      } else if (pitmTyp === 'S0180201' || pitmTyp === 'S0180202') {
+        //반제품 - 충전품, 타정품
+        columns = [
+          'nbr',
+          'mkrVol',
+          'mkrVolUnit',
+          'useTrm',
+          'useLmt',
+          'csmBpCd',
+          'csmNm',
+          'brdAbbr',
+          'repBomNo',
+          'nomMtr',
+          'chagVol',
+          'chagVolUnit',
+          'pdtOrderTyp',
+          'pdtOrderNo',
+          'itnPrsCompCd',
+          'itnPrsCompNm',
+          'itmCtg',
+          'otcPrd',
+          'dmsEptYn',
+          'ctrptNo',
+          'perNo',
+          'labNo',
+          'ftnYn',
+          'qdrugYn',
+          'pearDiv',
+          'dioYn',
+          'prbInYn',
+          'prbFeYn',
+          'pnxFeYn',
+        ];
+      } else if (pitmTyp === 'S0180203') {
+        //반제품 - bulk
+        columns = [
+          'nbr',
+          'useTrm',
+          'useLmt',
+          'csmBpCd',
+          'csmNm',
+          'brdAbbr',
+          'pdtOrderTyp',
+          'pdtOrderNo',
+          'itnPrsCompCd',
+          'itnPrsCompNm',
+          'itmCtg',
+          'otcPrd',
+          'dmsEptYn',
+          'perNo',
+          'vdrRptRcpCrst',
+          'strgLmt',
+          'labNo',
+          'ftnYn',
+          'qdrugYn',
+          'pcs01',
+          'pcs02',
+          'pcs03',
+          'pcs04',
+          'makEqp',
+          'wrkNm',
+          'pearDiv',
+          'dioYn',
+          'prbInYn',
+          'prbFeYn',
+          'pnxFeYn',
+          'etnAnsReq',
+        ];
+      } else if (pitmTyp === 'S0180204') {
+        //반제품 - base
+        columns = [
+          'useTrm',
+          'useLmt',
+          'csmBpCd',
+          'csmNm',
+          'brdAbbr',
+          'pdtOrderTyp',
+          'pdtOrderNo',
+          'itnPrsCompCd',
+          'itnPrsCompNm',
+          'labNo',
+          'otcPrd',
+        ];
+      } else if (pitmTyp === 'S0180400') {
+        //원료
+        columns = [
+          'useTrm',
+          'useLmt',
+          'vdrRptRcpCrst',
+          'dlvYn',
+          'vdrCtrtDt',
+          'vdrRsvTm',
+          'etrCtnQty',
+          'rmtrSpec',
+          'rmtrCfmul',
+          'ftnYn',
+          'qdrugYn',
+          'phsUnitPre',
+          'amtUnit',
+          'currCd',
+        ];
+      } else if (pitmTyp === 'S0180102') {
+        //미품포장재
+        columns = ['useTrm', 'useLmt', 'brdAbbr', 'vdrRptRcpCrst'];
+      } else if (pitmTyp === 'S0180500') {
+        //포장재
+        columns = [
+          'mkrVol',
+          'mkrVolUnit',
+          'nomMtr',
+          'phsOrderQty',
+          'phsOrderUnit',
+          'vdrRptRcpCrst',
+          'strgLmt',
+          'dlvYn',
+          'vdrCtrtDt',
+          'vdrRsvTm',
+          'pkgMtrSpec',
+          'ctrptNo',
+          'phsUnitPre',
+          'amtUnit',
+          'currCd',
+          'amtLoccurr',
+        ];
+      } else if (pitmTyp === 'S0180600') {
+        //상품
+        columns = ['useTrm', 'useLmt', 'brdAbbr', 'vdrRptRcpCrst', 'ftnYn', 'qdrugYn'];
+      }
+      return columns;
+    },
     setTxtinfo(){
-      const item1 = this.list.$grid.getSelectedItems();
-      const item = this.list.$grid.getParentColumnByDataField('nbr').children.filter(
-        (row) => row.visible === true,
-      );
-      const txt = item.map(
+      let item = this.list.$grid.getSelectedItems();
+      item = item[0].item;
+      const columns = this.setColmn(item.pitmTyp);
+      let txt = columns.map(
         (row) => {
-          if(item1[0].item[row.dataField] !== null){
-            return row.headerText+" : "+item1[0].item[row.dataField]
+          const header = this.list.$grid.getColumnItemByDataField(row).headerText;
+          if(item[row] !== null){
+            return header+" : "+item[row]
           }else{
-            return row.headerText+" : "
+            return header+" :"
           }
         }
       );
+      FormUtil.setData(this.requestInfo.forms, {pitmInfo : txt.join().replaceAll(',','\n')});
     },
     searchFormEvent(event) {
       if (event.type === 'keydown' && event.originEvent.key === 'Enter') {

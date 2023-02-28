@@ -27,4 +27,5 @@ public interface ComboDao {
 	List<ComboVO> getTestMaterialTreeCd(String value, String plntCd);
     List<ComboVO> getTestTerm(String plntCd);
     List<ComboVO> getEquipment(String plntCd);
+    List<ComboVO> getIntegratedReport();
 }

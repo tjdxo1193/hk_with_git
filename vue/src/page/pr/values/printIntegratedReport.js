@@ -15,7 +15,7 @@ const list = {
     props: {
       editable: false,
       showRowCheckColumn: false,
-      rowStyleFunction: function (rowIndex, item) {
+      rowStyleFunction: (rowIndex, item) => {
         if (item.useVerYn === 'N' || item.specUseVerYn === 'N') {
           return 'standardNoSet';
         }
@@ -112,53 +112,6 @@ const testInfo = {
       .build(),
 };
 
-const reportInfo = {
-  static: {
-    title: '통합 리포트 등록',
-    countPerRow: 2,
-    buttons: [
-      { name: 'save', label: '저장', disabled: true },
-      { name: 'init', label: '초기화', disabled: true },
-    ],
-  },
-  forms: () =>
-    FormBuilder.builder()
-      .Hidden('plntCd')
-      .Hidden('ansIdx')
-      .Select('pmSpcmNo', '통합성적서구분')
-      .RadioGroup('delYn', '삭제여부', {
-        value: '',
-        groups: [
-          { checkedValue: 'N', label: 'N' },
-          { checkedValue: 'Y', label: 'Y' },
-        ],
-        gap: 50,
-      })
-      .Datepicker('aaa', '출하일자', { value: todayDate })
-      .InputNumber('bbb', '출하수량')
-      .Textarea('arptSpcc', '통합성적서특이사항', { rows: 12, _colSpan: 2, _rowSpan: 12 })
-      .build(),
-};
-
-const reportHistoryGrid = {
-  static: {
-    title: '통합 리포트 등록',
-    buttons: [{ name: 'print', label: '통합 성적서 출력', disabled: true }],
-    props: {
-      editable: false,
-    },
-  },
-  columns: () =>
-    ColumnBuilder.builder()
-      .col('shiptDt', '출하일자')
-      .col('shiptQty', '출하수량')
-      .col('wrtNm', '작성자')
-      .col('wrtDs', '작성일시')
-      .col('prtNm', '출력자')
-      .col('prtDs', '출력일시')
-      .build(),
-};
-
 const testItemList = {
   static: {
     title: '시험항목',
@@ -168,30 +121,30 @@ const testItemList = {
   },
   columns: () =>
     ColumnBuilder.builder()
-      .col('plntCd', false)
-      .col('pitmSpecIdx', false)
-      .col('reqIdx', false)
-      .col('ansIdx', false)
-      .col('rstSeq', false)
-      .col('ansProcCd', false)
-      .col('aitmCd', false)
+      .col('plntCd', { visible: false })
+      .col('pitmSpecIdx', { visible: false })
+      .col('reqIdx', { visible: false })
+      .col('ansIdx', { visible: false })
+      .col('rstSeq', { visible: false })
+      .col('ansProcCd', { visible: false })
+      .col('aitmCd', { visible: false })
       .col('aitmKn', '항목명', { width: 150 })
       .col('vriaNo', 'VARIANT NO', { width: 100 })
       .col('vriaKn', 'VARIANT 국문', { width: 100 })
-      .col('ansDptCd', false)
+      .col('ansDptCd', { visible: false })
       .col('ansDptNm', '시험파트')
-      .col('ansUid', false)
+      .col('ansUid', { visible: false })
       .col('ansNm', '시험자')
       .col('perspecTxt', '허가규격', { width: 150 })
       .col('owcSpecTxt', '자사규격', { width: 150 })
-      .col('specTyp', false)
+      .col('specTyp', { visible: false })
       .col('specTypNm', '규격유형')
-      .col('jdgTyp', false)
+      .col('jdgTyp', { visible: false })
       .col('jdgTypNm', '판정유형', { width: 100 })
       .col('mkrQty', '표시량')
       .col('rstVal', '결과값')
       .col('markVal', '표기값')
-      .col('rstJdg', false)
+      .col('rstJdg', { visible: false })
       .col('rstJdgNm', '결과판정')
       .col('rstRmk', '결과비고')
       .col('perSlv', '허가', {
@@ -208,11 +161,11 @@ const testItemList = {
           .col('owcSlvDesc', '서술')
           .build(),
       })
-      .col('slvJdgCfm', false)
-      .col('slvJdgNonCfm', false)
+      .col('slvJdgCfm', { visible: false })
+      .col('slvJdgNonCfm', { visible: false })
       .col('slvJdgCfmNm', '기준 적합값', { width: 90 })
       .col('slvJdgNonCfmNm', '기준 부적합값', { width: 90 })
-      .col('rstUnitCd', false)
+      .col('rstUnitCd', { visible: false })
       .col('rstUnitNm', '결과단위')
       .col('rstDpnt', '결과소수점')
       .col('rptPrtYn', '성적서출력여부', { width: 100 })
@@ -220,6 +173,56 @@ const testItemList = {
       .col('rptPrtSlvVal', '성적서출력기준값', { width: 110 })
       .col('ansRstInpDs', '결과입력일시', { width: 150 })
       .col('aitmRmk', '비고', { width: 200 })
+      .build(),
+};
+
+const reportInfo = {
+  static: {
+    title: '통합 리포트 등록',
+    countPerRow: 2,
+    buttons: [
+      { name: 'save', label: '저장', disabled: true },
+      { name: 'init', label: '초기화', disabled: true },
+    ],
+  },
+  forms: () =>
+    FormBuilder.builder()
+      .Hidden('plntCd')
+      .Hidden('ansIdx')
+      .Hidden('rptRdPath')
+      .Select('rptDiv', '통합성적서구분', {
+        async: () => api.combo.common.getIntegratedReport(),
+      })
+      .RadioGroup('delYn', '삭제여부', {
+        value: 'N',
+        groups: [
+          { checkedValue: 'N', label: 'N' },
+          { checkedValue: 'Y', label: 'Y' },
+        ],
+      })
+      .Datepicker('shiptDt', '출하일자', { value: todayDate })
+      .InputNumber('shiptQty', '출하수량')
+      .Textarea('arptSpcc', '통합성적서특이사항', { rows: 12, _colSpan: 2, _rowSpan: 12 })
+      .build(),
+};
+
+const reportHistoryGrid = {
+  static: {
+    title: '통합 리포트 발행 목록',
+    buttons: [{ name: 'print', label: '통합 성적서 출력', disabled: true }],
+    props: {
+      editable: false,
+    },
+  },
+  columns: () =>
+    ColumnBuilder.builder()
+      .col('shiptDt', '출하일자')
+      .col('shiptQty', '출하수량')
+      .col('wrtNm', '작성자')
+      .col('wrtDs', '작성일시')
+      .col('prtNm', '출력자')
+      .col('prtDs', '출력일시')
+      .col('arptSpcc', { visible: false })
       .build(),
 };
 

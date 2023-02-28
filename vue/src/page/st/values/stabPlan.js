@@ -250,6 +250,9 @@ const stabInfoRegForm = {
       .spanRow(2)
       // .Input('14', '제조번호구분')
       // .required()
+      .Select('strgFrm', '보관 형태', {
+        async: () => api.combo.userCommon.getStrgFrmCombo(),
+      })
       .Hidden('sbtPlnIdx', '안정성 계획 IDX')
       .Hidden('ansIdx', '시험 IDX')
       .Hidden('sbtAnsPlnAprIdx', '안정성 시험 계획 승인 IDX')

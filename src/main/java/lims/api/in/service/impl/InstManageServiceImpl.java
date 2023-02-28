@@ -16,7 +16,6 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class InstManageServiceImpl implements InstManageService {
     private final InstManageDao dao;
     private final FileService fileService;

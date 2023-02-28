@@ -6,6 +6,7 @@ import lims.api.common.exception.NoUpdatedDataException;
 import lims.api.ms.dao.ItemManageDao;
 import lims.api.ms.dao.MsElnCtRptFileDao;
 import lims.api.ms.domain.MsElnCtRptFileKey;
+import lims.api.ms.enums.ItemManage;
 import lims.api.ms.enums.PItemType;
 import lims.api.ms.enums.SpecProgress;
 import lims.api.ms.service.ItemManageFileService;
@@ -13,13 +14,12 @@ import lims.api.ms.service.ItemManageService;
 import lims.api.ms.vo.ItemApprSpecVO;
 import lims.api.ms.vo.ItemManageVO;
 import lims.api.ms.vo.MsElnCtRptFileVO;
+import lims.api.util.StringUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.util.Strings;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
-import java.io.OptionalDataException;
-import java.text.Format;
 import java.util.List;
 import java.util.Optional;
 @Slf4j
@@ -53,20 +53,46 @@ public class ItemManageServiceImpl implements ItemManageService {
     }
 
     @Override
-    public void firstSave(ItemManageVO request) {
+    public void firstSave(ItemManageVO param) {
         int result = 0;
+        param.setQpSpecProcCd(SpecProgress.APPROVED.getCode());
+        param.setUseVerYn('Y');
 
-        request.setQpSpecProcCd(SpecProgress.APPROVED.getCode());
-        request.setUseVerYn('Y');
-
-        result = dao.firstSave(request);
-        tempSave(request);
+        result = dao.firstSave(param);
 
         if(result == 0){
             throw new NoUpdatedDataException();
         }
 
+        if(isWrapItemType(param)){
+            matchingPkgaCodeWhenWrapTest(param);
+        }
 
+        tempSave(param);
+    }
+
+    private void matchingPkgaCodeWhenWrapTest(ItemManageVO param) {
+
+        int updateResult = 0;
+        ItemManageVO ivo = Optional.ofNullable(dao.findAitmSpecIdxAndPkgaCdBySapCode(param))
+                .orElse(new ItemManageVO());
+
+        if(StringUtils.isEmpty(ivo.getPkgaCd()) || ivo.getAitmSpecIdx() == null ){
+            log.info("[bug report] packaging code not found. matching fail");
+        }else{
+            ivo.setPlntCd(param.getPlntCd());
+            ivo.setPitmCd(param.getPitmCd());
+            ivo.setPitmVer(param.getPitmVer());
+            updateResult += dao.updatePkgaCd(ivo);
+
+            ivo.setPitmSpecIdx(param.getPitmSpecIdx());
+            ivo.setSpecProcCd(SpecProgress.TEMPORARY_STORAGE.getCode());
+            updateResult += dao.updateAitmIdx(ivo);
+
+            if(updateResult != 2){
+                throw new NoUpdatedDataException();
+            }
+        }
     }
 
     @Override

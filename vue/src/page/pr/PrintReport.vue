@@ -27,6 +27,8 @@ import { FormUtil, RdUtil } from '@/util';
 
 import values from './values/printReport';
 
+const { pitemType } = values;
+
 export default {
   name: 'PrintReport',
   components: {},
@@ -103,10 +105,32 @@ export default {
       }
       if (name === 'printTestReport') {
         const parameter = FormUtil.getData(this.reportInfo.forms);
-        RdUtil.openReport(
-          '/HF_FINISHED_PRODUCT_TEST_REPORT.mrd',
-          `/rp [${parameter.plntCd}] [${parameter.ansIdx}]`,
-        );
+        if(parameter.pitmTyp == pitemType.FINISHED_SET || parameter.pitmTyp == pitemType.BEAUTIFUL_PACKAGING){
+          RdUtil.openReport(
+            '/HF_FINISHED_PRODUCT_TEST_REPORT.mrd',
+            `/rp [${parameter.plntCd}] [${parameter.ansIdx}]`,
+          );
+          return;
+        }
+        if(parameter.pitmTyp == pitemType.SEMI_MANUFACTURES_FILLING_FOAM 
+        || parameter.pitmTyp == pitemType.SEMI_MANUFACTURES_OTHER_PRODUCT
+        || parameter.pitmTyp == pitemType.SEMI_MANUFACTURES_BULK
+        || parameter.pitmTyp == pitemType.SEMI_MANUFACTURES_BASE){
+          RdUtil.openReport(
+            '/HF_FINISHED_PRODUCT_TEST_REPORT.mrd',
+            `/rp [${parameter.plntCd}] [${parameter.ansIdx}]`,
+          );
+          return;
+        }
+        if(parameter.pitmTyp == pitemType.RAW_MATERIAL){
+          RdUtil.openReport(
+            '/HF_FINISHED_PRODUCT_TEST_REPORT.mrd',
+            `/rp [${parameter.plntCd}] [${parameter.ansIdx}]`,
+          );
+          return;
+        }
+
+        return;
       }
       if (name === 'save') {
         this.save();

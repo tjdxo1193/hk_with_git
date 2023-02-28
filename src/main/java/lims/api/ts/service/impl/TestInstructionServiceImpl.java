@@ -4,7 +4,9 @@ import lims.api.common.domain.FileKey;
 import lims.api.common.exception.NoUpdatedDataException;
 import lims.api.common.service.ApproveService;
 import lims.api.common.service.FileService;
+import lims.api.common.service.UserService;
 import lims.api.ts.dao.TestInstructionDao;
+import lims.api.ts.enums.TestProcess;
 import lims.api.ts.service.TestInstructionService;
 import lims.api.ts.vo.TestInstructionVO;
 import lombok.RequiredArgsConstructor;
@@ -19,9 +21,12 @@ public class TestInstructionServiceImpl implements TestInstructionService {
     private final TestInstructionDao dao;
     private final FileService fileService;
     private final ApproveService approveService;
+    private final UserService userService;
 
     @Override
     public List<TestInstructionVO> getTestInstructList(TestInstructionVO request) {
+        request.setAnsProcCd(TestProcess.TEST_INSTRUCTION.getProcessCode());
+        request.setWithDelegateUserIds(userService.getDelegateAssignUserIdsWithMe(request.getUserId()));
         return dao.getTestInstructList(request);
     }
 

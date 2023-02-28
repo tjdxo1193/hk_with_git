@@ -40,4 +40,7 @@ export default {
   getTestTerm() {
     return $axios.get('/combo/testTerm');
   },
+  getIntegratedReport() {
+    return $axios.get('/combo/integratedReport');
+  },
 };

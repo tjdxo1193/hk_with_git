@@ -79,4 +79,7 @@ export default {
   getWorkDivCombo() {
     return this.getDetailUserCommonCd('U026');
   },
+  getStrgFrmCombo() {
+    return this.getDetailUserCommonCd('U027');
+  },
 };

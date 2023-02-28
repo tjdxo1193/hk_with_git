@@ -2,10 +2,12 @@ package lims.api.ms.vo;
 
 import lims.api.common.domain.Paging;
 import lims.api.common.domain.UpdateDetect;
+import lims.api.integration.annotation.EnumType;
+import lims.api.integration.domain.eai.TrsStateful;
+import lims.api.integration.enums.InterfaceSystemType;
+import lims.api.integration.enums.TestStatusProcess;
 import lims.api.ms.domain.MsElnCtRptFileKey;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;

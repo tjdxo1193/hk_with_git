@@ -101,4 +101,6 @@ public class MonitorTestResultReviewVO implements UpdateDetect {
     /*승인정보*/
     private ApproveVO approveInfo;
     private int rstAprReqIdx;
+
+    private String withDelegateUserIds; //대리자
 }

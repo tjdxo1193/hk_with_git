@@ -94,6 +94,7 @@ public class MonitorTestResultApprVO implements UpdateDetect {
     private String markVal; //표기값
     private String ansDptNm; //시험부서명
 
+    private String withDelegateUserIds; //대리자
     private String userId; //사용자
     private String rea; //사유
 

@@ -61,6 +61,7 @@
   <SapPrdhaSearchModal
     :show="sapPrdhaSearchModal.show"
     :sapPrdha="sapPrdhaSearchModal.sapPrdha"
+    :versionInfo="sapPrdhaSearchModal.versionInfo"
     @close="() => (sapPrdhaSearchModal.show = false)"
     @modalReturnDataEvent="sapPrdhaModalReturnDataEvent"
   />
@@ -77,6 +78,8 @@ import {
 import { FormUtil, GridUtil, StringUtil } from '@/util';
 
 import values from './values/specManage';
+
+const {processCode, pitemtype} = values
 
 export default {
   name: 'SpecManage',
@@ -162,21 +165,6 @@ export default {
         show: false,
         labNo: '',
       },
-      processCode: {
-        temporarySave: 'S0080100',
-      },
-      pitemtype: {
-        finishedSet: 'S0180100',
-        finishedSingle: 'S0180101',
-        beautifulPackaging: 'S0180102',
-        semiManufacturesFillingFoam: 'S0180201',
-        semiManufacturesOtherProduct: 'S0180202',
-        semiManufacturesBulk: 'S0180203',
-        semiManufacturesBase: 'S0180204',
-        rawMaterial: 'S0180400',
-        packagingMaterial: 'S0180500',
-        goods: 'S0180600',
-      },
       departmentList: {
         hirDepartmentCode: '',
         list: [],
@@ -189,7 +177,6 @@ export default {
       },
       sapPrdhaSearchModal: {
         show: false,
-        sapPrdha: null,
       },
     };
   },
@@ -300,9 +287,6 @@ export default {
         this.showElnSpecCopyForTestMethodModal();
         return;
       }
-      if (name == 'putPkgaCd') {
-        this.putPkgaCd();
-      }
     },
 
     initAll() {
@@ -334,6 +318,11 @@ export default {
 
       // 첫 규격이고, 규격 index 없을때 (아예초기상태)
       if (this.isSelectedItemHasNotVersion()) {
+        if(this.isImpossibleToRevisionBecausePackigingAndfinishedProduct()){
+          this.activateRequestReviewButtonWhenTemporarySave();
+          return;
+        }
+
         this.actvateButtonWhenFirstVersionAndNoIndex();
 
         // 반제품 일 경우, Eln규격 버튼 활성화
@@ -467,13 +456,11 @@ export default {
     disableCommonInfoForm() {
       const { forms } = this.commonInfoForm;
       FormUtil.disable(forms, 'pkgaCdSearch');
-      FormUtil.disableButtons(this.commonInfoForm.buttons, ['putPkgaCd']);
     },
 
     enableCommonInfoForm() {
       const { forms } = this.commonInfoForm;
       FormUtil.enable(forms, 'pkgaCdSearch');
-      FormUtil.enableButtons(this.commonInfoForm.buttons, ['putPkgaCd']);
     },
 
     disableTestItemListUpdatableButtons() {
@@ -487,7 +474,7 @@ export default {
     },
 
     changeCommonInfoFormButtons() {
-      if (this.isSelectedTemporaryVersion()) {
+      if (this.isSelectedTemporaryVersion() && this.isImpossibleToRevisionBecausePackigingAndfinishedProduct()) {
         this.enableCommonInfoForm();
       } else {
         this.disableCommonInfoForm();
@@ -496,29 +483,22 @@ export default {
 
     onClickCommonInfoFormButtons({ originEvent }) {
       if (originEvent === 'pkgaCdSearch') {
+        const {pitmSpecIdx, pitmCd, pitmVer} = FormUtil.getData(this.valueWithVersionGrid.forms);
+        this.sapPrdhaSearchModal.versionInfo = {pitmSpecIdx, pitmCd, pitmVer}
         this.sapPrdhaSearchModal.show = true;
       }
     },
 
-    sapPrdhaModalReturnDataEvent(item = null) {
-      const { aitmSpecIdx, pkgaCd, sapPrdha } = item;
+    async sapPrdhaModalReturnDataEvent(item = null) {
+      const { aitmSpecIdx, pkgaCd, sapPrdha, pkgaTypNm } = item;
+      console.log(aitmSpecIdx, pkgaCd, sapPrdha, pkgaTypNm)
       const { forms } = this.commonInfoForm;
+      const { pitmCd, pitmVer } = FormUtil.getData(this.valueWithPitmGrid.forms);
 
-      FormUtil.setData(forms, { aitmSpecIdx, pkgaCd, sapPrdha });
-    },
+      FormUtil.setData(forms, { aitmSpecIdx, pkgaCd, sapPrdha, pkgaTypNm });
 
-    putPkgaCd() {
-      const { forms } = this.commonInfoForm;
-      const parameter = FormUtil.getData(forms);
-
-      forms.validate().then(() =>
-        this.$eSign(() => this.$axios.put('/ms/specManage/putPkgaCd', parameter))
-          .then(() => {
-            this.$info(this.$message.info.updated);
-            this.fetchPItemSpecList();
-          })
-          .catch(() => this.$error(this.$message.error.updateData)),
-      );
+      await this.fetchVersionList({pitmCd, pitmVer});
+      this.fetchPItemSpecAItemList({aitmSpecIdx});
     },
 
     changeButtonWhenSelectedTestItem() {
@@ -538,8 +518,7 @@ export default {
     activateRequestReviewButtonWhenTemporarySave() {
       // 검토요청 버튼은 임시저장이나 검토반려 일때만 활성화
       if (
-        (this.isSelectedTemporaryVersion() || this.isSelectedReviewRejectVersion()) &&
-        this.isSelectedItemHasVersion()
+        this.isSelectedTemporaryVersion() || this.isSelectedReviewRejectVersion()
       ) {
         FormUtil.enableButtons(this.testItemList.buttons, ['requestReview']);
       }
@@ -610,22 +589,22 @@ export default {
 
     isSelectedTemporaryVersion() {
       const { specProcCd } = FormUtil.getData(this.valueWithVersionGrid.forms);
-      return specProcCd == 'S0080100';
+      return specProcCd == processCode.TEMPORARY_SAVE;
     },
 
     isSelectedReviewRejectVersion() {
       const { specProcCd } = FormUtil.getData(this.valueWithVersionGrid.forms);
-      return specProcCd == 'S0080110';
+      return specProcCd == processCode.REVIEW_RETURN;
     },
 
     isApproved() {
       const { specProcCd } = FormUtil.getData(this.valueWithVersionGrid.forms);
-      return specProcCd == 'S0080400';
+      return specProcCd == processCode.APPROVED;
     },
 
     isSpecRemove() {
       const { specProcCd } = FormUtil.getData(this.valueWithVersionGrid.forms);
-      return specProcCd == 'S0080900';
+      return specProcCd == processCode.SPEC_REMOVE;
     },
 
     isSelectedUsableVersion() {
@@ -749,9 +728,8 @@ export default {
       }
 
       const { $grid } = this.testItemList;
-      const { pitmSpecIdx } = FormUtil.getData(this.valueWithVersionGrid.forms);
+      const { pitmSpecIdx, aitmSpecIdx, aitmSpecVer } = FormUtil.getData(this.valueWithVersionGrid.forms);
       const { pitmCd, pitmVer } = FormUtil.getData(this.valueWithPitmGrid.forms);
-      const { aitmSpecIdx, aitmSpecVer } = FormUtil.getData(this.valueWithVersionGrid.forms);
       const parameter = {
         aitmSpecIdx,
         pitmSpecIdx,
@@ -957,31 +935,31 @@ export default {
     isImpossibleToRevisionBecausePackigingAndfinishedProduct() {
       const { pitmTyp } = FormUtil.getData(this.valueWithPitmGrid.forms);
       return (
-        pitmTyp == this.pitemtype.finishedSet ||
-        pitmTyp == this.pitemtype.finishedSingle ||
-        pitmTyp == this.pitemtype.packagingMaterial
+        pitmTyp == pitemtype.FINISHED_SET ||
+        pitmTyp == pitemtype.FINISHED_SINGLE ||
+        pitmTyp == pitemtype.PACKAGING_MATERIAL
       );
     },
 
     isSemiManufactures() {
       const { pitmTyp } = FormUtil.getData(this.valueWithPitmGrid.forms);
       return (
-        pitmTyp == this.pitemtype.semiManufacturesFillingFoam ||
-        pitmTyp == this.pitemtype.semiManufacturesOtherProduct ||
-        pitmTyp == this.pitemtype.semiManufacturesBulk ||
-        pitmTyp == this.pitemtype.semiManufacturesBase
+        pitmTyp == pitemtype.SEMI_MANUFACTURES_FILLING_FOAM ||
+        pitmTyp == pitemtype.SEMI_MANUFACTURES_OTHER_PRODUCT ||
+        pitmTyp == pitemtype.SEMI_MANUFACTURES_BULK ||
+        pitmTyp == pitemtype.SEMI_MANUFACTURES_BAS
       );
     },
 
     isImpossibleToCopyRow() {
       const { pitmTyp } = FormUtil.getData(this.valueWithPitmGrid.forms);
       return (
-        pitmTyp == this.pitemtype.rawMaterial ||
-        pitmTyp == this.pitemtype.goods ||
-        pitmTyp == this.pitemtype.semiManufacturesFillingFoam ||
-        pitmTyp == this.pitemtype.semiManufacturesOtherProduct ||
-        pitmTyp == this.pitemtype.semiManufacturesBulk ||
-        pitmTyp == this.pitemtype.semiManufacturesBase
+        pitmTyp == pitemtype.RAW_MATERIAL ||
+        pitmTyp == pitemtype.GOODS ||
+        pitmTyp == pitemtype.SEMI_MANUFACTURES_FILLING_FOAM ||
+        pitmTyp == pitemtype.SEMI_MANUFACTURES_OTHER_PRODUCT ||
+        pitmTyp == pitemtype.SEMI_MANUFACTURES_BULK ||
+        pitmTyp == pitemtype.SEMI_MANUFACTURES_BASE
       );
     },
 

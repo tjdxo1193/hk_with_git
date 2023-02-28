@@ -5,6 +5,7 @@
     </template>
 
     <FormBase v-bind="searchForm" @form-event="searchFormEvent" />
+    <FormBase v-bind="valueWithWrapInfo"/>
 
     <Space :gap="10" />
 
@@ -38,9 +39,13 @@ export default {
       type: String,
       default: () => '',
     },
+    versionInfo: {
+      type: Object,
+      default: {}
+    }
   },
   data() {
-    const { searchForm } = this.$copy(values);
+    const { searchForm, valueWithWrapInfo } = this.$copy(values);
 
     return {
       searchForm: {
@@ -57,6 +62,9 @@ export default {
       processCode: {
         approved: 'S0080400',
       },
+      valueWithWrapInfo: {
+        forms: valueWithWrapInfo.forms(),
+      }
     };
   },
   watch: {
@@ -71,6 +79,8 @@ export default {
   },
   methods: {
     doInit() {
+      this.reset();
+
       const sapPrdha = this.$props?.sapPrdha;
       if (sapPrdha) {
         const forms = this.searchForm?.forms;
@@ -81,6 +91,7 @@ export default {
     },
     reset() {
       this.searchForm.forms = values.searchForm.forms();
+      this.valueWithWrapInfo.forms = values.valueWithWrapInfo.forms();
     },
     close() {
       this.reset();
@@ -91,7 +102,7 @@ export default {
         this.fetchQmPkgaList();
       }
       if (name === 'select') {
-        this.selectSapCode();
+        this.putPkgaCd();
       }
     },
     async fetchQmPkgaList() {
@@ -113,9 +124,9 @@ export default {
       return data;
     },
     cellDoubleClick({ item = {} }) {
-      const { forms } = this.searchForm;
-      const { sapPrdha, pkgaDiv } = item;
-      FormUtil.setData(forms, { sapPrdha, pkgaDiv });
+      const { sapPrdha, pkgaDiv, pkgaCd, aitmSpecIdx, pkgaTypNm } = item;
+      FormUtil.setData(this.valueWithWrapInfo.forms, { pkgaCd, aitmSpecIdx, sapPrdha, pkgaTypNm });
+      FormUtil.setData(this.searchForm.forms, { sapPrdha, pkgaDiv });
     },
     searchFormEvent({ type, originEvent }) {
       if (type == 'keydown') {
@@ -124,33 +135,23 @@ export default {
         }
       }
     },
-    inputSapPrdha() {
-      const { forms } = this.searchForm;
-      const sapPrdha = FormUtil.getValue(forms, 'sapPrdha');
+    async putPkgaCd() {
+      const { pkgaCd, aitmSpecIdx, sapPrdha, pkgaTypNm } = FormUtil.getData(this.valueWithWrapInfo.forms);
 
-      if (!sapPrdha) {
-        this.$warn(this.$message.warn.unSelectedData);
-        return;
-      } else {
-        this.getOneQmPkga().then((data) => {
-          if (!data) {
-            this.$warn(this.$message.warn.unSelectedData);
-            return;
-          }
-
-          this.$emit('modalReturnDataEvent', { sapPrdha });
-          this.close();
-        });
-      }
-    },
-    selectSapCode() {
-      const selectItem = this.searchForm.$grid.getSelectedRows()?.[0];
-      if (!selectItem?.sapPrdha) {
+      if (!pkgaCd) {
         return this.$warn(this.$message.warn.unSelectedData);
       }
+      console.log(pkgaTypNm);
+      const { pitmSpecIdx, pitmCd, pitmVer } = this.$props.versionInfo;
+      const parameter = { pkgaCd, aitmSpecIdx, sapPrdha, pitmSpecIdx, pitmCd, pitmVer, pkgaTypNm };
 
-      this.$emit('modalReturnDataEvent', selectItem);
-      this.close();
+      this.$eSign(() => this.$axios.put('/ms/specManage/putPkgaCd', parameter))
+        .then(() => {
+          this.$info(this.$message.info.updated);
+          this.$emit('modalReturnDataEvent', parameter);
+          this.close();
+        })
+        .catch(() => this.$error(this.$message.error.updateData))
     },
   },
   computed: {},

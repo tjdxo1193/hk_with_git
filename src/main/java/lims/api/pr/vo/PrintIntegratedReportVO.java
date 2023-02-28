@@ -32,7 +32,7 @@ public class PrintIntegratedReportVO {
     private String pitmTyp;
     private String pitmTypNm;
     private String pitmVer;
-    private int ansIdx;
+    private Integer ansIdx;
     private String oosYn;
     private String ansProcCd;
     private String ansNo;
@@ -112,4 +112,19 @@ public class PrintIntegratedReportVO {
     private String prtDs;
     private Character delYn;
 
+    private Integer rptIdx;
+    private String rptDiv;
+    private String rptNm;
+    private String rptRdPath;
+    private String rptRmk;
+    private String etcRmk;
+    private String crtIp;
+    private String crtDs;
+    private String crtUid;
+    private String udtIp;
+    private String udtUid;
+
+    /* 별칭 */
+    private String wrtNm;
+    private String prtNm;
 }

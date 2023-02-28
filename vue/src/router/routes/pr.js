@@ -97,7 +97,7 @@ export default [
         meta: {
           menu: {
             code: 'M159',
-            title: '통합리포트출력',
+            title: '리포트출력(통합성적서)',
           },
         },
       },

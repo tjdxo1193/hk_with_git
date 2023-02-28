@@ -78,6 +78,7 @@
             PNX_FE_YN,
             PKG_MTR_SPEC,
             RMTR_CFMUL,
+            QPS.PITM_SPEC_IDX,
             COUNT(*) OVER() AS TOTAL
         FROM QM_PITM QP
         JOIN QM_PITM_INFO QPI ON QP.PLNT_CD = QPI.PLNT_CD AND QP.PITM_CD = QPI.PITM_CD AND QP.PITM_VER = QPI.PITM_VER
@@ -123,6 +124,7 @@
                QP.PITM_VER,
                (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QPSSUB.SPEC_PROC_CD) AS SPEC_PROC_NM,
                QPSSUB.SPEC_PROC_CD,
+               QPS.PITM_SPEC_IDX,
                QP.USE_VER_YN,
                QP.RVS_NO,
                QP.DOC_NO,
@@ -442,14 +444,6 @@
         </if>
     </select>
 
-    <select id="findAItemSpecIdxBySapCode" parameterType="ItemManageVO" resultType="Integer">
-        SELECT MAX(AITM_SPEC_IDX) AS AITM_SPEC_IDX
-        FROM QM_PKGA
-        WHERE PLNT_CD = #{plntCd}
-          AND SAP_PRDHA = #{sapPrdha}
-          AND SPEC_PROC_CD = #{specProcCd}
-    </select>
-
     <insert id="createQmPitmSpecAitm" parameterType="ItemApprSpecVO">
         INSERT INTO QM_PITM_SPEC_AITM
         (PLNT_CD,
@@ -529,6 +523,22 @@
           AND PITM_VER = #{pitmVer}
     </update>
 
+    <update id="updatePkgaCd" parameterType="itemManageVO">
+        UPDATE QM_PITM_INFO SET
+            PKGA_CD = #{pkgaCd}
+        WHERE PLNT_CD = #{plntCd}
+        AND PITM_CD = #{pitmCd}
+        AND PITM_VER = #{pitmVer}
+    </update>
+
+    <update id="updateAitmIdx" parameterType="itemManageVO">
+        UPDATE QM_PITM_SPEC SET
+            AITM_SPEC_IDX = #{aitmSpecIdx}
+        WHERE PLNT_CD = #{plntCd}
+        AND PITM_SPEC_IDX = #{pitmSpecIdx}
+        AND SPEC_PROC_CD = #{specProcCd}
+    </update>
+
     <!-- MS_SAP_BOM 조회 -->
     <select id="getBomList" parameterType="ItemManageVO" resultType="ItemManageVO">
         SELECT MSB.POSNR
@@ -570,5 +580,13 @@
         <if test="matnr != null and matnr != ''">
             AND UPPER(MSB.MATNR) LIKE UPPER('%' || #{matnr} || '%')
         </if>
+    </select>
+    <select id="findAitmSpecIdxAndPkgaCdBySapCode" parameterType="ItemManageVO" resultType="ItemManageVO">
+        SELECT AITM_SPEC_IDX, PKGA_CD
+        FROM QM_PKGA
+        WHERE PLNT_CD = #{plntCd}
+          AND SAP_PRDHA = #{sapPrdha}
+          AND SPEC_PROC_CD = #{qpSpecProcCd}
+          AND USE_VER_YN = 'Y'
     </select>
 </mapper>

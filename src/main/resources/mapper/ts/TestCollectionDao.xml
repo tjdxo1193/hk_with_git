@@ -114,7 +114,7 @@
         LEFT JOIN QM_PITM_INFO QPI ON QP.PITM_CD = QPI.PITM_CD AND QP.PITM_VER = QPI.PITM_VER AND QP.PLNT_CD = QPI.PLNT_CD
         LEFT JOIN QM_PITM_INFO_SAP QPIS ON QP.PITM_CD = QPIS.PITM_CD AND QP.PITM_VER = QPIS.PITM_VER AND QP.PLNT_CD = QPIS.PLNT_CD
         WHERE QPAR.PLNT_CD = #{plntCd}
-        AND QPAP.ANS_PROC_CD = 'S0130300'
+        AND QPAP.ANS_PROC_CD = #{ansProcCd} AND QPAP.HLD_YN = 'N'
         <if test="pitmTyp != '' and pitmTyp != null">
             AND QPI.PITM_TYP = #{pitmTyp}
         </if>

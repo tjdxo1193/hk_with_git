@@ -49,7 +49,7 @@
         AND MMAP.ANS_PROC_CD IN (#{testProcessList[0]}, #{testProcessList[1]})
         AND MMAP.PLNT_CD = #{plntCd}
         AND MMAP.HLD_YN != 'Y'
-        AND MMAP.REVW_UID = #{revwUid}
+        AND MMAP.REVW_UID IN ( ${withDelegateUserIds} )
         <if test="ansNo != null and ansNo != ''">
             AND TRIM(UPPER(MMAP.ANS_NO)) LIKE ('%' || TRIM(UPPER(#{ansNo})) || '%')
         </if>

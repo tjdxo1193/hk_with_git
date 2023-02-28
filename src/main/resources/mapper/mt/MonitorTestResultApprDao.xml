@@ -57,7 +57,7 @@
         AND ANS_PROC_CD = #{ansProcCd}
         AND MMAP.PLNT_CD = #{plntCd}
         AND MMAP.HLD_YN != 'Y'
-        AND SAI.APR_UID = #{userId}
+        AND SAI.APR_UID IN ( ${withDelegateUserIds} ) AND SAI.APR_YN = 'N'
         <if test="ansNo != null and ansNo != ''">
             AND TRIM(UPPER(MMAP.ANS_NO)) LIKE ('%' || TRIM(UPPER(#{ansNo})) || '%')
         </if>

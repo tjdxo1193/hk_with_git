@@ -98,6 +98,7 @@ public class TestInstructionVO implements UpdateDetect {
     /*시험정보*/
     private int ansIdx; //시험 IDX
     private String ansNo; //시험번호
+    private String ansProcCd; //시험프로세스
     private String rcpDt; //접수일자
     private String rcpUnm; //접수자
     private String clltDt; //채취일자
@@ -160,4 +161,5 @@ public class TestInstructionVO implements UpdateDetect {
     private List<String> searchReqDt; //의뢰일자
 
     private Integer assAprReqIdx; //지시자idx
+    private String withDelegateUserIds; //대리자
 }

@@ -2,6 +2,7 @@ package lims.api.mt.service.impl;
 
 import lims.api.common.exception.NoUpdatedDataException;
 import lims.api.common.service.ApproveService;
+import lims.api.common.service.UserService;
 import lims.api.mt.dao.MonitorTestResultReviewDao;
 import lims.api.mt.enums.MonitorTestProcess;
 import lims.api.mt.service.MonitorTestResultReviewService;
@@ -18,6 +19,7 @@ public class MonitorTestResultReviewServiceImpl implements MonitorTestResultRevi
 
     private final MonitorTestResultReviewDao dao;
     private final ApproveService approveService;
+    private final UserService userService;
 
     @Override
     public List<MonitorTestResultReviewVO> getMonitorTestResultReviewList(MonitorTestResultReviewVO request) {
@@ -25,6 +27,7 @@ public class MonitorTestResultReviewServiceImpl implements MonitorTestResultRevi
         processList.add(0, MonitorTestProcess.MONITOR_TEST_REVIEW.getProcessCode());
         processList.add(1, MonitorTestProcess.MONITOR_TEST_APPROVAL_REJECT.getProcessCode());
         request.setTestProcessList(processList);
+        request.setWithDelegateUserIds(userService.getDelegateAssignUserIdsWithMe(request.getRevwUid()));
         return dao.getMonitorTestResultReviewList(request);
     }
 

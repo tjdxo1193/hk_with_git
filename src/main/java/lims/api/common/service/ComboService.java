@@ -23,4 +23,5 @@ public interface ComboService {
 	List<ComboVO> getTestMaterialTreeCd(ComboVO param, String plntCd);
     List<ComboVO> getTestTerm(String plntCd);
     List<ComboVO> getEquipment(String plntCd);
+    List<ComboVO> getIntegratedReport();
 }

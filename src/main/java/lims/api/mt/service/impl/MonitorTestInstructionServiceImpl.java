@@ -2,6 +2,7 @@ package lims.api.mt.service.impl;
 
 import lims.api.common.exception.NoUpdatedDataException;
 import lims.api.common.service.ApproveService;
+import lims.api.common.service.UserService;
 import lims.api.mt.dao.MonitorTestInstructionDao;
 import lims.api.mt.enums.MonitorTestProcess;
 import lims.api.mt.service.MonitorTestInstructionService;
@@ -17,10 +18,12 @@ public class MonitorTestInstructionServiceImpl implements MonitorTestInstruction
 
     private final MonitorTestInstructionDao dao;
     private final ApproveService approveService;
+    private final UserService userService;
 
     @Override
     public List<MonitorTestInstructionVO> getMonitorTestInstructionList(MonitorTestInstructionVO request) {
         request.setAnsProcCd(MonitorTestProcess.MONITOR_TEST_INSTRUCTION.getProcessCode());
+        request.setWithDelegateUserIds(userService.getDelegateAssignUserIdsWithMe(request.getUserId()));
         return dao.getMonitorTestInstructionList(request);
     }
 

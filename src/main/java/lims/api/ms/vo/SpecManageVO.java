@@ -78,4 +78,5 @@ public class SpecManageVO implements UpdateDetect {
 
     // 포장시험, 자재계층 테이블
     private String pkgaCd;
+    private String pkgaTypNm;
 }

@@ -98,4 +98,5 @@ public class MonitorTestInstructionVO implements UpdateDetect {
     private String rstUnit; //결과 단위 코드
     private String ansDptNm; //시험부서명
 
+    private String withDelegateUserIds; //대리자
 }
