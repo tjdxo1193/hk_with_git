@@ -61,7 +61,9 @@
             LEFT JOIN QM_PITM_INFO_SAP QPIS ON QP.PITM_CD = QPIS.PITM_CD
                                                    AND QP.PITM_VER = QPIS.PITM_VER AND QP.PLNT_CD = QPIS.PLNT_CD
         WHERE QPAR.PLNT_CD = #{plntCd}
+          AND QPAP.ANS_PROC_CD='S0130900'
           AND QPAP.HLD_YN = 'N'
+          AND QPI.PITM_TYP IN ('S0180100', 'S0180101')
           <if test="sytJdg != null and sytJdg != ''">
           AND QPAP.SYT_JDG = #{sytJdg}
           </if>
@@ -86,9 +88,10 @@
           <if test="ansNo != null and ansNo != ''">
           AND TRIM(UPPER(QPAP.ANS_NO)) LIKE ('%' || TRIM(UPPER(#{ansNo})) || '%')
           </if>
-          <if test="searchReqDt != null and searchReqDt != ''">
-          AND QPAP.REQ_DT BETWEEN #{searchReqDt[0]} AND #{searchReqDt[1]}
+          <if test="ispReqNo != null and ispReqNo != ''">
+            AND TRIM(UPPER(QPAR.ISP_REQ_NO)) LIKE ('%' || TRIM(UPPER(#{ispReqNo})) || '%')
           </if>
+            AND QPAP.REQ_DT BETWEEN #{searchReqDt[0]} AND #{searchReqDt[1]}
         ORDER BY QPAR.REQ_IDX
     </select>
 

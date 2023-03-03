@@ -255,7 +255,7 @@
                         REQ.ISP_REQ_NO,
                         REQ.BATCH_NO,
                         REQ.MTR_CD,
-                        QPI.PITM_NM AS MTR_NM,
+                        QPI.PITM_NM  AS MTR_NM,
                         REQ.CSM_NM,
                         QPAP.ANS_NO,
                         QPAP.ANS_TYP,
@@ -284,7 +284,7 @@
                         REQ.ISP_REQ_NO,
                         REQ.BATCH_NO,
                         REQ.MTR_CD,
-                        QPI.PITM_NM AS MTR_NM,
+                        QPI.PITM_NM  AS MTR_NM,
                         REQ.CSM_NM,
                         QPAP.ANS_NO,
                         QPAP.ANS_TYP,
@@ -326,5 +326,154 @@
           AND PHS_ORDER_NO = #{phsOrderNo}
           AND ORDER_ITM = #{phsOrderItm}
     </select>
+
+
+    <select id="nextDegreeInMaterial" resultType="Integer">
+        SELECT NVL(MAX(DEGREE), 0) + 1
+        FROM IF_TRS_QMS_MATERIAL
+    </select>
+
+    <select id="nextIdxInMaterial" resultType="Integer">
+        SELECT NVL(MAX(IDX), 0) + 1
+        FROM IF_TRS_QMS_MATERIAL
+    </select>
+
+    <insert id="createMaterial" parameterType="lims.api.integration.vo.QMSSendVO$MaterialAll">
+        INSERT INTO IF_TRS_QMS_MATERIAL
+        (IDX,
+         DEGREE,
+         CRT_DS,
+         TRS_STATUS)
+        VALUES (#{idx},
+                #{degree},
+                SYSDATE,
+                #{trsStatus})
+    </insert>
+
+    <update id="updateMaterial" parameterType="lims.api.integration.vo.QMSSendVO$MaterialAll">
+        UPDATE IF_TRS_QMS_MATERIAL
+        SET
+        TRS_STATUS = #{trsStatus}
+        <if test="ifInfoIdx != null and ifInfoIdx != ''">
+            ,IF_INFO_IDX = #{ifInfoIdx}
+        </if>
+        <if test="errorlogId != null and errorlogId != ''">
+            ,ERRORLOG_ID = #{errorlogId}
+        </if>
+        WHERE
+        IDX = #{idx}
+    </update>
+
+
+    <select id="nextIdxInCosmetic" resultType="Integer">
+        SELECT NVL(MAX(IDX), 0) + 1
+        FROM IF_TRS_QMS_COSMETIC
+        WHERE MATERIAL_IDX = #{value}
+    </select>
+
+    <insert id="createCosmetic" parameterType="lims.api.integration.vo.QMSSendVO$CosmeticMaterial">
+        INSERT INTO IF_TRS_QMS_COSMETIC
+        (MATERIAL_IDX,
+         IDX,
+         PITM_CD,
+         PITM_NM,
+         PER_PITM_NM,
+         PKG_UNIT,
+         MST_FML_NO)
+        VALUES (#{materialIdx},
+                #{idx},
+                #{pitmCd},
+                #{pitmNm},
+                #{perPitmNm},
+                #{pkgUnit},
+                #{mstFmlNo})
+    </insert>
+
+
+    <select id="nextIdxInCosmeticBulk" resultType="Integer">
+        SELECT NVL(MAX(IDX), 0) + 1
+        FROM IF_TRS_QMS_COSMETIC_BULK
+        WHERE MATERIAL_IDX = #{value}
+    </select>
+
+    <insert id="createCosmeticBulk" parameterType="lims.api.integration.vo.QMSSendVO$CosmeticBulkMaterial">
+        INSERT INTO IF_TRS_QMS_COSMETIC_BULK
+        (MATERIAL_IDX,
+         IDX,
+         PITM_CD,
+         PITM_NM,
+         PER_PITM_NM,
+         VDR_BP_CD,
+         VDR_NM,
+         PITM_DIV,
+         TYP_DIV,
+         TYP_DTL,
+         CHAT_DIV,
+         FTN_DIV,
+         USE_LMT,
+         OPEN_LMT,
+         LAB_NO,
+         FML_NO)
+        VALUES (#{materialIdx},
+                #{idx},
+                #{pitmCd},
+                #{pitmNm},
+                #{perPitmNm},
+                #{vdrBpCd},
+                #{vdrNm},
+                #{pitmDiv},
+                #{typDiv},
+                #{typDtl},
+                #{chatDiv},
+                #{ftnDiv},
+                #{useLmt},
+                #{openLmt},
+                #{labNo},
+                #{fmlNo})
+    </insert>
+
+
+    <select id="nextIdxInDrug" resultType="Integer">
+        SELECT NVL(MAX(IDX), 0) + 1
+        FROM IF_TRS_QMS_DRUG
+        WHERE MATERIAL_IDX = #{value}
+    </select>
+
+    <insert id="createDrug" parameterType="lims.api.integration.vo.QMSSendVO$DrugMaterial">
+        INSERT INTO IF_TRS_QMS_DRUG
+        (MATERIAL_IDX,
+         IDX,
+         PITM_CD,
+         PITM_NM,
+         PER_PITM_NM,
+         PKG_UNIT,
+         MST_FML_NO)
+        VALUES (#{materialIdx},
+                #{idx},
+                #{pitmCd},
+                #{pitmNm},
+                #{perPitmNm},
+                #{pkgUnit},
+                #{mstFmlNo})
+    </insert>
+
+
+    <select id="nextIdxInDrugBulk" resultType="Integer">
+        SELECT NVL(MAX(IDX), 0) + 1
+        FROM IF_TRS_QMS_DRUG_BULK
+        WHERE MATERIAL_IDX = #{value}
+    </select>
+
+    <insert id="createDrugBulk" parameterType="lims.api.integration.vo.QMSSendVO$DrugBulkMaterial">
+        INSERT INTO IF_TRS_QMS_DRUG_BULK
+        (MATERIAL_IDX,
+         IDX,
+         PITM_CD,
+         PITM_NM)
+        VALUES (#{materialIdx},
+                #{idx},
+                #{pitmCd},
+                #{pitmNm})
+    </insert>
 
 </mapper>

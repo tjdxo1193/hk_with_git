@@ -55,7 +55,7 @@ export default {
           cellDoubleClick: (e) => {
             FormUtil.setData(this.requestInfo.forms, e.item);
             this.getResultDetail(e);
-            this.enableButtons(['init']);
+            this.enableButtons(['init', 'save']);
           },
         },
       },
@@ -72,6 +72,9 @@ export default {
       resultHistoryModal: {
         show: false,
         parameter: {},
+      },
+      fileInfo: {
+        fileIdx: '',
       },
     };
   },
@@ -93,6 +96,16 @@ export default {
         .then(({ data }) => data);
       $grid.setGridData(data);
     },
+    save() {
+      let parameter = FormUtil.getData(this.requestInfo.forms);
+      this.$eSignWithReason(() => this.$axios.put('/ts/testResultAppr/save', parameter))
+        .then(() => {
+          this.$info(this.$message.info.saved);
+          this.init();
+          this.getTestResultApprList();
+        })
+        .catch(() => this.$error(this.$message.error.updateData));
+    },
     searchFormEvent(event) {
       if (event.type === 'keydown' && event.originEvent.key === 'Enter') {
         this.getTestResultApprList();
@@ -104,6 +117,9 @@ export default {
       }
       if (name === 'init') {
         return this.init();
+      }
+      if (name === 'save') {
+        this.save();
       }
       if (name === 'approve') {
         const checkedRows = this.list.$grid.getCheckedRowItems();
@@ -133,7 +149,7 @@ export default {
     init() {
       this.requestInfo.forms = values.requestInfo.forms();
       this.requestInfo.$grid.clearGridData();
-      this.disableButtons(['init']);
+      this.disableButtons(['init', 'save']);
     },
     compareAnsUid() {
       const checkedRows = this.requestInfo.$grid.getCheckedRowItems();
@@ -202,9 +218,9 @@ export default {
     },
     gridButtonClick(event) {
       if (event.dataField === 'fileAttacher') {
-        const ansIdx = Number(event.item.ansIdx);
-        const rstSeq = Number(event.item.rstSeq);
-        return this.showModal('fileAttacherModal', { ansIdx, rstSeq });
+        const fileIdx = Number(event.item.fileIdx);
+        this.fileInfo = { fileIdx: fileIdx };
+        return this.showModal('fileAttacherModal', { fileIdx });
       }
       if (event.dataField === 'resultHistory') {
         /**
@@ -225,7 +241,7 @@ export default {
     },
     showModal(name, parameter = {}) {
       if (name === 'fileAttacherModal') {
-        this.fileAttacherModal.fileIdx = this.getFildIdx(parameter);
+        this.fileAttacherModal.fileIdx = parameter.fileIdx;
         return (this.fileAttacherModal.show = true);
       }
       if (name === 'resultHistoryModal') {
@@ -240,13 +256,6 @@ export default {
       if (name === 'resultHistoryModal') {
         return (this.resultHistoryModal.show = false);
       }
-    },
-    getFildIdx(parameter) {
-      const isRstSeqEmpty = parameter.rstSeq == 0 ? true : false;
-      const selectedItem = isRstSeqEmpty
-        ? this.list.$grid.getSelectedItems()
-        : this.requestInfo.$grid.getSelectedItems();
-      return selectedItem[0].item.fileIdx;
     },
   },
   computed: {

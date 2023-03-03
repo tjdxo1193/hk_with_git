@@ -119,4 +119,5 @@ public class TestResultApprVO implements UpdateDetect {
     private String hldRea;
 
     private String ansTyp;
+    private String specGrv; // 비중
 }

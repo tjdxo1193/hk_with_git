@@ -113,7 +113,6 @@ export default {
             await this.fetchVersionList(e.item);
             this.settingDepartmentList(e.item);
             this.setPitmInfoToPitmGridValueForm(e.item);
-            this.setCommonInfoForm(e.item);
             this.focusFirstRowItemOfVersionGrid();
           },
         },
@@ -314,7 +313,9 @@ export default {
     // loadToVersionFormAndTestListGrid : hiddenform인 version폼에 클릭된 값 세팅 하고 시험항목리스트를 불러온다
     loadToVersionFormAndTestListGrid(item) {
       this.setVersionInfoToVersionGridValueForm(item);
+      this.setCommonInfoForm(item);
       const { aitmSpecIdx, pitmCd, pitmVer } = FormUtil.getData(this.valueWithVersionGrid.forms);
+
 
       // 첫 규격이고, 규격 index 없을때 (아예초기상태)
       if (this.isSelectedItemHasNotVersion()) {
@@ -424,9 +425,9 @@ export default {
 
     setCommonInfoForm(item) {
       const { forms } = this.commonInfoForm;
-      const { opsSepcUseVerYn, specProcCd, pitmTyp } = item;
+      const { useVerYn, specProcCd, pitmTyp } = item;
       const validateFlag =
-        this.isOkayToSaveCommonInfoForm(opsSepcUseVerYn, specProcCd) &&
+        this.isOkayToSaveCommonInfoForm(useVerYn, specProcCd) &&
         this.isFinishedOrPackaging(pitmTyp);
 
       if (!validateFlag) {
@@ -435,17 +436,15 @@ export default {
         this.enableCommonInfoForm();
         this.disableTestItemListUpdatableButtons();
       }
-
-      const sapPrdha = item.opsSpecSapPrdha;
-      FormUtil.setData(forms, { ...item, sapPrdha });
+      FormUtil.setData(forms, { ...item });
     },
 
     resetCommonInfoForm() {
       this.commonInfoForm.forms = values.commonInfoForm.forms();
     },
 
-    isOkayToSaveCommonInfoForm(opsSepcUseVerYn, specProcCd) {
-      return !(opsSepcUseVerYn != 'N' || specProcCd != 'S0080100');
+    isOkayToSaveCommonInfoForm(useVerYn, specProcCd) {
+      return !(useVerYn != 'N' || specProcCd != 'S0080100');
     },
 
     isFinishedOrPackaging(pitmTyp = null) {
@@ -491,7 +490,6 @@ export default {
 
     async sapPrdhaModalReturnDataEvent(item = null) {
       const { aitmSpecIdx, pkgaCd, sapPrdha, pkgaTypNm } = item;
-      console.log(aitmSpecIdx, pkgaCd, sapPrdha, pkgaTypNm)
       const { forms } = this.commonInfoForm;
       const { pitmCd, pitmVer } = FormUtil.getData(this.valueWithPitmGrid.forms);
 

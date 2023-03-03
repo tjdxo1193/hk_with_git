@@ -6,14 +6,14 @@ const searchForm = {
     props: {
       editable: false,
     },
-    countPerRow: 3,
+    countPerRow: 2,
     buttons: [{ name: 'select', label: '조회' }],
     height: '180px',
   },
   forms: () =>
     FormBuilder.builder()
-      .Input('pitmNm', '자재내역', { readonly: true })
       .Input('pitmCd', '자재번호')
+      .required()
       .Input('fileName', '파일명')
       .build(),
   columns: () =>

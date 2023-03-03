@@ -17,6 +17,7 @@ export default {
     pleaseSelectEmgYN: '긴급여부를 선택해주세요.',
     requireTestSample: '시험검체량은 0 또는 빈값을 입력할 수 없습니다.',
     invalidInputDateValue: '날짜형식이 맞지 않습니다.',
+    noEditedFiles: '파일이 추가/삭제되지 않습니다. 파일을 수정한 후 다시 시도해주세요.',
   },
 
   eSign: {
@@ -135,6 +136,7 @@ export default {
     noAitmSpecIdx: '규격 정보가 없습니다.',
     noWaitingApproved: '승인 대기 중인 정보가 있습니다. 다시 선택해 주세요.',
     expireAuthentication: '로그인 인증이 만료되었습니다.',
+    notoosItem: '기준일탈 대상이 아닙니다.',
   },
   confirm: {
     saveData: '저장하시겠습니까?',
@@ -156,5 +158,6 @@ export default {
     published: '발행하시겠습니까?',
     sended: '전송하시겠습니까?',
     created: '생성하시겠습니까?',
+    oos: '기준일탈 처리하시겠습니까?',
   },
 };

@@ -37,9 +37,18 @@ public class PrintReportController {
         return ResponseEntity.ok(service.getTestItmList(request));
     }
 
+    @GetMapping("/reportPath")
+    public ResponseEntity<String> getReportPath(@AuthToken Token token, PrintReportVO param){
+        String jwt = token.getJwt();
+        param.setPlntCd(jwtResolver.getPlantCode(jwt));
+        return ResponseEntity.ok(service.getReportPath(param));
+    }
+
+
     @PostMapping
     public ResponseEntity<CommonResponse> updateRptInfo(@AuthToken Token token, @RequestBody PrintReportVO request) {
-        //service.updateRptInfo(request);
+
+        service.updateRptInfo(request);
         return ResponseEntity.ok(new CommonResponse());
     }
 }

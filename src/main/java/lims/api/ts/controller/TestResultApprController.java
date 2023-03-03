@@ -65,6 +65,12 @@ public class TestResultApprController {
         return ResponseEntity.ok(new CommonResponse());
     }
 
+    @PutMapping("/save")
+    public ResponseEntity<CommonResponse> save(@RequestBody TestResultApprVO request) {
+        service.save(request);
+        return ResponseEntity.ok(new CommonResponse());
+    }
+
     private String getAuthUserPlntCd(Token token) {
         String jwt = token.getJwt();
         return jwtResolver.getPlantCode(jwt);

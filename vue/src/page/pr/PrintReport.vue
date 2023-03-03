@@ -27,8 +27,6 @@ import { FormUtil, RdUtil } from '@/util';
 
 import values from './values/printReport';
 
-const { pitemType } = values;
-
 export default {
   name: 'PrintReport',
   components: {},
@@ -83,13 +81,15 @@ export default {
     },
     async save() {
       const parameter = FormUtil.getData(this.reportInfo.forms);
+
+      console.log(parameter)
       await this.$eSignWithReason(() => this.$axios.post('/pr/printReport', parameter))
         .then(() => {
           this.$info(this.$message.info.saved);
           this.init();
           this.getTestReportList();
         })
-        .ckatch(() => this.$error(this.$message.error.updateData));
+        .catch(() => this.$error(this.$message.error.updateData));
     },
     searchFormEvent(event) {
       if (event.type === 'keydown' && event.originEvent.key === 'Enter') {
@@ -104,36 +104,16 @@ export default {
         this.init();
       }
       if (name === 'printTestReport') {
-        const parameter = FormUtil.getData(this.reportInfo.forms);
-        if(parameter.pitmTyp == pitemType.FINISHED_SET || parameter.pitmTyp == pitemType.BEAUTIFUL_PACKAGING){
-          RdUtil.openReport(
-            '/HF_FINISHED_PRODUCT_TEST_REPORT.mrd',
-            `/rp [${parameter.plntCd}] [${parameter.ansIdx}]`,
-          );
-          return;
-        }
-        if(parameter.pitmTyp == pitemType.SEMI_MANUFACTURES_FILLING_FOAM 
-        || parameter.pitmTyp == pitemType.SEMI_MANUFACTURES_OTHER_PRODUCT
-        || parameter.pitmTyp == pitemType.SEMI_MANUFACTURES_BULK
-        || parameter.pitmTyp == pitemType.SEMI_MANUFACTURES_BASE){
-          RdUtil.openReport(
-            '/HF_FINISHED_PRODUCT_TEST_REPORT.mrd',
-            `/rp [${parameter.plntCd}] [${parameter.ansIdx}]`,
-          );
-          return;
-        }
-        if(parameter.pitmTyp == pitemType.RAW_MATERIAL){
-          RdUtil.openReport(
-            '/HF_FINISHED_PRODUCT_TEST_REPORT.mrd',
-            `/rp [${parameter.plntCd}] [${parameter.ansIdx}]`,
-          );
-          return;
-        }
-
-        return;
+        this.bringTestReportByPItemType();
       }
       if (name === 'save') {
         this.save();
+      }
+      if (name === 'printTestInstruction'){
+        const parameter = FormUtil.getData(this.reportInfo.forms);
+        RdUtil.openReport(
+          `/TEST_INSTRUCTIONS.mrd`,
+          `/rp [${parameter.plntCd}] [${parameter.ansIdx}]`);
       }
     },
     init() {
@@ -164,6 +144,17 @@ export default {
         'printTestInstruction',
       ]);
       FormUtil.disableButtons(this.reportInfo.buttons, ['save']);
+    },
+    bringTestReportByPItemType(){
+      const parameter = FormUtil.getData(this.reportInfo.forms);
+      if(parameter.pitmTyp == null){
+        return this.$warn('자재 유형이 없어서 시험성적서를 출력하지 못합니다.');
+      }
+
+      this.$axios.get('/pr/printReport/reportPath', parameter)
+        .then(({ data }) => RdUtil.openReport(
+          `/${data}`,
+          `/rp [${parameter.plntCd}] [${parameter.ansIdx}] [${parameter.pitmTyp}]` ));
     },
   },
 };

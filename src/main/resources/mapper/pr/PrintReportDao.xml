@@ -6,6 +6,8 @@
         SELECT QPAR.PLNT_CD,
                QPAR.REQ_IDX,
                QPAR.ISP_REQ_NO,
+               QPAP.ANS_PROC_CD,
+               (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = QPAP.ANS_PROC_CD) AS ANS_PROC_NM,
                QPAR.ISP_REQ_DT,
                QPAR.MTR_CD,
                QPAR.MTR_NM,
@@ -88,6 +90,9 @@
         <if test="ansNo != null and ansNo != ''">
             AND TRIM(UPPER(QPAP.ANS_NO)) LIKE ('%' || TRIM(UPPER(#{ansNo})) || '%')
         </if>
+        <if test="ispReqNo != null and ispReqNo != ''">
+            AND TRIM(UPPER(QPAR.ISP_REQ_NO)) LIKE ('%' || TRIM(UPPER(#{ispReqNo})) || '%')
+        </if>
         <if test="searchReqDt != null and searchReqDt != ''">
             AND QPAP.REQ_DT BETWEEN #{searchReqDt[0]} AND #{searchReqDt[1]}
         </if>
@@ -151,28 +156,26 @@
             C.MKR_QTY,
             C.AITM_RMK
         FROM QT_PITM_ANS_PROC A
-            JOIN QT_PITM_ANS_INFO B ON A.PLNT_CD = B.PLNT_CD AND A.ANS_IDX = B.ANS_IDX
-            JOIN QT_PITM_ANS_RST C ON A.PLNT_CD = C.PLNT_CD AND A.ANS_IDX = C.ANS_IDX
-            JOIN QM_PITM_SPEC D ON A.PLNT_CD = D.PLNT_CD AND A.PITM_SPEC_IDX = D.PITM_SPEC_IDX
-            JOIN QM_PITM E ON D.PLNT_CD = E.PLNT_CD AND D.PITM_CD = E.PITM_CD AND D.PITM_VER = E.PITM_VER
-            JOIN QM_PITM_INFO F ON E.PLNT_CD = F.PLNT_CD AND E.PITM_CD = F.PITM_CD AND E.PITM_VER = F.PITM_VER
-            JOIN QT_PITM_ANS_REQ G ON A.PLNT_CD = G.PLNT_CD AND A.REQ_IDX = G.REQ_IDX
-            JOIN MS_AMITM H ON C.AMITM_CD = H.AMITM_CD
-            JOIN MS_AITM I ON H.AITM_CD = I.AITM_CD
+            INNER JOIN QT_PITM_ANS_INFO B ON A.PLNT_CD = B.PLNT_CD AND A.ANS_IDX = B.ANS_IDX
+            INNER JOIN QT_PITM_ANS_RST C ON A.PLNT_CD = C.PLNT_CD AND A.ANS_IDX = C.ANS_IDX
+            INNER JOIN QM_PITM_SPEC D ON A.PLNT_CD = D.PLNT_CD AND A.PITM_SPEC_IDX = D.PITM_SPEC_IDX
+            INNER JOIN QM_PITM E ON D.PLNT_CD = E.PLNT_CD AND D.PITM_CD = E.PITM_CD AND D.PITM_VER = E.PITM_VER
+            INNER JOIN QM_PITM_INFO F ON E.PLNT_CD = F.PLNT_CD AND E.PITM_CD = F.PITM_CD AND E.PITM_VER = F.PITM_VER
+            INNER JOIN QT_PITM_ANS_REQ G ON A.PLNT_CD = G.PLNT_CD AND A.REQ_IDX = G.REQ_IDX
+            INNER JOIN MS_AMITM H ON C.AMITM_CD = H.AMITM_CD
+            INNER JOIN MS_AITM I ON H.AITM_CD = I.AITM_CD
         WHERE A.ANS_IDX = #{ansIdx} AND C.DEL_YN = 'N'
         ORDER BY C.RST_SEQ
     </select>
 
-    <update id="createReportInfo" parameterType="PrintReportVO">
-        <selectKey resultType="Integer" order="BEFORE" >
-            SELECT NVL(MAX(ARPT_SEQ) + 1, 1) AS ARPT_SEQ
-            FROM QT_PITM_ANS_ARPT QPAA
-            WHERE QPAA.PLNT_CD = #{plntCd}
-            AND QPAA.ANS_IDX = #{ansIdx}
-        </selectKey>
+    <select id="getReportPath" resultType="java.lang.String" parameterType="PrintReportVO">
+        SELECT RPT_RD_PATH FROM SY_RPT_MST WHERE RPT_IDX = (SELECT EXT_CD3 FROM SY_CD_DTL WHERE PLNT_CD = #{plntCd} AND DTL_CD = #{pitmTyp})
+    </select>
 
+    <update id="updateReportInfo" parameterType="PrintReportVO">
+        UPDATE QT_PITM_ANS_INFO SET
+            RPT_SPCC = #{rptSpcc}
+        WHERE PLNT_CD = #{plntCd}
+        AND ANS_IDX = #{ansIdx}
     </update>
-
-
-
 </mapper>

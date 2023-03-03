@@ -691,11 +691,12 @@
 			FROM QM_PITM_INFO QPI
 			LEFT JOIN QM_PITM QP ON QP.PLNT_CD = QPI.PLNT_CD AND QP.PITM_VER = QPI.PITM_VER AND QP.PITM_CD = QPI.PITM_CD
 			WHERE QPI.PLNT_CD = #{plntCd}
-		  	AND PITM_TYP NOT IN (${pitmTyp})
+		  	AND QPI.PITM_TYP NOT IN (${pitmTyp})
+			AND QPI.SAP_PRDHA = #{sapPrdha}
+			AND QPI.PKGA_CD = #{pkgaCd}
 			AND QP.USE_VER_YN = 'Y'
 		    AND QP.DEL_YN = 'N'
 			AND QP.SPEC_PROC_CD = #{specProcCd}
-			AND SAP_PRDHA = #{sapPrdha}
 	</select>
 
 	<select id="findSpecListByItemInfo" parameterType="WrapTestManageVO" resultType="SpecManageVO">

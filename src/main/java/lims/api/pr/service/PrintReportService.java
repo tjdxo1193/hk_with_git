@@ -8,4 +8,5 @@ public interface PrintReportService {
     List<PrintReportVO> getTestReportList(PrintReportVO request);
     List<PrintReportVO> getTestItmList(PrintReportVO request);
     void updateRptInfo(PrintReportVO request);
+    String getReportPath(PrintReportVO param);
 }

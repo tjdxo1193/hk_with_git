@@ -3,6 +3,7 @@ package lims.api.integration.vo;
 import lims.api.integration.annotation.EnumType;
 import lims.api.integration.domain.eai.TrsStateful;
 import lims.api.integration.enums.InterfaceSystemType;
+import lims.api.integration.enums.ReportDivOfNonCfm;
 import lims.api.integration.enums.TestResultType;
 import lims.api.integration.enums.TestStatusProcess;
 import lombok.*;
@@ -60,6 +61,7 @@ public class MESSendVO {
         private String lotNo;
         private String nonCfmReason;
         private String emId;
+        private ReportDivOfNonCfm reportDiv;
         private String fileName;
         private byte[] fileData;
     }

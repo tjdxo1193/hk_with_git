@@ -4,6 +4,7 @@ import lims.api.integration.annotation.EnumType;
 import lims.api.integration.domain.eai.TrsStateful;
 import lims.api.integration.enums.DMRItemDiv;
 import lims.api.integration.enums.FinalOrderStatus;
+import lims.api.integration.enums.MaterialCharCode;
 import lims.api.integration.enums.SAPPItemType;
 import lims.api.ts.enums.TestJudgement;
 import lims.api.ts.enums.TestProcess;
@@ -12,6 +13,7 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -116,43 +118,110 @@ public class QMSSendVO {
     @Builder
     @EqualsAndHashCode
     public static class Material {
-        private final String werks;
-        private final String matnr;
-        private final String dispo;
-        private final DMRItemDiv itemDiv;
+        private String werks;
+        private String dispo;
+        private String matnr;
+        private DMRItemDiv itemDiv;
+
+        private CosmeticMaterial cosmeticFinished;
+        private CosmeticBulkMaterial cosmeticBulk;
+        private DrugMaterial quasiDrugFinished;
+        private DrugBulkMaterial quasiDrugBulk;
     }
 
     @Getter
     @Builder
-    public static class MaterialAll {
-        private List<CosmeticFinishedMaterial> cosmeticFinisheds;
+    @EqualsAndHashCode(callSuper = false)
+    public static class MaterialAll extends TrsStateful {
+        private List<CosmeticMaterial> cosmetics;
         private List<CosmeticBulkMaterial> cosmeticBulks;
-        private List<QuasiDrugFinishedMaterial> drugFinisheds;
-        private List<QuasiDrugBulkMaterial> drugBulks;
+        private List<DrugMaterial> drugs;
+        private List<DrugBulkMaterial> drugBulks;
     }
 
     @Getter
     @Builder
-    public static class CosmeticFinishedMaterial {
-
+    @EqualsAndHashCode
+    public static class CosmeticMaterial {
+        @Setter
+        private Integer materialIdx;
+        @Setter
+        private Integer idx;
+        private String pitmCd;      // 자재코드
+        private String pitmNm;      // 제품명
+        private String perPitmNm;   // 허가 제품명
+        private String pkgUnit;     // 포장 단위
+        private String mstFmlNo;    // 제품표준서 번호
+        private String vdrBpCd;     // 거래처 BP 코드
+        private String vdrNm;       // 거래처명
     }
 
     @Getter
     @Builder
+    @EqualsAndHashCode
     public static class CosmeticBulkMaterial {
-
+        @Setter
+        private Integer materialIdx;
+        @Setter
+        private Integer idx;
+        private String pitmCd;      // 자재코드
+        private String pitmNm;      // 제명 명
+        private String perPitmNm;   // 허가 제품명
+        private String vdrBpCd;     // 거래처 BP 코드
+        private String vdrNm;       // 거래처명
+        private String pitmDiv;     // 품목 구분
+        private String typDiv;      // 유형 분류
+        private String typDtl;      // 유형 세부 분류
+        private String chatDiv;     // 특성 구분
+        private String ftnDiv;      // 기능성 구분
+        private String useLmt;      // 사용기간
+        private String openLmt;     // 개봉 후 사용기간
+        private String labNo;       // 처방코드
+        private String fmlNo;       // 표준서 번호
+        private String pkgUnit;     // 포장 단위
     }
 
     @Getter
     @Builder
-    public static class QuasiDrugFinishedMaterial {
-
+    @EqualsAndHashCode
+    public static class DrugMaterial {
+        @Setter
+        private Integer materialIdx;
+        @Setter
+        private Integer idx;
+        private String pitmCd;      // 자재코드
+        private String pitmNm;      // 제품명
+        private String perpitmNm;   // 허가 제품명
+        private String pkgUnit;     // 포장단위
+        private String mstFmlNo;    // 제품표준서 번호
+        private String vdrBpCd;     // 거래처 BP 코드
+        private String vdrNm;       // 거래처명
     }
 
     @Getter
     @Builder
-    public static class QuasiDrugBulkMaterial {
-
+    @EqualsAndHashCode
+    public static class DrugBulkMaterial {
+        @Setter
+        private Integer materialIdx;
+        @Setter
+        private Integer idx;
+        private String pitmCd;      // 자재코드
+        private String pitmNm;      // 제품명
+        private String wrtDt;       // 작성일자
+        private String wrtId;       // 작성자 ID
+        private String labNo;       // 처방 코드
+        private String mstFmlNo;    // 제품표준서 번호
+        private String pitmDiv;     // 제뭉 구분
+        private String enmDt;       // 제정 일자
+        private String perDt;       // 허가 일자
+        private String enfoDt;      // 시행 일자
+        private String perNo;       // 허가 번호
+        private String fmln;        // 제형 및 성상
+        private String divNo;       // 분류 번호
+        private String pkgUnit;     // 포장 단위
+        private String useTrm;      // 사용 기간
+        private String slvAmtd;     // 기준 및 시험방법
     }
 
 }

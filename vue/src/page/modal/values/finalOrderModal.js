@@ -14,6 +14,7 @@ const srmOrderList = {
   forms: () =>
     FormBuilder.builder()
       .Input('phsOrderNo', '구매오더번호')
+      .required()
       .Input('phsOrderItm', '오더항목')
       .Input('lotNo', '제조번호')
       .build(),
@@ -50,6 +51,7 @@ const mesOrderList = {
   forms: () =>
     FormBuilder.builder()
       .Input('pdtOrderNo', '생산오더번호')
+      .required()
       .Input('phsOrderItm', '오더항목')
       .Input('lotNo', '제조번호')
       .build(),

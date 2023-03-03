@@ -14,6 +14,7 @@ const searchForm = {
     FormBuilder.builder()
       .Select('rptDiv', '성적서구분')
       .Input('batchNo', '배치번호')
+      .required()
       .Input('phsOrderNo', '구매오더번호')
       .Input('lotNo', '제조번호')
       .build(),

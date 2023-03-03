@@ -168,17 +168,16 @@ export default {
     },
     gridButtonClick(event) {
       if (event.dataField === 'fileAttacher') {
-        const ansIdx = Number(event.item.ansIdx);
-        const rstSeq = Number(event.item.rstSeq);
-        return this.showModal('fileAttacherModal', { ansIdx, rstSeq });
+        const fileIdx = Number(event.item.fileIdx);
+        this.fileAttacherModal.fileIdx = fileIdx;
+        return this.showModal('fileAttacherModal');
       }
     },
-    showModal(name, parameter = {}) {
+    showModal(name) {
       if (name === 'requestApproverModal') {
         return (this.requestApproverModal.show = true);
       }
       if (name === 'fileAttacherModal') {
-        this.fileAttacherModal.fileIdx = this.getFildIdx(parameter);
         return (this.fileAttacherModal.show = true);
       }
     },
@@ -195,13 +194,6 @@ export default {
     },
     disableButtons(buttons) {
       FormUtil.disableButtons(this.testInfo.buttons, buttons);
-    },
-    getFildIdx(parameter) {
-      const isRstSeqEmpty = parameter.rstSeq == 0 ? true : false;
-      const selectedItem = isRstSeqEmpty
-        ? this.list.$grid.getSelectedItems()
-        : this.testInfo.$grid.getSelectedItems();
-      return selectedItem[0].item.fileIdx;
     },
   },
 };

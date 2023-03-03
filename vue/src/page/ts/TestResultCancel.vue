@@ -45,7 +45,13 @@ export default {
         forms: list.forms(),
         columns: list.columns(),
         event: {
-          cellDoubleClick: (e) => this.getResultDetail(e.item.ansIdx),
+          cellDoubleClick: (e) => {
+            this.getResultDetail(e.item.ansIdx);
+            this.enableButtons(['init']);
+            if(e.item.hldYn === 'Y'){
+              this.enableButtons(['oos']);
+            }
+          },
         },
       },
       resultInputInfo: {
@@ -55,6 +61,11 @@ export default {
       fileAttacherModal: {
         show: false,
         fileIdx: 0,
+      },
+      fileInfo: {
+        ansIdx: '',
+        fileIdx: '',
+        rstSeq: ''
       },
     };
   },
@@ -67,6 +78,7 @@ export default {
         .then(({ data }) => data);
       $grid.setGridData(data);
 
+      this.disableButtons(['init', 'oos']);
       this.resultInputInfo.$grid.clearGridData();
     },
     async getResultDetail(ansIdx) {
@@ -114,9 +126,26 @@ export default {
           return this.$warn(this.$message.warn.unCheckedData);
         }
       }
+      if (name === 'hold') {
+        const checkedRows = this.list.$grid.getCheckedRowItems();
+        if (checkedRows.length) {
+          return this.hold();
+        } else {
+          return this.$warn(this.$message.warn.unCheckedData);
+        }
+      }
+      if (name === 'oos') {
+        const checkedRows = this.resultInputInfo.$grid.getCheckedRowItems();
+        if (checkedRows.length) {
+          return this.oos();
+        } else {
+          return this.$warn(this.$message.warn.unCheckedData);
+        }
+      }
     },
     init() {
       this.resultInputInfo.$grid.clearGridData();
+      this.disableButtons(['init', 'oos']);
     },
     setButtonsState(testDiv) {
       const holdButtons = ['hold'];
@@ -173,16 +202,37 @@ export default {
           });
       });
     },
+    oos() {
+      const checkedRows = this.resultInputInfo.$grid.getCheckedRowItems();
+      const parameter = checkedRows.map(({ item }) => item);
+      if(parameter[0].ansProcCd === "S0130600" || parameter[0].ansProcCd === "S0130610"){
+        this.$confirm(this.$message.confirm.oos).then(() => {
+          // this.$axios.put('/ts/testResultReview/savedFile', parameter)
+          // .then(() => {
+          //   this.$info(this.$message.info.approveRequest);
+          //   this.init();
+          //   this.getTestResultReviewList();
+          // })
+          // .catch(() => {
+          //   this.$error(this.$message.error.updateData);
+          // });
+        });
+      }else{
+        return this.$warn(this.$message.warn.notoosItem);
+      }
+    },
     gridButtonClick(event) {
       if (event.dataField === 'fileAttacher') {
         const ansIdx = Number(event.item.ansIdx);
         const rstSeq = Number(event.item.rstSeq);
-        return this.showModal('fileAttacherModal', { ansIdx, rstSeq });
+        const fileIdx = Number(event.item.fileIdx);
+        this.fileInfo = { ansIdx: ansIdx, fileIdx: fileIdx, rstSeq: rstSeq };
+        return this.showModal('fileAttacherModal', { fileIdx });
       }
     },
     showModal(name, parameter = {}) {
       if (name === 'fileAttacherModal') {
-        this.fileAttacherModal.fileIdx = this.getFildIdx(parameter);
+        this.fileAttacherModal.fileIdx = parameter.fileIdx;
         return (this.fileAttacherModal.show = true);
       }
     },
@@ -191,30 +241,24 @@ export default {
         return (this.fileAttacherModal.show = false);
       }
     },
-    getFildIdx(parameter) {
-      const isRstSeqEmpty = parameter.rstSeq == 0 ? true : false;
-      const selectedItem = isRstSeqEmpty
-        ? this.list.$grid.getSelectedItems()
-        : this.resultInputInfo.$grid.getSelectedItems();
-      return selectedItem[0].item.fileIdx;
+    enableButtons(buttons) {
+      FormUtil.enableButtons(this.resultInputInfo.buttons, buttons);
     },
-    getAnsIdx() {
-      const selectedItem = this.list.$grid.getSelectedItems();
-      return selectedItem[0].item.ansIdx;
-    },
-    getRstSeq() {
-      const selectedItem = this.resultInputInfo.$grid.getSelectedItems();
-      return selectedItem.length ? selectedItem[0].item.rstSeq : 0;
+    disableButtons(buttons) {
+      FormUtil.disableButtons(this.resultInputInfo.buttons, buttons);
     },
     fileSave({ addedFiles, removedFileIds }) {
-      const ansIdx = Number(this.getAnsIdx());
-      const rstSeq = Number(this.getRstSeq());
-      const fileIdx = Number(this.getFildIdx({ ansIdx, rstSeq }));
-      const fileInfoList = { addedFiles, removedFileIds, ansIdx, rstSeq, fileIdx };
-
+      let parameter = this.fileInfo;
+      const ansIdx = parameter.ansIdx;
+      const fileIdx = parameter.fileIdx;
+      parameter = {
+        ...parameter,
+        addedFiles,
+        removedFileIds
+      };
       this.$confirm(this.$message.confirm.saveData).then(() => {
         this.$axios
-          .postByForm('/ts/testResultCancel/savedFile', fileInfoList)
+          .postByForm('/ts/testResultCancel/savedFile', parameter)
           .then(({ data }) => {
             if (addedFiles.length == 0) {
               this.$info(this.$message.info.removedFiles);
@@ -234,11 +278,9 @@ export default {
       if (originFileIdx > 0) {
         return this.$refs.fileAttacherModal.getFileList();
       } else {
-        return this.setInitFileIdx(fileIdx);
+        this.fileAttacherModal.fileIdx = fileIdx;
+        this.fileInfo.fileIdx = fileIdx;
       }
-    },
-    setInitFileIdx(fileIdx) {
-      this.fileAttacherModal.fileIdx = fileIdx;
     },
   },
 };

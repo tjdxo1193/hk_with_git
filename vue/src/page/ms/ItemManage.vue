@@ -16,9 +16,9 @@
     <FormWithHeader v-bind="commonInfoForm" @button-click="onClickCommonInfoFormButtons" />
   </Horizontal>
 
-  <FormWithHeader v-bind="materialInfoForm" @form-event="formEventMaterialInfoForm" />
+  <FormWithHeader v-bind="detailInfoForm" @form-event="formEventDetailInfoForm" />
 
-  <FormWithHeader v-bind="sampleInfoForm" />
+  <FormWithHeader v-bind="materialInfoForm" />
 
 
   <ReasonForItemRevisionModal
@@ -73,8 +73,8 @@ export default {
       searchGridWithForm,
       itemVersionGrid,
       commonInfoForm,
+      detailInfoForm,
       materialInfoForm,
-      sampleInfoForm,
       codeWithSearchGrid,
     } = this.$copy(values);
     return {
@@ -119,13 +119,13 @@ export default {
         ...commonInfoForm.static,
         forms: commonInfoForm.forms(),
       },
+      detailInfoForm: {
+        ...detailInfoForm.static,
+        forms: detailInfoForm.forms(),
+      },
       materialInfoForm: {
         ...materialInfoForm.static,
         forms: materialInfoForm.forms(),
-      },
-      sampleInfoForm: {
-        ...sampleInfoForm.static,
-        forms: sampleInfoForm.forms(),
       },
       reasonForItemRevisionModal: {
         show: false,
@@ -164,8 +164,8 @@ export default {
 
     initItemVersionForms() {
       this.commonInfoForm.forms = values.commonInfoForm.forms();
+      this.detailInfoForm.forms = values.detailInfoForm.forms();
       this.materialInfoForm.forms = values.materialInfoForm.forms();
-      this.sampleInfoForm.forms = values.sampleInfoForm.forms();
       this.codeWithSearchGrid.forms = values.codeWithSearchGrid.forms();
       FormUtil.disableButtons(this.commonInfoForm.buttons, [
         'bomModal',
@@ -308,14 +308,14 @@ export default {
 
     setDataToItemVersionForms(item) {
       FormUtil.setData(this.commonInfoForm.forms, item);
+      FormUtil.setData(this.detailInfoForm.forms, item);
       FormUtil.setData(this.materialInfoForm.forms, item);
-      FormUtil.setData(this.sampleInfoForm.forms, item);
     },
 
     formToParam() {
       const commonData = FormUtil.getData(this.commonInfoForm.forms);
-      const materialData = FormUtil.getData(this.materialInfoForm.forms);
-      const sampleData = FormUtil.getData(this.sampleInfoForm.forms);
+      const materialData = FormUtil.getData(this.detailInfoForm.forms);
+      const sampleData = FormUtil.getData(this.materialInfoForm.forms);
       let param = {
         ...commonData,
         ...materialData,
@@ -324,7 +324,7 @@ export default {
       return param;
     },
 
-    formEventMaterialInfoForm({ originEvent, item }) {
+    formEventDetailInfoForm({ originEvent, item }) {
       if (originEvent === 'ctrptNoSearch') {
         if (item?.itemLabel === 'itemManageFileAttacherModal') {
           this.showModal(item.itemLabel);
@@ -387,11 +387,11 @@ export default {
     },
 
     enableFormButton(buttonName) {
-      const { forms } = this.materialInfoForm;
+      const { forms } = this.detailInfoForm;
       FormUtil.enable(forms, buttonName);
     },
     disableFormButton(buttonName) {
-      const { forms } = this.materialInfoForm;
+      const { forms } = this.detailInfoForm;
       FormUtil.disable(forms, buttonName);
     },
 
@@ -409,7 +409,7 @@ export default {
     },
 
     getCtrptNo() {
-      return FormUtil.getValue(this.materialInfoForm.forms, 'ctrptNo');
+      return FormUtil.getValue(this.detailInfoForm.forms, 'ctrptNo');
     },
 
     setItemManageFileAttacherModalInitData() {

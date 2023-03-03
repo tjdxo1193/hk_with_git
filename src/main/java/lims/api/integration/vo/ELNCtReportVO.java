@@ -1,5 +1,6 @@
 package lims.api.integration.vo;
 
+import com.mchange.v2.beans.BeansUtils;
 import lims.api.integration.domain.eai.RevStateful;
 import lims.api.util.process.KeyGenerator;
 import lims.api.util.process.MappingKey;
@@ -9,6 +10,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.BeanUtils;
 
 import java.util.Base64;
 import java.util.List;

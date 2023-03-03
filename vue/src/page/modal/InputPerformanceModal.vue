@@ -62,12 +62,16 @@ export default {
     },
     searchFormEvent(event) {
       if (event.type === 'keydown' && event.originEvent.key === 'Enter') {
-        return this.getInpPerformanceList();
+        this.searchForm.forms.validate().then(() => {
+          this.getInpPerformanceList();
+        });
       }
     },
     onClickButton({ name }) {
       if (name === 'select') {
-        return this.getInpPerformanceList();
+        this.searchForm.forms.validate().then(() => {
+          this.getInpPerformanceList();
+        });
       }
     },
     init() {},

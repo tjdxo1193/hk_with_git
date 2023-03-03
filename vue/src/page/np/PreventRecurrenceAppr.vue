@@ -134,22 +134,20 @@ export default {
     },
     gridButtonClick(event) {
       if (event.dataField === 'fileAttacher') {
-        const ansIdx = Number(event.item.ansIdx);
-        const rstSeq = Number(event.item.rstSeq);
-        return this.showModal('fileAttacherModal', { ansIdx, rstSeq });
+        const fileIdx = Number(event.item.fileIdx);
+        this.fileAttacherModal.fileIdx = fileIdx;
+        return this.showModal('fileAttacherModal');
       }
       if (event.dataField === 'prvRcrReport') {
-        const parameter = event.item;
-        return this.showModal('preventRecurrenceReportModal', parameter);
+        this.preventRecurrenceReportModal.parameter = event.item;
+        return this.showModal('preventRecurrenceReportModal');
       }
     },
-    showModal(name, parameter = {}) {
+    showModal(name) {
       if (name === 'fileAttacherModal') {
-        this.fileAttacherModal.fileIdx = this.getFildIdx(parameter);
         return (this.fileAttacherModal.show = true);
       }
       if (name === 'preventRecurrenceReportModal') {
-        this.preventRecurrenceReportModal.parameter = parameter;
         return (this.preventRecurrenceReportModal.show = true);
       }
     },
@@ -166,13 +164,6 @@ export default {
     },
     disableButtons(buttons) {
       FormUtil.disableButtons(this.testInfo.buttons, buttons);
-    },
-    getFildIdx(parameter) {
-      const isRstSeqEmpty = parameter.rstSeq == 0 ? true : false;
-      const selectedItem = isRstSeqEmpty
-        ? this.list.$grid.getSelectedItems()
-        : this.testInfo.$grid.getSelectedItems();
-      return selectedItem[0].item.fileIdx;
     },
   },
 };

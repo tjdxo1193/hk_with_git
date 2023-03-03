@@ -236,12 +236,12 @@ public class SpecManageServiceImpl implements SpecManageService {
         int result = 0;
 
         // 품목 테이블에는 pkgaCd가 저장되어야 한다.
-        SpecManageVO qmPitmDto = new SpecManageVO();
-        qmPitmDto.setPlntCd(param.getPlntCd());
-        qmPitmDto.setPitmCd(param.getPitmCd());
-        qmPitmDto.setPitmVer(param.getPitmVer());
-        qmPitmDto.setPkgaCd(param.getPkgaCd());
-        result += dao.updatePkgaCd(qmPitmDto);
+        SpecManageVO qmiPitmDto = new SpecManageVO();
+        qmiPitmDto.setPlntCd(param.getPlntCd());
+        qmiPitmDto.setPitmCd(param.getPitmCd());
+        qmiPitmDto.setPitmVer(param.getPitmVer());
+        qmiPitmDto.setPkgaCd(param.getPkgaCd());
+        result += dao.updatePkgaCd(qmiPitmDto);
 
         // 규격서 테이블에는 aitmSpecIdx가 저장되어야 한다.
         SpecManageVO qmPitmSpecDto = new SpecManageVO();

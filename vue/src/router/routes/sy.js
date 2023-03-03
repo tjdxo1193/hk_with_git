@@ -137,6 +137,39 @@ export default [
         },
       },
       // {
+      //   path: '',
+      //   name: '',
+      //   component: null,
+      //   meta: {
+      //     menu: {
+      //       code: '',
+      //       title: '인터페이스 정보 조회',
+      //     }
+      //   }
+      // },,
+      // {
+      //   path: '',
+      //   name: '',
+      //   component: null,
+      //   meta: {
+      //     menu: {
+      //       code: '',
+      //       title: '인터페이스 수신 이력',
+      //     }
+      //   }
+      // },
+      // {
+      //   path: '',
+      //   name: '',
+      //   component: null,
+      //   meta: {
+      //     menu: {
+      //       code: '',
+      //       title: '인터페이스 송신 이력',
+      //     }
+      //   }
+      // },
+      // {
       //   path: 'notice',
       //   name: 'notice',
       //   component: System.Notice,

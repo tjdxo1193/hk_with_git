@@ -101,7 +101,10 @@ const requestInfo = {
     title: '항목조회',
     $grid: null,
     props: { editable: false },
-    buttons: [{ name: 'init', label: '초기화', disabled: true }],
+    buttons: [
+      { name: 'save', label: '저장', disabled: true },
+      { name: 'init', label: '초기화', disabled: true },
+    ],
   },
   forms: () =>
     FormBuilder.builder()

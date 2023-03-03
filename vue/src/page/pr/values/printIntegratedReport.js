@@ -6,6 +6,11 @@ import { ColumnBuilder, FormBuilder } from '@/util/builder';
 const todayDate = dayjs().format('YYYY-MM-DD');
 const weekAgoDate = dayjs().add(-7, 'd').format('YYYY-MM-DD');
 
+const pitemtype = {
+  finishedSet: 'S0180100',
+  finishedSingle: 'S0180101',
+};
+
 const list = {
   static: {
     title: '조회',
@@ -32,13 +37,22 @@ const list = {
   },
   forms: () =>
     FormBuilder.builder()
-      .Select('pitmTyp', '자재구분', { async: () => api.combo.systemCommon.getPitmDivCombo() })
+      .Select('pitmTyp', '자재구분', {
+        async: () =>
+          api.combo.systemCommon.getPitmDivCombo().then((res) => {
+            res.data = res.data.filter(
+              ({ value }) => value === pitemtype.finishedSet || value === pitemtype.finishedSingle,
+            );
+            return res;
+          }),
+      })
       .Input('pitmCd', '자재번호')
       .Input('pitmNm', '자재내역')
       .Input('ispReqNo', '검사요청번호')
+      .Input('ansNo', '시험번호')
       .Input('lotNo', '제조번호')
       .Input('batchNo', '배치번호')
-      .DatepickerTwinWithSwitch('searchIspReqDt', '검사요청일자', {
+      .DatepickerTwin('searchReqDt', '검사요청일자', {
         value: [weekAgoDate, todayDate],
       })
       .spanCol(2)

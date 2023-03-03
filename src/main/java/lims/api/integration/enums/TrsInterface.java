@@ -17,7 +17,7 @@ public enum TrsInterface {
 
     ELN_METHOD_BY_ITEM(InterfaceSystemType.ELN, "IF_ELN_0008", "/RESTAdapter/PIF_ELN_0008", InterfaceSendType.ASYNC),
 
-    QMS_MATERIAL(InterfaceSystemType.QMS, null, null, InterfaceSendType.SYNC),
+    QMS_MATERIAL(InterfaceSystemType.QMS, null, "/interface/lims/material.qms", InterfaceSendType.SYNC),
     QMS_SHIPT(InterfaceSystemType.QMS, null, "/interface/lims/shipt.qms", InterfaceSendType.SYNC);
 
     private final InterfaceSystemType systemType;

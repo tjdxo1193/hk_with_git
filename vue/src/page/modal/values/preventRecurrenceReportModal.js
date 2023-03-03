@@ -13,6 +13,7 @@ const searchForm = {
   forms: () =>
     FormBuilder.builder()
       .Input('batchNo', '배치번호')
+      .required()
       .Input('phsOrderNo', '구매오더번호')
       .Input('pdtOrderNo', '생산오더번호')
       //(주의) lotNo makNo

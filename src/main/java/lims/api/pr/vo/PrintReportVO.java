@@ -107,4 +107,7 @@ public class PrintReportVO implements UpdateDetect {
     private String crgDptNm;
     private String mkrQty; //표시량
     private String aitmRmk; //시험항목 비고
+
+    /* 별칭 */
+    private String ansProcNm;
 }

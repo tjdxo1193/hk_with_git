@@ -47,15 +47,16 @@ const list = {
   forms: () =>
     FormBuilder.builder()
       .Select('pitmTyp', '자재구분', { async: () => api.combo.systemCommon.getPitmDivCombo() })
+      .Select('ansProcCd', '진행상황', { async: () => api.combo.systemCommon.getAnsProcCombo() })
       .Input('pitmCd', '자재번호')
       .Input('pitmNm', '자재내역')
       .Input('ispReqNo', '검사요청번호')
+      .Input('ansNo', '시험번호')
       .Input('lotNo', '제조번호')
       .Input('batchNo', '배치번호')
       .DatepickerTwinWithSwitch('searchIspReqDt', '검사요청일자', {
         value: [weekAgoDate, todayDate],
       })
-      .spanCol(2)
       .build(),
   columns: () =>
     ColumnBuilder.builder()
@@ -64,8 +65,10 @@ const list = {
       .col('pitmCd', '자재번호')
       .col('pitmNm', '자재내역')
       .col('pitmEn', '자재내역(영문)')
-      .col('pitmTyp', '자재구분')
+      .col('pitmTypNm', '자재구분')
+      .col('pitmTyp', '자재구분',{visible: false})
       .col('ansNo', '시험번호', { width: 90 })
+      .col('ansProcNm', '진행상황')
       .col('reqDt', '의뢰일자')
       .col('reqDt', '지시일자')
       .col('sytJdgNm', '결과판정')

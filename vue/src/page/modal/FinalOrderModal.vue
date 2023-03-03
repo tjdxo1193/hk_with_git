@@ -1,8 +1,9 @@
 <template>
-  <ModalBase :title="title" :show="show" width="1300px" height="560px" @close="close">
+  <ModalBase :title="title" :show="show" width="1300px" height="580px" @close="close">
     <Horizontal align-items="center" :spans="[10, 0.1, 10]">
       <AUIGridSearch
         v-bind="srmOrderList"
+        @form-event="srmOrderFormEvent"
         @button-click="onClickButton"
         @grid-created="(proxy) => $setState('srmOrderList.$grid', proxy)"
       />
@@ -10,6 +11,7 @@
 
       <AUIGridSearch
         v-bind="mesOrderList"
+        @form-event="mesOrderFormEvent"
         @button-click="onClickButton"
         @grid-created="(proxy) => $setState('mesOrderList.$grid', proxy)"
       />
@@ -84,17 +86,30 @@ export default {
         .then(({ data }) => data);
       $grid.setGridData(data);
     },
-    OrderListEvent(event) {
+    srmOrderFormEvent(event) {
       if (event.type === 'keydown' && event.originEvent.key === 'Enter') {
-        return this.getSrmFinalOrderList();
+        this.srmOrderList.forms.validate().then(() => {
+          this.getSrmFinalOrderList();
+        });
+      }
+    },
+    mesOrderFormEvent(event) {
+      if (event.type === 'keydown' && event.originEvent.key === 'Enter') {
+        this.mesOrderList.forms.validate().then(() => {
+          this.getMesFinalOrderList();
+        });
       }
     },
     onClickButton({ name }) {
       if (name === 'selectSRM') {
-        return this.getSrmFinalOrderList();
+        this.srmOrderList.forms.validate().then(() => {
+          this.getSrmFinalOrderList();
+        });
       }
       if (name === 'selectMES') {
-        return this.getMesFinalOrderList();
+        this.mesOrderList.forms.validate().then(() => {
+          this.getMesFinalOrderList();
+        });
       }
     },
     init() {

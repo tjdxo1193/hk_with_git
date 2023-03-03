@@ -115,6 +115,11 @@ export default {
         show: false,
         parameter: {},
       },
+      fileInfo: {
+        ansIdx: '',
+        fileIdx: '',
+        rstSeq: ''
+      },
     };
   },
   methods: {
@@ -592,13 +597,14 @@ export default {
       if (event.dataField === 'fileAttacher') {
         const ansIdx = Number(event.item.ansIdx);
         const rstSeq = Number(event.item.rstSeq);
-        FormUtil.setData(this.list.forms, { ansIdx });
-        return this.showModal('fileAttacherModal', { ansIdx, rstSeq });
+        const fileIdx = Number(event.item.fileIdx);
+        this.fileInfo = { ansIdx: ansIdx, fileIdx: fileIdx, rstSeq: rstSeq };
+        return this.showModal('fileAttacherModal', { fileIdx });
       }
     },
     showModal(name, parameter = {}) {
       if (name === 'fileAttacherModal') {
-        this.fileAttacherModal.fileIdx = this.getFildIdx(parameter);
+        this.fileAttacherModal.fileIdx = parameter.fileIdx;
         return (this.fileAttacherModal.show = true);
       }
       if (name === 'testLabEventModal') {
@@ -638,29 +644,21 @@ export default {
     afterModalEvent(ansIdx) {
       this.getResultDetail(ansIdx);
     },
-    getFildIdx(parameter) {
-      const isRstSeqEmpty = parameter.rstSeq == 0 ? true : false;
-      const selectedItem = isRstSeqEmpty
-        ? this.list.$grid.getSelectedItems()
-        : this.resultInputInfo.$grid.getSelectedItems();
-      return selectedItem[0].item.fileIdx;
-    },
     getAnsIdx() {
       return FormUtil.getValue(this.list.forms, 'ansIdx');
     },
-    getRstSeq() {
-      const selectedItem = this.resultInputInfo.$grid.getSelectedItems();
-      return selectedItem.length ? selectedItem[0].item.rstSeq : 0;
-    },
     fileSave({ addedFiles, removedFileIds }) {
-      const ansIdx = Number(this.getAnsIdx());
-      const rstSeq = Number(this.getRstSeq());
-      const fileIdx = Number(this.getFildIdx({ ansIdx, rstSeq }));
-      const fileInfoList = { addedFiles, removedFileIds, ansIdx, rstSeq, fileIdx };
-
+      let parameter = this.fileInfo;
+      const ansIdx = parameter.ansIdx;
+      const fileIdx = parameter.fileIdx;
+      parameter = {
+        ...parameter,
+        addedFiles,
+        removedFileIds
+      }
       this.$confirm(this.$message.confirm.saveData).then(() => {
         this.$axios
-          .postByForm('/ts/testResultInput/savedFile', fileInfoList)
+          .postByForm('/ts/testResultInput/savedFile', parameter)
           .then(({ data }) => {
             if (addedFiles.length == 0) {
               this.$info(this.$message.info.removedFiles);
@@ -680,11 +678,9 @@ export default {
       if (originFileIdx > 0) {
         return this.$refs.fileAttacherModal.getFileList();
       } else {
-        return this.setInitFileIdx(fileIdx);
+        this.fileAttacherModal.fileIdx = fileIdx;
+        this.fileInfo.fileIdx = fileIdx;
       }
-    },
-    setInitFileIdx(fileIdx) {
-      this.fileAttacherModal.fileIdx = fileIdx;
     },
   },
   computed: {

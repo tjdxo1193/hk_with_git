@@ -10,4 +10,5 @@ public interface TestResultApprService {
     void approve(List<TestResultApprVO> list);
     void requestHold(List<TestResultApprVO> list);
     void requestRejection(List<TestResultApprVO> list);
+    void save(TestResultApprVO request);
 }

@@ -115,12 +115,16 @@ export default {
     },
     searchFormEvent(event) {
       if (event.type === 'keydown' && event.originEvent.key === 'Enter') {
-        return this.getPrvRcrReportList();
+        this.searchForm.forms.validate().then(() => {
+          this.getPrvRcrReportList();
+        });
       }
     },
     onClickButton({ name }) {
       if (name === 'select') {
-        return this.getPrvRcrReportList();
+        this.searchForm.forms.validate().then(() => {
+          this.getPrvRcrReportList();
+        });
       }
       if (name === 'save') {
         this.savePrvRcrReport();

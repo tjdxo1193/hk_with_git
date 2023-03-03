@@ -81,12 +81,16 @@ export default {
     },
     searchFormEvent(event) {
       if (event.type === 'keydown' && event.originEvent.key === 'Enter') {
-        return this.getSrmReportList();
+        this.searchForm.forms.validate().then(() => {
+          this.getSrmReportList();
+        });
       }
     },
     onClickButton({ name }) {
       if (name === 'select') {
-        return this.getSrmReportList();
+        this.searchForm.forms.validate().then(() => {
+          this.getSrmReportList();
+        });
       }
     },
     init() {

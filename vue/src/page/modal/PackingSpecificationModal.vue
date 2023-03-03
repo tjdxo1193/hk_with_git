@@ -85,12 +85,16 @@ export default {
     },
     searchFormEvent(event) {
       if (event.type === 'keydown' && event.originEvent.key === 'Enter') {
-        return this.getPackingSpecList();
+        this.searchForm.forms.validate().then(() => {
+          this.getPackingSpecList();
+        });
       }
     },
     onClickButton({ name }) {
       if (name === 'select') {
-        return this.getPackingSpecList();
+        this.searchForm.forms.validate().then(() => {
+          this.getPackingSpecList();
+        });
       }
     },
     init() {

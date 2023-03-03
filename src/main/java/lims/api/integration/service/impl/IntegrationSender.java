@@ -74,9 +74,9 @@ public class IntegrationSender {
             log.info("[sendNonconformityReport] This test is not by SAP");
             return;
         }
-//        if (nonconformityReport != null && data.isMES()) {
-//            sendNonconformityReportToSRMAndMES(data, nonconformityReport, ReportDivOfNonCfm.A);
-//        }
+        if (nonconformityReport != null && data.isMES()) {
+            sendNonconformityReportToSRMAndMES(data, nonconformityReport, ReportDivOfNonCfm.A);
+        }
         if (reoccurReport != null && data.isSRM()) {
             sendNonconformityReportToSRMAndMES(data, reoccurReport, ReportDivOfNonCfm.B);
         }
@@ -84,9 +84,9 @@ public class IntegrationSender {
 
     private void sendNonconformityReportToSRMAndMES(InterfaceSendVO.NonconformityReport data, ConvertMrd convertMrd, ReportDivOfNonCfm reportDiv) {
         TempFile tempFile = rdHelper.toTempFile(convertMrd.getName(), convertMrd.getParameter(), convertMrd.getTargetFullName());
-//        if (data.isMES()) {
-//            mesService.publishNonCfmReport(data.toMES(), FileUtil.getName(tempFile.getFile()), FileUtil.toBytes(tempFile.getFile()));
-//        }
+        if (data.isMES()) {
+            mesService.publishNonCfmReport(data.toMES(reportDiv), FileUtil.getName(tempFile.getFile()), FileUtil.toBytes(tempFile.getFile()));
+        }
         if (data.isSRM()) {
             srmService.publishNonCfmReport(data.toSRM(reportDiv), FileUtil.getName(tempFile.getFile()), FileUtil.toBytes(tempFile.getFile()));
         }

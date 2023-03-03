@@ -10,12 +10,17 @@ const searchForm = {
       treeIdRefField: 'batchNo',
       displayTreeOpen: true,
     },
-    countPerRow: 3,
-    height: '430px',
+    countPerRow: 2,
+    height: '400px',
     buttons: [{ name: 'select', label: '조회' }],
   },
   forms: () =>
-    FormBuilder.builder().Input('pitmCd', '자재번호').Input('batchNo', '배치번호').build(),
+    FormBuilder.builder()
+      .Input('pitmCd', '자재번호')
+      .required()
+      .Input('batchNo', '배치번호')
+      .required()
+      .build(),
   columns: () =>
     ColumnBuilder.builder()
       .col('mtrNm', '자재내역', { width: 150 })

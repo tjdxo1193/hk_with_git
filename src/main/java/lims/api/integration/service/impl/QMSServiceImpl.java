@@ -1,27 +1,30 @@
 package lims.api.integration.service.impl;
 
 import lims.api.integration.dao.QMSDao;
+import lims.api.integration.dao.SAPDao;
 import lims.api.integration.domain.eai.InterfaceSystemFactory;
 import lims.api.integration.domain.eai.Publisher;
 import lims.api.integration.domain.eai.TrsEventHandler;
 import lims.api.integration.domain.qms.MESShiptRepository;
 import lims.api.integration.domain.qms.SRMShiptRepository;
 import lims.api.integration.domain.qms.ShiptHandler;
-import lims.api.integration.enums.DMRItemDiv;
-import lims.api.integration.enums.InterfaceSystemType;
-import lims.api.integration.enums.MaterialMRP;
-import lims.api.integration.enums.TrsInterface;
+import lims.api.integration.enums.*;
 import lims.api.integration.model.InterfaceTrsResponse;
+import lims.api.integration.service.MaterialAdditionAttribute;
 import lims.api.integration.service.QMSService;
 import lims.api.integration.service.TrsService;
 import lims.api.integration.vo.QMSSendVO;
+import lims.api.integration.vo.SAPBusinessPartnerVO;
 import lims.api.integration.vo.SAPMaterialVO;
+import lims.api.util.StringUtil;
 import lims.api.util.httpClient.factory.HttpEntityFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -32,23 +35,24 @@ public class QMSServiceImpl implements QMSService {
     private final Publisher publisher;
     private final TrsService trsService;
     private final QMSDao qmsDao;
+    private final SAPDao sapDao;
 
     public QMSServiceImpl(InterfaceSystemFactory factory,
                           HttpEntityFactory entityFactory,
                           TrsService trsService,
-                          QMSDao qmsDao) {
+                          QMSDao qmsDao,
+                          SAPDao sapDao) {
         this.publisher = new Publisher(factory.createSystem(InterfaceSystemType.QMS), entityFactory);
         this.trsService = trsService;
         this.qmsDao = qmsDao;
+        this.sapDao = sapDao;
     }
 
     @Override
     public void publishMaterial(SAPMaterialVO param) {
-//        List<SAPMaterialVO.Mara> mara = param.getMara();
         List<SAPMaterialVO.Marc> marc = param.getMarc();
-//        List<SAPMaterialVO.Mvke> mvke = param.getMvke();
         List<SAPMaterialVO.Zmdv> zmdv = param.getZmdv();
-//        List<SAPMaterialVO.Makt> makt = param.getMakt();
+        List<SAPMaterialVO.Makt> makt = param.getMakt();
 
         if (CollectionUtils.isEmpty(marc)) {
             log.warn("[QMSServiceImpl.publishMaterial] No eixsts sap material MARC");
@@ -58,27 +62,179 @@ public class QMSServiceImpl implements QMSService {
             log.warn("[QMSServiceImpl.publishMaterial] No eixsts sap material ZMDV");
             return;
         }
-
-        List<QMSSendVO.Material> dmrCosmeticMaterials = filterTo(zmdv, o -> DMRItemDiv.isCosmetic(o.getCharValChar()));
-        List<QMSSendVO.Material> dmrQuasiDrugMaterials = filterTo(zmdv, o -> DMRItemDiv.isQuasiDrug(o.getCharValChar()));
+        if (CollectionUtils.isEmpty(makt)) {
+            log.warn("[QMSServiceImpl.publishMaterial] No eixsts sap material MAKT");
+            return;
+        }
 
         Map<String, List<QMSSendVO.Material>> marcFinishedMap = groupingByMaterial(marc, o -> MaterialMRP.isDMRFinished(o.getDispo()));
         Map<String, List<QMSSendVO.Material>> marcBulkMap = groupingByMaterial(marc, o -> MaterialMRP.isBulk(o.getDispo()));
 
-        List<QMSSendVO.Material> cosmeticFinishedMaterials = intersect(dmrCosmeticMaterials, marcFinishedMap);
-        List<QMSSendVO.Material> cosmeticBulkMaterials = intersect(dmrCosmeticMaterials, marcBulkMap);
+        MaterialAdditionAttribute attribute = new MaterialAdditionAttribute(zmdv, makt, sapDao.findBusinessPartner());
 
-        List<QMSSendVO.Material> drugFinishedMaterials = intersect(dmrQuasiDrugMaterials, marcFinishedMap);
-        List<QMSSendVO.Material> drugBulkMaterials = intersect(dmrQuasiDrugMaterials, marcBulkMap);
+        List<QMSSendVO.Material> dmrCosmeticMaterials = filter(zmdv, attribute, o -> DMRItemDiv.isCosmetic(o.getCharValChar()));
+        List<QMSSendVO.Material> dmrQuasiDrugMaterials = filter(zmdv, attribute, o -> DMRItemDiv.isQuasiDrug(o.getCharValChar()));
 
+        List<QMSSendVO.CosmeticMaterial> CosmeticMaterials = intersect(dmrCosmeticMaterials, marcFinishedMap, QMSSendVO.Material::getCosmeticFinished);
+        List<QMSSendVO.CosmeticBulkMaterial> cosmeticBulkMaterials = intersect(dmrCosmeticMaterials, marcBulkMap, QMSSendVO.Material::getCosmeticBulk);
+        List<QMSSendVO.DrugMaterial> DrugMaterials = intersect(dmrQuasiDrugMaterials, marcFinishedMap, QMSSendVO.Material::getQuasiDrugFinished);
+        List<QMSSendVO.DrugBulkMaterial> drugBulkMaterials = intersect(dmrQuasiDrugMaterials, marcBulkMap, QMSSendVO.Material::getQuasiDrugBulk);
 
+        QMSSendVO.MaterialAll materialAll = QMSSendVO.MaterialAll.builder()
+                .cosmetics(CosmeticMaterials)
+                .cosmeticBulks(cosmeticBulkMaterials)
+                .drugs(DrugMaterials)
+                .drugBulks(drugBulkMaterials)
+                .build();
 
-//        QMSSendVO.MaterialAll materialAll = QMSSendVO.MaterialAll.builder()
-//                .cosmeticFinisheds(cosmeticFinishedMaterials)
-//                .cosmeticBulks(cosmeticBulkMaterials)
-//                .drugFinisheds(drugFinishedMaterials)
-//                .drugBulks(drugBulkMaterials)
-//                .build();
+        trsService.execute(
+                TrsInterface.QMS_MATERIAL,
+                materialAll,
+                qmsDao::nextDegreeInMaterial,
+                qmsDao::nextIdxInMaterial,
+                new TrsEventHandler<>() {
+                    @Override
+                    public void saveBeforeSend(QMSSendVO.MaterialAll vo) {
+                        int materialIdx = vo.getIdx();
+
+                        for (QMSSendVO.CosmeticMaterial cosmetic : vo.getCosmetics()) {
+                            cosmetic.setMaterialIdx(materialIdx);
+                            cosmetic.setIdx(qmsDao.nextIdxInCosmetic(materialIdx));
+                            qmsDao.createCosmetic(cosmetic);
+                        }
+
+                        for (QMSSendVO.CosmeticBulkMaterial cosmeticBulk : vo.getCosmeticBulks()) {
+                            cosmeticBulk.setMaterialIdx(materialIdx);
+                            cosmeticBulk.setIdx(qmsDao.nextIdxInCosmeticBulk(materialIdx));
+                            qmsDao.createCosmeticBulk(cosmeticBulk);
+                        }
+
+                        for (QMSSendVO.DrugMaterial drug : vo.getDrugs()) {
+                            drug.setMaterialIdx(materialIdx);
+                            drug.setIdx(qmsDao.nextIdxInDrug(materialIdx));
+                            qmsDao.createDrug(drug);
+                        }
+
+                        for (QMSSendVO.DrugBulkMaterial drugBulk : vo.getDrugBulks()) {
+                            drugBulk.setMaterialIdx(materialIdx);
+                            drugBulk.setIdx(qmsDao.nextIdxInDrugBulk(materialIdx));
+                            qmsDao.createDrugBulk(drugBulk);
+                        }
+                    }
+
+                    @Override
+                    public InterfaceTrsResponse send() {
+                        return publisher.post(TrsInterface.QMS_MATERIAL.getServicePath(), InterfaceTrsResponse.class, materialAll);
+                    }
+
+                    @Override
+                    public void saveAfterSend(QMSSendVO.MaterialAll vo, InterfaceTrsResponse response) {
+                        qmsDao.updateMaterial(vo);
+                    }
+
+                    @Override
+                    public void saveOnError(QMSSendVO.MaterialAll vo) {
+                        qmsDao.updateMaterial(vo);
+                    }
+                }
+
+        );
+    }
+
+    private List<QMSSendVO.Material> filter(List<SAPMaterialVO.Zmdv> data, MaterialAdditionAttribute attribute, Predicate<SAPMaterialVO.Zmdv> itemDivPredicate) {
+        // 화장품, 의약외품을 구분할 수 있는 추가속성명
+        String charCode = MaterialCharCode.PITM_DIV.getValue();
+        List<QMSSendVO.Material> dmrMaterials = data.stream()
+                .filter(o -> charCode.equals(o.getCharCode()))
+                .filter(itemDivPredicate)
+                .map(o -> toMaterialVO(o, attribute))
+                .collect(Collectors.toList());
+        log.info("DMR zmdv material code count: {}", dmrMaterials.size());
+        return dmrMaterials;
+    }
+
+    private QMSSendVO.Material toMaterialVO(SAPMaterialVO.Zmdv o, MaterialAdditionAttribute attribute) {
+        return QMSSendVO.Material.builder()
+                .matnr(o.getMatnr())
+                .itemDiv(DMRItemDiv.of(o.getCharValChar()))
+                .cosmeticFinished(toCosmeticFinished(o, attribute))
+                .cosmeticBulk(toCosmeticBulk(o, attribute))
+                .quasiDrugFinished(toQuasiDrugFinished(o, attribute))
+                .quasiDrugBulk(toQuasiDrugBulk(o, attribute))
+                .build();
+    }
+
+    private QMSSendVO.CosmeticMaterial toCosmeticFinished(SAPMaterialVO.Zmdv o, MaterialAdditionAttribute attribute) {
+        String businessPartnerCode = attribute.get(o.getMatnr(), MaterialCharCode.CUSTOMER_CODE);
+        return QMSSendVO.CosmeticMaterial.builder()
+                .pitmCd(o.getMatnr())
+                .pitmNm(attribute.getName(o.getMatnr()))
+                .perPitmNm(attribute.getName(o.getMatnr()))
+                .pkgUnit(makePackageUnit(o.getMatnr(), attribute))
+                .mstFmlNo(makeDmrNo(o.getMatnr()))
+                .vdrBpCd(businessPartnerCode)
+                .vdrNm(attribute.getBusinessPartnerName(businessPartnerCode))
+                .build();
+    }
+
+    private QMSSendVO.CosmeticBulkMaterial toCosmeticBulk(SAPMaterialVO.Zmdv o, MaterialAdditionAttribute attribute) {
+        String businessPartnerCode = attribute.get(o.getMatnr(), MaterialCharCode.CUSTOMER_CODE);
+        return QMSSendVO.CosmeticBulkMaterial.builder()
+                .pitmCd(o.getMatnr())
+                .pitmNm(attribute.getName(o.getMatnr()))
+                .perPitmNm(attribute.getName(o.getMatnr()))
+                .vdrBpCd(businessPartnerCode)
+                .vdrNm(attribute.getBusinessPartnerName(businessPartnerCode))
+                .pitmDiv(attribute.get(o.getMatnr(), MaterialCharCode.PITM_DIV))
+                .typDiv(attribute.get(o.getMatnr(), MaterialCharCode.TYPE_DIV))
+                .typDtl(attribute.get(o.getMatnr(), MaterialCharCode.TYPE_DIV_DTL))
+                .chatDiv(attribute.get(o.getMatnr(), MaterialCharCode.CHAT_DIV))
+                .ftnDiv(attribute.get(o.getMatnr(), MaterialCharCode.FUNCTION_DIV))
+                .useLmt(attribute.get(o.getMatnr(), MaterialCharCode.USE_TRM))
+                .openLmt(attribute.get(o.getMatnr(), MaterialCharCode.OPEN_LMT))
+                .labNo(attribute.get(o.getMatnr(), MaterialCharCode.LAB_NO))
+                .fmlNo(makeDmrNo(o.getMatnr()))
+                .pkgUnit(makePackageUnit(o.getMatnr(), attribute))
+                .build();
+    }
+
+    private QMSSendVO.DrugMaterial toQuasiDrugFinished(SAPMaterialVO.Zmdv o, MaterialAdditionAttribute attribute) {
+        String businessPartnerCode = attribute.get(o.getMatnr(), MaterialCharCode.CUSTOMER_CODE);
+        return QMSSendVO.DrugMaterial.builder()
+                .pitmCd(o.getMatnr())
+                .pitmNm(attribute.getName(o.getMatnr()))
+                .pkgUnit(makePackageUnit(o.getMatnr(), attribute))
+                .perpitmNm(attribute.getName(o.getMatnr()))
+                .vdrBpCd(businessPartnerCode)
+                .vdrNm(attribute.getBusinessPartnerName(businessPartnerCode))
+                .build();
+    }
+
+    private QMSSendVO.DrugBulkMaterial toQuasiDrugBulk(SAPMaterialVO.Zmdv o, MaterialAdditionAttribute attribute) {
+        return QMSSendVO.DrugBulkMaterial.builder()
+                .pitmCd(o.getMatnr())
+                .pitmNm(attribute.getName(o.getMatnr()))
+                .wrtDt("2023-03-01")
+                .wrtId("1")
+                .labNo("testlabno")
+                .mstFmlNo(makeDmrNo(o.getMatnr()))
+                .pitmDiv("PitmDiv")
+                .enfoDt("2023-02-28")
+                .perNo("12345")
+                .fmln("제형및성상")
+                .divNo("divNo")
+                .pkgUnit(makePackageUnit(o.getMatnr(), attribute))
+                .useTrm("12")
+                .slvAmtd("시험방법")
+                .build();
+    }
+
+    private String makeDmrNo(String materialCode) {
+        return "B" + materialCode;
+    }
+
+    private String makePackageUnit(String materialCode, MaterialAdditionAttribute attribute) {
+        return attribute.get(materialCode, MaterialCharCode.DISPLAY_QTY) + attribute.get(materialCode, MaterialCharCode.DISPLAY_QTY_UNIT);
     }
 
     private Map<String, List<QMSSendVO.Material>> groupingByMaterial(List<SAPMaterialVO.Marc> data, Predicate<SAPMaterialVO.Marc> mrpPredicate) {
@@ -101,35 +257,25 @@ public class QMSServiceImpl implements QMSService {
                         }));
     }
 
-    private List<QMSSendVO.Material> filterTo(List<SAPMaterialVO.Zmdv> data, Predicate<SAPMaterialVO.Zmdv> itemDivPredicate) {
-        // 화장품, 의약외품 구분 추가속성명
-        String charCode = "ZMDE_APPL_REGULATION";
-        List<QMSSendVO.Material> dmrMaterials = data.stream()
-                .filter(o -> charCode.equals(o.getCharCode()))
-                .filter(itemDivPredicate)
-                // TODO 벌크 및 완제품에 따라 데이터 세팅
-                .map(o -> QMSSendVO.Material.builder()
-                        .matnr(o.getMatnr())
-                        .itemDiv(DMRItemDiv.of(o.getCharValChar()))
-                        .build())
-                .collect(Collectors.toList());
-        log.info("DMR zmdv material code count: {}", dmrMaterials.size());
-        return dmrMaterials;
-    }
-
-    private List<QMSSendVO.Material> intersect(List<QMSSendVO.Material> DMRMaterial, Map<String, List<QMSSendVO.Material>> marcMap) {
-        Set<QMSSendVO.Material> dmrMaterials = new HashSet<>();
+    private <T> List<T> intersect(List<QMSSendVO.Material> DMRMaterial, Map<String, List<QMSSendVO.Material>> marcMap, Function<QMSSendVO.Material, T> converter) {
+        Set<T> dmrMaterials = new HashSet<>();
+        QMSSendVO.Material temp;
         for (QMSSendVO.Material material : DMRMaterial) {
             if (marcMap.containsKey(material.getMatnr())) {
-                List<QMSSendVO.Material> temps = marcMap.get(material.getMatnr());
+                List<QMSSendVO.Material> marcs = marcMap.get(material.getMatnr());
 
-                for (QMSSendVO.Material temp : temps) {
-                    dmrMaterials.add(QMSSendVO.Material.builder()
+                for (QMSSendVO.Material marc : marcs) {
+                    temp = QMSSendVO.Material.builder()
+                            .werks(marc.getWerks())
+                            .dispo(marc.getDispo())
                             .matnr(material.getMatnr())
                             .itemDiv(material.getItemDiv())
-                            .werks(temp.getWerks())
-                            .dispo(temp.getDispo())
-                            .build());
+                            .cosmeticFinished(material.getCosmeticFinished())
+                            .cosmeticBulk(material.getCosmeticBulk())
+                            .quasiDrugFinished(material.getQuasiDrugFinished())
+                            .quasiDrugBulk(material.getQuasiDrugBulk())
+                            .build();
+                    dmrMaterials.add(converter.apply(temp));
                 }
             }
         }

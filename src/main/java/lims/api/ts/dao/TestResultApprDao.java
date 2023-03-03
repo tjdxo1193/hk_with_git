@@ -27,4 +27,7 @@ public interface TestResultApprDao {
 
     @Audit(target = QtPitmAnsProc.class, label = AuditEvent.TestInfo.reviewRejection)
     int requestRejection(TestResultApprVO param);
+
+    @Audit(target = QtPitmAnsProc.class, label = AuditEvent.TestInfo.testJudgeModify)
+    int save(TestResultApprVO request);
 }

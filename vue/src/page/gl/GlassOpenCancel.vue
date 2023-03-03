@@ -40,11 +40,18 @@ export default {
           cellDoubleClick: () => {
             this.enableButtons(['fileSave']);
           },
+          selectionChange: (e) => {
+            this.setSelectedRowInfo(e.primeCell.item);
+          },
         },
       },
       fileAttacherModal: {
         fileIdx: 0,
         show: false,
+      },
+      selectedRowInfo: {
+        fileIdx: 0,
+        ritmEtrIdx: 0,
       },
     };
   },
@@ -95,16 +102,8 @@ export default {
         this.$warn(this.$message.warn.unSelectedData);
       }
     },
-    getFildIdx() {
-      const selectedItem = this.list.$grid.getSelectedItems();
-      return selectedItem[0].item.fileIdx;
-    },
-    getRitmEtrIdx() {
-      const selectedItem = this.list.$grid.getSelectedItems();
-      return selectedItem[0].item.ritmEtrIdx;
-    },
     showModal() {
-      this.fileAttacherModal.fileIdx = this.getFildIdx();
+      this.fileAttacherModal.fileIdx = this.selectedRowInfo.fileIdx;
       this.fileAttacherModal.show = true;
     },
     hideModal() {
@@ -117,8 +116,8 @@ export default {
       FormUtil.disableButtons(this.list.buttons, buttons);
     },
     fileSave({ addedFiles, removedFileIds }) {
-      const ritmEtrIdx = this.getRitmEtrIdx();
-      const fileIdx = Number(this.getFildIdx());
+      const ritmEtrIdx = this.selectedRowInfo.ritmEtrIdx;
+      const fileIdx = Number(this.selectedRowInfo.fileIdx);
       const fileInfoList = { addedFiles, removedFileIds, ritmEtrIdx, fileIdx };
 
       this.$axios
@@ -138,13 +137,19 @@ export default {
     },
     getFileListByFileIdx(originFileIdx, fileIdx) {
       if (originFileIdx > 0) {
+        this.selectedRowInfo.fileIdx = originFileIdx;
         return this.$refs.fileAttacherModal.getFileList();
       } else {
+        this.selectedRowInfo.fileIdx = fileIdx;
         return this.setInitFileIdx(fileIdx);
       }
     },
     setInitFileIdx(fileIdx) {
       this.fileAttacherModal.fileIdx = fileIdx;
+    },
+    setSelectedRowInfo(item) {
+      this.selectedRowInfo.fileIdx = item.fileIdx;
+      this.selectedRowInfo.ritmEtrIdx = item.ritmEtrIdx;
     },
   },
 };

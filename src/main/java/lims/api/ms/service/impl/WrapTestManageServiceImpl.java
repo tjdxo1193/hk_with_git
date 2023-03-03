@@ -178,6 +178,7 @@ public class WrapTestManageServiceImpl implements WrapTestManageService {
 		String pItemTypeNotInClauseCondition = "'" +String.join("','", codes) + "'";
 		param.setPitmTyp(pItemTypeNotInClauseCondition);
 		List<ItemManageVO> itemList = wrapTestManageDao.getItemListBySapPrdha(param);
+
 		for(ItemManageVO ivo : itemList){
 
 			SpecManageVO specInfo = wrapTestManageDao.findSpecListByItemInfo(ivo);

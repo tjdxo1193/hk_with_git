@@ -127,4 +127,5 @@ public class PrintIntegratedReportVO {
     /* 별칭 */
     private String wrtNm;
     private String prtNm;
+    private String rptDivNm;
 }

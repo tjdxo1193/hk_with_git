@@ -75,6 +75,7 @@ public class TestResultApprServiceImpl implements TestResultApprService {
                     .lotNo(row.getLotNo())
                     .splLotNo(row.getSplLotNo())
                     .batchNo(row.getBatchNo())
+                    .specGrv(row.getSpecGrv())
                     .rmk(row.getPitmSpcc())
                     .nonCfmReason(row.getNonCfmRea())
                     .ispReqNo(row.getIspReqNo())
@@ -127,6 +128,15 @@ public class TestResultApprServiceImpl implements TestResultApprService {
         }
 
         if(list.size() != result) {
+            throw new NoUpdatedDataException();
+        }
+    }
+
+    @Override
+    public void save(TestResultApprVO request) {
+        int result = dao.save(request);
+
+        if(result == 0) {
             throw new NoUpdatedDataException();
         }
     }

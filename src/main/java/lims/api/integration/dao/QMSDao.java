@@ -37,4 +37,41 @@ public interface QMSDao {
 
     List<QMSSendVO.ShiptValidate> findSRMFinalOrdersByOrderNoAndLotNo(QMSSendVO.ShiptReq param);
 
+
+    Integer nextDegreeInMaterial();
+
+    Integer nextIdxInMaterial();
+
+    int createMaterial(QMSSendVO.MaterialAll param);
+
+    int updateMaterial(QMSSendVO.MaterialAll param);
+
+
+    Integer nextIdxInCosmetic(Integer materialIdx);
+
+    int createCosmetic(QMSSendVO.CosmeticMaterial param);
+
+    int updateCosmetic(QMSSendVO.CosmeticMaterial param);
+
+
+    Integer nextIdxInCosmeticBulk(Integer materialIdx);
+
+    int createCosmeticBulk(QMSSendVO.CosmeticBulkMaterial param);
+
+    int updateCosmeticBulk(QMSSendVO.CosmeticBulkMaterial param);
+
+
+    Integer nextIdxInDrug(Integer materialIdx);
+
+    int createDrug(QMSSendVO.DrugMaterial param);
+
+    int updateDrug(QMSSendVO.DrugMaterial param);
+
+
+    Integer nextIdxInDrugBulk(Integer materialIdx);
+
+    int createDrugBulk(QMSSendVO.DrugBulkMaterial param);
+
+    int updateDrugBulk(QMSSendVO.DrugBulkMaterial param);
+
 }

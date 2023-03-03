@@ -17,5 +17,7 @@ public interface PrintReportDao {
     List<PrintReportVO> getTestItmList(PrintReportVO request);
 
     @Audit(target = QtPitmAnsInfo.class, label = AuditEvent.ReportEvent.createReportInfo)
-    int createReportInfo(PrintReportVO request);
+    int updateReportInfo(PrintReportVO request);
+
+    String getReportPath(PrintReportVO param);
 }

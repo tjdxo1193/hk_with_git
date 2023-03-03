@@ -105,6 +105,7 @@ public class ItemManageVO extends Paging implements UpdateDetect {
     /* QM_PKGA */
     private String pkgaCd;
     private Integer pkgaVer;
+    private String pkgaTypNm;
 
     /* ApproveVO */
     private String aprReqDiv;       // S005 승인 요청 구분

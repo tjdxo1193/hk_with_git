@@ -198,6 +198,7 @@ public interface AuditEvent {
         String savedRequestFile = "의뢰 파일 등록";
         String savedItemFile = "항목 파일 등록";
         String testFinalApproved = "시험 최종승인";
+        String testJudgeModify = "시험 결과판정 변경";
     }
 
     interface labEvent {

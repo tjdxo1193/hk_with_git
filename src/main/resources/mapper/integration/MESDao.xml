@@ -121,7 +121,7 @@
 
     <insert id="createNonCfmReport" parameterType="lims.api.integration.vo.MESSendVO$NonCfmReport">
         INSERT INTO IF_TRS_MES_REPORT_NON_CFM
-        (IDX, DEGREE, BATCH_NO, ISP_REQ_NO, ANS_NO, PDT_ORDER_NO, ORDER_ITM, LOT_NO, NON_CFM_REASON, EM_ID, FILE_NAME,
+        (IDX, DEGREE, BATCH_NO, ISP_REQ_NO, ANS_NO, PDT_ORDER_NO, ORDER_ITM, LOT_NO, NON_CFM_REASON, EM_ID, REPORT_DIV, FILE_NAME,
          FILE_DATA, CRT_DS, TRS_STATUS)
         VALUES (#{idx},
                 #{degree},
@@ -133,6 +133,7 @@
                 #{lotNo},
                 #{nonCfmReason},
                 #{emId},
+                #{reportDiv},
                 #{fileName},
                 #{fileData},
                 SYSDATE,

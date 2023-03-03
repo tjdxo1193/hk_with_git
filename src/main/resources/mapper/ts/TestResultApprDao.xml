@@ -61,7 +61,8 @@
             B.NON_CFM_REA,
             B.PITM_SPCC,
             (NVL(B.SMP_VOL_ANS, 0) + NVL(B.SMP_VOL_ETC, 0) + NVL(B.SMP_VOL_STRG, 0)) AS SMP_VOL_TOT,
-            A.ANS_TYP
+            A.ANS_TYP,
+            (SELECT MAX(MARK_VAL) FROM QT_PITM_ANS_RST WHERE AMITM_CD IN ('TM002205','TM002206')) AS SPEC_GRV
         FROM QT_PITM_ANS_PROC A
         JOIN QT_PITM_ANS_INFO B ON A.PLNT_CD = B.PLNT_CD AND A.ANS_IDX = B.ANS_IDX
         JOIN QM_PITM_SPEC D ON A.PLNT_CD = D.PLNT_CD AND A.PITM_SPEC_IDX = D.PITM_SPEC_IDX
@@ -173,8 +174,7 @@
 
     <update id="approve" parameterType="TestResultApprVO">
         UPDATE QT_PITM_ANS_PROC SET
-            SYT_JDG = #{sytJdg}
-            , ANS_PROC_CD = #{ansProcCd}
+            ANS_PROC_CD = #{ansProcCd}
         WHERE PLNT_CD = #{plntCd} AND ANS_IDX = #{ansIdx}
     </update>
 
@@ -196,6 +196,12 @@
             , RJT_UID = #{rjtUid}
             , RJT_DS = SYSDATE
             , RJT_REA = #{rjtRea}
+        WHERE PLNT_CD = #{plntCd} AND ANS_IDX = #{ansIdx}
+    </update>
+
+    <update id="save" parameterType="TestResultApprVO">
+        UPDATE QT_PITM_ANS_PROC SET
+            SYT_JDG = #{sytJdg}
         WHERE PLNT_CD = #{plntCd} AND ANS_IDX = #{ansIdx}
     </update>
 

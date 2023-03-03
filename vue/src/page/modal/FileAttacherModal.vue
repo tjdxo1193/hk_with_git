@@ -96,7 +96,11 @@ export default {
       const { dropzone } = this.detail;
       const addedFiles = dropzone.getAddedFiles();
       const removedFileIds = dropzone.getRemovedIds();
-      this.$emit('save', { addedFiles, removedFileIds });
+      if(addedFiles.length !== 0 || removedFileIds.length !== 0){
+        this.$emit('save', { addedFiles, removedFileIds });
+      }else{
+        this.$warn(this.$message.validate.noEditedFiles);
+      }
     },
     close() {
       this.$emit('close');

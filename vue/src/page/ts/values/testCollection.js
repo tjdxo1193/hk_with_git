@@ -34,8 +34,6 @@ const list = {
       .build(),
   columns: () =>
     ColumnBuilder.builder()
-      .col('id', false)
-      .col('reqIdx', false)
       .col('fileCnt', '첨부파일', { colSpan: 2, width: 50 })
       .button('fileAttacher', '첨부', { width: 50 })
       .col('ansTypNm', '시험구분')
@@ -139,8 +137,7 @@ const testCollectionInfo = {
   forms: () =>
     FormBuilder.builder()
       .Hidden('reqIdx', '의뢰idx')
-      .Hidden('ansIdx', '시험idx')
-      .Hidden('fileIdx', '첨부파일idx')
+      .Input('ansIdx', '시험idx')
       .Hidden('plntCd', '플랜트코드')
       .Input('spcmNo', '표준견본번호')
       .multiple(

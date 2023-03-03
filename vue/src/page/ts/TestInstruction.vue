@@ -77,6 +77,10 @@ export default {
         fileIdx: 0,
       },
       tabs,
+      fileInfo: {
+        ansIdx: '',
+        fileIdx: ''
+      },
     };
   },
   methods: {
@@ -128,13 +132,16 @@ export default {
         .catch(() => this.$error(this.$message.error.deleteData));
     },
     fileSave({ addedFiles, removedFileIds }) {
-      const selectedItem = this.list.$grid.getSelectedItems();
-      const ansIdx = Number(selectedItem[0].item.ansIdx);
-      const fileIdx = Number(selectedItem[0].item.fileIdx);
-      const fileInfoList = { addedFiles, removedFileIds, ansIdx, fileIdx };
+      let parameter = this.fileInfo;
+      const fileIdx = parameter.fileIdx;
+      parameter = {
+        ...parameter,
+        addedFiles,
+        removedFileIds
+      }
       this.$confirm(this.$message.confirm.saveData).then(() => {
         this.$axios
-          .postByForm('/ts/testInstruction/saveFile', fileInfoList)
+          .postByForm('/ts/testInstruction/saveFile', parameter)
           .then(({ data }) => {
             if (addedFiles.length == 0) {
               this.$info(this.$message.info.removedFiles);
@@ -153,11 +160,9 @@ export default {
       if (originFileIdx > 0) {
         return this.$refs.fileAttacherModal.getFileList();
       } else {
-        return this.setInitFileIdx(fileIdx);
+        this.fileAttacherModal.fileIdx = fileIdx;
+        this.fileInfo.fileIdx = fileIdx;
       }
-    },
-    setInitFileIdx(fileIdx) {
-      this.fileAttacherModal.fileIdx = fileIdx;
     },
     searchFormEvent(event) {
       if (event.type === 'keydown' && event.originEvent.key === 'Enter') {
@@ -189,8 +194,10 @@ export default {
     gridButtonClick(event) {
       if (event.dataField === 'fileAttacher') {
         const ansIdx = Number(event.item.ansIdx);
-        this.fileAttacherModal.fileIdx = Number(event.item.fileIdx);
-        return this.showModal('fileAttacherModal', { ansIdx });
+        const fileIdx = Number(event.item.fileIdx);
+        this.fileAttacherModal.fileIdx = fileIdx;
+        this.fileInfo = { ansIdx: ansIdx, fileIdx: fileIdx };
+        return this.showModal('fileAttacherModal');
       }
     },
     init() {

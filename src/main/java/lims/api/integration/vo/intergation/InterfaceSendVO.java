@@ -173,7 +173,7 @@ public class InterfaceSendVO {
                     .build();
         }
 
-        public MESSendVO.NonCfmReport toMES() {
+        public MESSendVO.NonCfmReport toMES(ReportDivOfNonCfm reportDiv) {
             return MESSendVO.NonCfmReport.builder()
                     .batchNo(batchNo)
                     .ispReqNo(ispReqNo)
@@ -183,6 +183,7 @@ public class InterfaceSendVO {
                     .lotNo(lotNo)
                     .nonCfmReason(nonCfmReason)
                     .emId(emId)
+                    .reportDiv(reportDiv)
                     .build();
         }
     }

@@ -4,7 +4,6 @@ import lims.api.common.exception.NoUpdatedDataException;
 import lims.api.pr.dao.PrintReportDao;
 import lims.api.pr.service.PrintReportService;
 import lims.api.pr.vo.PrintReportVO;
-import lims.api.ts.vo.TestReceiptVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -28,9 +27,14 @@ public class PrintReportServiceImpl implements PrintReportService {
 
     @Override
     public void updateRptInfo(PrintReportVO request) {
-        int result = dao.createReportInfo(request);
+        int result = dao.updateReportInfo(request);
         if (result == 0) {
             throw new NoUpdatedDataException();
         }
+    }
+
+    @Override
+    public String getReportPath(PrintReportVO param) {
+        return dao.getReportPath(param);
     }
 }
