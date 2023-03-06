@@ -71,8 +71,10 @@ public class TestReceiptVO implements UpdateDetect {
     /*SAP품목정보*/
     private String labNo; //LAB NO
     private String brdAbbr; // 브랜드 약어
+    private String nomMtr; //기본자재
     private String etrCtnQty; // 입고 용기 수량
     private String rmtrSpec; // 원료 규격
+    private String nbr; //호수
     private String ftnYn; // 기능성 유무
     private String pcs01; // 공정01
     private String pcs02; // 공정02
@@ -95,6 +97,11 @@ public class TestReceiptVO implements UpdateDetect {
     private String pnxFeYn; // 페녹시에탄올프리관리대상
     private String rmtrCfmul; //원료조성성분비
     private String qdrugYn; //의약외품 유무
+    private String nomUnit;  // 기본단위
+    private String addCol1;
+    private String addCol1Nm;
+    private String addCol2;
+    private String addCol3;
     /* 시험항목 */
     private int pitmSpecIdx; //품목 규격서 IDX
     private int aitmSpecIdx; //시험항목 규격 IDX
@@ -130,6 +137,10 @@ public class TestReceiptVO implements UpdateDetect {
     private String aitmRmk; //시험항목 비고
 
     /*시험정보*/
+    private String reqDt;
+    private String reqRmk;
+    private String reqUnm;
+    private String reqDpt;
     private String rcpDptCd; //접수부서
     private String rcpUid; //접수자
     private String rcpRmk;
@@ -139,12 +150,14 @@ public class TestReceiptVO implements UpdateDetect {
     private String ansTypNm;
     private String ansEdt; //시험예정일자
     private String cplRqmDt; //시험완료일자
+    private String ansProcCd; //시험프로세스
 
     private String specUseVerYn; // 규격사용버전여부
     private String emgYn; //긴급여부
 
     private List<String> searchIspReqDt; //검사요청일자
 
+    /*부적합의뢰*/
     private String nonCfmSeq;
     private String ispReqNoBlk;
     private String zexfield1;
@@ -155,10 +168,5 @@ public class TestReceiptVO implements UpdateDetect {
     private String crtDs;
     private int ifInfoIdx;
 
-    private String addCol1;
-    private String addCol1Nm;
-    private String addCol2;
-    private String addCol3;
 
-    private String ansProcCd; //시험프로세스
 }

@@ -71,7 +71,7 @@
 
     <select id="nextPItemSpecIdxOfSpec" resultType="Integer"
             parameterType="lims.api.integration.vo.SAPPostProcessVO$Material$PItemKey">
-        SELECT NVL(MAX(PITM_SPEC_IDX), 0) + 1
+        SELECT SEQ_QM_PITM_SPEC.nextval
         FROM QM_PITM_SPEC
         WHERE PLNT_CD = #{plntCd}
     </select>

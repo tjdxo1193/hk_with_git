@@ -57,7 +57,7 @@
                                     STKTX, BMENG,
                                     BMEIN, VALID_FROM, VALID_TO, STLNR, ZTEXT, LKENZ, STLST, POSTP, PTEXT, POSNR, IDNRK,
                                     IDNRK_MAKT, POTX1, MENGE, MEINS, FMNGE, BEIKZ, CRT_DS, IF_INFO_IDX)
-        VALUES (#{idx},
+        VALUES (SEQ_IF_REV_SAP_BOM.nextval,
                 #{degree},
                 #{parentGuid},
                 #{guid},
@@ -150,7 +150,7 @@
         (IDX, DEGREE, MATNR, MTART, MEINS, MATKL, BISMT, PRDHA, SPART, MSTAE, WRKST, ZEINR, TAKLV, BSTME, XCHPF, EKWSL,
          MHDHB,
          ZLABNO, ZPROD_ABBR, CRT_DS, IF_INFO_IDX)
-        VALUES (#{idx},
+        VALUES (SEQ_IF_REV_SAP_MARA.nextval,
                 #{degree},
                 #{matnr},
                 #{mtart},
@@ -223,7 +223,7 @@
          LGPRO, LGFSB,
          PLIFZ, WEBAZ, ELSLO, STRGR, MTVFP, FEVOR, KZECH, AWSLS, PRCTR, LOSGR, SOBSK, FVIDK, ZFIRST_GI_DATE, CRT_DS,
          IF_INFO_IDX)
-        VALUES (#{idx},
+        VALUES (SEQ_IF_REV_SAP_MARC.nextval,
                 #{degree},
                 #{matnr},
                 #{werks},
@@ -282,7 +282,7 @@
     <insert id="createMaterialMvke" parameterType="lims.api.integration.vo.SAPMaterialVO$Mvke">
         INSERT INTO IF_REV_SAP_MATERIAL_MVKE
         (IDX, DEGREE, MATNR, VKORG, VTWEG, DWERK, AUMNG, KTGRM, CRT_DS, IF_INFO_IDX)
-        VALUES (#{idx},
+        VALUES (SEQ_IF_REV_SAP_MVKE.nextval,
                 #{degree},
                 #{matnr},
                 #{vkorg},
@@ -320,7 +320,7 @@
         INSERT INTO IF_REV_SAP_MATERIAL_ZMDV
         (IDX, DEGREE, MATNR, CLASS_TYPE, CLAZZ, CHAR_CODE, CHAR_DATA_TYP, CHAR_VAL_CHAR, CHAR_VAL_NUM, CRT_DS,
          IF_INFO_IDX)
-        VALUES (#{idx},
+        VALUES (SEQ_IF_REV_SAP_ZMDV.nextval,
                 #{degree},
                 #{matnr},
                 #{classType},
@@ -348,7 +348,7 @@
     <insert id="createMaterialMakt" parameterType="lims.api.integration.vo.SAPMaterialVO$Makt">
         INSERT INTO IF_REV_SAP_MATERIAL_MAKT
             (IDX, DEGREE, MATNR, SPRAS, MAKTX, CRT_DS, IF_INFO_IDX)
-        VALUES (#{idx},
+        VALUES (SEQ_IF_REV_SAP_MAKT.nextval,
                 #{degree},
                 #{matnr},
                 #{spras},

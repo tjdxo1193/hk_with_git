@@ -8,7 +8,7 @@
   <Card>
     <TabBase v-bind="tabs">
       <template #tab-testInfo>
-        <FormWithHeader v-bind="testInfo" />
+        <FormWithHeader v-bind="testInfo" @button-click="onClickTestInfo" />
         <Horizontal align-items="top" :spans="[5, 5]">
           <FormWithHeader
             v-bind="reportInfo"
@@ -30,16 +30,24 @@
       </template>
     </TabBase>
   </Card>
+  <InputPerformanceModal
+    :show="inputPerformanceModal.show"
+    :parameter="inputPerformanceModal.parameter"
+    @close="hideModal('inputPerformanceModal')"
+  />
 </template>
 
 <script>
-import { FormUtil } from '@/util';
+import { InputPerformanceModal } from '@/page/modal';
+import { FormUtil, RdUtil } from '@/util';
 
 import values from './values/printIntegratedReport';
 
 export default {
   name: 'PrintIntegrated',
-  components: {},
+  components: {
+    InputPerformanceModal,
+  },
   mounted() {
     this.getTestReportList();
     this.init();
@@ -80,6 +88,10 @@ export default {
           },
         },
       },
+      inputPerformanceModal: {
+        show: false,
+        parameter: {},
+      },
     };
   },
   methods: {
@@ -98,6 +110,7 @@ export default {
     disableButtons() {
       FormUtil.disableButtons(this.reportInfo.buttons, ['save', 'init']);
       FormUtil.disableButtons(this.reportHistoryGrid.buttons, ['print']);
+      FormUtil.disableButtons(this.testInfo.buttons, ['inputPerformance']);
     },
     async getTestReportList() {
       const { forms, $grid } = this.list;
@@ -157,6 +170,9 @@ export default {
           .then(() => this.save())
           .catch(() => {});
       }
+      if (name === 'print') {
+        this.bringIntegratedTestReport();
+      }
       if (name === 'init') {
         this.init();
         this.initReportForm();
@@ -169,6 +185,7 @@ export default {
       this.getReportHistory(data);
       FormUtil.enableButtons(this.reportInfo.buttons, ['save', 'init']);
       FormUtil.enableButtons(this.reportHistoryGrid.buttons, ['print']);
+      FormUtil.enableButtons(this.testInfo.buttons, ['inputPerformance']);
     },
     setDataToReportInfo(data) {
       const { forms } = this.reportInfo;
@@ -178,6 +195,30 @@ export default {
       if (event.type === 'keydown' && event.originEvent.key === 'Enter') {
         this.getTestReportList();
       }
+    },
+    onClickTestInfo({ name }) {
+      if (name === 'inputPerformance') {
+        this.inputPerformanceModal.parameter = FormUtil.getData(this.testInfo.forms);
+        this.showModal('inputPerformanceModal');
+      }
+    },
+    showModal(name) {
+      if (name === 'inputPerformanceModal') {
+        return (this.inputPerformanceModal.show = true);
+      }
+    },
+    hideModal(name) {
+      if (name === 'inputPerformanceModal') {
+        return (this.inputPerformanceModal.show = false);
+      }
+    },
+    bringIntegratedTestReport(){
+      const parameter = FormUtil.getData(this.testInfo.forms);
+              RdUtil.openReport(
+          '/INTEGRATED_TEST_REPORT_THREE.mrd',
+          `/rp [${parameter.plntCd}] [${parameter.ansIdx}] [${parameter.mtrCd}] [${parameter.batchNo}]`,
+        );
+        //  `/rp [1100] [142] ['10100000'] ['2209190005']`,
     },
   },
 };

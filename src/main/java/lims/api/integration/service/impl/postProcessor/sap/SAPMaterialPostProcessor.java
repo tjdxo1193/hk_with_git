@@ -37,7 +37,7 @@ public class SAPMaterialPostProcessor implements PostProcessor {
 
     @Override
     @PostProcessorRevExceptionHandler
-    public synchronized void execute(RevStateful rev) {
+    public void execute(RevStateful rev) {
         int latestDegree = rev.getDegree();
         SAPMaterialVO differentVO = new SAPMaterialVO();
         saveMaterialMaster(latestDegree, differentVO);

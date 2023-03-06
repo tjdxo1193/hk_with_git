@@ -17,14 +17,19 @@ public class SAPBomVO extends RevStateful implements KeyGenerator {
     private String parentGuid;
     private String guid;
     private String seq;
+    @MappingKey
+    private String werks;
+    @MappingKey
     private String matnr;
+    @MappingKey
+    private String stlal;
+    @MappingKey
+    private String posnr;
     private String maktx;
     private String mtart;
-    private String werks;
     private String name1;
     private String dispo;
     private String dsnam;
-    private String stlal;
     private String stktx;
     private String bmeng;
     private String bmein;
@@ -35,7 +40,6 @@ public class SAPBomVO extends RevStateful implements KeyGenerator {
     private String lkenz;
     private String postp;
     private String ptext;
-    private String posnr;
     private String idnrk;
     private String idnrkMakt;
     private String potx1;

@@ -22,8 +22,8 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public class RfcTemplate {
 
-    private InterfaceInfoService infoService;
-    private InterfaceErrorService interfaceErrorServiceImpl;
+    private final InterfaceInfoService infoService;
+    private final InterfaceErrorService interfaceErrorServiceImpl;
 
     public void execute(RfcInterface rfc, Consumer<Integer> context) {
         IfInfoVO infoVO = createRfcInfoVO(rfc);

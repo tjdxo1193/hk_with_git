@@ -15,6 +15,7 @@ import lims.api.util.process.KeyObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -33,7 +34,7 @@ public class BusinessPartnerScheduler implements Scheduler {
 
     private final RfcTemplate rfcTemplate;
 
-//    @Scheduled(cron = "0 0 2 * * *")
+    @Scheduled(cron = "0 0 2 * * *")
     @Override
     public void run() {
         save(RFCBusinessPartnerCheck.RECENT_10_DAYS);

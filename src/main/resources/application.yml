@@ -19,8 +19,8 @@ spring:
       enabled: detect
   datasource:
     hikari:
-      maximum-pool-size: 20
-      connection-timeout: 10000
+      maximum-pool-size: 50
+      connection-timeout: 60000
       max-lifetime: 0
       leak-detection-threshold: 20000
 
@@ -72,7 +72,7 @@ logging:
     root: info
     lims.api: debug
     jdbc.resultsettable: debug
-    jdbc.sqltiming: info
+    jdbc.sqltiming: debug
     jdbc: off
     jdbc.audit: off
     jdbc.sqlonly: off

@@ -58,8 +58,6 @@ public class TestRequestVO implements UpdateDetect {
     private String mtrDocItm; //자재 문서 항목
     private String csmBpCd; //고객처 BP 코드
     private String csmNm; //고객처 명
-    private String udtDs; //수정 일시
-    private String revDs; //수신 일시
     /*품목정보*/
     private String pkgMtrSpec; // 포장재 규격
     private String pitmCd; // 품목 코드
@@ -68,7 +66,6 @@ public class TestRequestVO implements UpdateDetect {
     private String pitmTyp; // 품목 유형
     private String pitmTypNm;
     private String pitmVer; // 품목버전
-    private String useVerYn; // 사용 버전 여부
     /*SAP품목정보*/
     private String labNo; //LAB NO
     private String brdAbbr; // 브랜드 약어
@@ -96,6 +93,13 @@ public class TestRequestVO implements UpdateDetect {
     private String prbInYn; // 파라벤포함여부
     private String prbFeYn; // 파라벤프리관리대상
     private String pnxFeYn; // 페녹시에탄올프리관리대상
+    private String rmtrCfmul; //원료조성성분비
+    private String qdrugYn; //의약외품 유무
+    private String nomUnit;  // 기본단위
+    private String addCol1;
+    private String addCol1Nm;
+    private String addCol2;
+    private String addCol3;
 
     /*시험정보*/
     private int ansIdx; //시험 IDX
@@ -132,35 +136,6 @@ public class TestRequestVO implements UpdateDetect {
     /* 시험항목 */
     private int pitmSpecIdx; //품목 규격서 IDX
     private int aitmSpecIdx; //시험항목 규격 IDX
-    private int rstSeq; //시험항목 순번
-    private String ispDurTm; //검사 소요 시간
-    private String eqmUseTm; //기기 사용 시간
-    private String amitmCd; //시험항목별방법 코드
-    private String vriaKn; //VARIANT 국문
-    private String vriaNo; //VARIANT NO
-    private String aitmKn; //시험항목 국문
 
-    private String perspecTxt; //허가규격 텍스트
-    private String owcSpecTxt; //자사 규격 텍스트
-    private String specTxtEn; //규격 텍스트 영문
-    private String perSlvLow; //허가 기준 하한
-    private String perSlvUpp; //허가 기준 상한
-    private String perSlvDesc; //허가 기준 서술
-    private String owcSlvLow; //자사 기준 하한
-    private String owcSlvUpp; //자사 기준 상한
-    private String owcSlvDesc; //자사 기준 서술
-    private String rstDpnt; //결과 소수점
-    private String rptPrtSlvVal; //성적서 출력 기준 값
-    private String rptPrtItmNm; //성적서 출력 항목 명
-    private String rptPrtYn; //성적서 출력 여부
-    private String specTypNm; //규격 유형
-    private String jdgTypNm; //판정 유형
-    private String slvJdgCfmNm; //기준 적합 판정
-    private String slvJdgNonCfmNm; //기준 부적합 판정
-    private String rstUnitNm; //결과 단위 코드
-    private String ansDptNm; //시험부서명
-
-    private String mkrQty; //표시량
-    private String aitmRmk; //시험항목 비고
-
+    private List<String> searchEtrDt; //입고일자
 }

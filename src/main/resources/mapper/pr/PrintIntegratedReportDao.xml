@@ -61,9 +61,10 @@
             LEFT JOIN QM_PITM_INFO_SAP QPIS ON QP.PITM_CD = QPIS.PITM_CD
                                                    AND QP.PITM_VER = QPIS.PITM_VER AND QP.PLNT_CD = QPIS.PLNT_CD
         WHERE QPAR.PLNT_CD = #{plntCd}
-          AND QPAP.ANS_PROC_CD='S0130900'
+          AND QPAP.ANS_PROC_CD = 'S0130900'
           AND QPAP.HLD_YN = 'N'
           AND QPI.PITM_TYP IN ('S0180100', 'S0180101')
+          AND QPAI.ANS_IDX IS NOT NULL
           <if test="sytJdg != null and sytJdg != ''">
           AND QPAP.SYT_JDG = #{sytJdg}
           </if>

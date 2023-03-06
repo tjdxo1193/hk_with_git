@@ -33,7 +33,11 @@ public class MaterialAdditionAttribute {
 
     private Map<MaterialKey, String> toAdditionAttrMap(List<SAPMaterialVO.Zmdv> data) {
         return data.stream().collect(Collectors.toMap(
-                o -> new MaterialKey(o.getMatnr(), MaterialCharCode.of(o.getCharCode())),
+                o -> {
+                    System.out.println(o.getCharCode());
+                    System.out.println(MaterialCharCode.of(o.getCharCode()));
+                    return new MaterialKey(o.getMatnr(), MaterialCharCode.of(o.getCharCode()));
+                },
                 o -> "CHAR".equalsIgnoreCase(o.getCharDataTyp()) ? o.getCharValChar() : o.getCharValNum(),
                 (oldO, newO) -> StringUtils.hasLength(oldO) ? oldO : newO
         ));

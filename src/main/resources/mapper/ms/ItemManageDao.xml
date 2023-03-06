@@ -305,7 +305,7 @@
         <selectKey keyProperty="pitmSpecIdx,rvsNo,docNo,rvsDt,enfoDt,rvsReaCd,rvsCtt,rvsDivPs"
                    resultType="ItemApprSpecVO" order="BEFORE">
             SELECT
-            (SELECT NVL(MAX(PITM_SPEC_IDX) + 1, 1) FROM QM_PITM_SPEC WHERE PLNT_CD = #{plntCd}) AS PITM_SPEC_IDX
+            (SELECT SEQ_QM_PITM_SPEC.nextval FROM DUAL) AS PITM_SPEC_IDX
             , RVS_NO
             , DOC_NO
             , RVS_DT

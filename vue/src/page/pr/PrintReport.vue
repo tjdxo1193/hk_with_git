@@ -82,7 +82,6 @@ export default {
     async save() {
       const parameter = FormUtil.getData(this.reportInfo.forms);
 
-      console.log(parameter)
       await this.$eSignWithReason(() => this.$axios.post('/pr/printReport', parameter))
         .then(() => {
           this.$info(this.$message.info.saved);

@@ -11,7 +11,6 @@ import lims.api.util.StringUtil;
 import lims.api.util.ThreadUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.function.BiFunction;
@@ -30,11 +29,9 @@ public class InterfaceControllerTemplate {
         try {
             info.setXifid(revInterface.getId());
             info.setXsysid(revInterface.getSystemTypeString());
-
+            info.setIfType(revInterface.getSendType());
             infoIdx = infoService.createInfo(info.getRevInfoVO());
-            T result = context.apply(infoIdx);
-            updateSuccessStatusInfo(infoIdx);
-            return result;
+            return context.apply(infoIdx);
 
         } catch (NullPointerException e) {
             String message = MessageUtil.getMessage("error.notNull");
@@ -44,13 +41,6 @@ public class InterfaceControllerTemplate {
             updateErrorStatusInfo(infoIdx, errorLogId, message);
             return onError.apply(e, message);
 
-        } catch (DataAccessException e) {
-            String message = MessageUtil.getMessage("error.sql.interfaceRev");
-            log.error("[{}] Error during interface receive in interface controller. error message: {}", ThreadUtil.getCallerMethodName(), e.getMessage());
-
-            Integer errorLogId = errorService.record(infoIdx, e);
-            updateErrorStatusInfo(infoIdx, errorLogId, message);
-            return onError.apply(e, message);
         } catch (Exception e) {
             String message = StringUtil.substr(e.getMessage(), 120);
             log.error("[{}] Error during interface receive in interface controller. error message: {}", ThreadUtil.getCallerMethodName(), e.getMessage());
@@ -59,16 +49,6 @@ public class InterfaceControllerTemplate {
             updateErrorStatusInfo(infoIdx, errorLogId, message);
             return onError.apply(e, message);
         }
-
-    }
-
-    private void updateSuccessStatusInfo(Integer infoIdx) {
-        IfInfoVO info = IfInfoVO.builder()
-                .idx(infoIdx)
-                .xstat(InterfaceResponseStatus.S)
-                .xmsg(InterfaceResponseStatus.S.getMessage())
-                .build();
-        infoService.updateStatusInfo(info);
     }
 
     private void updateErrorStatusInfo(Integer infoIdx, Integer errorLogId, String message) {

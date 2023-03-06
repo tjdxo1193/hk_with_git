@@ -35,34 +35,54 @@ public class IntegrationSender {
      * 품질 시험의 특정 상태마다 연계 시스템으로 현재 시험 상태 정보를 보낸다.
      */
     public void sendTestStatus(InterfaceSendVO.TestStatus data) {
+        sendTestStatusToSAP(data);
+        sendTestStatusToSRM(data);
+    }
+
+    public void sendTestStatusToSAP(InterfaceSendVO.TestStatus data) {
         if (TestType.byNotSAP(data.getTestType())) {
-            log.info("[sendTestStatus] This test is not by SAP");
+            log.info("[sendTestStatusToSAP] This test is not by SAP");
             return;
         }
         sapService.publishTestStatus(data.toSAP());
-//        if (data.isMES()) {
-//            mesService.publishTestStatus(data.toMES());
-//        }
-        if (data.isSRM()) {
-            srmService.publishTestStatus(data.toSRM());
+    }
+
+    public void sendTestStatusToSRM(InterfaceSendVO.TestStatus data) {
+        if (TestType.byNotSAP(data.getTestType())) {
+            log.info("[sendTestStatusToSRM] This test is not by SAP");
+            return;
         }
+        if (!data.isSRM()) {
+            return;
+        }
+        srmService.publishTestStatus(data.toSRM());
     }
 
     /*
      * 품질 시험의 결과 판정 정보를 보낸다.
      */
     public void sendTestResult(InterfaceSendVO.TestResult data) {
+        sendTestResultToSAP(data);
+        sendTestResultToSRM(data);
+    }
+
+    public void sendTestResultToSAP(InterfaceSendVO.TestResult data) {
         if (TestType.byNotSAP(data.getTestType())) {
-            log.info("[sendTestResult] This test is not by SAP");
+            log.info("[sendTestResultToSAP] This test is not by SAP");
             return;
         }
         sapService.publishTestResultJudgment(data.toSAP());
-//        if (data.isMES()) {
-//            mesService.publishTestResultJudgment(data.toMES());
-//        }
-        if (data.isSRM()) {
-            srmService.publishTestResultJudgment(data.toSRM());
+    }
+
+    public void sendTestResultToSRM(InterfaceSendVO.TestResult data) {
+        if (TestType.byNotSAP(data.getTestType())) {
+            log.info("[sendTestResultToSRM] This test is not by SAP");
+            return;
         }
+        if (!data.isSRM()) {
+            return;
+        }
+        srmService.publishTestResultJudgment(data.toSRM());
     }
 
     /**

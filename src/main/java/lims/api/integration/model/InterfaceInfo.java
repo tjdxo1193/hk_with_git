@@ -2,6 +2,7 @@ package lims.api.integration.model;
 
 import lims.api.integration.enums.InterfaceInfoDiv;
 import lims.api.integration.enums.InterfaceResponseStatus;
+import lims.api.integration.enums.InterfaceSendType;
 import lims.api.integration.vo.IfInfoVO;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,6 +18,7 @@ public class InterfaceInfo {
     private String xifid;
     private String xdate;
     private String xtime;
+    private InterfaceSendType ifType;
 
     public IfInfoVO getRevInfoVO() {
         return IfInfoVO.builder()
@@ -25,6 +27,7 @@ public class InterfaceInfo {
                 .xifid(xifid)
                 .xdate(xdate)
                 .xtime(xtime)
+                .ifType(ifType)
                 .xstat(getXstat())
                 .xmsg(getXmsg())
                 .infoDiv(InterfaceInfoDiv.REV)
@@ -36,6 +39,7 @@ public class InterfaceInfo {
                 .xtid(xtid)
                 .xdate(xdate)
                 .xtime(xtime)
+                .ifType(ifType)
                 .xstat(getXstat())
                 .xmsg(getXmsg())
                 .infoDiv(InterfaceInfoDiv.TRS)
@@ -43,11 +47,11 @@ public class InterfaceInfo {
     }
 
     protected InterfaceResponseStatus getXstat() {
-        return null;
+        return InterfaceResponseStatus.S;
     }
 
     protected String getXmsg() {
-        return null;
+        return InterfaceResponseStatus.S.getMessage();
     }
 
 }

@@ -27,13 +27,10 @@ public enum MaterialCharCode {
     LAB_NO("ZMDE_LABNO"),                   // Lab No, 처방 코드
 
     CUSTOMER_CODE("ZMDE_CUSTOMER"),         // 고객사 코드
-    DISPLAY_QTY("ZMDE_VOL_WEI"),            // 표시 용량
-    DISPLAY_QTY_UNIT("ZMDE_VOL_WEI_UNIT"),  // 표시 용량 단위
     PITM_DIV("ZMDE_APPL_REGULATION"),       // 품목구분
     TYPE_DIV("ZMDE_KFDA_CLASSIFY1"),        // 유형구분
     TYPE_DIV_DTL("ZMDE_KFDA_CLASSIFY2"),    // 유형세분류
     FUNCTION_DIV("ZMDE_FUNCTIONAL_GOODS_DETAIL"), // 기능성 구분
-    CHAT_DIV("ZMDE_FUNCTIONAL_GOODS"),      // 특성 구분
     OPEN_LMT("ZMDE_PERIOD_AFTER_OPENING")   // 개봉 후 사용기간
     ;
 

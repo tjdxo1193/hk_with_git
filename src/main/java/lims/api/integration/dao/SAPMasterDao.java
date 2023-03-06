@@ -56,9 +56,11 @@ public interface SAPMasterDao {
     int updateMaterialMakt(SAPMaterialVO.Makt param);
 
 
+    List<SAPBomVO> findBOM();
+
     int createBOM(SAPBomVO param);
 
-    int deleteBOM();
+    int updateBOM(SAPBomVO param);
 
 
     List<SAPCharacteristicVO.Cabn> findCharacteristicCabn();

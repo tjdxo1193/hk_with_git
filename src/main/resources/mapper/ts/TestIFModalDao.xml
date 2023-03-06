@@ -27,9 +27,13 @@
         LEFT JOIN QM_PITM QP ON QPS.PITM_CD = QP.PITM_CD AND QPS.PITM_VER = QP.PITM_VER AND QPS.PLNT_CD = QP.PLNT_CD
         LEFT JOIN QM_PITM_INFO QPI ON QP.PITM_CD = QPI.PITM_CD AND QP.PITM_VER = QPI.PITM_VER AND QP.PLNT_CD = QPI.PLNT_CD
         WHERE QPAR.PLNT_CD = #{plntCd}
-        AND MSFO.PHS_ORDER_NO = #{phsOrderNo}
-        AND MSFO.ORDER_ITM = #{phsOrderItm}
-        AND MSFO.LOT_NO = #{lotNo}
+        AND TRIM(UPPER(MSFO.PHS_ORDER_NO)) LIKE '%' || TRIM(UPPER(#{phsOrderNo})) || '%'
+        <if test="phsOrderItm != null and phsOrderItm != ''">
+            AND TRIM(UPPER(MSFO.ORDER_ITM)) LIKE '%' || TRIM(UPPER(#{phsOrderItm})) || '%'
+        </if>
+        <if test="lotNo != null and lotNo != ''">
+            AND TRIM(UPPER(MSFO.LOT_NO)) LIKE '%' || TRIM(UPPER(#{lotNo})) || '%'
+        </if>
         ORDER BY QPAP.ANS_IDX, QPAP.REQ_IDX
     </select>
 
@@ -58,9 +62,13 @@
         LEFT JOIN QM_PITM QP ON QPS.PITM_CD = QP.PITM_CD AND QPS.PITM_VER = QP.PITM_VER AND QPS.PLNT_CD = QP.PLNT_CD
         LEFT JOIN QM_PITM_INFO QPI ON QP.PITM_CD = QPI.PITM_CD AND QP.PITM_VER = QPI.PITM_VER AND QP.PLNT_CD = QPI.PLNT_CD
         WHERE QPAR.PLNT_CD = #{plntCd}
-        AND MMFO.PDT_ORDER_NO = #{pdtOrderNo}
-        AND MMFO.ORDER_ITM = #{phsOrderItm}
-        AND MMFO.LOT_NO = #{lotNo}
+        AND TRIM(UPPER(MMFO.PDT_ORDER_NO)) LIKE '%' || TRIM(UPPER(#{pdtOrderNo})) || '%'
+        <if test="phsOrderItm != null and phsOrderItm != ''">
+            AND TRIM(UPPER(MMFO.ORDER_ITM)) LIKE '%' || TRIM(UPPER(#{phsOrderItm})) || '%'
+        </if>
+        <if test="lotNo != null and lotNo != ''">
+            AND TRIM(UPPER(MMFO.LOT_NO)) LIKE '%' || TRIM(UPPER(#{lotNo})) || '%'
+        </if>
         ORDER BY QPAP.ANS_IDX, QPAP.REQ_IDX
     </select>
 
@@ -79,12 +87,12 @@
         FROM MS_SRM_REO_PREV
         WHERE 1=1
         AND DEL_YN = 'N'
-        AND BATCH_NO = #{batchNo}
+        AND TRIM(UPPER(BATCH_NO)) LIKE '%' || TRIM(UPPER(#{batchNo})) || '%'
         <if test="phsOrderNo != null and phsOrderNo != ''">
-            AND PHS_ORDER_NO = #{phsOrderNo}
+            AND TRIM(UPPER(PHS_ORDER_NO)) LIKE '%' || TRIM(UPPER(#{phsOrderNo})) || '%'
         </if>
         <if test="lotNo != null and lotNo != ''">
-            AND MAK_NO = #{lotNo}
+            AND TRIM(UPPER(MAK_NO)) LIKE '%' || TRIM(UPPER(#{lotNo})) || '%'
         </if>
     </select>
 
@@ -144,12 +152,12 @@
             , IF_INFO_IDX
         FROM MS_SRM_RPT
         WHERE 1=1
-        AND BATCH_NO = #{batchNo}
+        AND TRIM(UPPER(BATCH_NO)) LIKE '%' || TRIM(UPPER(#{batchNo})) || '%'
         <if test="phsOrderNo != null and phsOrderNo != ''">
-            AND PHS_ORDER_NO = #{phsOrderNo}
+            AND TRIM(UPPER(PHS_ORDER_NO)) LIKE '%' || TRIM(UPPER(#{phsOrderNo})) || '%'
         </if>
         <if test="lotNo != null and lotNo != ''">
-            AND MAK_NO = #{lotNo}
+            AND TRIM(UPPER(MAK_NO)) LIKE '%' || TRIM(UPPER(#{lotNo})) || '%'
         </if>
     </select>
 
@@ -164,7 +172,7 @@
             , IF_INFO_IDX
         FROM MS_MES_PKG_SPEC
         WHERE 1=1
-        AND PITM_CD = #{pitmCd}
+        AND TRIM(UPPER(PITM_CD)) LIKE '%' || TRIM(UPPER(#{pitmCd})) || '%'
     </select>
 
     <select id="getInpPerformanceList" parameterType="TestIFModalVO" resultType="TestIFModalVO">

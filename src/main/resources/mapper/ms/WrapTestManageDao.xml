@@ -548,7 +548,7 @@
 
 	<insert id="insertVersionUpBySapPrdha" parameterType="SpecManageVO">
 		<selectKey keyProperty="pitmSpecIdx" resultType="int" order="BEFORE">
-			SELECT NVL(MAX(PITM_SPEC_IDX), 0) + 1 FROM QM_PITM_SPEC WHERE PLNT_CD = #{plntCd}
+			SELECT SEQ_QM_PITM_SPEC.nextval AS PITM_SPEC_IDX FROM DUAL
 		</selectKey>
 		INSERT INTO QM_PITM_SPEC
 		(

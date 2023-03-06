@@ -94,9 +94,17 @@ const testInfo = {
     title: '의뢰정보',
     countPerRow: 4,
     id: 'testInfo',
+    buttons: [{ name: 'inputPerformance', label: '투입실적', disabled: true }],
   },
   forms: () =>
     FormBuilder.builder()
+      .Hidden('plntCd')
+      .Hidden('reqIdx')
+      .Hidden('ansIdx')
+      .Hidden('batchNo')
+      .Hidden('pitmVer')
+      .Hidden('ansTyp')
+      .Hidden('aitmSpecIdx')
       .Input('ansNo', '시험번호', { readonly: true })
       .Input('pitmNm', '자재내역', { readonly: true })
       .Input('pitmEn', '자재내역(영문)', { readonly: true })

@@ -110,10 +110,11 @@ const list = {
       .build(),
 };
 
-const requestInfo = {
+const itemInfo = {
   static: {
+    title: '자재정보',
     countPerRow: 4,
-    id: 'requestInfo',
+    id: 'itemInfo',
   },
   forms: () =>
     FormBuilder.builder()
@@ -123,38 +124,56 @@ const requestInfo = {
       .Hidden('pitmVer')
       .Hidden('ansTyp')
       .Hidden('aitmSpecIdx')
+      .Hidden('pitmCd', '자재번호')
+      .Hidden('pitmNm', '자재내역')
       .Input('ispReqNo', '검사요청번호', { readonly: true })
-      .Input('pitmNm', '자재내역', { readonly: true })
-      .Input('pitmEn', '자재내역(영문)', { readonly: true })
-      .Input('pitmCd', '자재번호', { readonly: true })
       .Input('ispReqDt', '검사요청일자', { readonly: true })
-      .Input('strgLmt', '보관기한', { readonly: true })
-      .Input('useLmt', '사용기한', { readonly: true })
-      .Input('vdrCtrtDt', '납품약정일자', { readonly: true })
       .Input('lotNo', '제조번호', { readonly: true })
       .Input('makDt', '제조일자', { readonly: true })
-      .Input('splLotNo', '공급사제조번호', { readonly: true })
-      .Input('splNm', '공급사', { readonly: true })
+      .Input('addCol1Nm', '입고유형', { readonly: true })
+      .multiple(
+        'input',
+        '입고수량',
+        FormBuilder.builder()
+          .Input('etrQty', { readonly: true })
+          .Input('inpUnit', { readonly: true })
+          .spanCol(0.5)
+          .build(),
+      )
+      .Input('useLmt', '사용기한', { readonly: true })
+      .Input('strgLmt', '보관기한', { readonly: true })
       .Input('phsOrderNo', '구매오더번호', { readonly: true })
-      .Input('phsOrderItm', '구매오더항목', { readonly: true })
-      .Input('phsOrderQty', '구매오더수량', { readonly: true })
-      .Input('phsOrderUnit', '구매오더단위', { readonly: true })
-      .Input('pdtOrderNo', '생산오더번호', { readonly: true })
-      .Input('pdtOrderTyp', '생산오더유형', { readonly: true })
+      .Input('splCd', '공급사코드', { readonly: true })
+      .Textarea('detailInfo', '상세정보', { readonly: true, rows: 8 })
+      .spanRow(5)
+      .spanCol(2)
+      .Input('splNm', '공급사명', { readonly: true })
+      .Input('splLotNo', '공급사제조번호', { readonly: true })
       .Input('phsCrgNm', '구매담당자', { readonly: true })
-      .Input('mtrDocNo', '자재문서번호', { readonly: true })
-      .Input('phsUnitPre', '구매단가', { readonly: true })
-      .Input('amtUnit', '가격단위', { readonly: true })
-      .Input('etrQty', '입고수량', { readonly: true })
-      .Input('etrDt', '입고일자', { readonly: true })
+      .Input('pdtOrderNo', '생산오더번호', { readonly: true })
       .Input('makEqp', '제조설비', { readonly: true })
       .Input('wrkNm', '작업자명', { readonly: true })
-      .Input('addCol1', '입고유형')
-      .Input('addCol2', '입고취소여부')
-      .Input('addCol3', '전표생성일자')
       .build(),
 };
 
+const requestInfo = {
+  static: {
+    title: '의뢰정보',
+    countPerRow: 4,
+    id: 'requestInfo',
+  },
+  forms: () =>
+    FormBuilder.builder()
+      .Input('pitmTypNm', '자재구분', { readonly: true })
+      .Input('pitmCd', '자재번호', { readonly: true })
+      .Input('pitmNm', '자재내역', { readonly: true })
+      .Input('pitmEn', '자재내역(영문)', { readonly: true })
+      .Input('reqUnm', '의뢰자', { readonly: true })
+      .Input('reqDpt', '의뢰부서', { readonly: true })
+      .Input('reqDt', '의뢰일시', { readonly: true })
+      .Input('reqRmk', '의뢰비고', { readonly: true })
+      .build(),
+};
 const itemList = {
   static: {
     $grid: null,
@@ -170,23 +189,28 @@ const itemList = {
       .col('pitmVer', '자재<br>버전', { width: 50, cellMerge: true, visible: false })
       .col('aitmSpecVer', '규격서<br>버전', { width: 50, cellMerge: true })
       .col('amitmCd', false)
-      .col('aitmKn', '시험항목명')
+      .col('ansDptNm', '시험파트')
+      .col('aitmKn', '시험항목명', { width: 150 })
       .col('vriaNo', 'VARIANT<br>NO')
       .col('vriaKn', 'VARIANT<br>국문')
-      .col('ansDptNm', '시험파트')
-      .col('perspecTxt', '허가규격', { width: 150 })
-      .col('owcSpecTxt', '자사규격', { width: 150 })
       .col('specTypNm', '규격유형')
+      .col('specTxt', '기준(통합)', {
+        children: ColumnBuilder.builder()
+          .col('perspecTxt', '기준(허가)', { width: 150 })
+          .col('owcSpecTxt', '기준(자사)', { width: 150 })
+          .col('specTxtEn', '기준(영문)')
+          .build(),
+      })
       .col('jdgTypNm', '판정유형')
       .col('mkrQty', '표시량')
-      .col('permitCriteria', '허가기준', {
+      .col('permitCriteria', '기준값(허가)', {
         children: ColumnBuilder.builder()
           .col('perSlvLow', '하한')
           .col('perSlvUpp', '상한')
           .col('perSlvDesc', '서술')
           .build(),
       })
-      .col('companyStandard', '자사기준', {
+      .col('companyStandard', '기준값(자사)', {
         children: ColumnBuilder.builder()
           .col('owcSlvLow', '하한')
           .col('owcSlvUpp', '상한')
@@ -197,8 +221,12 @@ const itemList = {
       .col('slvJdgNonCfmNm', '기준부적합판정')
       .col('rstUnitNm', '결과단위')
       .col('rstDpnt', '결과소수점')
-      .col('rptPrtSlvVal', '성적서<br>출력기준')
-      .col('rptPrtItmNm', '성적서<br>출력항목')
+      .col('companyStandard', '성적서', {
+        children: ColumnBuilder.builder()
+          .col('rptPrtItmNm', '항목(출력)')
+          .col('rptPrtSlvVal', '기준(출력)')
+          .build(),
+      })
       .col('rptPrtYn', '성적서<br>출력여부')
       .col('aitmRmk', '비고', { width: 200 })
       .build(),
@@ -226,6 +254,7 @@ const tabs = {
 export default {
   list,
   requestInfo,
+  itemInfo,
   itemList,
   tabs,
 };

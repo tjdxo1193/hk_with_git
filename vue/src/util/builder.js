@@ -313,7 +313,11 @@ export const FormBuilder = {
       _addOptionToArgs(args, option) {
         const lastArg = args[args.length - 1];
         if (objectUtil.isObject(lastArg)) {
-          Object.entries(option).forEach(([k, v]) => (lastArg[k] = v));
+          Object.entries(option).forEach(([k, v]) => {
+            if (!ObjectUtil.has(lastArg, k)) {
+              lastArg[k] = v;
+            }
+          });
         } else {
           args.push(option);
         }

@@ -48,8 +48,6 @@
             , QPAR.MTR_DOC_ITM
             , QPAR.CSM_BP_CD
             , QPAR.CSM_NM
-            , QPAR.UDT_DS
-            , QPAR.REV_DS
             , QPAR.ADD_COL1
             , DECODE(QPAR.ADD_COL1, 'A', '시험(구매)', 'B', '시험(생산)', '시험(수동)') AS ADD_COL1_NM
             , QPAR.ADD_COL2
@@ -64,8 +62,11 @@
             , QP.USE_VER_YN
             , QPIS.LAB_NO
             , QPIS.BRD_ABBR
+            , QPIS.NOM_MTR
+            , QPIS.NOM_UNIT
             , QPIS.ETR_CTN_QTY
             , QPIS.RMTR_SPEC
+            , QPIS.NBR
             , QPIS.FTN_YN
             , QPIS.PCS01
             , QPIS.PCS02
@@ -98,6 +99,10 @@
             , QPAP.ANS_TYP
             , DECODE(QPAP.ANS_TYP, NULL, DECODE(QPAR.ADD_COL1, 'A', '시험(구매)', 'B', '시험(생산)', '시험(수동)'),(SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = QPAP.ANS_TYP)) AS ANS_TYP_NM
             , QPAP.ANS_EDT
+            , (SELECT USER_NM FROM SY_USER SU WHERE SU.USER_ID = QPAP.REQ_UID AND SU.PLNT_CD = QPAP.PLNT_CD) AS REQ_UNM
+            , (SELECT SD.DPT_NM FROM SY_DPT SD WHERE SD.DPT_CD = QPAP.REQ_DPT_CD AND SD.PLNT_CD = QPAP.PLNT_CD) AS REQ_DPT
+            , QPAP.REQ_RMK
+            , QPAP.REQ_DT
         FROM QT_PITM_ANS_REQ QPAR
         LEFT JOIN QT_PITM_ANS_PROC QPAP ON QPAR.REQ_IDX = QPAP.REQ_IDX AND QPAR.PLNT_CD = QPAP.PLNT_CD
         LEFT JOIN (
@@ -183,8 +188,6 @@
             , QPAR.MTR_DOC_ITM
             , QPAR.CSM_BP_CD
             , QPAR.CSM_NM
-            , QPAR.UDT_DS
-            , QPAR.REV_DS
             , QPAR.ADD_COL1
             , DECODE(QPAR.ADD_COL1, 'A', '시험(구매)', 'B', '시험(생산)', '시험(수동)') AS ADD_COL1_NM
             , QPAR.ADD_COL2
@@ -199,8 +202,11 @@
             , 'Y' AS USE_VER_YN
             , QPIS.LAB_NO
             , QPIS.BRD_ABBR
+            , QPIS.NOM_MTR
+            , QPIS.NOM_UNIT
             , QPIS.ETR_CTN_QTY
             , QPIS.RMTR_SPEC
+            , QPIS.NBR
             , QPIS.FTN_YN
             , QPIS.PCS01
             , QPIS.PCS02
@@ -233,6 +239,10 @@
             , QPAP.ANS_TYP
             , DECODE(QPAP.ANS_TYP, NULL, DECODE(QPAR.ADD_COL1, 'A', '시험(구매)', 'B', '시험(생산)', '시험(수동)'),(SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = QPAP.ANS_TYP)) AS ANS_TYP_NM
             , QPAP.ANS_EDT
+            , (SELECT USER_NM FROM SY_USER SU WHERE SU.USER_ID = QPAP.REQ_UID AND SU.PLNT_CD = QPAP.PLNT_CD) AS REQ_UNM
+            , (SELECT SD.DPT_NM FROM SY_DPT SD WHERE SD.DPT_CD = QPAP.REQ_DPT_CD AND SD.PLNT_CD = QPAP.PLNT_CD) AS REQ_DPT
+            , QPAP.REQ_RMK
+            , QPAP.REQ_DT
         FROM QT_PITM_ANS_REQ QPAR
         LEFT JOIN QT_PITM_ANS_PROC QPAP ON QPAR.REQ_IDX = QPAP.REQ_IDX AND QPAR.PLNT_CD = QPAP.PLNT_CD
         LEFT JOIN QM_PITM_SPEC QPS ON QPS.PITM_SPEC_IDX = QPAP.PITM_SPEC_IDX AND QPS.PLNT_CD = QPAP.PLNT_CD

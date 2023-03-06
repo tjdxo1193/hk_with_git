@@ -1,5 +1,9 @@
+import dayjs from 'dayjs';
 import api from '@/api';
 import { ColumnBuilder, FormBuilder } from '@/util/builder';
+
+const todayDate = dayjs().format('YYYY-MM-DD');
+const weekAgoDate = dayjs().add(-7, 'd').format('YYYY-MM-DD');
 
 const list = {
   static: {
@@ -17,21 +21,36 @@ const list = {
   },
   forms: () =>
     FormBuilder.builder()
+      .Select('ansTyp', '시험구분', {
+        async: () =>
+          api.combo.systemCommon.getAnsTypCombo().then((res) => {
+            res.data = res.data.filter(
+              ({ value }) =>
+                value !== 'S0230001' &&
+                value !== 'S0230002' &&
+                value !== 'S0230003' &&
+                value !== 'S0230004',
+            );
+            return res;
+          }),
+      })
       .Select('pitmTyp', '자재구분', { async: () => api.combo.systemCommon.getPitmDivCombo() })
       .Input('pitmCd', '자재번호')
       .Input('pitmNm', '자재내역')
-      .Input('ansNo', '시험번호')
-      .Input('ispReqNo', '검사요청번호')
-      .Input('phsOrderNo', '구매오더번호')
       .Input('lotNo', '제조번호')
       .Input('batchNo', '배치번호')
+      .DatepickerTwinWithSwitch('searchEtrDt', '입고일자', {
+        value: [weekAgoDate, todayDate],
+        disabled : false,
+      })
+      .spanCol(2)
       .build(),
   columns: () =>
     ColumnBuilder.builder()
       //공통
       .col('group_cmmn', '공통정보', {
         children: ColumnBuilder.builder()
-          .col('plntCd', '플랜트코드')
+          .col('plntCd', '플랜트')
           .col('ansTypNm', '시험유형')
           .col('pitmTypNm', '자재구분')
           .col('pitmCd', '자재번호')
@@ -43,11 +62,12 @@ const list = {
           .col('lotNo', '제조번호')
           .col('batchNo', '배치번호')
           .col('makDt', '제조일자')
-          .col('addCol1', '입고유형')
+          .col('addCol1Nm', '입고유형')
           .col('etrQty', '입고수량')
           .col('inpUnit', '입력단위')
           .col('etrDt', '입고일자')
           .col('addCol2', '입고취소여부')
+          .col('addCol3', '전표생성일자')
           .col('phsOrderTyp', '구매오더유형')
           .col('phsOrderNo', '구매오더번호')
           .col('phsOrderItm', '구매오더항목')
@@ -120,11 +140,11 @@ const list = {
       .build(),
 };
 
-const requestInfo = {
+const itemInfo = {
   static: {
-    title: '의뢰정보',
+    title: '자재정보',
     countPerRow: 4,
-    id: 'requestInfo',
+    id: 'itemInfo',
   },
   forms: () =>
     FormBuilder.builder()
@@ -132,7 +152,7 @@ const requestInfo = {
       .Input('ispReqDt', '검사요청일자', { readonly: true })
       .Input('lotNo', '제조번호', { readonly: true })
       .Input('makDt', '제조일자', { readonly: true })
-      .Input('addInput1', '입고유형', { readonly: true })
+      .Input('addCol1Nm', '입고유형', { readonly: true })
       .multiple(
         'input',
         '입고수량',
@@ -146,7 +166,7 @@ const requestInfo = {
       .Input('strgLmt', '보관기한', { readonly: true })
       .Input('phsOrderNo', '구매오더번호', { readonly: true })
       .Input('splCd', '공급사코드', { readonly: true })
-      .Textarea('pitmInfo', '자재정보', { readonly: true, rows: 8 })
+      .Textarea('detailInfo', '상세정보', { readonly: true, rows: 8 })
       .spanRow(5)
       .spanCol(2)
       .Input('splNm', '공급사명', { readonly: true })
@@ -172,11 +192,11 @@ const requestInfo = {
       .build(),
 };
 
-const testInfo = {
+const requestInfo = {
   static: {
-    title: '시험정보',
+    title: '의뢰정보',
     countPerRow: 4,
-    id: 'testInfo',
+    id: 'requestInfo',
     buttons: [
       { name: 'save', label: '수정', disabled: true },
       { name: 'requestRegist', label: '의뢰등록', disabled: true },
@@ -228,6 +248,6 @@ const testInfo = {
 
 export default {
   list,
+  itemInfo,
   requestInfo,
-  testInfo,
 };

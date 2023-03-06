@@ -476,10 +476,70 @@
     </update>
 
 
+    <select id="findBOM" resultType="SAPBomVO">
+        SELECT POSNR,
+               STLAL,
+               WERKS,
+               MATNR,
+               MAKTX,
+               MTART,
+               NAME1,
+               DISPO,
+               DSNAM,
+               STKTX,
+               BMENG,
+               BMEIN,
+               VALID_FROM,
+               VALID_TO,
+               STLNR,
+               ZTEXT,
+               LKENZ,
+               POSTP,
+               PTEXT,
+               IDNRK,
+               IDNRK_MAKT,
+               POTX1,
+               MENGE,
+               MEINS,
+               FMNGE,
+               BEIKZ,
+               CRT_DS,
+               UDT_DS,
+               STLST
+        FROM MS_SAP_BOM
+    </select>
+
     <insert id="createBOM" parameterType="SAPBomVO">
         INSERT INTO MS_SAP_BOM
-        (POSNR, STLAL, WERKS, MATNR, MAKTX, MTART, NAME1, DISPO, DSNAM, STKTX, BMENG, BMEIN, VALID_FROM, VALID_TO,
-         STLNR, ZTEXT, LKENZ, STLST, POSTP, PTEXT, IDNRK, IDNRK_MAKT, POTX1, MENGE, MEINS, FMNGE, BEIKZ, CRT_DS, UDT_DS)
+        (POSNR,
+         STLAL,
+         WERKS,
+         MATNR,
+         MAKTX,
+         MTART,
+         NAME1,
+         DISPO,
+         DSNAM,
+         STKTX,
+         BMENG,
+         BMEIN,
+         VALID_FROM,
+         VALID_TO,
+         STLNR,
+         ZTEXT,
+         LKENZ,
+         STLST,
+         POSTP,
+         PTEXT,
+         IDNRK,
+         IDNRK_MAKT,
+         POTX1,
+         MENGE,
+         MEINS,
+         FMNGE,
+         BEIKZ,
+         CRT_DS,
+         UDT_DS)
         VALUES (#{posnr},
                 #{stlal},
                 #{werks},
@@ -511,10 +571,37 @@
                 SYSDATE)
     </insert>
 
-    <delete id="deleteBOM">
-        DELETE
-        FROM MS_SAP_BOM
-    </delete>
+    <update id="updateBOM" parameterType="SAPBomVO">
+        UPDATE MS_SAP_BOM
+        SET MAKTX      = #{maktx},
+            MTART      = #{mtart},
+            NAME1      = #{name1},
+            DISPO      = #{dispo},
+            DSNAM      = #{dsnam},
+            STKTX      = #{stktx},
+            BMENG      = #{bmeng},
+            BMEIN      = #{bmein},
+            VALID_FROM = #{validFrom},
+            VALID_TO   = #{validTo},
+            STLNR      = #{stlnr},
+            ZTEXT      = #{ztext},
+            LKENZ      = #{lkenz},
+            STLST      = #{stlst},
+            POSTP      = #{postp},
+            PTEXT      = #{ptext},
+            IDNRK      = #{idnrk},
+            IDNRK_MAKT = #{idnrkMakt},
+            POTX1      = #{potx1},
+            MENGE      = #{menge},
+            MEINS      = #{meins},
+            FMNGE      = #{fmnge},
+            BEIKZ      = #{beikz},
+            UDT_DS     = SYSDATE
+        WHERE POSNR = #{posnr}
+          AND STLAL = #{stlal}
+          AND WERKS = #{werks}
+          AND MATNR = #{matnr}
+    </update>
 
 
     <select id="findCharacteristicCabn" resultType="lims.api.integration.vo.SAPCharacteristicVO$Cabn">

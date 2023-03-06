@@ -8,6 +8,7 @@ import lims.api.integration.enums.rfc.RFCParamOfBusinessPartner;
 import lims.api.integration.service.RFCService;
 import lims.api.integration.vo.rfc.RFCAssetsVO;
 import lims.api.integration.vo.rfc.RFCBusinessPartnerVO;
+import lims.api.schedule.service.impl.BusinessPartnerScheduler;
 import lims.api.schedule.service.impl.ManufactureInputPerformanceScheduler;
 import lims.api.schedule.service.impl.PurchaseInputPerformanceScheduler;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,8 @@ public class RFCController {
 
     private final PurchaseInputPerformanceScheduler purchaseInputPerformanceScheduler;
     private final ManufactureInputPerformanceScheduler manufactureInputPerformanceScheduler;
+
+    private final BusinessPartnerScheduler scheduler;
 
     @Permit
     @GetMapping("scheduler/{code}")
@@ -69,5 +72,12 @@ public class RFCController {
         List<RFCBusinessPartnerVO> migration = rfcService.getBusinessPartner(migrationParam);
         log.info("migration data size: {}", migration.size());
     }
+
+    @Permit
+    @GetMapping("bpWithName")
+    public void bpWithName() {
+        scheduler.runMigration();
+    }
+
 
 }

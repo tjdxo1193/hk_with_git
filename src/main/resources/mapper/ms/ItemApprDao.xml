@@ -259,7 +259,7 @@
 
     <insert id="createQmPitmSpec" parameterType="ItemManageVO">
         <selectKey keyProperty="pitmSpecIdx" resultType="Integer" order="BEFORE">
-            SELECT NVL(MAX(PITM_SPEC_IDX) + 1, 1) FROM QM_PITM_SPEC WHERE PLNT_CD = #{plntCd}
+            SELECT SEQ_QM_PITM_SPEC.nextval FROM DUAL
         </selectKey>
         INSERT INTO QM_PITM_SPEC (PLNT_CD, PITM_SPEC_IDX, AITM_SPEC_IDX, PITM_CD, PITM_VER, USE_VER_YN, DEL_YN,
         SPEC_PROC_CD) VALUES

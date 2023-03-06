@@ -14,14 +14,11 @@ import lims.api.integration.service.MaterialAdditionAttribute;
 import lims.api.integration.service.QMSService;
 import lims.api.integration.service.TrsService;
 import lims.api.integration.vo.QMSSendVO;
-import lims.api.integration.vo.SAPBusinessPartnerVO;
 import lims.api.integration.vo.SAPMaterialVO;
-import lims.api.util.StringUtil;
 import lims.api.util.httpClient.factory.HttpEntityFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.util.*;
 import java.util.function.Function;
@@ -188,7 +185,7 @@ public class QMSServiceImpl implements QMSService {
                 .pitmDiv(attribute.get(o.getMatnr(), MaterialCharCode.PITM_DIV))
                 .typDiv(attribute.get(o.getMatnr(), MaterialCharCode.TYPE_DIV))
                 .typDtl(attribute.get(o.getMatnr(), MaterialCharCode.TYPE_DIV_DTL))
-                .chatDiv(attribute.get(o.getMatnr(), MaterialCharCode.CHAT_DIV))
+                .chatDiv(attribute.get(o.getMatnr(), MaterialCharCode.FTN_YN))
                 .ftnDiv(attribute.get(o.getMatnr(), MaterialCharCode.FUNCTION_DIV))
                 .useLmt(attribute.get(o.getMatnr(), MaterialCharCode.USE_TRM))
                 .openLmt(attribute.get(o.getMatnr(), MaterialCharCode.OPEN_LMT))
@@ -234,7 +231,7 @@ public class QMSServiceImpl implements QMSService {
     }
 
     private String makePackageUnit(String materialCode, MaterialAdditionAttribute attribute) {
-        return attribute.get(materialCode, MaterialCharCode.DISPLAY_QTY) + attribute.get(materialCode, MaterialCharCode.DISPLAY_QTY_UNIT);
+        return attribute.get(materialCode, MaterialCharCode.MKR_VOL) + attribute.get(materialCode, MaterialCharCode.MKR_VOL_UNIT);
     }
 
     private Map<String, List<QMSSendVO.Material>> groupingByMaterial(List<SAPMaterialVO.Marc> data, Predicate<SAPMaterialVO.Marc> mrpPredicate) {

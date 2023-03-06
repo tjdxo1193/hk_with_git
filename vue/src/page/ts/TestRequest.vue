@@ -7,8 +7,8 @@
   />
 
   <Card>
-    <FormWithHeader v-bind="testInfo" @form-event="formEvent" @button-click="onClickButton" />
-    <FormWithHeader v-bind="requestInfo" />
+    <FormWithHeader v-bind="requestInfo" @form-event="formEvent" @button-click="onClickButton" />
+    <FormWithHeader v-bind="itemInfo" />
   </Card>
 
   <TestModal
@@ -33,7 +33,7 @@ export default {
     this.getTestRequestList();
   },
   data() {
-    const { list, requestInfo, testInfo } = this.$copy(values);
+    const { list, itemInfo, requestInfo } = this.$copy(values);
     return {
       list: {
         ...list.static,
@@ -41,22 +41,22 @@ export default {
         columns: list.columns(),
         event: {
           cellDoubleClick: (e) => {
+            FormUtil.setData(this.itemInfo.forms, e.item);
             FormUtil.setData(this.requestInfo.forms, e.item);
-            FormUtil.setData(this.testInfo.forms, e.item);
             this.enableButtons(['init', 'save']);
             this.disableButtons(['requestRegist']);
-            FormUtil.disable(this.testInfo.forms, ['search']);
+            FormUtil.disable(this.requestInfo.forms, ['search']);
             this.setTxtinfo();
           },
         },
       },
+      itemInfo: {
+        ...itemInfo.static,
+        forms: itemInfo.forms(),
+      },
       requestInfo: {
         ...requestInfo.static,
         forms: requestInfo.forms(),
-      },
-      testInfo: {
-        ...testInfo.static,
-        forms: testInfo.forms(),
       },
       testModal: {
         show: false,
@@ -74,7 +74,7 @@ export default {
         });
     },
     requestRegist() {
-      const parameter = FormUtil.getData(this.testInfo.forms);
+      const parameter = FormUtil.getData(this.requestInfo.forms);
       this.$eSign(() => this.$axios.put('/ts/testRequest/requestRegist', parameter))
         .then(() => {
           this.$info(this.$message.info.saved);
@@ -103,7 +103,7 @@ export default {
       }
     },
     save() {
-      const parameter = FormUtil.getData(this.testInfo.forms);
+      const parameter = FormUtil.getData(this.requestInfo.forms);
       this.$eSign(() => this.$axios.put('/ts/testRequest/save', parameter))
         .then(() => {
           this.$info(this.$message.info.saved);
@@ -132,7 +132,7 @@ export default {
       }
     },
     checkTestType() {
-      const item = FormUtil.getData(this.testInfo.forms);
+      const item = FormUtil.getData(this.requestInfo.forms);
       return item.ansTyp === null || item.ansTyp === '' ? true : false;
     },
     setColmn(pitmTyp){
@@ -306,7 +306,7 @@ export default {
           }
         }
       );
-      FormUtil.setData(this.requestInfo.forms, {pitmInfo : txt.join().replaceAll(',','\n')});
+      FormUtil.setData(this.itemInfo.forms, {detailInfo : txt.join().replaceAll(',','\n')});
     },
     searchFormEvent(event) {
       if (event.type === 'keydown' && event.originEvent.key === 'Enter') {
@@ -342,15 +342,15 @@ export default {
       }
     },
     testModalReturnDataEvent(data) {
+      FormUtil.setData(this.itemInfo.forms, data);
       FormUtil.setData(this.requestInfo.forms, data);
-      FormUtil.setData(this.testInfo.forms, data);
-      FormUtil.setData(this.testInfo.forms, {ansTyp : 'S0230005'});
+      FormUtil.setData(this.requestInfo.forms, {ansTyp : 'S0230005'});
       this.hideModal('testModal');
       this.enableButtons(['init', 'requestRegist']);
     },
     init() {
+      this.itemInfo.forms = values.itemInfo.forms();
       this.requestInfo.forms = values.requestInfo.forms();
-      this.testInfo.forms = values.testInfo.forms();
       this.disableButtons(['init', 'save', 'requestRegist']);
     },
     showModal(name) {
@@ -360,10 +360,10 @@ export default {
       this.$setState(name, { show: false });
     },
     enableButtons(buttons) {
-      FormUtil.enableButtons(this.testInfo.buttons, buttons);
+      FormUtil.enableButtons(this.requestInfo.buttons, buttons);
     },
     disableButtons(buttons) {
-      FormUtil.disableButtons(this.testInfo.buttons, buttons);
+      FormUtil.disableButtons(this.requestInfo.buttons, buttons);
     },
   },
 };

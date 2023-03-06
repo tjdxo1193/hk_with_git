@@ -9,7 +9,8 @@
   <Card>
     <TabBase v-bind="tabs" @common-button-click="onClickButton">
       <template #tab-requestInfo>
-        <FormBase v-bind="requestInfo" />
+      <FormWithHeader v-bind="requestInfo"/>
+      <FormWithHeader v-bind="itemInfo" />
       </template>
 
       <template #tab-testInfo>
@@ -82,7 +83,7 @@ export default {
     this.getTestReceiptList();
   },
   data() {
-    const { list, requestInfo, itemList, tabs } = this.$copy(values);
+    const { list, requestInfo, itemInfo, itemList, tabs } = this.$copy(values);
     return {
       list: {
         ...list.static,
@@ -92,6 +93,7 @@ export default {
           cellDoubleClick: (e) => {
             this.nonconformityTestModal.reqIdx = e.item.reqIdx;
             FormUtil.setData(this.requestInfo.forms, e.item);
+            FormUtil.setData(this.itemInfo.forms, e.item);
             this.getTestAitm();
             this.enableButtons([
               'init',
@@ -111,6 +113,10 @@ export default {
       requestInfo: {
         ...requestInfo.static,
         forms: requestInfo.forms(),
+      },
+      itemInfo: {
+        ...itemInfo.static,
+        forms: itemInfo.forms(),
       },
       itemList: {
         ...itemList.static,
@@ -151,7 +157,7 @@ export default {
         .then(({ data }) => this.list.$grid.setGridData(data));
     },
     getTestAitm() {
-      const parameter = FormUtil.getData(this.requestInfo.forms);
+      const parameter = FormUtil.getData(this.itemInfo.forms);
       this.itemList.$grid
         ._useLoader(() => this.$axios.get('/ts/testReceipt/getTestAitm', parameter))
         .then(({ data }) => this.itemList.$grid.setGridData(data));
@@ -189,32 +195,32 @@ export default {
         this.requestCreate();
       }
       if (name === 'finalOrder') {
-        this.finalOrderModal.parameter = FormUtil.getData(this.requestInfo.forms);
+        this.finalOrderModal.parameter = FormUtil.getData(this.itemInfo.forms);
         return (this.finalOrderModal.show = true);
       }
       if (name === 'preventRecurrenceReport') {
-        this.preventRecurrenceReportModal.parameter = FormUtil.getData(this.requestInfo.forms);
+        this.preventRecurrenceReportModal.parameter = FormUtil.getData(this.itemInfo.forms);
         return (this.preventRecurrenceReportModal.show = true);
       }
       if (name === 'srmReport') {
-        this.srmReportModal.parameter = FormUtil.getData(this.requestInfo.forms);
+        this.srmReportModal.parameter = FormUtil.getData(this.itemInfo.forms);
         return (this.srmReportModal.show = true);
       }
       if (name === 'packagingSpec') {
-        this.packingSpecificationModal.parameter = FormUtil.getData(this.requestInfo.forms);
+        this.packingSpecificationModal.parameter = FormUtil.getData(this.itemInfo.forms);
         return (this.packingSpecificationModal.show = true);
       }
       if (name === 'nonconformityTestList') {
-        const parameter = FormUtil.getData(this.requestInfo.forms);
+        const parameter = FormUtil.getData(this.itemInfo.forms);
         this.inputPerformanceModal.reqIdx = parameter.reqIdx;
         return (this.nonconformityTestModal.show = true);
       }
       if (name === 'inputPerformance') {
-        this.inputPerformanceModal.parameter = FormUtil.getData(this.requestInfo.forms);
+        this.inputPerformanceModal.parameter = FormUtil.getData(this.itemInfo.forms);
         return (this.inputPerformanceModal.show = true);
       }
       if (name === 'specimen') {
-        const parameter = FormUtil.getData(this.requestInfo.forms);
+        const parameter = FormUtil.getData(this.itemInfo.forms);
         this.$router.push({
           name: 'specimenManage',
           params: {
@@ -226,7 +232,7 @@ export default {
         this.init();
       }
       if (name === 'processSpecimen') {
-        const parameter = FormUtil.getData(this.requestInfo.forms);
+        const parameter = FormUtil.getData(this.itemInfo.forms);
         this.$router.push({
           name: 'processSpecimenManage',
           params: {
@@ -239,7 +245,7 @@ export default {
         this.init();
       }
       if (name === 'packagingSpecimen') {
-        const parameter = FormUtil.getData(this.requestInfo.forms);
+        const parameter = FormUtil.getData(this.itemInfo.forms);
         this.$router.push({
           name: 'packagingSpecimenManage',
           params: {
@@ -276,6 +282,7 @@ export default {
     },
     init() {
       this.requestInfo.forms = values.requestInfo.forms();
+      this.itemInfo.forms = values.itemInfo.forms();
       this.itemList.$grid.clearGridData();
       this.disableButtons([
         'init',

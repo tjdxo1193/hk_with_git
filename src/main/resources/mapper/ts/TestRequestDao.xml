@@ -47,18 +47,22 @@
             , QPAR.MTR_DOC_ITM
             , QPAR.CSM_BP_CD
             , QPAR.CSM_NM
-            , QPAR.UDT_DS
-            , QPAR.REV_DS
+            , QPAR.ADD_COL1
+            , DECODE(QPAR.ADD_COL1, 'A', '시험(구매)', 'B', '시험(생산)', '시험(수동)') AS ADD_COL1_NM
+            , QPAR.ADD_COL2
+            , QPAR.ADD_COL3
             , QP.PITM_CD
             , QPI.PITM_NM
             , QPI.PITM_EN
             , QPI.PITM_TYP
             , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = QPI.PITM_TYP) AS PITM_TYP_NM
+            , QPI.PKG_MTR_SPEC
             , QPS.AITM_SPEC_IDX
-            , QP.USE_VER_YN
             , QP.PITM_VER
             , QPIS.LAB_NO
             , QPIS.BRD_ABBR
+            , QPIS.NOM_MTR
+            , QPIS.NOM_UNIT
             , QPIS.ETR_CTN_QTY
             , QPIS.RMTR_SPEC
             , QPIS.NBR
@@ -78,6 +82,8 @@
             , QPIS.PER_NO
             , QPIS.CHAG_VOL
             , QPIS.CHAG_VOL_UNIT
+            , QPIS.QDRUG_YN
+            , QPIS.RMTR_CFMUL
             , DECODE(QPIS.DIO_YN, 'Y', '대상', '대상아님') AS DIO_YN
             , DECODE(QPIS.PRB_IN_YN, 'Y', '포함됨', '포함안됨') AS PRB_IN_YN
             , DECODE(QPIS.PRB_FE_YN, 'Y', '대상', '대상아님') AS PRB_FE_YN
@@ -97,8 +103,8 @@
         LEFT JOIN SY_APR_INFO SAI ON SAI.PLNT_CD = QPAP.PLNT_CD AND SAI.APR_IDX = QPAP.ASS_APR_REQ_IDX
         WHERE QPAR.PLNT_CD = #{plntCd}
         AND QPAP.ANS_PROC_CD = #{ansProcCd}
-        <if test="ansNo != null and ansNo != ''">
-            AND TRIM(UPPER(QPAP.ANS_NO)) LIKE ('%' || TRIM(UPPER(#{ansNo})) || '%')
+        <if test="ansTyp != null and ansTyp != ''">
+            AND QPAP.ANS_TYP = #{ansTyp}
         </if>
         <if test="pitmTyp != '' and pitmTyp != null">
             AND QPI.PITM_TYP = #{pitmTyp}
@@ -109,17 +115,14 @@
         <if test="pitmCd != null and pitmCd != ''">
             AND TRIM(UPPER(QPI.PITM_CD)) LIKE ('%' || TRIM(UPPER(#{pitmCd})) || '%')
         </if>
-        <if test="ispReqNo != null and ispReqNo != ''">
-            AND TRIM(UPPER(QPAR.ISP_REQ_NO)) LIKE ('%' || TRIM(UPPER(#{ispReqNo})) || '%')
-        </if>
-        <if test="phsOrderNo != null and phsOrderNo != ''">
-            AND TRIM(UPPER(QPAR.PHS_ORDER_NO)) LIKE ('%' || TRIM(UPPER(#{phsOrderNo})) || '%')
-        </if>
         <if test="lotNo != null and lotNo != ''">
             AND TRIM(UPPER(QPAR.LOT_NO)) LIKE ('%' || TRIM(UPPER(#{lotNo})) || '%')
         </if>
         <if test="batchNo != null and batchNo != ''">
             AND TRIM(UPPER(QPAR.BATCH_NO)) LIKE ('%' || TRIM(UPPER(#{batchNo})) || '%')
+        </if>
+        <if test="searchEtrDt != null and searchEtrDt != ''">
+            AND QPAR.ETR_DT BETWEEN #{searchEtrDt[0]} AND #{searchEtrDt[1]}
         </if>
         ORDER BY QPAP.ANS_IDX, QPAR.REQ_IDX
     </select>
@@ -129,82 +132,22 @@
             , QPAR.REQ_IDX
             , QPAR.ISP_REQ_NO
             , QPAR.ISP_REQ_DT
-            , QPAR.MTR_CD
-            , QPAR.MTR_NM
-            , QPAR.BATCH_NO
             , QPAR.ETR_QTY
             , QPAR.INP_UNIT
-            , QPAR.SAVE_PLA
-            , QPAR.ETR_DT
-            , QPAR.PHS_ORDER_TYP
+            , QPAR.BATCH_NO
+            , QPAR.LOT_NO
             , QPAR.PHS_ORDER_NO
-            , QPAR.PHS_ORDER_ITM
-            , QPAR.ITM_CTG
-            , QPAR.PHS_UNIT_PRE
-            , QPAR.AMT_UNIT
-            , QPAR.CURR_CD
-            , QPAR.AMT_LOCCURR
-            , QPAR.PHS_ORDER_QTY
-            , QPAR.PHS_ORDER_UNIT
+            , QPAR.PDT_ORDER_NO
             , QPAR.SPL_CD
             , QPAR.SPL_NM
             , QPAR.PHS_CRG_NM
-            , QPAR.DLV_YN
-            , QPAR.VDR_CTRT_DT
-            , QPAR.VDR_RSV_TM
-            , QPAR.VDR_RPT_RCP_CRST
-            , QPAR.LOT_NO
-            , QPAR.REP_BOM_NO
-            , QPAR.SPL_LOT_NO
             , QPAR.MAK_DT
-            , QPAR.STRG_LMT
-            , QPAR.USE_LMT
-            , QPAR.PDT_ORDER_TYP
-            , QPAR.PDT_ORDER_NO
-            , QPAR.ITN_PRS_COMP_CD
-            , QPAR.ITN_PRS_COMP_NM
-            , QPAR.MAK_EQP
             , QPAR.WRK_NM
-            , QPAR.MTR_DOC_NO
-            , QPAR.MTR_DOC_YR
-            , QPAR.MTR_DOC_ITM
-            , QPAR.CSM_BP_CD
-            , QPAR.CSM_NM
-            , QPAR.UDT_DS
-            , QPAR.REV_DS
-            , QP.PITM_CD
-            , QPI.PKG_MTR_SPEC
-            , QPI.PITM_NM
-            , QPI.PITM_EN
-            , QPI.PITM_TYP
-            , (SELECT DTL_NM FROM SY_CD_DTL SCD WHERE SCD.DTL_CD = QPI.PITM_TYP) AS PITM_TYP_NM
-            , QP.USE_VER_YN
-            , QP.PITM_VER
-            , QPIS.LAB_NO
-            , QPIS.BRD_ABBR
-            , QPIS.NOM_MTR
-            , QPIS.ETR_CTN_QTY
-            , QPIS.RMTR_SPEC
-            , QPIS.FTN_YN
-            , QPIS.PCS01
-            , QPIS.PCS02
-            , QPIS.PCS03
-            , QPIS.PCS04
-            , QPIS.USE_TRM
-            , QPIS.OTC_PRD
-            , QPIS.DMS_EPT_YN
-            , QPIS.PEAR_DIV
-            , QPIS.MKR_VOL
-            , QPIS.MKR_VOL_UNIT
-            , QPIS.ETN_ANS_REQ
-            , QPIS.CTRPT_NO
-            , QPIS.PER_NO
-            , QPIS.CHAG_VOL
-            , QPIS.CHAG_VOL_UNIT
-            , DECODE(QPIS.DIO_YN, 'Y', '대상', '대상아님') AS DIO_YN
-            , DECODE(QPIS.PRB_IN_YN, 'Y', '포함됨', '포함안됨') AS PRB_IN_YN
-            , DECODE(QPIS.PRB_FE_YN, 'Y', '대상', '대상아님') AS PRB_FE_YN
-            , DECODE(QPIS.PNX_FE_YN, 'Y', '대상', '대상아님') AS PNX_FE_YN
+            , QPAR.MAK_EQP
+            , QPAR.USE_LMT
+            , QPAR.STRG_LMT
+            , QPAR.ADD_COL1
+            , DECODE(QPAR.ADD_COL1, 'A', '시험(구매)', 'B', '시험(생산)', '시험(수동)') AS ADD_COL1_NM
             , QPAP.ANS_IDX
             , QPAP.PITM_SPEC_IDX
             , QPAP.ANS_NO

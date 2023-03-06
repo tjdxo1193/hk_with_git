@@ -51,7 +51,7 @@ public class SAPServiceImpl implements SAPService {
     }
 
     @Override
-    public synchronized void saveBOM(Integer infoIdx, List<SAPBomVO> param, String parentGuid) {
+    public void saveBOM(Integer infoIdx, List<SAPBomVO> param, String parentGuid) {
         int count = 0;
         Integer degree = sapDao.nextDegreeInBOM();
         RevInterface revInterface = RevInterface.SAP_BOM;
@@ -59,7 +59,6 @@ public class SAPServiceImpl implements SAPService {
         if (CollectionUtils.isNotEmpty(param)) {
             for (SAPBomVO vo : param) {
                 vo.setDegree(degree);
-                vo.setIdx(sapDao.nextIdxInBOM());
                 vo.setParentGuid(parentGuid);
                 vo.setIfInfoIdx(infoIdx);
                 count += sapDao.createBOM(vo);
@@ -77,7 +76,7 @@ public class SAPServiceImpl implements SAPService {
     }
 
     @Override
-    public synchronized void saveMaterial(Integer infoIdx, SAPMaterialVO param) {
+    public void saveMaterial(Integer infoIdx, SAPMaterialVO param) {
         int count = 0;
         Integer degree = sapDao.nextDegreeInMaterial();
         RevInterface revInterface = RevInterface.SAP_MATERIAL;
@@ -85,7 +84,6 @@ public class SAPServiceImpl implements SAPService {
         if (CollectionUtils.isNotEmpty(param.getMara())) {
             for (SAPMaterialVO.Mara mara : param.getMara()) {
                 mara.setDegree(degree);
-                mara.setIdx(sapDao.nextIdxInMaterialMara());
                 mara.setIfInfoIdx(infoIdx);
                 count += sapDao.createMaterialMara(mara);
             }
@@ -94,7 +92,6 @@ public class SAPServiceImpl implements SAPService {
         if (CollectionUtils.isNotEmpty(param.getMarc())) {
             for (SAPMaterialVO.Marc marc : param.getMarc()) {
                 marc.setDegree(degree);
-                marc.setIdx(sapDao.nextIdxInMaterialMarc());
                 marc.setIfInfoIdx(infoIdx);
                 count += sapDao.createMaterialMarc(marc);
             }
@@ -103,7 +100,6 @@ public class SAPServiceImpl implements SAPService {
         if (CollectionUtils.isNotEmpty(param.getMvke())) {
             for (SAPMaterialVO.Mvke mvke : param.getMvke()) {
                 mvke.setDegree(degree);
-                mvke.setIdx(sapDao.nextIdxInMaterialMvke());
                 mvke.setIfInfoIdx(infoIdx);
                 count += sapDao.createMaterialMvke(mvke);
             }
@@ -112,7 +108,6 @@ public class SAPServiceImpl implements SAPService {
         if (CollectionUtils.isNotEmpty(param.getZmdv())) {
             for (SAPMaterialVO.Zmdv zmdv : param.getZmdv()) {
                 zmdv.setDegree(degree);
-                zmdv.setIdx(sapDao.nextIdxInMaterialZmdv());
                 zmdv.setIfInfoIdx(infoIdx);
                 count += sapDao.createMaterialZmdv(zmdv);
             }
@@ -121,7 +116,6 @@ public class SAPServiceImpl implements SAPService {
         if (CollectionUtils.isNotEmpty(param.getMakt())) {
             for (SAPMaterialVO.Makt makt : param.getMakt()) {
                 makt.setDegree(degree);
-                makt.setIdx(sapDao.nextIdxInMaterialMakt());
                 makt.setIfInfoIdx(infoIdx);
                 count += sapDao.createMaterialMakt(makt);
             }
@@ -131,9 +125,9 @@ public class SAPServiceImpl implements SAPService {
             throw new IntegrationNoSavedException();
         }
 
-        new Thread(() -> qmsService
-                .publishMaterial(param))
-                .start();
+//        new Thread(() -> qmsService
+//                .publishMaterial(param))
+//                .start();
         new Thread(() -> postProcessorMap
                 .get(revInterface)
                 .execute(new RevStateful(degree, infoIdx)))
