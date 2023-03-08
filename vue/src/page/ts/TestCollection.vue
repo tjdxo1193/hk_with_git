@@ -86,7 +86,7 @@ export default {
       },
       fileInfo: {
         ansIdx: '',
-        fileIdx: ''
+        fileIdx: '',
       },
     };
   },
@@ -127,9 +127,8 @@ export default {
       parameter = {
         ...parameter,
         addedFiles,
-        removedFileIds
-      }
-      console.log(parameter,'parameter');
+        removedFileIds,
+      };
       this.$confirm(this.$message.confirm.saveData).then(() => {
         this.$axios
           .postByForm('/ts/testCollection/saveFile', parameter)

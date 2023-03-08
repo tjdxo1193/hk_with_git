@@ -65,6 +65,12 @@
     @close="() => (sapPrdhaSearchModal.show = false)"
     @modalReturnDataEvent="sapPrdhaModalReturnDataEvent"
   />
+
+  <PackingSpecificationModal
+    :show="packingSpecificationModal.show"
+    :parameter="packingSpecificationModal.parameter"
+    @close="hidePackagingSpecModal"
+  ></PackingSpecificationModal>
 </template>
 
 <script>
@@ -74,12 +80,13 @@ import {
   ItemsCopyByTestMethodModal,
   RequestReviewerModal,
   SapPrdhaSearchModal,
+  PackingSpecificationModal,
 } from '@/page/modal';
 import { FormUtil, GridUtil, StringUtil } from '@/util';
 
 import values from './values/specManage';
 
-const {processCode, pitemtype} = values
+const { processCode, pitemtype } = values;
 
 export default {
   name: 'SpecManage',
@@ -92,6 +99,7 @@ export default {
     ItemsCopyByTestMethodModal,
     ElnSpecCopyForTestMethodModal,
     SapPrdhaSearchModal,
+    PackingSpecificationModal,
   },
   data() {
     const {
@@ -176,6 +184,10 @@ export default {
       },
       sapPrdhaSearchModal: {
         show: false,
+      },
+      packingSpecificationModal: {
+        show: false,
+        parameter: {},
       },
     };
   },
@@ -286,6 +298,9 @@ export default {
         this.showElnSpecCopyForTestMethodModal();
         return;
       }
+      if (name == 'packagingSpec') {
+        this.showPackagingSpecModal();
+      }
     },
 
     initAll() {
@@ -312,14 +327,14 @@ export default {
 
     // loadToVersionFormAndTestListGrid : hiddenform인 version폼에 클릭된 값 세팅 하고 시험항목리스트를 불러온다
     loadToVersionFormAndTestListGrid(item) {
+      this.activePackagingSpecButton();
       this.setVersionInfoToVersionGridValueForm(item);
       this.setCommonInfoForm(item);
       const { aitmSpecIdx, pitmCd, pitmVer } = FormUtil.getData(this.valueWithVersionGrid.forms);
 
-
       // 첫 규격이고, 규격 index 없을때 (아예초기상태)
       if (this.isSelectedItemHasNotVersion()) {
-        if(this.isImpossibleToRevisionBecausePackigingAndfinishedProduct()){
+        if (this.isImpossibleToRevisionBecausePackigingAndfinishedProduct()) {
           this.activateRequestReviewButtonWhenTemporarySave();
           return;
         }
@@ -329,7 +344,10 @@ export default {
         // 반제품 일 경우, Eln규격 버튼 활성화
         if (this.isSemiManufactures()) {
           this.fetchPItemSpecSemiAItemList({ pitmCd, pitmVer });
-          this.elnSpecCopyForTestMethodModal.labNo = FormUtil.getValue(this.commonInfoForm.forms, 'labNo');
+          this.elnSpecCopyForTestMethodModal.labNo = FormUtil.getValue(
+            this.commonInfoForm.forms,
+            'labNo',
+          );
           this.activateElnSpecButton();
         }
 
@@ -363,6 +381,7 @@ export default {
         'addRow',
         'copyRow',
         'removeRow',
+        'packagingSpec',
       ]);
     },
 
@@ -381,16 +400,17 @@ export default {
       return this.testItemList.$grid.getRowCount() == 0;
     },
 
-    equalPreviousVersion(){
-      const {aitmSpecIdx} = FormUtil.getData(this.valueWithVersionGrid.forms);
+    equalPreviousVersion() {
+      const { aitmSpecIdx } = FormUtil.getData(this.valueWithVersionGrid.forms);
       const aitmIdxArray = this.versionList.$grid.getColumnValues('aitmSpecIdx', true);
-      if(aitmSpecIdx != aitmIdxArray.shift()){
+      if (aitmSpecIdx != aitmIdxArray.shift()) {
         return false;
       }
       return aitmIdxArray.includes(aitmSpecIdx);
     },
 
     changeButtonWhenSelectedVersion() {
+      this.activePackagingSpecButton();
       const buttons = this.testItemList.buttons;
 
       if (this.isImpossibleToRevisionBecausePackigingAndfinishedProduct()) {
@@ -473,7 +493,10 @@ export default {
     },
 
     changeCommonInfoFormButtons() {
-      if (this.isSelectedTemporaryVersion() && this.isImpossibleToRevisionBecausePackigingAndfinishedProduct()) {
+      if (
+        this.isSelectedTemporaryVersion() &&
+        this.isImpossibleToRevisionBecausePackigingAndfinishedProduct()
+      ) {
         this.enableCommonInfoForm();
       } else {
         this.disableCommonInfoForm();
@@ -482,8 +505,8 @@ export default {
 
     onClickCommonInfoFormButtons({ originEvent }) {
       if (originEvent === 'pkgaCdSearch') {
-        const {pitmSpecIdx, pitmCd, pitmVer} = FormUtil.getData(this.valueWithVersionGrid.forms);
-        this.sapPrdhaSearchModal.versionInfo = {pitmSpecIdx, pitmCd, pitmVer}
+        const { pitmSpecIdx, pitmCd, pitmVer } = FormUtil.getData(this.valueWithVersionGrid.forms);
+        this.sapPrdhaSearchModal.versionInfo = { pitmSpecIdx, pitmCd, pitmVer };
         this.sapPrdhaSearchModal.show = true;
       }
     },
@@ -495,8 +518,8 @@ export default {
 
       FormUtil.setData(forms, { aitmSpecIdx, pkgaCd, sapPrdha, pkgaTypNm });
 
-      await this.fetchVersionList({pitmCd, pitmVer});
-      this.fetchPItemSpecAItemList({aitmSpecIdx});
+      await this.fetchVersionList({ pitmCd, pitmVer });
+      this.fetchPItemSpecAItemList({ aitmSpecIdx });
     },
 
     changeButtonWhenSelectedTestItem() {
@@ -515,9 +538,7 @@ export default {
 
     activateRequestReviewButtonWhenTemporarySave() {
       // 검토요청 버튼은 임시저장이나 검토반려 일때만 활성화
-      if (
-        this.isSelectedTemporaryVersion() || this.isSelectedReviewRejectVersion()
-      ) {
+      if (this.isSelectedTemporaryVersion() || this.isSelectedReviewRejectVersion()) {
         FormUtil.enableButtons(this.testItemList.buttons, ['requestReview']);
       }
 
@@ -526,6 +547,10 @@ export default {
 
     activateElnSpecButton() {
       FormUtil.enableButtons(this.testItemList.buttons, ['elnSpec']);
+    },
+
+    activePackagingSpecButton() {
+      FormUtil.enableButtons(this.testItemList.buttons, ['packagingSpec']);
     },
 
     setPitmInfoToPitmGridValueForm({ pitmCd, pitmVer, pitmTyp }) {
@@ -583,6 +608,16 @@ export default {
 
     hideElnSpecCopyForTestMethodModal() {
       this.$setState('elnSpecCopyForTestMethodModal', { show: false });
+    },
+
+    showPackagingSpecModal() {
+      this.packingSpecificationModal.parameter = FormUtil.getData(this.commonInfoForm.forms);
+      return (this.packingSpecificationModal.show = true);
+    },
+
+    hidePackagingSpecModal() {
+      this.packingSpecificationModal.parameter = FormUtil.getData(this.commonInfoForm.forms);
+      return (this.packingSpecificationModal.show = false);
     },
 
     isSelectedTemporaryVersion() {
@@ -716,7 +751,7 @@ export default {
         });
     },
 
-    async updateNewVersion(){
+    async updateNewVersion() {
       if (this.isNotExistJdgType()) {
         return;
       }
@@ -726,7 +761,9 @@ export default {
       }
 
       const { $grid } = this.testItemList;
-      const { pitmSpecIdx, aitmSpecIdx, aitmSpecVer } = FormUtil.getData(this.valueWithVersionGrid.forms);
+      const { pitmSpecIdx, aitmSpecIdx, aitmSpecVer } = FormUtil.getData(
+        this.valueWithVersionGrid.forms,
+      );
       const { pitmCd, pitmVer } = FormUtil.getData(this.valueWithPitmGrid.forms);
       const parameter = {
         aitmSpecIdx,
@@ -993,6 +1030,7 @@ export default {
           vriaKn: row.vriaKn,
           vriaNo: row.vriaNo,
           aitmOrd: $grid.getRowCount() + idx + 1,
+          rptPrtYn: 'Y',
         })),
       );
     },

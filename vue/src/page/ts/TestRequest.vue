@@ -123,7 +123,6 @@ export default {
           this.list.$grid.setColumnPropByDataField('group_detail', { headerText: data[0].label });
         }
         let showColumns = this.setColmn(item.pitmTyp);
-        console.log(showColumns,'showColumns');
         this.list.$grid.hideColumnGroup('group_detail');
         this.list.$grid.showColumnByDataField(showColumns);
       } else {
@@ -135,7 +134,7 @@ export default {
       const item = FormUtil.getData(this.requestInfo.forms);
       return item.ansTyp === null || item.ansTyp === '' ? true : false;
     },
-    setColmn(pitmTyp){
+    setColmn(pitmTyp) {
       let columns;
       if (pitmTyp === 'S0180100' || pitmTyp === 'S0180101') {
         //완제품 - 세트, 단품
@@ -292,21 +291,19 @@ export default {
       }
       return columns;
     },
-    setTxtinfo(){
+    setTxtinfo() {
       let item = this.list.$grid.getSelectedItems();
       item = item[0].item;
       const columns = this.setColmn(item.pitmTyp);
-      let txt = columns.map(
-        (row) => {
-          const header = this.list.$grid.getColumnItemByDataField(row).headerText;
-          if(item[row] !== null){
-            return header+" : "+item[row]
-          }else{
-            return header+" :"
-          }
+      let txt = columns.map((row) => {
+        const header = this.list.$grid.getColumnItemByDataField(row).headerText;
+        if (item[row] !== null) {
+          return header + ' : ' + item[row];
+        } else {
+          return header + ' :';
         }
-      );
-      FormUtil.setData(this.itemInfo.forms, {detailInfo : txt.join().replaceAll(',','\n')});
+      });
+      FormUtil.setData(this.itemInfo.forms, { detailInfo: txt.join().replaceAll(',', '\n') });
     },
     searchFormEvent(event) {
       if (event.type === 'keydown' && event.originEvent.key === 'Enter') {
@@ -344,7 +341,7 @@ export default {
     testModalReturnDataEvent(data) {
       FormUtil.setData(this.itemInfo.forms, data);
       FormUtil.setData(this.requestInfo.forms, data);
-      FormUtil.setData(this.requestInfo.forms, {ansTyp : 'S0230005'});
+      FormUtil.setData(this.requestInfo.forms, { ansTyp: 'S0230005' });
       this.hideModal('testModal');
       this.enableButtons(['init', 'requestRegist']);
     },

@@ -86,4 +86,6 @@ public class InstManageVO {
     private String chkCylNm;
     private String quaCylNm;
     private String calCylNm;
+    private String anlkl;
+    private String bzdat;
 }

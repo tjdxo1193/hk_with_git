@@ -298,7 +298,7 @@
 
 	<insert id="insertVersion" parameterType="WrapTestManageVO">
 		<selectKey keyProperty="searchedAitmSpecIdx" resultType="int" order="BEFORE">
-			SELECT NVL(MAX(AITM_SPEC_IDX), 0) + 1 FROM QM_PITM_AITM_SPEC
+			SELECT NVL(MAX(AITM_SPEC_IDX), 0) + 1 FROM QM_PITM_AITM_SPEC WHERE PLNT_CD = #{plntCd}
 		</selectKey>
 		INSERT INTO
 			QM_PITM_AITM_SPEC(
@@ -626,8 +626,8 @@
 	<update id="updateSpecUseVerYnN" parameterType="SpecManageVO">
 		UPDATE QM_PITM_SPEC
 		SET USE_VER_YN = 'N'
-		WHERE PITM_CD = #{pitmCd}
-
+		WHERE PLNT_CD = #{plntCd}
+		AND PITM_CD = #{pitmCd}
 	</update>
 
 	<select id="getSapList" parameterType="WrapTestManageVO" resultType="WrapTestManageVO">

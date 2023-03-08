@@ -32,8 +32,6 @@ auth:
     secret: R0iNN6wSxunNsnYS4fYiHKYz745AyTmwI2riqhEsCwk=
 
 logging:
-  level:
-    lims.api: info
   logback:
     rollingpolicy:
       max-history: 60

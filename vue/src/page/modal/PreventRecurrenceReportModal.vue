@@ -14,7 +14,7 @@
         <Dropzone @created="$setState('detail.dropzone', $event)" :option="{ readonly }" />
       </template>
     </FormBase>
-    
+
     <template #footer>
       <ActionBar :buttons="saveButton.buttons" @button-click="onClickButton"></ActionBar>
     </template>
@@ -67,7 +67,7 @@ export default {
     show() {
       if (this.$props.show) {
         const item = this.$props.parameter;
-        if(!this.$props.readonly){
+        if (!this.$props.readonly) {
           FormUtil.enableButtons(this.saveButton.buttons, ['save']);
         }
         FormUtil.setData(this.searchForm.forms, item);
@@ -95,8 +95,8 @@ export default {
       parameter = {
         ...parameter,
         addedFiles,
-        removedFileIds
-      }
+        removedFileIds,
+      };
       this.$confirm(this.$message.confirm.saveData).then(() => {
         this.$axios
           .postByForm('/ts/testIFModal/savePrvRcrReport', parameter)

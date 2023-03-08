@@ -84,7 +84,9 @@ public class WrapTestManageServiceImpl implements WrapTestManageService {
 			});
 			
 			// _PKGA
+			final String PKGA_TYP_NM = baseData.getPkgaTypNm();
 			baseData = testItemList.get(0);
+			baseData.setPkgaTypNm(PKGA_TYP_NM);
 			baseData.setAitmSpecIdx(searchedAitmSpecIdx);
 			baseData.setPkgaDiv(pkgaDiv);
 			baseData.setSapPrdha(sapPrdha);

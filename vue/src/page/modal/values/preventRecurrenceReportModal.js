@@ -38,7 +38,7 @@ const detail = {
 };
 
 const saveButton = {
-  buttons: [{name: 'save', label: '저장', disabled: true}]
+  buttons: [{ name: 'save', label: '저장', disabled: true }],
 };
 
 export default {

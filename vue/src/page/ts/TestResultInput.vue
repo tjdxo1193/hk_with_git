@@ -48,6 +48,12 @@
     :show="finalOrderModal.show"
     @close="hideModal('finalOrderModal')"
   ></FinalOrderModal>
+
+  <InputPerformanceModal
+    :show="inputPerformanceModal.show"
+    :parameter="inputPerformanceModal.parameter"
+    @close="hideModal('inputPerformanceModal')"
+  ></InputPerformanceModal>
 </template>
 
 <script>
@@ -57,6 +63,7 @@ import {
   RequestReviewerModal,
   ResultHistoryModal,
   FinalOrderModal,
+  InputPerformanceModal,
 } from '@/page/modal';
 import { FormUtil, StringUtil } from '@/util';
 
@@ -70,6 +77,7 @@ export default {
     RequestReviewerModal,
     ResultHistoryModal,
     FinalOrderModal,
+    InputPerformanceModal,
   },
   mounted() {
     this.getResultInputList();
@@ -115,10 +123,14 @@ export default {
         show: false,
         parameter: {},
       },
+      inputPerformanceModal: {
+        show: false,
+        parameter: {},
+      },
       fileInfo: {
         ansIdx: '',
         fileIdx: '',
-        rstSeq: ''
+        rstSeq: '',
       },
     };
   },
@@ -157,6 +169,9 @@ export default {
       if (name === 'save') {
         return this.beforeCheckSave();
       }
+      if (name === 'inputCfmRstVal') {
+        return this.inputCfmRstVal();
+      }
       if (name === 'init') {
         return this.init();
       }
@@ -173,6 +188,9 @@ export default {
       if (name === 'finalOrder') {
         return this.showModal('finalOrderModal');
       }
+      if (name === 'inputPerformance') {
+        return this.showModal('inputPerformanceModal');
+      }
       if (name === 'requestReview') {
         return this.beforeCheckRequestReview();
       }
@@ -187,6 +205,22 @@ export default {
     isSelectedRow() {
       const selectedItem = this.resultInputInfo.$grid.getSelectedItems();
       return selectedItem.length > 0 ? true : false;
+    },
+    inputCfmRstVal() {
+      const gridData = this.resultInputInfo.$grid.getGridData();
+      gridData.map((row) => {
+        if (row.jdgTyp === 'S0070001') {
+          row.rstVal = row.slvJdgCfm;
+          const updateData = {
+            _$uid: row._$uid,
+            rstVal: row.slvJdgCfm,
+            markVal: '',
+            rstJdg: '',
+          };
+          this.resultInputInfo.$grid.updateRowsById(updateData);
+          this.judgementTypeCheck(row);
+        }
+      });
     },
     init() {
       this.resultInputInfo.forms = values.resultInputInfo.forms();
@@ -401,7 +435,7 @@ export default {
           });
       });
     },
-    judgementTypeCheck({ item }) {
+    judgementTypeCheck(item) {
       /**
        * ? 결과값이 입력된 row에 대해서만 판정
        */
@@ -581,7 +615,7 @@ export default {
           rstJdg: '',
         };
         this.resultInputInfo.$grid.updateRowsById(updateData);
-        this.judgementTypeCheck(event);
+        this.judgementTypeCheck(event.item);
       }
       this.inputSytJdg();
     },
@@ -623,6 +657,11 @@ export default {
         this.finalOrderModal.parameter = parameter;
         return (this.finalOrderModal.show = true);
       }
+      if (name === 'inputPerformanceModal') {
+        const parameter = FormUtil.getData(this.resultInputInfo.forms);
+        this.inputPerformanceModal.parameter = parameter;
+        return (this.inputPerformanceModal.show = true);
+      }
     },
     hideModal(name) {
       if (name === 'fileAttacherModal') {
@@ -640,6 +679,9 @@ export default {
       if (name === 'finalOrderModal') {
         return (this.finalOrderModal.show = false);
       }
+      if (name === 'inputPerformanceModal') {
+        return (this.inputPerformanceModal.show = false);
+      }
     },
     afterModalEvent(ansIdx) {
       this.getResultDetail(ansIdx);
@@ -654,8 +696,8 @@ export default {
       parameter = {
         ...parameter,
         addedFiles,
-        removedFileIds
-      }
+        removedFileIds,
+      };
       this.$confirm(this.$message.confirm.saveData).then(() => {
         this.$axios
           .postByForm('/ts/testResultInput/savedFile', parameter)

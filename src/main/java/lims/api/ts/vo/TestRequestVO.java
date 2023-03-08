@@ -113,16 +113,16 @@ public class TestRequestVO implements UpdateDetect {
     private String ansProcCd;
     private String ansProcNm;
     private List<String> TestProcessList;
-    private String reqDt;
+    private String reqDs;
     private String reqRmk;
     private String reqUid;
     private String reqDptCd;
     private List<String> searchReqDt; //의뢰일자
-    private String rcpDt; //접수일자
+    private String rcpDs; //접수일자
     private String rcpUnm; //접수자
     private String assDt;
     private String assUnm;
-    private String revwDt;
+    private String revwDs;
     private String revwUnm;
     private String rstAprDs;
     private String rstAprUnm;

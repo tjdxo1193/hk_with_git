@@ -118,9 +118,9 @@ const resultInputInfo = {
   static: {
     title: '항목조회',
     $grid: null,
-    props: { 
+    props: {
       showRowCheckColumn: true,
-      editable: false
+      editable: false,
     },
     buttons: [
       { name: 'oos', label: '기준일탈', disabled: true },

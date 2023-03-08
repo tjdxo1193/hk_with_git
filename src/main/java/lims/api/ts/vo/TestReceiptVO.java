@@ -132,12 +132,11 @@ public class TestReceiptVO implements UpdateDetect {
     private String slvJdgNonCfmNm; //기준 부적합 판정
     private String rstUnitNm; //결과 단위 코드
     private String ansDptNm; //시험부서명
-
     private String mkrQty; //표시량
     private String aitmRmk; //시험항목 비고
 
     /*시험정보*/
-    private String reqDt;
+    private String reqDs;
     private String reqRmk;
     private String reqUnm;
     private String reqDpt;

@@ -329,13 +329,11 @@
 
 
     <select id="nextDegreeInMaterial" resultType="Integer">
-        SELECT NVL(MAX(DEGREE), 0) + 1
-        FROM IF_TRS_QMS_MATERIAL
+        SELECT SEQ_IF_TRS_QMS_MATERIAL_DEGREE.nextval FROM DUAL
     </select>
 
     <select id="nextIdxInMaterial" resultType="Integer">
-        SELECT NVL(MAX(IDX), 0) + 1
-        FROM IF_TRS_QMS_MATERIAL
+        SELECT SEQ_IF_TRS_QMS_MATERIAL.nextval FROM DUAL
     </select>
 
     <insert id="createMaterial" parameterType="lims.api.integration.vo.QMSSendVO$MaterialAll">

@@ -48,7 +48,7 @@ export default {
           cellDoubleClick: (e) => {
             this.getResultDetail(e.item.ansIdx);
             this.enableButtons(['init']);
-            if(e.item.hldYn === 'Y'){
+            if (e.item.hldYn === 'Y') {
               this.enableButtons(['oos']);
             }
           },
@@ -65,7 +65,7 @@ export default {
       fileInfo: {
         ansIdx: '',
         fileIdx: '',
-        rstSeq: ''
+        rstSeq: '',
       },
     };
   },
@@ -205,7 +205,7 @@ export default {
     oos() {
       const checkedRows = this.resultInputInfo.$grid.getCheckedRowItems();
       const parameter = checkedRows.map(({ item }) => item);
-      if(parameter[0].ansProcCd === "S0130600" || parameter[0].ansProcCd === "S0130610"){
+      if (parameter[0].ansProcCd === 'S0130600' || parameter[0].ansProcCd === 'S0130610') {
         this.$confirm(this.$message.confirm.oos).then(() => {
           // this.$axios.put('/ts/testResultReview/savedFile', parameter)
           // .then(() => {
@@ -217,7 +217,7 @@ export default {
           //   this.$error(this.$message.error.updateData);
           // });
         });
-      }else{
+      } else {
         return this.$warn(this.$message.warn.notoosItem);
       }
     },
@@ -254,7 +254,7 @@ export default {
       parameter = {
         ...parameter,
         addedFiles,
-        removedFileIds
+        removedFileIds,
       };
       this.$confirm(this.$message.confirm.saveData).then(() => {
         this.$axios

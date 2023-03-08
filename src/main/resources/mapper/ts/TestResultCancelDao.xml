@@ -64,6 +64,7 @@
             G.PHS_ORDER_NO,
             G.PDT_ORDER_NO,
             G.ADD_COL1,
+            G.ADD_COL2,
             B.NON_CFM_REA,
             B.PITM_SPCC,
             A.ANS_TYP

@@ -12,12 +12,12 @@ const pitemType = {
   RAW_MATERIAL: 'S0180400',
   PACKAGING_MATERIAL: 'S0180500',
   GOODS: 'S0180600',
-}
+};
 
 const processCode = {
   TEMPORARY_SAVE: 'S0080100',
   APPROVED: 'S0080400',
-}
+};
 
 const codeWithSearchGrid = {
   forms: () =>
@@ -82,10 +82,10 @@ const searchGridWithForm = {
       .col('crgDptNm', '담당부서')
       .col('pitmVer', '자재버전')
       .col('specProcCd', 'spec_진행상태', { visible: false })
-      .col('pitmSpecIdx', 'spec_자재규격IDX', {visible: false})
+      .col('pitmSpecIdx', 'spec_자재규격IDX', { visible: false })
       .col('qpSpecProcCd', 'qm_pitm_자재진행상태', { visible: false })
-      .col('useVerYn', 'qm_pitm_버전사용여부', { visible: false})
-      .col('crgDptCd', 'qm_pitm_info', {visible: false})
+      .col('useVerYn', 'qm_pitm_버전사용여부', { visible: false })
+      .col('crgDptCd', 'qm_pitm_info', { visible: false })
       .col('pitmTyp', 'qm_pitm_info_자재유형', { visible: false })
       .col('pitmEn', 'qm_pitm_info_자재영문명', { visible: false })
       .col('sapPrdha', 'qm_pitm_info_자재계층코드', { visible: false })
@@ -109,68 +109,68 @@ const itemVersionGrid = {
       .col('specProcNm', '진행상태')
       .col('udtNm', '수정자')
       .col('udtDs', '수정일시')
-      .col('crgDptNm', '담당부서', {visible: false})
+      .col('crgDptNm', '담당부서', { visible: false })
       .col('specProcCd', 'spec_진행상태', { visible: false })
-      .col('pitmSpecIdx', 'spec_자재규격IDX', {visible: false})
+      .col('pitmSpecIdx', 'spec_자재규격IDX', { visible: false })
       .col('qpSpecProcCd', 'qm_pitm_자재진행상태', { visible: false })
-      .col('useVerYn', 'qm_pitm_버전사용여부', { visible: false})
-      .col('delYn', 'qm_pitm_삭제여부', {visible: false})
-      .col('rvsDt', 'qm_pitm_계정일자', {visible: false})
-      .col('rvsReaCd', 'qm_pitm_개정사유', {visible: false})
-      .col('rvsCtt', 'qm_pitm_개정내역', {visible: false})
+      .col('useVerYn', 'qm_pitm_버전사용여부', { visible: false })
+      .col('delYn', 'qm_pitm_삭제여부', { visible: false })
+      .col('rvsDt', 'qm_pitm_계정일자', { visible: false })
+      .col('rvsReaCd', 'qm_pitm_개정사유', { visible: false })
+      .col('rvsCtt', 'qm_pitm_개정내역', { visible: false })
       .col('pitmTyp', 'qm_pitm_info_자재유형', { visible: false })
       .col('pitmTypNm', 'qm_pitm_info_자재유형', { visible: false })
       .col('pitmEn', 'qm_pitm_info_자재영문명', { visible: false })
       .col('sapPrdha', 'qm_pitm_info_자재계층코드', { visible: false })
-      .col('ansDurDay', 'qm_pitm_info', {visible: false})
-      .col('crgDptCd', 'qm_pitm_info', {visible: false})
-      .col('spcmNo', 'qm_pitm_info', {visible: false})
-      .col('micYn', 'qm_pitm_info', {visible: false})
-      .col('clltMtd', 'qm_pitm_info', {visible: false})
-      .col('clltMcn', 'qm_pitm_info', {visible: false})
-      .col('clltPla', 'qm_pitm_info', {visible: false})
-      .col('smpStrgMtd', 'qm_pitm_info', {visible: false})
-      .col('smpVolUnit', 'qm_pitm_info', {visible: false})
-      .col('smpVolAns', 'qm_pitm_info', {visible: false})
-      .col('smpVolEtc', 'qm_pitm_info', {visible: false})
-      .col('smpVolMng', 'qm_pitm_info', {visible: false})
-      .col('pkgMtrSpec', 'qm_pitm_info', {visible: false})
-      .col('smpVolStrg', 'qm_pitm_info', {visible: false})
-      .col('pkgaCd', 'qm_pitm_info_포장재시험코드', {visible: false})
-      .col('mtrTyp', 'qm_pitm_info_sap', {visible: false})
-      .col('mtrMrp', 'qm_pitm_info_sap', {visible: false})
-      .col('labNo', 'qm_pitm_info_sap', {visible: false})
-      .col('brdAbbr', 'qm_pitm_info_sap', {visible: false})
-      .col('brdLne', 'qm_pitm_info_sap', {visible: false})
-      .col('nomMtr', 'qm_pitm_info_sap', {visible: false})
-      .col('etrCtnQty', 'qm_pitm_info_sap', {visible: false})
-      .col('rmtrSpec', 'qm_pitm_info_sap', {visible: false})
-      .col('nbr', 'qm_pitm_info_sap', {visible: false})
-      .col('ftnYn', 'qm_pitm_info_sap', {visible: false})
-      .col('pcs01', 'qm_pitm_info_sap', {visible: false})
-      .col('pcs02', 'qm_pitm_info_sap', {visible: false})
-      .col('pcs03', 'qm_pitm_info_sap', {visible: false})
-      .col('pcs04', 'qm_pitm_info_sap', {visible: false})
-      .col('useTrm', 'qm_pitm_info_sap', {visible: false})
-      .col('otcPrd', 'qm_pitm_info_sap', {visible: false})
-      .col('dmsEptYn', 'qm_pitm_info_sap', {visible: false})
-      .col('pearDiv', 'qm_pitm_info_sap', {visible: false})
-      .col('mkrVol', 'qm_pitm_info_sap', {visible: false})
-      .col('mkrVolUnit', 'qm_pitm_info_sap', {visible: false})
-      .col('busCrg', 'qm_pitm_info_sap', {visible: false})
-      .col('etnAnsReq', 'qm_pitm_info_sap', {visible: false})
-      .col('ctrptNo', 'qm_pitm_info_sap', {visible: false})
-      .col('perNo', 'qm_pitm_info_sap', {visible: false})
-      .col('chagVol', 'qm_pitm_info_sap', {visible: false})
-      .col('chagVolUnit', 'qm_pitm_info_sap', {visible: false})
-      .col('dioYn', 'qm_pitm_info_sap', {visible: false})
-      .col('prbInYn', 'qm_pitm_info_sap', {visible: false})
-      .col('prbFeYn', 'qm_pitm_info_sap', {visible: false})
-      .col('pnxFeYn', 'qm_pitm_info_sap', {visible: false})
-      .col('rmtrCfmul', 'qm_pitm_info_sap', {visible: false})
-      .col('qdrugYn', 'qm_pitm_info_sap', {visible: false})
-      .col('nomUnit', 'qm_pitm_info_sap', {visible: false})
-      .col('pkgaTypNm', 'QM_PKGA_자재유형명', {visible: false})
+      .col('ansDurDay', 'qm_pitm_info', { visible: false })
+      .col('crgDptCd', 'qm_pitm_info', { visible: false })
+      .col('spcmNo', 'qm_pitm_info', { visible: false })
+      .col('micYn', 'qm_pitm_info', { visible: false })
+      .col('clltMtd', 'qm_pitm_info', { visible: false })
+      .col('clltMcn', 'qm_pitm_info', { visible: false })
+      .col('clltPla', 'qm_pitm_info', { visible: false })
+      .col('smpStrgMtd', 'qm_pitm_info', { visible: false })
+      .col('smpVolUnit', 'qm_pitm_info', { visible: false })
+      .col('smpVolAns', 'qm_pitm_info', { visible: false })
+      .col('smpVolEtc', 'qm_pitm_info', { visible: false })
+      .col('smpVolMng', 'qm_pitm_info', { visible: false })
+      .col('pkgMtrSpec', 'qm_pitm_info', { visible: false })
+      .col('smpVolStrg', 'qm_pitm_info', { visible: false })
+      .col('pkgaCd', 'qm_pitm_info_포장재시험코드', { visible: false })
+      .col('mtrTyp', 'qm_pitm_info_sap', { visible: false })
+      .col('mtrMrp', 'qm_pitm_info_sap', { visible: false })
+      .col('labNo', 'qm_pitm_info_sap', { visible: false })
+      .col('brdAbbr', 'qm_pitm_info_sap', { visible: false })
+      .col('brdLne', 'qm_pitm_info_sap', { visible: false })
+      .col('nomMtr', 'qm_pitm_info_sap', { visible: false })
+      .col('etrCtnQty', 'qm_pitm_info_sap', { visible: false })
+      .col('rmtrSpec', 'qm_pitm_info_sap', { visible: false })
+      .col('nbr', 'qm_pitm_info_sap', { visible: false })
+      .col('ftnYn', 'qm_pitm_info_sap', { visible: false })
+      .col('pcs01', 'qm_pitm_info_sap', { visible: false })
+      .col('pcs02', 'qm_pitm_info_sap', { visible: false })
+      .col('pcs03', 'qm_pitm_info_sap', { visible: false })
+      .col('pcs04', 'qm_pitm_info_sap', { visible: false })
+      .col('useTrm', 'qm_pitm_info_sap', { visible: false })
+      .col('otcPrd', 'qm_pitm_info_sap', { visible: false })
+      .col('dmsEptYn', 'qm_pitm_info_sap', { visible: false })
+      .col('pearDiv', 'qm_pitm_info_sap', { visible: false })
+      .col('mkrVol', 'qm_pitm_info_sap', { visible: false })
+      .col('mkrVolUnit', 'qm_pitm_info_sap', { visible: false })
+      .col('busCrg', 'qm_pitm_info_sap', { visible: false })
+      .col('etnAnsReq', 'qm_pitm_info_sap', { visible: false })
+      .col('ctrptNo', 'qm_pitm_info_sap', { visible: false })
+      .col('perNo', 'qm_pitm_info_sap', { visible: false })
+      .col('chagVol', 'qm_pitm_info_sap', { visible: false })
+      .col('chagVolUnit', 'qm_pitm_info_sap', { visible: false })
+      .col('dioYn', 'qm_pitm_info_sap', { visible: false })
+      .col('prbInYn', 'qm_pitm_info_sap', { visible: false })
+      .col('prbFeYn', 'qm_pitm_info_sap', { visible: false })
+      .col('pnxFeYn', 'qm_pitm_info_sap', { visible: false })
+      .col('rmtrCfmul', 'qm_pitm_info_sap', { visible: false })
+      .col('qdrugYn', 'qm_pitm_info_sap', { visible: false })
+      .col('nomUnit', 'qm_pitm_info_sap', { visible: false })
+      .col('pkgaTypNm', 'QM_PKGA_자재유형명', { visible: false })
       .build(),
 };
 
@@ -234,13 +234,13 @@ const detailInfoForm = {
         'ctrptNoMulti',
         'CT성적서번호',
         FormBuilder.builder()
-        .Input('ctrptNo', 'CT성적서번호', { readonly: true })
-        .Button('ctrptNoSearch', 'itemManageFileAttacherModal', {
-          type: 'search',
-          disabled: true,
-        })
-        .build(),
-        )
+          .Input('ctrptNo', 'CT성적서번호', { readonly: true })
+          .Button('ctrptNoSearch', 'itemManageFileAttacherModal', {
+            type: 'search',
+            disabled: true,
+          })
+          .build(),
+      )
       .readonly()
       .Select('smpStrgMtd', '검체보관방법', {
         async: () => api.combo.userCommon.getSmpStrgMtdCombo(),
@@ -302,22 +302,22 @@ const materialInfoForm = {
   },
   forms: () =>
     FormBuilder.builder()
-    .Input('1', '재질')
-    .Input('2', '규격1')
-    .Input('3', '규격2')
-    .Input('4', '중량')
-    .multiple(
-      '5',
-      '만충용량',
-      FormBuilder.builder()
-      .InputNumber('51', '')
-      .Select('52', { async: () => api.combo.userCommon.getSmpVolUnitCombo()})
-      .build(),
+      .Input('1', '재질')
+      .Input('2', '규격1')
+      .Input('3', '규격2')
+      .Input('4', '중량')
+      .multiple(
+        '5',
+        '만충용량',
+        FormBuilder.builder()
+          .InputNumber('51', '')
+          .Select('52', { async: () => api.combo.userCommon.getSmpVolUnitCombo() })
+          .build(),
       )
-    .Input('6', '비고')
-    .blank()
-    .blank()
-    .build(),
+      .Input('6', '비고')
+      .blank()
+      .blank()
+      .build(),
 };
 
 export default {

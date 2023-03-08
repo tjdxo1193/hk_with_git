@@ -72,17 +72,22 @@ public class QMSServiceImpl implements QMSService {
         List<QMSSendVO.Material> dmrCosmeticMaterials = filter(zmdv, attribute, o -> DMRItemDiv.isCosmetic(o.getCharValChar()));
         List<QMSSendVO.Material> dmrQuasiDrugMaterials = filter(zmdv, attribute, o -> DMRItemDiv.isQuasiDrug(o.getCharValChar()));
 
-        List<QMSSendVO.CosmeticMaterial> CosmeticMaterials = intersect(dmrCosmeticMaterials, marcFinishedMap, QMSSendVO.Material::getCosmeticFinished);
+        List<QMSSendVO.CosmeticMaterial> cosmeticMaterials = intersect(dmrCosmeticMaterials, marcFinishedMap, QMSSendVO.Material::getCosmeticFinished);
         List<QMSSendVO.CosmeticBulkMaterial> cosmeticBulkMaterials = intersect(dmrCosmeticMaterials, marcBulkMap, QMSSendVO.Material::getCosmeticBulk);
-        List<QMSSendVO.DrugMaterial> DrugMaterials = intersect(dmrQuasiDrugMaterials, marcFinishedMap, QMSSendVO.Material::getQuasiDrugFinished);
+        List<QMSSendVO.DrugMaterial> drugMaterials = intersect(dmrQuasiDrugMaterials, marcFinishedMap, QMSSendVO.Material::getQuasiDrugFinished);
         List<QMSSendVO.DrugBulkMaterial> drugBulkMaterials = intersect(dmrQuasiDrugMaterials, marcBulkMap, QMSSendVO.Material::getQuasiDrugBulk);
 
         QMSSendVO.MaterialAll materialAll = QMSSendVO.MaterialAll.builder()
-                .cosmetics(CosmeticMaterials)
+                .cosmetics(cosmeticMaterials)
                 .cosmeticBulks(cosmeticBulkMaterials)
-                .drugs(DrugMaterials)
+                .drugs(drugMaterials)
                 .drugBulks(drugBulkMaterials)
                 .build();
+
+        if (isEmptyData(materialAll)) {
+            log.warn("[publishMaterial] No exists data.");
+            return;
+        }
 
         trsService.execute(
                 TrsInterface.QMS_MATERIAL,
@@ -93,6 +98,7 @@ public class QMSServiceImpl implements QMSService {
                     @Override
                     public void saveBeforeSend(QMSSendVO.MaterialAll vo) {
                         int materialIdx = vo.getIdx();
+                        qmsDao.createMaterial(vo);
 
                         for (QMSSendVO.CosmeticMaterial cosmetic : vo.getCosmetics()) {
                             cosmetic.setMaterialIdx(materialIdx);
@@ -142,8 +148,7 @@ public class QMSServiceImpl implements QMSService {
         // 화장품, 의약외품을 구분할 수 있는 추가속성명
         String charCode = MaterialCharCode.PITM_DIV.getValue();
         List<QMSSendVO.Material> dmrMaterials = data.stream()
-                .filter(o -> charCode.equals(o.getCharCode()))
-                .filter(itemDivPredicate)
+                .filter(o -> charCode.equals(o.getCharCode()) && itemDivPredicate.test(o))
                 .map(o -> toMaterialVO(o, attribute))
                 .collect(Collectors.toList());
         log.info("DMR zmdv material code count: {}", dmrMaterials.size());
@@ -156,8 +161,8 @@ public class QMSServiceImpl implements QMSService {
                 .itemDiv(DMRItemDiv.of(o.getCharValChar()))
                 .cosmeticFinished(toCosmeticFinished(o, attribute))
                 .cosmeticBulk(toCosmeticBulk(o, attribute))
-                .quasiDrugFinished(toQuasiDrugFinished(o, attribute))
-                .quasiDrugBulk(toQuasiDrugBulk(o, attribute))
+                .quasiDrugFinished(toDrugFinished(o, attribute))
+                .quasiDrugBulk(toDrugBulk(o, attribute))
                 .build();
     }
 
@@ -195,19 +200,19 @@ public class QMSServiceImpl implements QMSService {
                 .build();
     }
 
-    private QMSSendVO.DrugMaterial toQuasiDrugFinished(SAPMaterialVO.Zmdv o, MaterialAdditionAttribute attribute) {
+    private QMSSendVO.DrugMaterial toDrugFinished(SAPMaterialVO.Zmdv o, MaterialAdditionAttribute attribute) {
         String businessPartnerCode = attribute.get(o.getMatnr(), MaterialCharCode.CUSTOMER_CODE);
         return QMSSendVO.DrugMaterial.builder()
                 .pitmCd(o.getMatnr())
                 .pitmNm(attribute.getName(o.getMatnr()))
                 .pkgUnit(makePackageUnit(o.getMatnr(), attribute))
-                .perpitmNm(attribute.getName(o.getMatnr()))
+                .perPitmNm(attribute.getName(o.getMatnr()))
                 .vdrBpCd(businessPartnerCode)
                 .vdrNm(attribute.getBusinessPartnerName(businessPartnerCode))
                 .build();
     }
 
-    private QMSSendVO.DrugBulkMaterial toQuasiDrugBulk(SAPMaterialVO.Zmdv o, MaterialAdditionAttribute attribute) {
+    private QMSSendVO.DrugBulkMaterial toDrugBulk(SAPMaterialVO.Zmdv o, MaterialAdditionAttribute attribute) {
         return QMSSendVO.DrugBulkMaterial.builder()
                 .pitmCd(o.getMatnr())
                 .pitmNm(attribute.getName(o.getMatnr()))
@@ -294,6 +299,13 @@ public class QMSServiceImpl implements QMSService {
         if (handler.isReady()) {
             publishShiptData(handler.getData());
         }
+    }
+
+    private boolean isEmptyData(QMSSendVO.MaterialAll materialAll) {
+        return CollectionUtils.isEmpty(materialAll.getCosmetics()) &&
+                CollectionUtils.isEmpty(materialAll.getCosmeticBulks()) &&
+                CollectionUtils.isEmpty(materialAll.getDrugs()) &&
+                CollectionUtils.isEmpty(materialAll.getDrugBulks());
     }
 
     @Override

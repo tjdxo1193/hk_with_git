@@ -5,7 +5,7 @@
     </template>
 
     <FormBase v-bind="searchForm" @form-event="searchFormEvent" />
-    <FormBase v-bind="valueWithWrapInfo"/>
+    <FormBase v-bind="valueWithWrapInfo" />
 
     <Space :gap="10" />
 
@@ -41,8 +41,8 @@ export default {
     },
     versionInfo: {
       type: Object,
-      default: {}
-    }
+      default: {},
+    },
   },
   data() {
     const { searchForm, valueWithWrapInfo } = this.$copy(values);
@@ -64,7 +64,7 @@ export default {
       },
       valueWithWrapInfo: {
         forms: valueWithWrapInfo.forms(),
-      }
+      },
     };
   },
   watch: {
@@ -136,7 +136,9 @@ export default {
       }
     },
     async putPkgaCd() {
-      const { pkgaCd, aitmSpecIdx, sapPrdha, pkgaTypNm } = FormUtil.getData(this.valueWithWrapInfo.forms);
+      const { pkgaCd, aitmSpecIdx, sapPrdha, pkgaTypNm } = FormUtil.getData(
+        this.valueWithWrapInfo.forms,
+      );
 
       if (!pkgaCd) {
         return this.$warn(this.$message.warn.unSelectedData);
@@ -151,7 +153,7 @@ export default {
           this.$emit('modalReturnDataEvent', parameter);
           this.close();
         })
-        .catch(() => this.$error(this.$message.error.updateData))
+        .catch(() => this.$error(this.$message.error.updateData));
     },
   },
   computed: {},

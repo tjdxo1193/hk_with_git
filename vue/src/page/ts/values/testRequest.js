@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+
 import api from '@/api';
 import { ColumnBuilder, FormBuilder } from '@/util/builder';
 
@@ -41,7 +42,7 @@ const list = {
       .Input('batchNo', '배치번호')
       .DatepickerTwinWithSwitch('searchEtrDt', '입고일자', {
         value: [weekAgoDate, todayDate],
-        disabled : false,
+        disabled: false,
       })
       .spanCol(2)
       .build(),
@@ -51,7 +52,7 @@ const list = {
       .col('group_cmmn', '공통정보', {
         children: ColumnBuilder.builder()
           .col('plntCd', '플랜트')
-          .col('ansTypNm', '시험유형')
+          .col('ansTypNm', '시험구분')
           .col('pitmTypNm', '자재구분')
           .col('pitmCd', '자재번호')
           .col('pitmNm', '자재내역')
@@ -136,7 +137,6 @@ const list = {
           .col('amtLoccurr', '금액현지통화', { width: 100 })
           .build(),
       })
-
       .build(),
 };
 

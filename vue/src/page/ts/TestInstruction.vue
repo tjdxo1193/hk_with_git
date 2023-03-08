@@ -79,7 +79,7 @@ export default {
       tabs,
       fileInfo: {
         ansIdx: '',
-        fileIdx: ''
+        fileIdx: '',
       },
     };
   },
@@ -137,8 +137,8 @@ export default {
       parameter = {
         ...parameter,
         addedFiles,
-        removedFileIds
-      }
+        removedFileIds,
+      };
       this.$confirm(this.$message.confirm.saveData).then(() => {
         this.$axios
           .postByForm('/ts/testInstruction/saveFile', parameter)

@@ -1,13 +1,9 @@
 <template>
   <ModalBase v-bind="$props" @close="close">
-
-    <FormBase
-      v-bind="pItemSpecForm"
-      @button-click="onClickButton"
-    />
+    <FormBase v-bind="pItemSpecForm" @button-click="onClickButton" />
 
     <AUIGridSearch
-       v-bind="pItemSpecList"
+      v-bind="pItemSpecList"
       @grid-created="(proxy) => $setState('pItemSpecList.$grid', proxy)"
     />
 
@@ -46,7 +42,7 @@ export default {
     },
     labNo: {
       type: String,
-    }
+    },
   },
   watch: {
     show: function () {
@@ -54,7 +50,7 @@ export default {
         this.pItemSpecList.$grid.clearGridData();
         this.aItemList.$grid.clearGridData();
         this.pItemSpecForm.forms = values.pItemSpecForm.forms();
-        FormUtil.setData(this.pItemSpecForm.forms, {labNo : this.$props.labNo});
+        FormUtil.setData(this.pItemSpecForm.forms, { labNo: this.$props.labNo });
       }
     },
   },

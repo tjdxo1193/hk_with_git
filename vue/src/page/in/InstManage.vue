@@ -8,6 +8,7 @@
     ref="registerForm"
     v-bind="registerForm"
     @button-click="onClickRegisterFormButtons"
+    @form-event="onClickButtonsInRegisterForm"
     :modelValue="registerForm.modelValue"
   />
   <AUIGridWithHeader
@@ -23,10 +24,21 @@
     @save="saveFile"
     @close="hideModal('fileAttacherModal')"
   />
+  <SearchSapAssetsInfoModal
+    :show="searchSapAssetsInfoModal.show"
+    @close="hideSearchSapAssetsInfoModal()"
+    @select="putAssetsInfo()"
+  />
+  <SearchSapDepreciationInfoModal
+    :show="searchSapDepreciationInfoModal.show"
+    @close="hideSearchSapDepreciationInfoModal()"
+    @select="putDepreciationInfo()"
+  />
+  
 </template>
 
 <script>
-import { FileAttacherModal } from '@/page/modal';
+import { FileAttacherModal, SearchSapAssetsInfoModal, SearchSapDepreciationInfoModal } from '@/page/modal';
 import { FormUtil } from '@/util';
 
 import values from './values/instManage.js';
@@ -35,6 +47,8 @@ export default {
   name: 'instManage',
   components: {
     FileAttacherModal,
+    SearchSapAssetsInfoModal,
+    SearchSapDepreciationInfoModal,
   },
   mounted() {
     this.fetchSearchGrid();
@@ -67,6 +81,12 @@ export default {
         fileIdx: 0,
         show: false,
       },
+      searchSapAssetsInfoModal: {
+        show: false,
+      },
+      searchSapDepreciationInfoModal: {
+        show: false,
+      }
     };
   },
   methods: {
@@ -212,6 +232,23 @@ export default {
         return (this.fileAttacherModal.show = false);
       }
     },
+    
+    showSearchSapAssetsInfoModal() {
+      this.$setState('searchSapAssetsInfoModal', { show: true });
+    },
+    
+    hideSearchSapAssetsInfoModal() {
+      this.$setState('searchSapAssetsInfoModal', { show: false });
+    },
+
+    showSearchSapDepreciationInfoModal() {
+      this.$setState('searchSapDepreciationInfoModal', { show: true });
+    },
+    
+    hideSearchSapDepreciationInfoModal() {
+      this.$setState('searchSapDepreciationInfoModal', { show: false });
+    },
+
     onClickSearchFormButtons({ name }) {
       if (name === 'search') {
         this.initButtonClick();
@@ -246,6 +283,18 @@ export default {
         this.initButtonClick();
       }
     },
+    onClickButtonsInRegisterForm({ originEvent }) {
+      if (originEvent === 'searchSapAssets'){
+        this.showSearchSapAssetsInfoModal();
+      }
+      if (originEvent === 'searchSapDepreciation'){
+        const {forms} = this.registerForm;
+        if(!forms.anlkl || !forms.anln1){
+          return this.$warn(this.$message.warn.noAssetsInfo);
+        }
+        this.showSearchSapDepreciationInfoModal();
+      }
+    },
     onClickAccessoryGridButtons({ name }) {
       if (name === 'addRow') {
         this.accessoryGridAddRow();
@@ -253,6 +302,34 @@ export default {
       if (name === 'deleteRow') {
         this.accessoryGridDeleteRow();
       }
+    },
+    putAssetsInfo(item){
+      const mappingParam = {
+        sapAstNo : item.anln1,
+        sapAstNoDtl : item.anln2,
+        anlkl : item.anlkl,
+        sapAstNm : item.txt50,
+        sapCrtDt : item.erdat,
+        sapChgDt : item.aedat,
+        sapAcqDt : item.zugdt,
+        sapAccd : item.kumafa,
+        sapSaleDpsDt : item.deakt, // 비활성화일? SAP매각/폐기일자,
+        sapAddDesc : item.txa50,
+        sapCrgNmEmid : item.zzpic,
+        sapCosc : item.kostl,
+        sapOrco : item.kansw,
+      }
+      
+      FormUtil.setData(this.registerForm.forms, mappingParam)
+    },
+    putDepreciationInfo(item){
+      const mappingParam = {
+        sapAccd : item.kumafa,
+        sapOrco : item.kansw,
+        //'bukrs','회사코드'
+        //'bzdat','자산기준일'
+      }
+      FormUtil.setData(this.registerForm.forms, mappingParam)
     },
   },
 };

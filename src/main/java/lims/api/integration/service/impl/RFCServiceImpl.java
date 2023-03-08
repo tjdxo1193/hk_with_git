@@ -27,39 +27,15 @@ public class RFCServiceImpl implements RFCService {
     }
 
     @Override
-    public List<RFCAssetsVO> getAssets() {
-        return getAssets(new RFCParam<>());
+    public List<RFCAssetsVO> getAssetsMaster() {
+        return getAssetsMaster(new RFCParam<>());
     }
 
-    @Override
-    public List<RFCAssetsVO> getAssets(RFCParam<RFCParamOfAssets, String> param) {
-        Set<RFCAssetsVO> result = new HashSet<>();
-
-        List<RFCAssetsVO> assetsList = getAssetsMaster(param);
-
-        RFCParam<RFCParamOfAssetsDepreciation, String> depreciationParam;
-        for (RFCAssetsVO assets : assetsList) {
-            depreciationParam = new RFCParam<>();
-            depreciationParam.put(RFCParamOfAssetsDepreciation.I_ANLKL, assets.getAnlkl());
-            List<RFCAssetsDepreciationVO> depreciations = getAssetsDepreciation(depreciationParam);
-
-            for (RFCAssetsDepreciationVO depreciation : depreciations) {
-                RFCAssetsVO info = new RFCAssetsVO();
-                BeanUtils.copyProperties(assets, info);
-                info.setKansw(depreciation.getKansw());
-                info.setKumafa(depreciation.getKumafa());
-                info.setBzdat(depreciation.getBzdat());
-                result.add(info);
-            }
-        }
-        return new ArrayList<>(result);
-    }
-
-    private List<RFCAssetsVO> getAssetsMaster(RFCParam<RFCParamOfAssets, String> param) {
+    public List<RFCAssetsVO> getAssetsMaster(RFCParam<RFCParamOfAssets, String> param) {
         return rfcResolver.getExecutor(new AssetsRFC()).execute(param, RFCAssetsVO[].class);
     }
 
-    private List<RFCAssetsDepreciationVO> getAssetsDepreciation(RFCParam<RFCParamOfAssetsDepreciation, String> param) {
+    public List<RFCAssetsDepreciationVO> getAssetsDepreciation(RFCParam<RFCParamOfAssetsDepreciation, String> param) {
         return rfcResolver.getExecutor(new AssetsDepreciationRFC()).execute(param, RFCAssetsDepreciationVO[].class);
     }
 

@@ -69,7 +69,7 @@ public class TestResultApprServiceImpl implements TestResultApprService {
                 sytJdg = TestResultType.P;
             }
 
-            //시험결과 데이터 보내기
+            //SAP, SRM 시험결과
             InterfaceSendVO.TestResult data = InterfaceSendVO.TestResult.builder()
                     .sytJdg(sytJdg)
                     .lotNo(row.getLotNo())
@@ -85,7 +85,29 @@ public class TestResultApprServiceImpl implements TestResultApprService {
                     .pdtOrderNo(row.getPdtOrderNo())
                     .testType(TestType.of(row.getAnsTyp()))
                     .build();
-            sender.sendTestResult(data);
+            //SRM 시험결과 데이터 보내기
+            sender.sendTestResultToSRM(data);
+            //QMS 출하요청
+            sender.sendFinishedTestForShipt(row.getBatchNo());
+
+            //완제품이면서 부적합이 아닌 경우
+            if(!row.getSytJdg().equals("S0110003") && (row.getPitmTyp().equals("S0180100") || row.getPitmTyp().equals("S0180101"))){
+                //진행상태 데이터 보내기
+                InterfaceSendVO.TestStatus testStatus = InterfaceSendVO.TestStatus.builder()
+                        .lotNo(row.getLotNo())
+                        .splLotNo(row.getSplLotNo())
+                        .batchNo(row.getBatchNo())
+                        .status(TestStatusProcess.TEST_COMPLETE.getValue())
+                        .ispReqNo(row.getIspReqNo())
+                        .phsOrderNo(row.getPhsOrderNo())
+                        .pdtOrderNo(row.getPdtOrderNo())
+                        .testType(TestType.of(row.getAnsTyp()))
+                        .build();
+                sender.sendTestStatusToSAP(testStatus);
+            }else{
+                //SAP 시험결과 데이터 보내기
+                sender.sendTestResultToSAP(data);
+            }
         }
 
         if(list.size() != result) {

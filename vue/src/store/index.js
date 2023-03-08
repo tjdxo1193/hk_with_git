@@ -21,26 +21,30 @@ const store = createStore({
  * 또한, 토큰 유효성에 따른 처리도 포함합니다.
  */
 async function initializeStore() {
-  store.commit(mutationType.INIT_GLOBAL_STATUS);
-  const isLoggedIn = store.getters[getterType.IS_LOGGED_IN];
-  const isVerified = await store.dispatch(actionType.VERIFY_TOKEN);
+  try {
+    store.commit(mutationType.INIT_GLOBAL_STATUS);
+    const isLoggedIn = store.getters[getterType.IS_LOGGED_IN];
+    const isVerified = await store.dispatch(actionType.VERIFY_TOKEN);
+    const isSSOLogin = window.location.pathname.startsWith('/sso-login');
 
-  await new window.Promise((resolve) => setTimeout(resolve));
+    console.warn(`isLoggedIn: ${isLoggedIn}, isVerified: ${isVerified}, isSSOLogin: ${isSSOLogin}`);
 
-  const { fullPath: currentRouteFullPath } = router.currentRoute.value;
-  const isSSOLogin = currentRouteFullPath.startsWith('/sso-login');
+    if (isSSOLogin) {
+      console.warn("Current path is sso path.");
+      return;
+    }
 
-  if (isSSOLogin) {
-    console.warn("Current path is sso path.");
-    return;
-  }
-
-  if (isLoggedIn && !isVerified) {
-    store.dispatch(actionType.RE_LOGIN).catch(() => {
-      store.dispatch(actionType.LOGOUT);
+    if (isLoggedIn && !isVerified) {
+      store.dispatch(actionType.RE_LOGIN).catch(() => {
+        store.dispatch(actionType.LOGOUT);
+        store.commit(mutationType.TO_WELCOME);
+      });
+    } else if (!isLoggedIn && !isVerified) {
       store.commit(mutationType.TO_WELCOME);
-    });
-  } else if (!isLoggedIn && !isVerified) {
+    }
+  } catch(e) {
+    console.error("refresh error", e);
+    store.dispatch(actionType.LOGOUT);
     store.commit(mutationType.TO_WELCOME);
   }
 }

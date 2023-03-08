@@ -15,9 +15,11 @@ public interface RFCService {
 
     List<RFCCommonCodeVO> getCommonCode(RFCParam param);
 
-    List<RFCAssetsVO> getAssets();
+    List<RFCAssetsVO> getAssetsMaster();
 
-    List<RFCAssetsVO> getAssets(RFCParam<RFCParamOfAssets, String> param);
+    List<RFCAssetsVO> getAssetsMaster(RFCParam<RFCParamOfAssets, String> param);
+
+    List<RFCAssetsDepreciationVO> getAssetsDepreciation(RFCParam<RFCParamOfAssetsDepreciation, String> param);
 
     List<RFCBusinessPartnerVO> getBusinessPartner(RFCParam<RFCParamOfBusinessPartner, String> param);
 

@@ -118,6 +118,8 @@ const resultInputInfo = {
     title: '결과입력',
     $grid: null,
     buttons: [
+      { name: 'inputCfmRstVal', label: '적합값고정', disabled: true },
+      { name: 'inputPerformance', label: '투입실적', disabled: true },
       { name: 'finalOrder', label: '마감오더', disabled: true },
       { name: 'resultHistory', label: '결과이력', disabled: true },
       { name: 'labEventPublish', label: '실험실이벤트발행', disabled: true },
@@ -141,6 +143,7 @@ const resultInputInfo = {
   forms: () =>
     FormBuilder.builder()
       .Hidden('plntCd')
+      .Hidden('pitmCd')
       .Hidden('phsOrderNo')
       .Hidden('pdtOrderNo')
       .Hidden('phsOrderItm')

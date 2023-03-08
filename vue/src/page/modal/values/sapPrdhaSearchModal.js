@@ -4,12 +4,12 @@ import { ColumnBuilder, FormBuilder } from '@/util/builder';
 const valueWithWrapInfo = {
   forms: () =>
     FormBuilder.builder()
-    .Hidden('pkgaCd', '포장재시험 코드')
-    .Hidden('aitmSpecIdx', '시험규격IDX')
-    .Hidden('pkgaTypNm', '시험규격IDX')
-    .Hidden('sapPrdha', '자재 계층 코드')
-  .build(),
-}
+      .Hidden('pkgaCd', '포장재시험 코드')
+      .Hidden('aitmSpecIdx', '시험규격IDX')
+      .Hidden('pkgaTypNm', '시험규격IDX')
+      .Hidden('sapPrdha', '자재 계층 코드')
+      .build(),
+};
 
 const searchForm = {
   static: {

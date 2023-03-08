@@ -20,7 +20,6 @@
 
   <FormWithHeader v-bind="materialInfoForm" />
 
-
   <ReasonForItemRevisionModal
     :show="reasonForItemRevisionModal.show"
     :initData="reasonForItemRevisionModal.initData"
@@ -45,11 +44,7 @@
 </template>
 
 <script>
-import {
-  BomModal,
-  ItemManageFileAttacherModal,
-  ReasonForItemRevisionModal,
-} from '@/page/modal';
+import { BomModal, ItemManageFileAttacherModal, ReasonForItemRevisionModal } from '@/page/modal';
 import { FormUtil, TokenUtil } from '@/util';
 
 import values from './values/itemManage';
@@ -142,7 +137,7 @@ export default {
         readonly: false,
       },
       currentValueForScroll: {
-        searchParam: {}, 
+        searchParam: {},
         gridRowCnt: 0,
         loadListFlag: true,
       },
@@ -221,15 +216,19 @@ export default {
 
     async addNextListGridData() {
       const { $grid } = this.searchGridWithForm;
-      
+
       this.currentValueForScroll.searchParam.offset = this.currentValueForScroll.gridRowCnt;
       this.currentValueForScroll.searchParam.limit = 100;
 
-      const { data } = await this.$axios.get('/ms/itemManage/pItem', this.currentValueForScroll.searchParam, { _progress: false });
+      const { data } = await this.$axios.get(
+        '/ms/itemManage/pItem',
+        this.currentValueForScroll.searchParam,
+        { _progress: false },
+      );
 
       this.currentValueForScroll.gridRowCnt += data.resultList.length;
       $grid.addRow(data.resultList, 'last');
-      
+
       return this.currentValueForScroll.gridRowCnt <= data.total;
     },
 

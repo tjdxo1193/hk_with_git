@@ -9,8 +9,8 @@
   <Card>
     <TabBase v-bind="tabs" @common-button-click="onClickButton">
       <template #tab-requestInfo>
-      <FormWithHeader v-bind="requestInfo"/>
-      <FormWithHeader v-bind="itemInfo" />
+        <FormWithHeader v-bind="requestInfo" />
+        <FormWithHeader v-bind="itemInfo" />
       </template>
 
       <template #tab-testInfo>
@@ -212,7 +212,7 @@ export default {
       }
       if (name === 'nonconformityTestList') {
         const parameter = FormUtil.getData(this.itemInfo.forms);
-        this.inputPerformanceModal.reqIdx = parameter.reqIdx;
+        this.nonconformityTestModal.reqIdx = parameter.reqIdx;
         return (this.nonconformityTestModal.show = true);
       }
       if (name === 'inputPerformance') {
@@ -314,10 +314,22 @@ export default {
     computedListColumns() {
       const editableColumns = ['emgYn'];
 
-      return this.list.columns.map((col) => ({
-        ...col,
-        editable: editableColumns.includes(col.dataField) ? true : false,
-      }));
+      const columns = this.list.columns.map((row) => {
+        if (row.children !== undefined) {
+          row.children = row.children.map((element) => ({
+            ...element,
+            editable: editableColumns.includes(element.dataField) ? true : false,
+          }));
+          return row;
+        } else {
+          return {
+            ...row,
+            editable: editableColumns.includes(row.dataField) ? true : false,
+          };
+        }
+      });
+
+      return columns;
     },
   },
 };

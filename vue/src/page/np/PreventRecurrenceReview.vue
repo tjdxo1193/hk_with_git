@@ -36,7 +36,11 @@
 </template>
 
 <script>
-import { RequestApproverModal, FileAttacherModal, PreventRecurrenceReportModal } from '@/page/modal';
+import {
+  RequestApproverModal,
+  FileAttacherModal,
+  PreventRecurrenceReportModal,
+} from '@/page/modal';
 import { FormUtil } from '@/util';
 
 import values from './values/preventRecurrenceReview';

@@ -125,9 +125,9 @@ public class SAPServiceImpl implements SAPService {
             throw new IntegrationNoSavedException();
         }
 
-//        new Thread(() -> qmsService
-//                .publishMaterial(param))
-//                .start();
+        new Thread(() -> qmsService
+                .publishMaterial(param))
+                .start();
         new Thread(() -> postProcessorMap
                 .get(revInterface)
                 .execute(new RevStateful(degree, infoIdx)))

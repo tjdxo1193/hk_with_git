@@ -6,7 +6,8 @@
         SELECT A.ATH_CD
         FROM SY_USER U
                  JOIN SY_ATH A ON U.PLNT_CD = A.PLNT_CD AND U.ATH_CD = A.ATH_CD AND A.USE_YN = 'Y'
-        WHERE U.USER_LOGN_ID = #{value}
+        WHERE U.PLNT_CD = #{plntCd}
+          AND U.USER_LOGN_ID = #{username}
     </select>
 
     <select id="findMenuByLoginId" resultType="String">
@@ -14,7 +15,8 @@
         FROM SY_USER U
                  JOIN SY_ATH A ON U.PLNT_CD = A.PLNT_CD AND U.ATH_CD = A.ATH_CD AND A.USE_YN = 'Y'
                  JOIN SY_ATH_GP G ON A.ATH_CD = G.ATH_CD AND G.USE_YN = 'Y'
-        WHERE U.USER_LOGN_ID = #{value}
+        WHERE U.PLNT_CD = #{plntCd}
+          AND U.USER_LOGN_ID = #{username}
     </select>
 
     <select id="hasAuthMenu" resultType="boolean">

@@ -74,8 +74,8 @@ const gridForSearchResult = {
   },
   columns: () =>
     ColumnBuilder.builder()
-      .col('fileIdx', false)
-      .button('fileAttacher', '첨부')
+      // .col('fileIdx', false)
+      // .button('fileAttacher', '첨부')
       .col('pitmNm', '자재내역')
       .col('pitmCd', '자재번호')
       .col('ansNo', '시험번호')

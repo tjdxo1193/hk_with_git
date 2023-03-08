@@ -114,6 +114,7 @@ public class StabPlanVO implements UpdateDetect {
     // QT_PITM_ANS_REQ
     private String lotNo;                       // 제조번호
     private String makDt;                       // 제조 일자
+    private String batchNo;                     // 배치 번호
 
     // SY_ANS_TRM
     private String ansCylDiv;                   // S009, 시험 주기 구분

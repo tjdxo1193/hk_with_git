@@ -31,15 +31,22 @@ public class QMSController {
     @Permit
     @PostMapping("devTest/material/{degree}")
     public void devTestMaterial(@PathVariable Integer degree) {
-        List<SAPMaterialVO.Marc> marc = sapDao.findMarcAllByDegree(degree);
-        List<SAPMaterialVO.Zmdv> zmdv = sapDao.findZmdvAllByDegree(degree);
-        List<SAPMaterialVO.Makt> makt = sapDao.findMaktAllByDegree(degree);
+        List<SAPMaterialVO.Marc> marc;
+        List<SAPMaterialVO.Zmdv> zmdv;
+        List<SAPMaterialVO.Makt> makt;
+        SAPMaterialVO param;
+        for (int i = 1; i <= 458; i++) {
+            marc = sapDao.findMarcAllByDegree(i);
+            zmdv = sapDao.findZmdvAllByDegree(i);
+            makt = sapDao.findMaktAllByDegree(i);
 
-        SAPMaterialVO param = new SAPMaterialVO();
-        param.setMarc(marc);
-        param.setZmdv(zmdv);
-        param.setMakt(makt);
-        qmsService.publishMaterial(param);
+            param = new SAPMaterialVO();
+            param.setMarc(marc);
+            param.setZmdv(zmdv);
+            param.setMakt(makt);
+            qmsService.publishMaterial(param);
+        }
+
     }
 
 }

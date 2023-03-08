@@ -46,6 +46,7 @@ const mutations = {
     this.commit(mutationType.HIDE_ALERT);
     this.commit(mutationType.HIDE_E_SIGN);
     this.commit(mutationType.END_RE_AUTHENNTICATE);
+    this.commit(mutationType.END_LOGIN_FAIL_PROCESS);
   },
   [mutationType.TO_WELCOME]() {
     this.commit(mutationType.INIT_GLOBAL_STATUS);

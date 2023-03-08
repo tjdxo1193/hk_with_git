@@ -17,8 +17,7 @@ const pitemType = {
   RAW_MATERIAL: 'S0180400',
   PACKAGING_MATERIAL: 'S0180500',
   GOODS: 'S0180600',
-}
-
+};
 
 const list = {
   static: {
@@ -66,7 +65,7 @@ const list = {
       .col('pitmNm', '자재내역')
       .col('pitmEn', '자재내역(영문)')
       .col('pitmTypNm', '자재구분')
-      .col('pitmTyp', '자재구분',{visible: false})
+      .col('pitmTyp', '자재구분', { visible: false })
       .col('ansNo', '시험번호', { width: 90 })
       .col('ansProcNm', '진행상황')
       .col('reqDt', '의뢰일자')

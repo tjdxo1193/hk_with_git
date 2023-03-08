@@ -9,7 +9,7 @@ const processCode = {
   APPROVAL_REQUEST: 'S0080300',
   APPROVED: 'S0080400',
   SPEC_REMOVE: 'S0080900',
-}
+};
 
 const pitemtype = {
   FINISHED_SET: 'S0180100',
@@ -22,7 +22,7 @@ const pitemtype = {
   RAW_MATERIAL: 'S0180400',
   PACKAGING_MATERIAL: 'S0180500',
   GOODS: 'S0180600',
-}
+};
 
 const valueWithPitmGrid = {
   forms: () =>
@@ -174,7 +174,7 @@ const versionList = {
       .col('rjtUid', '반려자', false)
       .col('useVerYn', '사용버전여부', false)
       .col('specProcCd', '진행상태코드', false)
-      .col('pitmNm', '자재내역' ,false)
+      .col('pitmNm', '자재내역', false)
       .col('pkgaCd', '포장재시험코드(QM_PITM_INFO)', false)
       .col('lsapPrdha', '계층유형코드(Lims)', false)
       .col('pkgaTypNm', '계층유형명(Lims)', false)
@@ -253,6 +253,7 @@ const testItemList = {
       { name: 'down', label: '아래', type: 'down', disabled: true },
       { name: 'elnSpec', label: 'ELN규격', disabled: true },
       { name: '_', label: '허가자료열람', disabled: true },
+      { name: 'packagingSpec', label: '포장사양서', disabled: true },
     ],
     props: {
       editable: true,

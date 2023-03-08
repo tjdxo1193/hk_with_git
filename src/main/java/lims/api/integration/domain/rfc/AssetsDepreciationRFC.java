@@ -20,13 +20,13 @@ public class AssetsDepreciationRFC implements RFC {
     public void setSearchParameter(JCoFunction function, RFCParam<? extends Enum<?>, String> param) {
         JCoParameterList input = function.getImportParameterList();
         input.setValue("I_BUKRS", CompanyType.KOLMAR.getCode());
-        input.setValue("I_BZDAT", "20221231");
 
         RFCParamOfAssetsDepreciation anlkl = RFCParamOfAssetsDepreciation.I_ANLKL;
         if (!param.containsKey(anlkl)) {
             throw new RuntimeException("No exists required parameter. RFCAssetsDepreciation.ANLKL.");
         }
         input.setValue(anlkl.name(), param.get(anlkl));
+        param.forEach((enums, value) -> input.getField(enums.name()).setValue(value));
     }
 
     @Override

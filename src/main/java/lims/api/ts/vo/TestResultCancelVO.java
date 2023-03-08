@@ -130,5 +130,6 @@ public class TestResultCancelVO implements UpdateDetect {
     private String nonCfmRea; //부적합사유
     private String pitmSpcc; //품목 특이사항
     private String addCol1;
+    private String addCol2;
     private String ansTyp;
 }

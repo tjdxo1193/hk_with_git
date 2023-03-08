@@ -142,6 +142,8 @@ export default {
   methods: {
     doInit() {
       this.resetVersionForm();
+      this.resetValueWithqmPkgaListGrid();
+
       this.resetSubGridList();
 
       this.changeButtonDisabledAll();
@@ -250,6 +252,9 @@ export default {
     },
     resetVersionForm() {
       this.versionForm.forms = values.versionForm.forms();
+    },
+    resetValueWithqmPkgaListGrid() {
+      this.valueWithqmPkgaListGrid.forms = values.valueWithqmPkgaListGrid.forms();
     },
     resetTestItemListGrid() {
       this.testItemList.$grid.clearGridData();

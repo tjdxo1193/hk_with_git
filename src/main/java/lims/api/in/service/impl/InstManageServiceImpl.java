@@ -8,6 +8,13 @@ import lims.api.common.service.FileService;
 import lims.api.in.dao.InstManageDao;
 import lims.api.in.service.InstManageService;
 import lims.api.in.vo.InstManageVO;
+import lims.api.integration.domain.rfc.RFCParam;
+import lims.api.integration.enums.rfc.RFCParamOfAssets;
+import lims.api.integration.enums.rfc.RFCParamOfAssetsDepreciation;
+import lims.api.integration.service.RFCService;
+import lims.api.integration.service.impl.RFCServiceImpl;
+import lims.api.integration.vo.rfc.RFCAssetsDepreciationVO;
+import lims.api.integration.vo.rfc.RFCAssetsVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,6 +26,7 @@ import java.util.List;
 public class InstManageServiceImpl implements InstManageService {
     private final InstManageDao dao;
     private final FileService fileService;
+    private final RFCService rfcService;
 
     @Override
     public List<InstManageVO> find(InstManageVO param) {
@@ -93,6 +101,19 @@ public class InstManageServiceImpl implements InstManageService {
             throw new NoUpdatedDataException();
         }
         return param.getEqmFileIdx();
+    }
+
+    @Override
+    public List<RFCAssetsVO> getAssetsMasterToModal(InstManageVO param) {
+        return rfcService.getAssetsMaster();
+    }
+
+    @Override
+    public List<RFCAssetsDepreciationVO> getAssetsDepreciationToModal(InstManageVO param) {
+        RFCParam rfcParam = new RFCParam<>();
+        rfcParam.put(RFCParamOfAssetsDepreciation.I_ANLKL, param.getAnlkl());   // 자산클래스
+        rfcParam.put(RFCParamOfAssetsDepreciation.I_BZDAT, param.getBzdat());   // 자산기준일
+        return rfcService.getAssetsDepreciation(rfcParam);
     }
 
     private List<InstManageVO> setAccessories(List<InstManageVO> params, String plntCd, String eqmCd) {

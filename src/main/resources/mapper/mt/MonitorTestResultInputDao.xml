@@ -116,7 +116,7 @@
             , MMAR.RST_DPNT
             , MMAR.RPT_PRT_SLV_VAL
             , MMAR.RPT_PRT_ITM_NM
-            , MMAR.RST_VAL
+            , (DECODE(SUBSTR(MMAR.RST_VAL, 0, 4), 'U008', (SELECT DTL_NM FROM SY_CD_DTL WHERE DTL_CD = MMAR.RST_VAL AND PLNT_CD = MMAR.PLNT_CD), RST_VAL)) AS RST_VAL
             , MMAR.MARK_VAL
             , MMAR.ANS_RST_INP_DS
             , MMAR.RPT_PRT_YN

@@ -23,6 +23,7 @@ function authGuard(router) {
     }
 
     if (noEixstsMenuCode(to)) {
+      console.error("No exists menu Code.");
       return;
     }
 

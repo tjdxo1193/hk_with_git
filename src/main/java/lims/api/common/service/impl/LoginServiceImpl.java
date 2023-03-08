@@ -65,16 +65,18 @@ public class LoginServiceImpl implements LoginService {
 
     @Override
     public UserVO getLoginUserInfo(UserVO userVO) {
-        UserVO user = Optional.ofNullable(userDao.getLoginUserInfo(userVO)).orElse(null);
-        AuthorityVO authority = authorizationService.getAuthorityByLoginId(userVO.getUserLognId());
+        String plantCode = userVO.getPlntCd();
+        String loginId = userVO.getUserLognId();
 
+        UserVO user = Optional.ofNullable(userDao.getLoginUserInfo(userVO)).orElse(null);
         if (user == null) {
             log.error("[{}] Not found account.", ThreadUtil.getCurrentMethodName());
             throw new UnauthenticatedException("auth.error.invalidAccount");
         }
 
+        AuthorityVO authority = authorizationService.getAuthorityByLoginId(plantCode, loginId);
         if (hasAuthority(authority)) {
-            authority.setMyMenus(authorizationService.getMyMenuCodesByLoginId(userVO.getUserLognId()));
+            authority.setMyMenus(authorizationService.getMyMenuCodesByLoginId(plantCode, loginId));
         }
         if (isSuperUser(user.getUserLognId())) {
             user.setSuperUser(true);

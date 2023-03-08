@@ -25,7 +25,7 @@ public class WrapTestManageController {
 		String jwt = token.getJwt();
         String plntCd = jwtResolver.getPlantCode(jwt);
         param.setPlntCd(plntCd);
-        
+
         return ResponseEntity.ok(wrapTestManageService.getList(param));
     }
 
@@ -74,13 +74,13 @@ public class WrapTestManageController {
 	public ResponseEntity<Integer> putQmPkGa(@AuthToken Token token, @RequestBody WrapTestManageVO baseData) {
 		List<WrapTestManageVO> testItemList = baseData.getTestItemList();
 		List<WrapTestManageVO> deleteTestItemList = baseData.getDeleteTestItemList();
-		
+
 		String jwt = token.getJwt();
         String plntCd = jwtResolver.getPlantCode(jwt);
         baseData.setPlntCd(plntCd);
         testItemList.forEach(e -> e.setPlntCd(plntCd));
         deleteTestItemList.forEach(e -> e.setPlntCd(plntCd));
-        
+
 		return ResponseEntity.ok(wrapTestManageService.putQmPkGa(baseData, testItemList, deleteTestItemList));
 	}
 	

@@ -178,7 +178,7 @@ public class QMSSendVO {
         private String openLmt;     // 개봉 후 사용기간
         private String labNo;       // 처방코드
         private String fmlNo;       // 표준서 번호
-        private String pkgUnit;     // 포장 단위
+        private String pkgUnit;     // 포장 단위R
     }
 
     @Getter
@@ -191,7 +191,7 @@ public class QMSSendVO {
         private Integer idx;
         private String pitmCd;      // 자재코드
         private String pitmNm;      // 제품명
-        private String perpitmNm;   // 허가 제품명
+        private String perPitmNm;   // 허가 제품명
         private String pkgUnit;     // 포장단위
         private String mstFmlNo;    // 제품표준서 번호
         private String vdrBpCd;     // 거래처 BP 코드

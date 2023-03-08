@@ -108,11 +108,12 @@ export default {
       if (name === 'save') {
         this.save();
       }
-      if (name === 'printTestInstruction'){
+      if (name === 'printTestInstruction') {
         const parameter = FormUtil.getData(this.reportInfo.forms);
         RdUtil.openReport(
           `/TEST_INSTRUCTIONS.mrd`,
-          `/rp [${parameter.plntCd}] [${parameter.ansIdx}]`);
+          `/rp [${parameter.plntCd}] [${parameter.ansIdx}]`,
+        );
       }
     },
     init() {
@@ -144,16 +145,20 @@ export default {
       ]);
       FormUtil.disableButtons(this.reportInfo.buttons, ['save']);
     },
-    bringTestReportByPItemType(){
+    bringTestReportByPItemType() {
       const parameter = FormUtil.getData(this.reportInfo.forms);
-      if(parameter.pitmTyp == null){
+      if (parameter.pitmTyp == null) {
         return this.$warn('자재 유형이 없어서 시험성적서를 출력하지 못합니다.');
       }
 
-      this.$axios.get('/pr/printReport/reportPath', parameter)
-        .then(({ data }) => RdUtil.openReport(
-          `/${data}`,
-          `/rp [${parameter.plntCd}] [${parameter.ansIdx}] [${parameter.pitmTyp}]` ));
+      this.$axios
+        .get('/pr/printReport/reportPath', parameter)
+        .then(({ data }) =>
+          RdUtil.openReport(
+            `/${data}`,
+            `/rp [${parameter.plntCd}] [${parameter.ansIdx}] [${parameter.pitmTyp}]`,
+          ),
+        );
     },
   },
 };

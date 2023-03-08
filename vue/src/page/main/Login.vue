@@ -118,6 +118,8 @@ export default {
           plntCd: this.plantCode,
         })
         .then(() => {
+          this.endLoginFailProcess();
+          
           if (this.isRememberUsername) {
             this.setCookie('plantCode', this.plantCode);
             this.setCookie('username', this.username);
@@ -128,12 +130,16 @@ export default {
         .catch((error) => {
           const message = error?.response?.data?.message;
           if (message) {
-            this.$store.commit(mutationType.START_LOGIN_FAIL_PROCESS);
-            this.$error(message).then(() =>
-              this.$store.commit(mutationType.END_LOGIN_FAIL_PROCESS),
-            );
+            this.startLoginFtailPerocess();
+            this.$error(message).finally(() => this.endLoginFailProcess());
           }
         });
+    },
+    startLoginFtailPerocess() {
+      this.$store.commit(mutationType.START_LOGIN_FAIL_PROCESS);
+    },
+    endLoginFailProcess() {
+      this.$store.commit(mutationType.END_LOGIN_FAIL_PROCESS);
     },
     existsUserInfoInCookie() {
       const cookie = this.getCookieAsObject();

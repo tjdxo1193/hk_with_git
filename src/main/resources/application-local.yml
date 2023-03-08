@@ -33,3 +33,8 @@ report-designer:
 auth:
   token:
     secret: R0iNN6wSxunNsnYS4fYiHKYz745AyTmwI2riqhEsCwk=
+
+logging:
+  level:
+    com.zaxxer.hikari.HikariConfig: off
+    com.zaxxer.hikari: off

@@ -40,8 +40,10 @@ public class TestResultCancelServiceImpl implements TestResultCancelService {
         for(TestResultCancelVO row : list) {
             row.setAnsProcCd(TestProcess.TEST_CANCEL.getProcessCode());
             result += dao.testCancel(row);
-            InterfaceSendVO.TestStatus data = setIFVO(row, TestStatusProcess.TEST_CANCEL.getValue());
-            sender.sendTestStatus(data);
+            if(row.getAddCol2().equals("N")) {
+                InterfaceSendVO.TestStatus data = setIFVO(row, TestStatusProcess.TEST_CANCEL.getValue());
+                sender.sendTestStatus(data);
+            }
         }
 
         if(list.size() != result) {

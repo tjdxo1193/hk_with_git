@@ -44,6 +44,8 @@ import TestModal from './TestModal';
 import TestSearchModal from './TestSearchModal.vue';
 import ToDoListModal from './ToDoListModal';
 import TreeCommonCodeModal from './TreeCommonCodeModal';
+import SearchSapAssetsInfoModal from './SearchSapAssetsInfoModal';
+import SearchSapDepreciationInfoModal from './SearchSapDepreciationInfoModal';
 
 export {
   ItemModal,
@@ -92,4 +94,6 @@ export {
   LabelListModal,
   InterfaceRecordModal,
   ToDoListModal,
+  SearchSapAssetsInfoModal,
+  SearchSapDepreciationInfoModal,
 };

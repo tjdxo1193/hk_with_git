@@ -17,6 +17,8 @@
 </template>
 
 <script>
+import dayjs from 'dayjs';
+
 import { TestSearchModal } from '@/page/modal';
 import { FormUtil } from '@/util';
 
@@ -113,8 +115,15 @@ export default {
       FormUtil.disable(forms, ['search']);
     },
     inputInfoFormEvent(event) {
+      const { forms } = this.inputInfoForm;
       if (event.originEvent === 'search') {
         this.showModal('testSearchModal');
+      }
+      if (event.originEvent === 'addOneYear') {
+        FormUtil.setData(forms, { dpsExpDt: String(dayjs().add(1, 'y')) });
+      }
+      if (event.originEvent === 'addTwoYear') {
+        FormUtil.setData(forms, { dpsExpDt: String(dayjs().add(2, 'y')) });
       }
     },
     showModal(name) {

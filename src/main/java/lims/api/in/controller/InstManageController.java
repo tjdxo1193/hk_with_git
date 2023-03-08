@@ -6,6 +6,8 @@ import lims.api.auth.service.impl.JwtResolver;
 import lims.api.common.model.CommonResponse;
 import lims.api.in.service.InstManageService;
 import lims.api.in.vo.InstManageVO;
+import lims.api.integration.vo.rfc.RFCAssetsDepreciationVO;
+import lims.api.integration.vo.rfc.RFCAssetsVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -71,4 +73,15 @@ public class InstManageController {
         String jwt = token.getJwt();
         return jwtResolver.getUserId(jwt);
     }
+
+    @GetMapping("/getAssetsMaster")
+    public ResponseEntity<List<RFCAssetsVO>> getAssetsMasterToModal(InstManageVO param){
+        return ResponseEntity.ok(service.getAssetsMasterToModal(param));
+    }
+
+    @GetMapping("/getAssetsDepreciation")
+    public ResponseEntity<List<RFCAssetsDepreciationVO>> getAssetsDepreciationToModal(InstManageVO param){
+        return ResponseEntity.ok(service.getAssetsDepreciationToModal(param));
+    }
+
 }

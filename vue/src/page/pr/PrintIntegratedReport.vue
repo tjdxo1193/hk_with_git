@@ -212,13 +212,13 @@ export default {
         return (this.inputPerformanceModal.show = false);
       }
     },
-    bringIntegratedTestReport(){
+    bringIntegratedTestReport() {
       const parameter = FormUtil.getData(this.testInfo.forms);
-              RdUtil.openReport(
-          '/INTEGRATED_TEST_REPORT_THREE.mrd',
-          `/rp [${parameter.plntCd}] [${parameter.ansIdx}] [${parameter.mtrCd}] [${parameter.batchNo}]`,
-        );
-        //  `/rp [1100] [142] ['10100000'] ['2209190005']`,
+      RdUtil.openReport(
+        '/INTEGRATED_TEST_REPORT_THREE.mrd',
+        `/rp [${parameter.plntCd}] [${parameter.ansIdx}] [${parameter.mtrCd}] [${parameter.batchNo}]`,
+      );
+      //  `/rp [1100] [142] ['10100000'] ['2209190005']`,
     },
   },
 };

@@ -6,9 +6,9 @@ import java.util.List;
 
 public interface AuthorizationService {
 
-    AuthorityVO getAuthorityByLoginId(String loginId);
+    AuthorityVO getAuthorityByLoginId(String plantCode, String loginId);
 
-    List<String> getMyMenuCodesByLoginId(String userId);
+    List<String> getMyMenuCodesByLoginId(String plantCode, String userId);
 
     boolean isAllowedMenu(String userId, String menuCode);
 

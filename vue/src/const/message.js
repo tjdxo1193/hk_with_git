@@ -137,6 +137,7 @@ export default {
     noWaitingApproved: '승인 대기 중인 정보가 있습니다. 다시 선택해 주세요.',
     expireAuthentication: '로그인 인증이 만료되었습니다.',
     notoosItem: '기준일탈 대상이 아닙니다.',
+    noAssetsInfo: '자산정보가 없습니다. 먼저 자산번호를 선택해주세요.',
   },
   confirm: {
     saveData: '저장하시겠습니까?',

@@ -50,7 +50,7 @@ const pItemSpecList = {
       .col('prdDiv', '반제품구분')
       .col('ifDt', '연계일시')
       .build(),
-}
+};
 
 const aItemList = {
   static: {

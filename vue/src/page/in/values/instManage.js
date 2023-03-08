@@ -177,13 +177,15 @@ const registerForm = {
         'sapAssets',
         'SAP자산번호',
         FormBuilder.builder()
-          .Input('sapAstNo')
+          .Input('sapAstNo', '주요자산번호')
+          .Hidden('sapAstNoDtl', '하위자산번호')
           .readonly()
           .spanCol(6)
           .Button('searchSapAssets', { label: '찾기' })
           .spanCol(2)
           .build(),
       )
+      .Hidden('anlkl', '자산클래스')
       .Input('sapAstNm', 'SAP자산명', { readonly: true })
       .Input('sapCrtDt', 'SAP생성일자', { readonly: true })
       .Input('sapChgDt', 'SAP변경일자', { readonly: true })
@@ -193,7 +195,17 @@ const registerForm = {
       .Input('sapCrgNmEmid', 'SAP담당자사번', { readonly: true })
       .Input('sapCosc', 'SAP코스트센터', { readonly: true })
       .Input('sapOrco', 'SAP취득가액', { readonly: true })
-      .Input('sapAccd', 'SAP감가상각누계액', { readonly: true })
+      .multiple(
+        'sapAssets',
+        'SAP감가상각누계액',
+        FormBuilder.builder()
+          .Input('sapAccd')
+          .readonly()
+          .spanCol(6)
+          .Button('searchSapDepreciation', { label: '찾기' })
+          .spanCol(2)
+          .build(),
+      )
       .Input('pmsChkTagtYn', 'PMS점검대상여부', { readonly: true })
       .build(),
 };

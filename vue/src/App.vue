@@ -8,10 +8,12 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
+
 import { Alert, ESign, Progress } from '@/component/feedback';
+
 import { actionType, getterType, message, mutationType } from './const';
 import { TokenUtil } from './util';
-import { mapGetters } from 'vuex';
 
 export default {
   name: 'App',
