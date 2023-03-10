@@ -1,20 +1,25 @@
 <template>
   <ModalBase v-bind="$props" @close="close">
-    <ActionBar :buttons="assetsList.buttons" @button-click="onClickButton"></ActionBar>
+    <template #action>
+      <ActionBar :buttons="assetsList.buttons" @button-click="onClickButton"></ActionBar>
+    </template>
+
+    <FormBase v-bind="assetsList" />
+
+    <Space :gap="10" />
+
     <AUIGrid v-bind="assetsList" @grid-created="(proxy) => $setState('assetsList.$grid', proxy)" />
-    <FormBase v-bind="assetsValueForm" />
   </ModalBase>
 </template>
 
 <script>
 import { FormUtil } from '@/util';
 
-import values from './values/SearchSapAssetsInfoModal';
+import values from './values/searchSapAssetsInfoModal';
 
 export default {
   name: 'searchSapAssetsInfoModal',
   emits: ['close', 'select'],
-  components: {},
   props: {
     title: {
       type: String,
@@ -34,25 +39,18 @@ export default {
     },
   },
   data() {
-    const { assetsList, assetsValueForm } = this.$copy(values);
-
+    const { assetsList } = this.$copy(values);
     return {
       assetsList: {
         ...assetsList.static,
         columns: assetsList.columns(),
-        buttons: assetsList.static.buttons,
+        forms: assetsList.forms(),
         event: {
-          cellClick: (e) => {
-            this.setHiddenValueForm(e.item);
-          },
           cellDoubleClick: (e) => {
             this.selectItems(e.item);
           },
         },
       },
-      assetsValueForm: {
-        forms: assetsValueForm.forms(),
-      }
     };
   },
   watch: {
@@ -64,8 +62,7 @@ export default {
   },
   methods: {
     doInit() {
-        this.fetchAssetsList();
-        this.assetsValueForm.forms = values.assetsValueForm.forms();
+      this.fetchAssetsList();
     },
     close() {
       this.$emit('close');
@@ -75,22 +72,23 @@ export default {
         this.fetchAssetsList();
       }
       if (name === 'select') {
-        const item = FormUtil.getData(this.assetsValueForm.forms);
-        if(!item.anln1){
-          return this.$warn(this.$message.warn.unSelectedData);
-        }
-        this.selectItems(item);
+        this.selectItems(this.getSelectedItem());
       }
     },
     async fetchAssetsList() {
-      const {$grid} = this.assetsList;
+      const param = FormUtil.getData(this.assetsList.forms);
+      const { $grid } = this.assetsList;
       const data = await $grid
-        ._useLoader(() => this.$axios.get('in/instManage/getAssetsMaster', {}))
+        ._useLoader(() => this.$axios.get('in/instManage/assetsMaster', param))
         .then(({ data }) => data);
       $grid.setGridData(data);
     },
-    setHiddenValueForm(item){
-      FormUtil.setData(this.assetsValueForm.forms, item);
+    getSelectedItem() {
+      const [selectedItem] = this.assetsList.$grid.getSelectedItems();
+      if (selectedItem == null) {
+        return this.$warn(this.$message.warn.unSelectedData);
+      }
+      return selectedItem.item;
     },
     selectItems(item) {
       this.$emit('select', item);

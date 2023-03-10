@@ -146,4 +146,8 @@ public class StandardMaterialVO implements UpdateDetect {
     private Integer openedStok;
     private ApproveVO approveInfo;
     private String originMngProcCd;
+    private String etrQtyUnitCd;
+
+    /* 별칭 */
+    private String etrQtyUnitNm;
 }

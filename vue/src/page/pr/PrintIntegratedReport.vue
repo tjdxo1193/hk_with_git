@@ -6,19 +6,19 @@
     @form-event="searchFormEvent"
   />
   <Card>
-    <TabBase v-bind="tabs">
+    <TabBase v-bind="tabs" @common-button-click="onClickButton">
       <template #tab-testInfo>
-        <FormWithHeader v-bind="testInfo" @button-click="onClickTestInfo" />
+        <FormWithHeader v-bind="testInfo" @button-click="onClickButton" />
         <Horizontal align-items="top" :spans="[5, 5]">
           <FormWithHeader
             v-bind="reportInfo"
-            @button-click="onClickReportInfo"
+            @button-click="onClickButton"
             @form-event="onChangeReportDivision"
           />
           <AUIGridWithHeader
             v-bind="reportHistoryGrid"
             @grid-created="(proxy) => $setState('reportHistoryGrid.$grid', proxy)"
-            @button-click="onClickReportInfo"
+            @button-click="onClickButton"
           />
         </Horizontal>
       </template>
@@ -86,6 +86,9 @@ export default {
           cellDoubleClick: (e) => {
             this.setDataToReportInfo(e.item);
           },
+          rowCheckClick: () => {
+            this.enableButtons(['print']);
+          },
         },
       },
       inputPerformanceModal: {
@@ -99,18 +102,13 @@ export default {
       const { $grid } = this.testItemList;
       this.testInfo.forms = values.testInfo.forms();
       $grid.clearGridData();
-      this.disableButtons();
+      this.disableButtons(['save', 'init', 'print', 'inputPerformance']);
     },
     initReportForm() {
       this.reportInfo.forms = values.reportInfo.forms();
       const { $grid } = this.reportHistoryGrid;
       $grid.clearGridData();
-      this.disableButtons();
-    },
-    disableButtons() {
-      FormUtil.disableButtons(this.reportInfo.buttons, ['save', 'init']);
-      FormUtil.disableButtons(this.reportHistoryGrid.buttons, ['print']);
-      FormUtil.disableButtons(this.testInfo.buttons, ['inputPerformance']);
+      this.disableButtons(['save', 'init', 'print', 'inputPerformance']);
     },
     async getTestReportList() {
       const { forms, $grid } = this.list;
@@ -118,22 +116,21 @@ export default {
       await $grid
         ._useLoader(() => this.$axios.get('/pr/printIntegratedReport', parameter))
         .then(({ data }) => $grid.setGridData(data));
-      this.init();
     },
-    async getTestItmList(event) {
+    async getTestItmList(item) {
       const { $grid } = this.testItemList;
-      const parameter = { ansIdx: event.ansIdx };
+      const parameter = { ansIdx: item.ansIdx, plntCd: item.plntCd };
       await $grid
         ._useLoader(() => this.$axios.get('/pr/printIntegratedReport/testItem', parameter))
         .then(({ data }) => {
           $grid.setGridData(data);
         });
     },
-    async getReportHistory(event) {
+    async getReportHistory(item) {
       const { $grid } = this.reportHistoryGrid;
-      const param = { ansIdx: event.ansIdx };
+      const parameter = { ansIdx: item.ansIdx, plntCd: item.plntCd };
       await $grid
-        ._useLoader(() => this.$axios.get('/pr/printIntegratedReport/reportHistory', param))
+        ._useLoader(() => this.$axios.get('/pr/printIntegratedReport/reportHistory', parameter))
         .then(({ data }) => {
           $grid.setGridData(data);
         });
@@ -141,34 +138,32 @@ export default {
     async save() {
       const { forms } = this.reportInfo;
       const param = FormUtil.getData(forms);
-      await this.$eSignWithReason(() => this.$axios.post('/pr/printIntegratedReport', param))
+      await this.$eSignWithReason(() => this.$axios.post('/pr/printIntegratedReport/save', param))
         .then(() => {
           this.$info(this.$message.info.saved);
+          this.reportInfo.forms = values.reportInfo.forms();
           this.getTestReportList();
           this.getReportHistory(param);
         })
         .catch(() => this.$error(this.$message.error.updateData));
     },
     async onChangeReportDivision(event) {
-      if (event.type === 'change' && event.item.name === 'rptDiv' && event.item.value !== '') {
+      if (event.type === 'change' && event.item.name === 'arptRptIdx' && event.item.value !== '') {
         const param = { rptIdx: event.item.value };
         await this.$axios
           .get('/pr/printIntegratedReport/integratedReport', param)
           .then(({ data }) => {
             FormUtil.setData(this.reportInfo.forms, {
-              rptRdPath: data.rptRdPath,
+              arptRptIdx: data.rptIdx,
               arptSpcc: data.arptSpcc,
             });
           })
           .catch();
       }
     },
-    onClickReportInfo({ name }) {
+    onClickButton({ name }) {
       if (name === 'save') {
-        this.reportInfo.forms
-          .validate()
-          .then(() => this.save())
-          .catch(() => {});
+        this.reportInfo.forms.validate().then(() => this.save());
       }
       if (name === 'print') {
         this.bringIntegratedTestReport();
@@ -177,15 +172,21 @@ export default {
         this.init();
         this.initReportForm();
       }
+      if (name === 'inputPerformance') {
+        this.inputPerformanceModal.parameter = FormUtil.getData(this.testInfo.forms);
+        this.showModal('inputPerformanceModal');
+      }
     },
     setDataToForms(data) {
       FormUtil.setData(this.testInfo.forms, data);
-      FormUtil.setData(this.reportInfo.forms, data);
+      FormUtil.setData(this.reportInfo.forms, {
+        plntCd: data.plntCd,
+        ansIdx: data.ansIdx,
+        rptRdPath: data.rptRdPath,
+      });
       this.getTestItmList(data);
       this.getReportHistory(data);
-      FormUtil.enableButtons(this.reportInfo.buttons, ['save', 'init']);
-      FormUtil.enableButtons(this.reportHistoryGrid.buttons, ['print']);
-      FormUtil.enableButtons(this.testInfo.buttons, ['inputPerformance']);
+      this.enableButtons(['init', 'save', 'inputPerformance']);
     },
     setDataToReportInfo(data) {
       const { forms } = this.reportInfo;
@@ -194,12 +195,6 @@ export default {
     searchFormEvent(event) {
       if (event.type === 'keydown' && event.originEvent.key === 'Enter') {
         this.getTestReportList();
-      }
-    },
-    onClickTestInfo({ name }) {
-      if (name === 'inputPerformance') {
-        this.inputPerformanceModal.parameter = FormUtil.getData(this.testInfo.forms);
-        this.showModal('inputPerformanceModal');
       }
     },
     showModal(name) {
@@ -212,13 +207,26 @@ export default {
         return (this.inputPerformanceModal.show = false);
       }
     },
+    enableButtons(buttons) {
+      FormUtil.enableButtons(this.reportInfo.buttons, buttons);
+      FormUtil.enableButtons(this.testInfo.buttons, buttons);
+      FormUtil.enableButtons(this.reportHistoryGrid.buttons, buttons);
+      FormUtil.enableButtons(this.tabs.buttons, buttons);
+    },
+    disableButtons(buttons) {
+      FormUtil.disableButtons(this.reportInfo.buttons, buttons);
+      FormUtil.disableButtons(this.testInfo.buttons, buttons);
+      FormUtil.disableButtons(this.reportHistoryGrid.buttons, buttons);
+      FormUtil.disableButtons(this.tabs.buttons, buttons);
+    },
     bringIntegratedTestReport() {
-      const parameter = FormUtil.getData(this.testInfo.forms);
+      const checkedRows = this.reportHistoryGrid.$grid.getCheckedRowItems();
+      const parameter = checkedRows[0].item;
       RdUtil.openReport(
-        '/INTEGRATED_TEST_REPORT_THREE.mrd',
-        `/rp [${parameter.plntCd}] [${parameter.ansIdx}] [${parameter.mtrCd}] [${parameter.batchNo}]`,
+        `/${parameter.rptRdPath}`,
+        `/rp [${parameter.plntCd}] [${parameter.ansIdx}] [${parameter.arptSeq}] [${parameter.mtrCd}] [${parameter.batchNo}]`,
+        //  `/rp [1100] [142] ['10000440'] ['2302060009']`,
       );
-      //  `/rp [1100] [142] ['10100000'] ['2209190005']`,
     },
   },
 };

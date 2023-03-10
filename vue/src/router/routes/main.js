@@ -10,6 +10,9 @@ export default [
       {
         path: 'home',
         component: Main.Home,
+        meta: {
+          isAuditMenu: false,
+        },
       },
     ],
     meta: {

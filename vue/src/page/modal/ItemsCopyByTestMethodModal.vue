@@ -56,7 +56,7 @@ export default {
         columns: pItemSpecList.columns(),
         buttons: pItemSpecList.static.buttons,
         event: {
-          cellClick: (e) => {
+          cellDoubleClick: (e) => {
             this.fetchAItemList(e.item);
           },
         },

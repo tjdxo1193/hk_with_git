@@ -17,7 +17,7 @@
 
 <script>
 import { FileAttacherModal } from '@/page/modal';
-import { FormUtil } from '@/util';
+import { FormUtil, RdUtil, TokenUtil } from '@/util';
 
 import values from './values/analColLabelPrint';
 
@@ -86,7 +86,8 @@ export default {
       }
     },
     print() {
-      const selectedItem = this.list.$grid.getSelectedItems();
+      const { $grid } = this.list;
+      const selectedItem = $grid.getSelectedItems();
       if (selectedItem.length == 0) {
         return this.$warn(this.$message.warn.unSelectedData);
       }
@@ -95,8 +96,13 @@ export default {
           this.$eSign(() => this.$axios.put('/an/analColLabelPrint', selectedItem[0].item))
             .then(() => {
               this.getAnalColLabelPrint();
-              // TODO 라벨 RD
-              alert('해당 자재의 전체 출력 RD');
+              const plntCd = TokenUtil.myPlantCode();
+              const ritmEtrIdx = selectedItem[0].item.ritmEtrIdx;
+              const ritmLabelNo = selectedItem[0].item.ritmLabelNo;
+              RdUtil.openReport(
+                '/ANAL_COL_LABEL.mrd',
+                `/rv plntCd['${plntCd}'] ritmEtrIdx['${ritmEtrIdx}'] ritmLabelNo['${ritmLabelNo}']`,
+              );
             })
             .catch(() => {
               this.$error(this.$message.error.printData);

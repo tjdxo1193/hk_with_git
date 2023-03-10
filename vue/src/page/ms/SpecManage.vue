@@ -424,6 +424,10 @@ export default {
           this.isSelectedTemporaryVersion() ||
           this.isSelectedReviewRejectVersion())
       ) {
+        this.elnSpecCopyForTestMethodModal.labNo = FormUtil.getValue(
+          this.commonInfoForm.forms,
+          'labNo',
+        );
         this.activateElnSpecButton();
       }
 
@@ -982,7 +986,7 @@ export default {
         pitmTyp == pitemtype.SEMI_MANUFACTURES_FILLING_FOAM ||
         pitmTyp == pitemtype.SEMI_MANUFACTURES_OTHER_PRODUCT ||
         pitmTyp == pitemtype.SEMI_MANUFACTURES_BULK ||
-        pitmTyp == pitemtype.SEMI_MANUFACTURES_BAS
+        pitmTyp == pitemtype.SEMI_MANUFACTURES_BASE
       );
     },
 

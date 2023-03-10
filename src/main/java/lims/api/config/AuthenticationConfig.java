@@ -46,6 +46,7 @@ public class AuthenticationConfig implements TokenAuthenticationConfigurer {
         return tokenClaims.create(ClaimsVO.builder()
                 .userId(user.getUserId())
                 .loginId(authentication.getUsername())
+                .emId(user.getEmid())
                 .plntCd(user.getPlntCd())
                 .dptCd(user.getDptCd())
                 .userNm(user.getUserNm())

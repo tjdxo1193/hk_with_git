@@ -94,6 +94,7 @@ const list = {
       .col('stdAsisCtetUnitCd', false)
       .col('stdAsisCtetUnitNm', '함량(As is) 단위')
       .col('etrQty', '용기수')
+      .col('etrQtyUnitNm', '용기수단위')
       .col('etrEachQty', '용량')
       .col('ritmUnitNm', '용량단위')
       .col('etrTotQty', '총수량')
@@ -184,7 +185,7 @@ const detail = {
         'safetyStock',
         '안전재고량',
         FormBuilder.builder()
-          .Input('sfyStok', { maxLength: 5 })
+          .InputNumber('sfyStok', { maxLength: 5 })
           .validator((value) => Number.isInteger(Number(value)))
           .Select('ritmUnitCd', {
             async: () => api.combo.userCommon.getUnitCombo(),
@@ -199,12 +200,11 @@ const detail = {
         'enterQuantity',
         '용기수',
         FormBuilder.builder()
-          .Input('etrQty', { maxLength: 5 })
+          .InputNumber('etrQty', { maxLength: 5 })
           .validator((value) => Number.isInteger(Number(value)))
           .required()
-          .Select('ritmUnitCd', {
+          .Select('etrQtyUnitCd', {
             async: () => api.combo.userCommon.getUnitCombo(),
-            disabled: true,
           })
           .build(),
       )
@@ -215,7 +215,7 @@ const detail = {
         'enterEachQuantity',
         '개별 용량/수량',
         FormBuilder.builder()
-          .Input('etrEachQty', { maxLength: 3 })
+          .InputNumber('etrEachQty', { maxLength: 5 })
           .validator((value) => Number.isInteger(Number(value)))
           .required()
           .Select('ritmUnitCd', {
@@ -258,7 +258,7 @@ const detail = {
           .Select('stdCtetCd', {
             async: () => api.combo.userCommon.getStdCtetCombo(),
           })
-          .Input('stdCtetVal', { maxLength: 5 })
+          .InputNumber('stdCtetVal', { maxLength: 5 })
           .validator((value) => value === '' || value > 0)
           .Select('stdCtetUnitCd', {
             async: () => api.combo.userCommon.getUnitCombo(),
@@ -267,11 +267,9 @@ const detail = {
             message: message.validate.requireInput,
             handler(value, formData) {
               const { stdCtetVal } = formData;
-
               if (!stdCtetVal) {
                 return true;
               }
-
               return !!value;
             },
           })
@@ -288,7 +286,7 @@ const detail = {
         '함량(As is)',
         FormBuilder.builder()
           .Input('stdAsisCtetNm', { maxLength: 20 })
-          .Input('stdAsisCtetVal', { maxLength: 5 })
+          .InputNumber('stdAsisCtetVal', { maxLength: 5 })
           .validator((value) => value === '' || value > 0)
           .Select('stdAsisCtetUnitCd', {
             async: () => api.combo.userCommon.getUnitCombo(),
@@ -297,11 +295,9 @@ const detail = {
             message: message.validate.requireInput,
             handler(value, formData) {
               const { stdAsisCtetVal } = formData;
-
               if (!stdAsisCtetVal) {
                 return true;
               }
-
               return !!value;
             },
           })

@@ -9,6 +9,7 @@ public class ClaimsVO {
 
     private String userId;
     private String loginId;
+    private String emId;
     private String plntCd;
     private String dptCd;
     private String userNm;

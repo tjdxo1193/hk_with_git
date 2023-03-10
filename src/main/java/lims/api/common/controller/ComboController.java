@@ -145,4 +145,9 @@ public class ComboController {
     public ResponseEntity<List<ComboVO>> integratedReport() {
         return ResponseEntity.ok(service.getIntegratedReport());
     }
+
+    @GetMapping("/interfaceSystem")
+    public ResponseEntity<List<ComboVO>> interfaceSystem() {
+        return ResponseEntity.ok(service.getInterfaceSystem());
+    }
 }

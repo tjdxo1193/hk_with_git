@@ -35,7 +35,7 @@ let instance = {
     twin: {
       type: Boolean,
       default: false,
-      description: `datepicker 2개를 사용합니다.`,
+      description: `범위 검색용 datepicker를 사용합니다.`,
     },
     type: {
       type: String,
@@ -108,8 +108,8 @@ let instance = {
       const isTwin = this.$props.twin;
       return {
         range: isTwin,
-        multiCalendars: isTwin,
-        multiStatic: false,
+        partialRange: false,
+        closeOnScroll: true,
       };
     },
     isTwinMode() {

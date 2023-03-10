@@ -136,39 +136,39 @@ export default [
           },
         },
       },
-      // {
-      //   path: '',
-      //   name: '',
-      //   component: null,
-      //   meta: {
-      //     menu: {
-      //       code: '',
-      //       title: '인터페이스 정보 조회',
-      //     }
-      //   }
-      // },,
-      // {
-      //   path: '',
-      //   name: '',
-      //   component: null,
-      //   meta: {
-      //     menu: {
-      //       code: '',
-      //       title: '인터페이스 수신 이력',
-      //     }
-      //   }
-      // },
-      // {
-      //   path: '',
-      //   name: '',
-      //   component: null,
-      //   meta: {
-      //     menu: {
-      //       code: '',
-      //       title: '인터페이스 송신 이력',
-      //     }
-      //   }
-      // },
+      {
+        path: 'interfaceMaster',
+        name: 'interfaceMaster',
+        component: System.InterfaceMaster,
+        meta: {
+          menu: {
+            code: 'M160',
+            title: '인터페이스 마스터',
+          }
+        }
+      },
+      {
+        path: 'interfaceRece',
+        name: 'interfaceRev',
+        component: null,
+        meta: {
+          menu: {
+            code: 'M161',
+            title: '인터페이스 수신 이력',
+          }
+        }
+      },
+      {
+        path: 'interfaceTrs',
+        name: 'interfaceTrs',
+        component: null,
+        meta: {
+          menu: {
+            code: 'M162',
+            title: '인터페이스 송신 이력',
+          }
+        }
+      },
       // {
       //   path: 'notice',
       //   name: 'notice',

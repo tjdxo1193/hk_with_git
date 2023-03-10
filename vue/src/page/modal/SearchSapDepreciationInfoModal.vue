@@ -1,9 +1,17 @@
 <template>
-  <ModalBase v-bind="$props" @close="close">
-    <ActionBar :buttons="depreciationList.buttons" @button-click="onClickButton"></ActionBar>
+  <ModalBase v-bind="$props" @close="close" height="100%">
+    <template #action>
+      <ActionBar :buttons="depreciationList.buttons" @button-click="onClickButton"></ActionBar>
+    </template>
+
+    <FormBase :forms="depreciationList.forms" />
+
     <Space :gap="10" />
-    <AUIGrid v-bind="depreciationList" @grid-created="(proxy) => $setState('depreciationList.$grid', proxy)" />
-    <FormBase v-bind="depreciationValueForm" />
+
+    <AUIGrid
+      v-bind="depreciationList"
+      @grid-created="(proxy) => $setState('depreciationList.$grid', proxy)"
+    />
   </ModalBase>
 </template>
 
@@ -15,7 +23,6 @@ import values from './values/searchSapDepreciationInfoModal';
 export default {
   name: 'searchSapDepreciationInfoModal',
   emits: ['close', 'select'],
-  components: {},
   props: {
     title: {
       type: String,
@@ -33,9 +40,18 @@ export default {
       type: String,
       default: '450px',
     },
+    anlkl: {
+      type: String,
+      default: null,
+      description: `
+        자산클래스.
+        유무형 감가상각 데이터를 조회하기 위해서는
+        유무형 자산 마스터에서 가져온 자산 클래스 값이 필요합니다.
+      `,
+    },
   },
   data() {
-    const { depreciationList, depreciationValueForm } = this.$copy(values);
+    const { depreciationList } = this.$copy(values);
 
     return {
       depreciationList: {
@@ -43,17 +59,12 @@ export default {
         columns: depreciationList.columns(),
         buttons: depreciationList.static.buttons,
         event: {
-          cellClick: (e) => {
-            this.setHiddenValueForm(e.item);
-          },
           cellDoubleClick: (e) => {
             this.selectItems(e.item);
           },
         },
+        forms: depreciationList.forms(),
       },
-      depreciationValueForm: {
-        forms: depreciationValueForm.forms(),
-      }
     };
   },
   watch: {
@@ -65,7 +76,7 @@ export default {
   },
   methods: {
     doInit() {
-        this.fetchDepreciationList();
+      this.fetchDepreciationList();
     },
     close() {
       this.$emit('close');
@@ -75,19 +86,25 @@ export default {
         this.fetchDepreciationList();
       }
       if (name === 'select') {
-        const items = FormUtil.getData(this.depreciationValueForm.forms);
-        this.selectItems(items);
+        this.selectItems(this.getSelectedItem());
       }
     },
     async fetchDepreciationList() {
-      const {$grid} = this.depreciationList;
+      const param = FormUtil.getData(this.depreciationList.forms);
+      param.anlkl = this.$props.anlkl;
+
+      const { $grid } = this.depreciationList;
       const data = await $grid
-        ._useLoader(() => this.$axios.get('in/instManage/getAssetsDepreciation'))
+        ._useLoader(() => this.$axios.get('in/instManage/assetsDepreciation', param))
         .then(({ data }) => data);
       $grid.setGridData(data);
     },
-    setHiddenValueForm(item){
-      FormUtil.setData(this.depreciationValueForm.forms, item);
+    getSelectedItem() {
+      const [selectedItem] = this.depreciationList.$grid.getSelectedItems();
+      if (selectedItem == null) {
+        return this.$warn(this.$message.warn.unSelectedData);
+      }
+      return selectedItem.item;
     },
     selectItems(items) {
       this.$emit('select', items);

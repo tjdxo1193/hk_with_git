@@ -21,7 +21,7 @@ export default {
 
     if (nowStr.length > exp.length) {
       const diff = nowStr.length - exp.length;
-      exp = exp * (10 ** diff);
+      exp = exp * 10 ** diff;
     }
     return now >= exp;
   },

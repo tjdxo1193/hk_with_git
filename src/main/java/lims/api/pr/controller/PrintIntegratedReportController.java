@@ -29,22 +29,20 @@ public class PrintIntegratedReportController {
 
     @GetMapping("/testItem")
     public ResponseEntity<List<PrintIntegratedReportVO>> getTestItem(@AuthToken Token token, PrintIntegratedReportVO request) {
-        request.setPlntCd(jwtResolver.getPlantCode(token.getJwt()));
         return ResponseEntity.ok(service.findTestItem(request));
     }
 
     @GetMapping("/reportHistory")
     public ResponseEntity<List<PrintIntegratedReportVO>> getReportHistory(@AuthToken Token token, PrintIntegratedReportVO request) {
-        request.setPlntCd(jwtResolver.getPlantCode(token.getJwt()));
         return ResponseEntity.ok(service.findReportHistory(request));
     }
 
-    @PostMapping
-    public ResponseEntity<CommonResponse> create(@AuthToken Token token, @RequestBody PrintIntegratedReportVO request) {
+    @PostMapping("/save")
+    public ResponseEntity<CommonResponse> save(@AuthToken Token token, @RequestBody PrintIntegratedReportVO request) {
         String jwt = token.getJwt();
         request.setPlntCd(jwtResolver.getPlantCode(jwt));
         request.setWrtUid(jwtResolver.getUserId(jwt));
-        service.create(request);
+        service.save(request);
         return ResponseEntity.ok(new CommonResponse());
     }
 

@@ -23,7 +23,8 @@ function authGuard(router) {
     }
 
     if (noEixstsMenuCode(to)) {
-      console.error("No exists menu Code.");
+      console.error('No exists menu Code.');
+      router.push(from);
       return;
     }
 
@@ -39,7 +40,7 @@ function authGuard(router) {
     } = response;
 
     if (!allowed) {
-      showAlertWarn(message.error.noAuthorizeMenu).then(() => router.push('/'));
+      showAlertWarn(message.error.noAuthorizeMenu).finally(() => router.push('/'));
       return;
     }
 

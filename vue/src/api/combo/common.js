@@ -43,4 +43,7 @@ export default {
   getIntegratedReport() {
     return $axios.get('/combo/integratedReport');
   },
+  getInterfaceSystem() {
+    return $axios.get('/combo/interfaceSystem');
+  },
 };

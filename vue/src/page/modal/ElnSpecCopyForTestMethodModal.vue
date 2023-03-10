@@ -1,6 +1,10 @@
 <template>
   <ModalBase v-bind="$props" @close="close">
-    <FormBase v-bind="pItemSpecForm" @button-click="onClickButton" />
+    <template #action>
+      <ActionBar :buttons="buttonGroups.buttons" @button-click="onClickButton" />
+    </template>
+
+    <FormBase v-bind="pItemSpecForm" />
 
     <AUIGridSearch
       v-bind="pItemSpecList"
@@ -55,19 +59,21 @@ export default {
     },
   },
   data() {
-    const { pItemSpecList, aItemList, pItemSpecForm } = this.$copy(values);
+    const { pItemSpecList, aItemList, pItemSpecForm, buttonGroups } = this.$copy(values);
     return {
+      buttonGroups: {
+        buttons: buttonGroups.buttons,
+      },
       pItemSpecForm: {
         ...pItemSpecForm.static,
         forms: pItemSpecForm.forms(),
-        buttons: pItemSpecForm.static.buttons,
       },
 
       pItemSpecList: {
         ...pItemSpecList.static,
         columns: pItemSpecList.columns(),
         event: {
-          cellClick: (e) => {
+          cellDoubleClick: (e) => {
             this.fetchAItemList(e.item);
           },
         },

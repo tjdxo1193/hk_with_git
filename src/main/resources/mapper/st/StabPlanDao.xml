@@ -514,7 +514,8 @@
             ANS_PPS = #{ansPps},
             STRG_TERMS = #{strgTerms},
             SBT_SMP_VOL = #{sbtSmpVol},
-            SMP_VOL_UNIT = #{smpVolUnit},
+<!--        SMP_VOL_UNIT = #{smpVolUnit}, -->
+            INP_UNIT = #{inpUnit},
             SBT_CRG_UID = #{sbtCrgUid},
             ANS_PPS_DTL = #{ansPpsDtl},
             DOC_NO = #{docNo},

@@ -11,7 +11,7 @@ public interface PrintIntegratedReportService {
 
     List<PrintIntegratedReportVO> findReportHistory(PrintIntegratedReportVO param);
 
-    void create(PrintIntegratedReportVO param);
+    void save(PrintIntegratedReportVO param);
 
     PrintIntegratedReportVO findReportDetail(PrintIntegratedReportVO param);
 }

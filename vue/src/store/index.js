@@ -2,7 +2,6 @@ import { createStore } from 'vuex';
 import createPersistedState from 'vuex-persistedstate';
 
 import { getterType, actionType, mutationType } from '@/const';
-import router from '@/router';
 
 import modules from './module';
 
@@ -30,7 +29,7 @@ async function initializeStore() {
     console.warn(`isLoggedIn: ${isLoggedIn}, isVerified: ${isVerified}, isSSOLogin: ${isSSOLogin}`);
 
     if (isSSOLogin) {
-      console.warn("Current path is sso path.");
+      console.warn('Current path is sso path.');
       return;
     }
 
@@ -42,8 +41,8 @@ async function initializeStore() {
     } else if (!isLoggedIn && !isVerified) {
       store.commit(mutationType.TO_WELCOME);
     }
-  } catch(e) {
-    console.error("refresh error", e);
+  } catch (e) {
+    console.error('refresh error', e);
     store.dispatch(actionType.LOGOUT);
     store.commit(mutationType.TO_WELCOME);
   }

@@ -169,7 +169,7 @@
     </select>
 
     <select id="getReportPath" resultType="java.lang.String" parameterType="PrintReportVO">
-        SELECT RPT_RD_PATH FROM SY_RPT_MST WHERE RPT_IDX = (SELECT EXT_CD3 FROM SY_CD_DTL WHERE PLNT_CD = #{plntCd} AND DTL_CD = #{pitmTyp})
+        SELECT RPT_RD_PATH FROM SY_RPT_MST WHERE RPT_IDX = (SELECT EXT_CD3 FROM SY_CD_DTL WHERE DTL_CD = #{pitmTyp})
     </select>
 
     <update id="updateReportInfo" parameterType="PrintReportVO">

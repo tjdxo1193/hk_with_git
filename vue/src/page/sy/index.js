@@ -13,6 +13,7 @@ import PwdManage from './PwdManage';
 import ScheduleManage from './ScheduleManage';
 import TreeCommonCodeManage from './TreeCommonCodeManage';
 import UserManage from './UserManage';
+import InterfaceMaster from './InterfaceMaster';
 
 export default {
   Notice,
@@ -30,4 +31,5 @@ export default {
   PwdManage,
   ScheduleManage,
   LoginHistory,
+  InterfaceMaster,
 };

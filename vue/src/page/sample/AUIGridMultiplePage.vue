@@ -34,14 +34,14 @@ export default {
         forms: product.forms(),
         columns: product.columns(),
         event: {
-          cellClick: (e) => this.getCartsByProductId(e.item.id),
+          cellDoubleClick: (e) => this.getCartsByProductId(e.item.id),
         },
       },
       cart: {
         ...carts.static,
         columns: carts.columns(),
         event: {
-          cellClick: (e) => this.getCartById(e.item.id),
+          cellDoubleClick: (e) => this.getCartById(e.item.id),
         },
       },
       item: {

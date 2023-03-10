@@ -66,6 +66,7 @@ export default {
     init() {
       this.registerForm.forms = values.registerForm.forms();
       this.setButtonsEnable('init');
+      this.setDefaultInfo();
     },
     setDefaultInfo() {
       const { forms } = this.registerForm;

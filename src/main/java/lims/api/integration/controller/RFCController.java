@@ -3,10 +3,10 @@ package lims.api.integration.controller;
 import lims.api.auth.annotation.Permit;
 import lims.api.integration.domain.rfc.RFCParam;
 import lims.api.integration.enums.rfc.RFCBusinessPartnerCheck;
-import lims.api.integration.enums.rfc.RFCParamOfAssetsDepreciation;
+import lims.api.integration.enums.rfc.RFCParamOfAssets;
 import lims.api.integration.enums.rfc.RFCParamOfBusinessPartner;
 import lims.api.integration.service.RFCService;
-import lims.api.integration.vo.rfc.RFCAssetsDepreciationVO;
+import lims.api.integration.vo.rfc.RFCAssetsVO;
 import lims.api.integration.vo.rfc.RFCBusinessPartnerVO;
 import lims.api.schedule.service.impl.BusinessPartnerScheduler;
 import lims.api.schedule.service.impl.ManufactureInputPerformanceScheduler;
@@ -51,10 +51,10 @@ public class RFCController {
     @Permit
     @GetMapping("assets")
     public void assets() {
-        RFCParam<RFCParamOfAssetsDepreciation, String> param = new RFCParam<>();
-        List<RFCAssetsDepreciationVO> results =  rfcService.getAssetsDepreciation(param);
+        RFCParam<RFCParamOfAssets, String> param = new RFCParam<>();
+        List<RFCAssetsVO> results =  rfcService.getAssetsMaster(param);
         log.info("Call common code RFC. result size: {}", results.size());
-        for (RFCAssetsDepreciationVO vo : results) {
+        for (RFCAssetsVO vo : results) {
             log.info(vo.toString());
         }
     }

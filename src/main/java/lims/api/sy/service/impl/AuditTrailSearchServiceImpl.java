@@ -26,7 +26,8 @@ public class AuditTrailSearchServiceImpl implements AuditTrailSearchService {
     private final AuditTrailSearchDao searchDao;
 
     private final List<GridHeader> preFixedHeaders = List.of(
-            new GridHeader("PLNT_CD", "사업장 코드"),
+            new GridHeader("PLNT_CD", "플랜트 코드", false),
+            new GridHeader("PLNT_NM", "플랜트"),
             new GridHeader("MENU_NM", "메뉴명"),
             new GridHeader("EVT_NM", "이벤트명")
     );
@@ -44,8 +45,7 @@ public class AuditTrailSearchServiceImpl implements AuditTrailSearchService {
     @Override
     public AuditTrailSearchResponse getAudits(AuditTrailSearchVO param) {
         List<AuditMaster> masters = manageDao.findAuditMasterByMenuCode(param.getMenuCd());
-        return new AuditTrailSearchResponse(getGridHeaders(masters), getData(
-                masters, param));
+        return new AuditTrailSearchResponse(getGridHeaders(masters), getData(masters, param));
     }
 
     private List<GridHeader> getGridHeaders(List<AuditMaster> masters) {

@@ -4,6 +4,7 @@
 
     <select id="findAuditsByPlantCodeAndMenuCode" parameterType="AuditTrailSearchVO" resultType="Map">
         SELECT A.PLNT_CD,
+               SP.PLNT_NM,
                A.AUDIT_IDX,
                AD.AUDIT_SRLNO,
                A.MENU_CD,
@@ -25,13 +26,19 @@
                       ON A.PLNT_CD = AD.PLNT_CD
                           AND A.AUDIT_IDX = AD.AUDIT_IDX
                  LEFT JOIN SY_MENU SM
-                           ON A.MENU_CD = SM.MENU_CD
---                  LEFT JOIN SY_USER SU
---                            ON A.CRT_UID = SU.USER_ID
+                            ON A.MENU_CD = SM.MENU_CD
+                 LEFT JOIN SY_PLNT SP
+                            ON A.PLNT_CD = SP.PLNT_CD
         WHERE A.PLNT_CD = #{plntCd}
-          <if test="menuCd != null and menuCd != ''">
-            AND A.MENU_CD = #{menuCd}
-          </if>
+            <if test="menuCd != null and menuCd != ''">
+                AND A.MENU_CD = #{menuCd}
+            </if>
+            <if test="ip != null and ip != ''">
+                AND A.CRT_IP LIKE '%'||#{ip}||'%'
+            </if>
+            <if test="searchRange != null">
+                AND A.CRT_DS BETWEEN #{searchRange[0]} AND #{searchRange[1]}
+            </if>
         ORDER BY A.PLNT_CD,
                  A.AUDIT_IDX DESC
     </select>

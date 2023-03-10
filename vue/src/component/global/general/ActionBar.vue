@@ -63,7 +63,7 @@ export default {
 
   &__button-wrap {
     display: flex;
-    padding-right: 15px;
+    padding-right: 0px;
   }
 }
 </style>

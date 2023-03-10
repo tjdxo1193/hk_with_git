@@ -99,7 +99,8 @@ const gridForSearchResult = {
       .col('sbtCrgUidNm', '담당자')
       .col('sbtSmpVol', '안정성검체수량')
       .col('smpVolUnit', '안정성검체단위', { visible: false })
-      .col('smpVolUnitNm', '안정성검체단위')
+      .col('smpVolUnitNm', '안정성검체단위', { visible: false })
+      .col('inpUnit', '입력 단위')
       .col('strgTerms', '보관조건', { visible: false })
       .col('strgTermsNm', '보관조건')
       // .col('23', '보관조건(허가사항)')
@@ -185,6 +186,7 @@ const stabItemSearchForm = {
       .Hidden('sbtSmpVol', '안정성검체량')
       .Hidden('smpVolUnit', '안정성검체단위')
       .Hidden('smpVolUnitNm', '안정성검체단위')
+      .Hidden('inpUnit', '입력 단위')
       .Hidden('lotNo', '제조번호')
       .Hidden('ansIdx', '시험 IDX')
       .Hidden('expiredate')
@@ -197,6 +199,15 @@ const stabInfoRegForm = {
   static: {
     title: '안정성정보등록',
     countPerRow: 4,
+    buttons: [
+      { name: 'stopRequest', label: '시험중단', disabled: true },
+      { name: 'stopCancelRequest', label: '시험중단취소', disabled: true },
+      { name: 'approveRequest', label: '승인요청', disabled: true },
+      { name: 'save', label: '저장' },
+      { name: 'update', label: '수정', disabled: true },
+      { name: 'delete', label: '삭제', disabled: true, type: 'danger' },
+      { name: 'reset', label: '초기화' },
+    ],
   },
   forms: () =>
     FormBuilder.builder()
@@ -231,9 +242,10 @@ const stabInfoRegForm = {
           .InputNumber('sbtSmpVol')
           .required()
           .spanCol(2)
-          .Select('smpVolUnit', null, {
-            async: () => api.combo.userCommon.getSmpVolUnitCombo(),
-          })
+          .Input('inpUnit', null)
+          // .Select('smpVolUnit', null, {
+          //   async: () => api.combo.userCommon.getSmpVolUnitCombo(),
+          // })
           .required()
           .build(),
       )
@@ -260,22 +272,9 @@ const stabInfoRegForm = {
       .build(),
 };
 
-const buttonGroups = {
-  buttons: [
-    { name: 'stopRequest', label: '시험중단', disabled: true },
-    { name: 'stopCancelRequest', label: '시험중단취소', disabled: true },
-    { name: 'approveRequest', label: '승인요청', disabled: true },
-    { name: 'save', label: '저장' },
-    { name: 'update', label: '수정', disabled: true },
-    { name: 'delete', label: '삭제', disabled: true, type: 'danger' },
-    { name: 'reset', label: '초기화' },
-  ],
-};
-
 export default {
   searchForm,
   gridForSearchResult,
   stabItemSearchForm,
   stabInfoRegForm,
-  buttonGroups,
 };

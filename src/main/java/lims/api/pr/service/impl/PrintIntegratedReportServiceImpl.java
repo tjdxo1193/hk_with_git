@@ -31,10 +31,14 @@ public class PrintIntegratedReportServiceImpl implements PrintIntegratedReportSe
     }
 
     @Override
-    public void create(PrintIntegratedReportVO param) {
+    public void save(PrintIntegratedReportVO param) {
         int result = 0;
-        result += dao.create(param);
-        if (result < 1) {
+        if(param.getArptSeq() == null){
+            result = dao.create(param);
+        }else{
+            result = dao.update(param);
+        }
+        if (result == 0) {
             throw new NoCreatedDataException();
         }
     }

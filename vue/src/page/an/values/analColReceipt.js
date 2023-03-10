@@ -107,7 +107,7 @@ const detail = {
         'ancLenMulti',
         '길이',
         FormBuilder.builder()
-          .Input('ancLen', '길이', { maxLength: 20 })
+          .InputNumber('ancLen', '길이', { maxLength: 20 })
           .Select('ancLenUnitCd', '길이단위코드', {
             async: () => api.combo.userCommon.getUnitCombo(),
           })

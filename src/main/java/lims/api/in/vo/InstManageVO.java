@@ -41,6 +41,7 @@ public class InstManageVO {
     private String qttRng;      // 정량 범위
     private String rmk;         // 비고
     private Integer eqmFileIdx;     // 기기 파일 IDX
+    private String sapAnlkl;        // 자산 클래스
     private String sapAstNo;        // SAP 자산 번호
     private String sapAstNm;        // SAP 자산 명
     private String sapCrtDt;        // SAP 생성 일자
@@ -50,8 +51,8 @@ public class InstManageVO {
     private String sapAddDesc;      // SAP 추가 설명
     private String sapCrgNmEmid;        // SAP 담당자 사번
     private String sapCosc;         // SAP 코스트 센터
-    private Integer sapOrco;        // SAP 취득가액
-    private Integer sapAccd;        // SAP 감가상각 누계액
+    private String sapOrco;        // SAP 취득가액
+    private String sapAccd;        // SAP 감가상각 누계액
     private Character pmsChkTagtYn;     // PMS 점검 대상 여부
     private String crtIp;
     private String crtDs;

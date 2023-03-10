@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="lims.api.sd.dao.StdItemApprDao">
-
     <select id="findAll" parameterType="StandardMaterialVO" resultType="StandardMaterialVO">
         SELECT
             A.PLNT_CD,
@@ -78,7 +77,9 @@
             B.STD_ASIS_CTET_UNIT_CD,
             B.STD_RMTR_MAK_NO,
             B.STD_RMTR_ANS_NO,
-            C.APR_YN
+            C.APR_YN,
+            A.ETR_QTY_UNIT_CD,
+            (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = A.PLNT_CD AND DTL_CD = A.ETR_QTY_UNIT_CD) AS ETR_QTY_UNIT_NM
         FROM RT_RITM_ETR A
         JOIN RT_RITM_ETR_INFO_STD B ON A.RITM_ETR_IDX = B.RITM_ETR_IDX
         JOIN SY_CD_TREE D ON A.RITM_ROOT_CD = D.TREE_CD AND A.PLNT_CD = D.PLNT_CD

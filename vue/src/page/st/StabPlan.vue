@@ -9,7 +9,7 @@
 
   <FormWithHeader v-bind="stabItemSearchForm" @form-event="stabItemSearchFormEvent" />
 
-  <FormWithHeader v-bind="stabInfoRegForm" />
+  <FormWithHeader v-bind="stabInfoRegForm" @button-click="onEventsButton" />
 
   <StabItemSearchModal
     :show="stabItemSearchModal.show"
@@ -50,8 +50,6 @@
     @close="hideModal('requestApproverModal')"
     @modalReturnDataEvent="preAllApprove"
   ></RequestApproverModal>
-
-  <ActionBar :buttons="buttonGroups.buttons" @button-click="onEventsButton" />
 </template>
 
 <script>
@@ -78,7 +76,7 @@ export default {
     RequestApproverModal,
   },
   data() {
-    const { searchForm, gridForSearchResult, stabItemSearchForm, stabInfoRegForm, buttonGroups } =
+    const { searchForm, gridForSearchResult, stabItemSearchForm, stabInfoRegForm } =
       this.$copy(values);
     return {
       searchForm: {
@@ -102,10 +100,6 @@ export default {
       stabInfoRegForm: {
         ...stabInfoRegForm.static,
         forms: stabInfoRegForm.forms(),
-      },
-
-      buttonGroups: {
-        buttons: buttonGroups.buttons,
       },
 
       stabItemSearchModal: {
@@ -274,10 +268,10 @@ export default {
       ]);
     },
     disabledBtnInBtnGroups(btnName) {
-      FormUtil.disableButtons(this.buttonGroups.buttons, btnName);
+      FormUtil.disableButtons(this.stabInfoRegForm.buttons, btnName);
     },
     enabledBtnInBtnGroups(btnName) {
-      FormUtil.enableButtons(this.buttonGroups.buttons, btnName);
+      FormUtil.enableButtons(this.stabInfoRegForm.buttons, btnName);
     },
 
     // 조회결과 그리드
@@ -312,12 +306,14 @@ export default {
       const item = FormUtil.getData(stabItemSearchFormForms);
       const sbtPlnIdx = FormUtil.getValue(stabInfoRegFormForms, 'sbtPlnIdx');
 
+      let selectedItem = {};
       if (item) {
-        const selectedItem = { ...item, sbtPlnIdx };
-        this.setStabDetailPlanRegModalPropsSelectedItem(selectedItem);
+        selectedItem = { ...item };
       }
 
-      return;
+      selectedItem.sbtPlnIdx = sbtPlnIdx;
+
+      return this.setStabDetailPlanRegModalPropsSelectedItem(selectedItem);
     },
 
     onEventsButton({ name }) {
@@ -380,7 +376,8 @@ export default {
         '안정성검체량 : ' +
         (item.sbtSmpVol ? item.sbtSmpVol : '') +
         ' ' +
-        (item.smpVolUnitNm ? item.smpVolUnitNm : '');
+        // (item.smpVolUnitNm ? item.smpVolUnitNm : '');
+        (item.inpUnit ? item.inpUnit : '');
 
       FormUtil.setData(forms, { ...item, txtinfo1, txtinfo2, txtinfo3 });
     },

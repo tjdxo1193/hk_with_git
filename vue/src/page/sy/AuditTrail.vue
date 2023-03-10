@@ -5,6 +5,7 @@
         v-bind="audit"
         @grid-created="(proxy) => $setState('audit.$grid', proxy)"
         @button-click="onClickOnSearch"
+        @enter="getAudits"
       />
     </section>
 
@@ -23,10 +24,15 @@
 </template>
 
 <script>
+import { FormUtil } from '@/util';
+
 import values from './values/auditTrail';
 
 export default {
   name: 'AuditTrail',
+  mounted() {
+    this.getAudits();
+  },
   data() {
     const { audit } = this.$copy(values);
     return {
@@ -50,10 +56,13 @@ export default {
       }
     },
     async getAudits() {
-      // TODO 메뉴 코드 생성되면 Routes에 메뉴 코드를 설정하고 검색 조건 로직 구현
-
       this.clearAuditState();
-      const { data } = await this.audit.$grid._useLoader(() => this.$axios.get('/sys/auditTrail'));
+
+      const condition = FormUtil.getData(this.audit.forms);
+      const { data } = await this.audit.$grid._useLoader(() =>
+        this.$axios.get('/sys/auditTrail', condition),
+      );
+
       this.audit.$grid.changeColumnLayout(data.headerDataFields);
       this.audit.$grid.setGridData(data.data);
     },

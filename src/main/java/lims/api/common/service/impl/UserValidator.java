@@ -25,7 +25,11 @@ public class UserValidator {
             return false;
         }
 
-        if (isLockedUser(username)) {
+//        if (isLockedUser(username)) {
+//            throw new UnauthenticatedException("auth.error.userInfoLocked");
+//        }
+
+        if (isLockedUser(userInfo)) {
             throw new UnauthenticatedException("auth.error.userInfoLocked");
         }
 
@@ -58,8 +62,13 @@ public class UserValidator {
         }
     }
 
-    private boolean isLockedUser(String username) {
-        UserVO userInfo = userDao.findByUserLoginId(username);
+//    private boolean isLockedUser(String username) {
+//        UserVO userInfo = userDao.findByUserLoginId(username);
+//        return !StringUtils.isEmpty(userInfo.getUserId()) && StringUtils.equals(userInfo.getLockYn(), "Y");
+//    }
+
+    private boolean isLockedUser(UserVO user) {
+        UserVO userInfo = userDao.findByUserLoginIdAndPlantCode(user);
         return !StringUtils.isEmpty(userInfo.getUserId()) && StringUtils.equals(userInfo.getLockYn(), "Y");
     }
 

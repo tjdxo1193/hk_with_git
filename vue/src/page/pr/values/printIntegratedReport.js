@@ -52,8 +52,9 @@ const list = {
       .Input('ansNo', '시험번호')
       .Input('lotNo', '제조번호')
       .Input('batchNo', '배치번호')
-      .DatepickerTwin('searchReqDt', '검사요청일자', {
+      .DatepickerTwinWithSwitch('searchReqDt', '검사요청일자', {
         value: [weekAgoDate, todayDate],
+        disabled: false,
       })
       .spanCol(2)
       .build(),
@@ -200,19 +201,16 @@ const testItemList = {
 
 const reportInfo = {
   static: {
-    title: '통합 리포트 등록',
+    title: '리포트등록',
     countPerRow: 2,
-    buttons: [
-      { name: 'save', label: '저장', disabled: true },
-      { name: 'init', label: '초기화', disabled: true },
-    ],
+    buttons: [{ name: 'save', label: '저장', disabled: true }],
   },
   forms: () =>
     FormBuilder.builder()
       .Hidden('plntCd')
       .Hidden('ansIdx')
-      .Hidden('rptRdPath')
-      .Select('rptDiv', '통합성적서구분', {
+      .Hidden('arptSeq')
+      .Select('arptRptIdx', '통합성적서구분', {
         async: () => api.combo.common.getIntegratedReport(),
       })
       .RadioGroup('delYn', '삭제여부', {
@@ -230,10 +228,12 @@ const reportInfo = {
 
 const reportHistoryGrid = {
   static: {
-    title: '통합 리포트 발행 목록',
-    buttons: [{ name: 'print', label: '통합 성적서 출력', disabled: true }],
+    title: '리포트출력목록',
+    buttons: [{ name: 'print', label: '출력', disabled: true }],
     props: {
       editable: false,
+      showRowCheckColumn: true,
+      rowCheckToRadio: true,
     },
   },
   columns: () =>
@@ -253,6 +253,7 @@ const tabs = {
     { name: 'testInfo', label: '시험정보' },
     { name: 'itemInfo', label: '항목정보' },
   ],
+  buttons: [{ name: 'init', label: '초기화', disabled: true }],
 };
 
 export default {

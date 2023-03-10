@@ -6,7 +6,7 @@ const setTokenToHeader = (request) => {
   request.headers.Authorization = `Bearer ${store.getters[getterType.AUTHENTICATION_TOKEN]}`;
 };
 
-const isNoReLoginRequest = (url) => url !== api.auth.url.RE_LOGIN;
+const isNoLoginRequest = (url) => !api.auth.isLoginUrl(url);
 
 const isUnauthentication = (statusCode) => {
   return statusCode === http.code.UNAUTHENTICATION || statusCode === http.code.FORBIDDEN;
@@ -45,7 +45,7 @@ export default function authInterceptor(axios) {
      *! 즉, 무한 루프의 가능성이 존재합니다.
      *! 따라서 재발급 요청에서 응답한 401코드는 토큰 재발급 로직을 실행하지 않도록 처리합니다.
      */
-    if (isNoReLoginRequest(config.url) && isUnauthentication(status)) {
+    if (isNoLoginRequest(config.url) && isUnauthentication(status)) {
       const isLoggedIn = store.getters[getterType.IS_LOGGED_IN];
 
       if (!isLoggedIn) {

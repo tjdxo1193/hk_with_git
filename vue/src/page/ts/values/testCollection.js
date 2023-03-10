@@ -137,7 +137,7 @@ const testCollectionInfo = {
   forms: () =>
     FormBuilder.builder()
       .Hidden('reqIdx', '의뢰idx')
-      .Input('ansIdx', '시험idx')
+      .Hidden('ansIdx', '시험idx')
       .Hidden('plntCd', '플랜트코드')
       .Input('spcmNo', '표준견본번호')
       .multiple(

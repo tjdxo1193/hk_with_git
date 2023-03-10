@@ -4,9 +4,11 @@ import lims.api.common.dao.ComboDao;
 import lims.api.common.service.ComboService;
 import lims.api.common.vo.ComboSearchVO;
 import lims.api.common.vo.ComboVO;
+import lims.api.integration.enums.InterfaceSystemType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -103,5 +105,14 @@ public class ComboServiceImpl implements ComboService {
     @Override
     public List<ComboVO> getIntegratedReport() {
         return dao.getIntegratedReport();
+    }
+
+    @Override
+    public List<ComboVO> getInterfaceSystem() {
+        List<ComboVO> combos = new ArrayList<>();
+        for(InterfaceSystemType systemType : InterfaceSystemType.values()) {
+            combos.add(ComboVO.ofValue(systemType.name()));
+        }
+        return combos;
     }
 }

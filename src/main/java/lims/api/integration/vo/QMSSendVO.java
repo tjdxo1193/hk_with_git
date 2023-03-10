@@ -4,8 +4,8 @@ import lims.api.integration.annotation.EnumType;
 import lims.api.integration.domain.eai.TrsStateful;
 import lims.api.integration.enums.DMRItemDiv;
 import lims.api.integration.enums.FinalOrderStatus;
-import lims.api.integration.enums.MaterialCharCode;
 import lims.api.integration.enums.SAPPItemType;
+import lims.api.ms.enums.PItemType;
 import lims.api.ts.enums.TestJudgement;
 import lims.api.ts.enums.TestProcess;
 import lims.api.ts.enums.TestType;
@@ -13,7 +13,6 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +59,10 @@ public class QMSSendVO {
         private String batchNo;
         private String mtrCd;
         private String mtrNm;
+        @EnumType(PItemType.class)
+        private String pitmTyp;
         private String csmNm;
+        private Integer ansIdx;
         private String ansNo;
         @EnumType(TestJudgement.class)
         private String pitmJdgDiv;
@@ -86,6 +88,8 @@ public class QMSSendVO {
     public static class ShiptPerform {
         private String mtrCd;
         private String mtrNm;
+        @EnumType(PItemType.class)
+        private String pitmTyp;
         private String phsOrderNo;
         private String phsOrderItm;
         private String pdtOrderNo;
@@ -96,9 +100,11 @@ public class QMSSendVO {
         private String splLotNo;
         private String phsOrderTyp;
         private String pdtOrderTyp;
+        private Integer ansIdx;
         private String ansNo;
 
         transient private Integer shiptTestIdx;
+        transient private Integer shiptTestSeq;
         transient private Integer seq;
     }
 

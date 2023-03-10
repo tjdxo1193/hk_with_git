@@ -17,7 +17,7 @@
 
 <script>
 import { FileAttacherModal } from '@/page/modal';
-import { FormUtil } from '@/util';
+import { FormUtil, RdUtil, TokenUtil } from '@/util';
 
 import values from './values/glassLabelPrint';
 
@@ -86,17 +86,27 @@ export default {
       }
     },
     print() {
-      const selectedItem = this.list.$grid.getSelectedItems();
+      const { $grid } = this.list;
+      let selectedItem = $grid.getSelectedItems();
       if (selectedItem.length == 0) {
         return this.$warn(this.$message.warn.unSelectedData);
       }
       this.$confirm(this.$message.confirm.printed).then(() => {
         if (selectedItem.length > 0) {
+          const rowIndex = $grid.getSelectedIndex()[0];
+
           this.$eSign(() => this.$axios.put('/gl/glassLabelPrint', selectedItem[0].item))
             .then(() => {
-              this.getGlassLabelPrint();
-              // TODO 라벨 RD
-              alert('해당 자재의 전체 출력 RD');
+              this.getGlassLabelPrint().then(() => {
+                selectedItem = $grid.getItemByRowIndex(rowIndex);
+                const plntCd = TokenUtil.myPlantCode();
+                const ritmEtrIdx = selectedItem.ritmEtrIdx;
+                const ritmLabelNo = selectedItem.ritmLabelNo;
+                RdUtil.openReport(
+                  '/GLASS_LABEL.mrd',
+                  `/rv plntCd['${plntCd}'] ritmEtrIdx['${ritmEtrIdx}'] ritmLabelNo['${ritmLabelNo}']`,
+                );
+              });
             })
             .catch(() => {
               this.$error(this.$message.error.printData);

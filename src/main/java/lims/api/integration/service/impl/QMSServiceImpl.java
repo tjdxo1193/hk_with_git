@@ -326,6 +326,7 @@ public class QMSServiceImpl implements QMSService {
 
                             for (QMSSendVO.ShiptPerform perform : test.getPerforms()) {
                                 perform.setShiptTestIdx(test.getShiptIdx());
+                                perform.setShiptTestSeq(test.getSeq());
                                 qmsDao.createShiptPerform(perform);
                             }
                         }

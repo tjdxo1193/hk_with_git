@@ -175,6 +175,7 @@ public interface AuditEvent {
         String resultDelete = "결과 삭제";
         String resultInput = "결과 입력";
         String resultComplete = "결과 입력 완료";
+        String requestResultReview = "결과 검토 요청";
         String resultReview = "결과 검토";
         String reviewReject = "검토 반려";
         String sampleCollect = "검체 채취";
@@ -402,5 +403,10 @@ public interface AuditEvent {
         String rejectReLabelPrint = "라벨 재출력 반려";
         String approveReLabelPrint = "라벨 재출력 승인";
         String cancelReLabelPrint = "라벨 재출력 취소";
+    }
+
+    interface IntegratedReportPrint {
+        String createReport = "통합성적서 생성";
+        String updateReport = "통합성적서 수정";
     }
 }

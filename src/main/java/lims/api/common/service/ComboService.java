@@ -24,4 +24,5 @@ public interface ComboService {
     List<ComboVO> getTestTerm(String plntCd);
     List<ComboVO> getEquipment(String plntCd);
     List<ComboVO> getIntegratedReport();
+    List<ComboVO> getInterfaceSystem();
 }

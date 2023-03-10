@@ -4,6 +4,8 @@ import lims.api.auth.annotation.AuthToken;
 import lims.api.auth.domain.Token;
 import lims.api.auth.service.impl.JwtResolver;
 import lims.api.common.model.CommonResponse;
+import lims.api.common.vo.RFCAssetDepreciationRequestVO;
+import lims.api.common.vo.RFCAssetRequestVO;
 import lims.api.in.service.InstManageService;
 import lims.api.in.vo.InstManageVO;
 import lims.api.integration.vo.rfc.RFCAssetsDepreciationVO;
@@ -12,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -74,14 +77,14 @@ public class InstManageController {
         return jwtResolver.getUserId(jwt);
     }
 
-    @GetMapping("/getAssetsMaster")
-    public ResponseEntity<List<RFCAssetsVO>> getAssetsMasterToModal(InstManageVO param){
-        return ResponseEntity.ok(service.getAssetsMasterToModal(param));
+    @GetMapping("/assetsMaster")
+    public ResponseEntity<List<RFCAssetsVO>> getAssetsMasterToModal(RFCAssetRequestVO param){
+        return ResponseEntity.ok(service.getAssetsMaster(param));
     }
 
-    @GetMapping("/getAssetsDepreciation")
-    public ResponseEntity<List<RFCAssetsDepreciationVO>> getAssetsDepreciationToModal(InstManageVO param){
-        return ResponseEntity.ok(service.getAssetsDepreciationToModal(param));
+    @GetMapping("/assetsDepreciation")
+    public ResponseEntity<List<RFCAssetsDepreciationVO>> getAssetsDepreciationToModal(@Valid RFCAssetDepreciationRequestVO param){
+        return ResponseEntity.ok(service.getAssetsDepreciation(param));
     }
 
 }

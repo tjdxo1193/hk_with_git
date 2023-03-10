@@ -7,8 +7,8 @@
   <AUIGridWithHeader
     v-bind="gridForItemSetting"
     @grid-created="(proxy) => $setState('gridForItemSetting.$grid', proxy)"
+    @button-click="onEventsButton"
   />
-  <ActionBar :buttons="buttonGroups.buttons" @button-click="onEventsButton" />
 </template>
 
 <script>
@@ -20,8 +20,7 @@ export default {
   name: 'StabResultApprPage',
   mounted() {},
   data() {
-    const { buttonGroups, gridForSearchResult, searchForm, gridForItemSetting } =
-      this.$copy(values);
+    const { gridForSearchResult, searchForm, gridForItemSetting } = this.$copy(values);
     return {
       searchForm: {
         ...searchForm.static,
@@ -37,10 +36,6 @@ export default {
       gridForItemSetting: {
         ...gridForItemSetting.static,
         columns: gridForItemSetting.columns(),
-      },
-
-      buttonGroups: {
-        buttons: buttonGroups.buttons,
       },
     };
   },

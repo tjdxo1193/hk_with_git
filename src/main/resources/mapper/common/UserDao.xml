@@ -5,6 +5,7 @@
     <select id="getLoginUserInfo" parameterType="UserVO" resultType="UserVO">
         SELECT USER_ID,
                USER_LOGN_ID,
+               EMID,
                PWD AS PASSWORD,
                DPT_CD,
                PLNT_CD,
@@ -27,6 +28,7 @@
 
     <select id="findByUserLoginIdAndPlantCode" parameterType="UserVO" resultType="UserVO">
         SELECT USER_ID,
+               USER_LOGN_ID,
                PWD AS PASSWORD,
                DPT_CD,
                PLNT_CD,
@@ -39,18 +41,20 @@
 
     <update id="updateLognFailCnt" parameterType="UserVO">
         <selectKey resultType="Integer" keyProperty="lognFailCnt" order="BEFORE">
-            SELECT NVL(LOGN_FAIL_CNT,0)+1 FROM SY_USER WHERE USER_ID = #{userId}
+            SELECT NVL(LOGN_FAIL_CNT,0)+1 FROM SY_USER WHERE USER_ID = #{userId} AND PLNT_CD = #{plntCd}
         </selectKey>
 
         UPDATE SY_USER SET
         LOGN_FAIL_CNT = #{lognFailCnt}
         WHERE USER_LOGN_ID = #{userLognId}
+          AND PLNT_CD = #{plntCd}
     </update>
 
     <update id="updateLockYn" parameterType="UserVO">
         UPDATE SY_USER
         SET LOCK_YN = #{lockYn}
         WHERE USER_LOGN_ID = #{userLognId}
+          AND PLNT_CD = #{plntCd}
     </update>
 
     <!--

@@ -8,6 +8,7 @@ import lombok.Setter;
 public class UserVO {
     private String userId;
     private String userLognId;
+    private String emid;
     private String password;
     private String plntCd;
     private String dptCd;

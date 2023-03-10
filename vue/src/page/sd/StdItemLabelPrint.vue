@@ -17,7 +17,7 @@
 
 <script>
 import { FileAttacherModal } from '@/page/modal';
-import { FormUtil } from '@/util';
+import { FormUtil, RdUtil, TokenUtil } from '@/util';
 
 import values from './values/stdItemLabelPrint';
 
@@ -86,18 +86,26 @@ export default {
       }
     },
     print() {
-      const selectedItem = this.list.$grid.getSelectedItems();
-      if (selectedItem.length == 0) {
+      const { $grid } = this.list;
+      const selectedItem = $grid.getSelectedItems();
+      if (selectedItem.length === 0) {
         return this.$warn(this.$message.warn.unSelectedData);
       }
-
       this.$confirm(this.$message.confirm.printed).then(() => {
         if (selectedItem.length > 0) {
           this.$eSign(() => this.$axios.put('/sd/stdItemLabelPrint', selectedItem[0].item))
             .then(() => {
               this.getStdLabelPrint();
-              // TODO 라벨 RD
-              alert('해당 자재의 전체 출력 RD');
+              RdUtil.openReport(
+                '/STD_LABEL.mrd',
+                `/rv plntcd['` +
+                  TokenUtil.myPlantCode() +
+                  `'] ritmEtrIdx['` +
+                  selectedItem[0].item.ritmEtrIdx +
+                  `'] ritmLabelNo['` +
+                  selectedItem[0].item.ritmLabelNo +
+                  `']`,
+              );
             })
             .catch(() => {
               this.$error(this.$message.error.printData);

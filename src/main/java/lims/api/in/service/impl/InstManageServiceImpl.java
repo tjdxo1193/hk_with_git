@@ -5,6 +5,8 @@ import lims.api.common.exception.NoCreatedDataException;
 import lims.api.common.exception.NoDeletedDataException;
 import lims.api.common.exception.NoUpdatedDataException;
 import lims.api.common.service.FileService;
+import lims.api.common.vo.RFCAssetDepreciationRequestVO;
+import lims.api.common.vo.RFCAssetRequestVO;
 import lims.api.in.dao.InstManageDao;
 import lims.api.in.service.InstManageService;
 import lims.api.in.vo.InstManageVO;
@@ -12,11 +14,9 @@ import lims.api.integration.domain.rfc.RFCParam;
 import lims.api.integration.enums.rfc.RFCParamOfAssets;
 import lims.api.integration.enums.rfc.RFCParamOfAssetsDepreciation;
 import lims.api.integration.service.RFCService;
-import lims.api.integration.service.impl.RFCServiceImpl;
 import lims.api.integration.vo.rfc.RFCAssetsDepreciationVO;
 import lims.api.integration.vo.rfc.RFCAssetsVO;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -104,13 +104,20 @@ public class InstManageServiceImpl implements InstManageService {
     }
 
     @Override
-    public List<RFCAssetsVO> getAssetsMasterToModal(InstManageVO param) {
-        return rfcService.getAssetsMaster();
+    public List<RFCAssetsVO> getAssetsMaster(RFCAssetRequestVO param) {
+        RFCParam<RFCParamOfAssets, String> rfcParam = new RFCParam<>();
+        List<String> dates = param.getSearchPrtDt();
+        if (dates.size() != 2) {
+            throw new RuntimeException("Date range parameter length must be 2.");
+        }
+        rfcParam.put(RFCParamOfAssets.IV_GETDAT_FROM, dates.get(0).replaceAll("-", ""));
+        rfcParam.put(RFCParamOfAssets.IV_GETDAT_TO, dates.get(1).replaceAll("-", ""));
+        return rfcService.getAssetsMaster(rfcParam);
     }
 
     @Override
-    public List<RFCAssetsDepreciationVO> getAssetsDepreciationToModal(InstManageVO param) {
-        RFCParam rfcParam = new RFCParam<>();
+    public List<RFCAssetsDepreciationVO> getAssetsDepreciation(RFCAssetDepreciationRequestVO param) {
+        RFCParam<RFCParamOfAssetsDepreciation, String> rfcParam = new RFCParam<>();
         rfcParam.put(RFCParamOfAssetsDepreciation.I_ANLKL, param.getAnlkl());   // 자산클래스
         rfcParam.put(RFCParamOfAssetsDepreciation.I_BZDAT, param.getBzdat());   // 자산기준일
         return rfcService.getAssetsDepreciation(rfcParam);

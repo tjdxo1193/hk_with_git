@@ -7,8 +7,8 @@
   <AUIGridWithHeader
     v-bind="itemSettingList"
     @grid-created="(proxy) => $setState('itemSettingList.$grid', proxy)"
+    @button-click="onEventsButton"
   />
-  <ActionBar :buttons="buttonGroups.buttons" @button-click="onEventsButton" />
 
   <InputReasonModal
     :show="inputReasonModal.show"
@@ -31,7 +31,7 @@ export default {
     InputReasonModal,
   },
   data() {
-    const { searchForm, gridForSearchResult, itemSettingList, buttonGroups } = this.$copy(values);
+    const { searchForm, gridForSearchResult, itemSettingList } = this.$copy(values);
     return {
       searchForm: {
         ...searchForm.static,
@@ -51,10 +51,6 @@ export default {
       itemSettingList: {
         ...itemSettingList.static,
         columns: itemSettingList.columns(),
-      },
-
-      buttonGroups: {
-        buttons: buttonGroups.buttons,
       },
 
       inputReasonModal: {

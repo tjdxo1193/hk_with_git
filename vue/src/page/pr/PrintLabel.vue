@@ -107,17 +107,23 @@ export default {
       );
     },
     printLabel() {
-      const { forms } = this.printLabelInfoForms;
-      const parameter = FormUtil.getData(forms);
+      const { $grid } = this.printLabelGridWithSearchForms;
+      const checkedRows = $grid.getCheckedRowItems();
 
-      if (!parameter || !parameter.plntCd || !parameter.ansIdx || !this.pitmTypList.rawMaterial) {
+      const noKeyValue = checkedRows.filter((row) => !row.item.plntCd || !row.item.ansIdx);
+
+      if (!checkedRows?.length || noKeyValue?.length) {
         this.$warn(this.$message.warn.unSelectedData);
         return;
       }
 
+      const plntCd = checkedRows[0].item.plntCd;
+      const ansIdxList = checkedRows.map((row) => row.item).map((item) => item.ansIdx);
+      const ansIdxListStr = ansIdxList.join();
+
       RdUtil.openReport(
         '/LABEL_PRINT.mrd',
-        `/rp [${parameter.plntCd}] [${parameter.ansIdx}] [${this.pitmTypList.rawMaterial}]`,
+        `/rp [${plntCd}] [${ansIdxListStr}] [${this.pitmTypList.rawMaterial}]`,
       );
 
       this.fetchPrintLabelGridWithSearchForms();

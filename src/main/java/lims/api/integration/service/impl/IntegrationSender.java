@@ -94,10 +94,10 @@ public class IntegrationSender {
             log.info("[sendNonconformityReport] This test is not by SAP");
             return;
         }
-        if (nonconformityReport != null && data.isMES()) {
+        if (nonconformityReport != null) {
             sendNonconformityReportToSRMAndMES(data, nonconformityReport, ReportDivOfNonCfm.A);
         }
-        if (reoccurReport != null && data.isSRM()) {
+        if (reoccurReport != null) {
             sendNonconformityReportToSRMAndMES(data, reoccurReport, ReportDivOfNonCfm.B);
         }
     }

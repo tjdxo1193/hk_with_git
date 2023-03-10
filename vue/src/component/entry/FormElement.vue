@@ -109,6 +109,7 @@ export default {
         /**
          ** Enter를 빠르게 여러번 입력했을 때,
          ** 조회 및 저장이 연이어 일어나는 것을 방지하기 위함
+         ** 만약 포커스가 유지되어야 한다면 enter 이벤트 emit 부분을 debounce 처리
          */
         event.target.blur();
       }

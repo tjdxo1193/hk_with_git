@@ -141,6 +141,11 @@ const itemSettingList = {
   static: {
     title: '항목설정',
     $grid: null,
+    buttons: [
+      { name: 'approve', label: '승인' },
+      { name: 'reject', label: '반려' },
+      { name: 'reset', label: '초기화' },
+    ],
     props: {
       editable: false,
       showRowCheckColumn: false,
@@ -155,17 +160,8 @@ const itemSettingList = {
   columns: () => ColumnBuilder.builder().build(),
 };
 
-const buttonGroups = {
-  buttons: [
-    { name: 'approve', label: '승인' },
-    { name: 'reject', label: '반려' },
-    { name: 'reset', label: '초기화' },
-  ],
-};
-
 export default {
   searchForm,
   gridForSearchResult,
   itemSettingList,
-  buttonGroups,
 };

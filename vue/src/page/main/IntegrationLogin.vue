@@ -1,3 +1,4 @@
+<template></template>
 <script>
 import { mutationType } from '@/const';
 import store from '@/store';

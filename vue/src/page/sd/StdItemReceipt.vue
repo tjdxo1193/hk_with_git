@@ -191,13 +191,10 @@ export default {
     calculateEtrTotQty() {
       const etrQty = FormUtil.getValue(this.detail.forms, 'etrQty');
       const etrEachQty = FormUtil.getValue(this.detail.forms, 'etrEachQty');
-
       const etrTotQty = Number.parseInt(etrQty * etrEachQty);
-
       if (isNaN(etrTotQty)) {
         FormUtil.setData(this.detail.forms, { etrTotQty: 0 });
       }
-
       if (etrTotQty >= 0) {
         FormUtil.setData(this.detail.forms, { etrTotQty });
       }
@@ -206,7 +203,6 @@ export default {
       const manualSelection = 1;
       const periodSelection = 2;
       const noLimitSelection = 3;
-
       if (value == manualSelection) {
         this.isCurrLotYn('N');
         FormUtil.enable(this.detail.forms, 'opnBefExpirDt');

@@ -10,7 +10,7 @@ const prdDivList = [
   { value: 'F', label: '완제품' },
   { value: 'S', label: '반제품' },
 ];
-
+const buttonGroups = { buttons: [{ name: 'search', label: '조회' }] };
 const pItemSpecForm = {
   static: {
     title: 'ELN규격목록',
@@ -20,7 +20,6 @@ const pItemSpecForm = {
       showRowCheckColumn: false,
     },
     countPerRow: 3,
-    buttons: [{ name: 'search', label: '조회' }],
   },
   forms: () =>
     FormBuilder.builder()
@@ -132,4 +131,5 @@ export default {
   pItemSpecForm,
   pItemSpecList,
   aItemList,
+  buttonGroups,
 };

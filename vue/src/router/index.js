@@ -40,8 +40,8 @@ const removeRoutes = (routes) => {
 const initializeRouter = async () => {
   await store.dispatch(actionType.FETCH_MENU_INFO_FROM_SERVER);
   const menuInfo = store.getters[getterType.GET_MENU_INFOS_AS_OBJECT];
-  const routes = getWillRemoveRoutes(menuInfo);
-  removeRoutes(routes);
+  const removeTargetRoutes = getWillRemoveRoutes(menuInfo);
+  removeRoutes(removeTargetRoutes);
 };
 
 useGuards(router);

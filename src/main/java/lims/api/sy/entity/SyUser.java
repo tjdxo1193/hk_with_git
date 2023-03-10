@@ -2,8 +2,10 @@ package lims.api.sy.entity;
 
 import spring.audit.annotation.AuditEntity;
 import spring.audit.annotation.AuditId;
+import spring.audit.annotation.AuditJoinDefinition;
 
 @AuditEntity(name = "SY_USER")
+@AuditJoinDefinition(name = "nameById", joinProperty = "userId", auditProperty = "userNm")
 public class SyUser {
     @AuditId
     private String userId;

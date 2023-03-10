@@ -73,6 +73,8 @@ export default {
     this.plantCombo = data;
   },
   mounted() {
+    this.endLoginFailProcess();
+
     if (this.existsUserInfoInCookie()) {
       this.username = this.getCookie('username');
       this.plantCode = this.getCookie('plantCode');
@@ -118,8 +120,6 @@ export default {
           plntCd: this.plantCode,
         })
         .then(() => {
-          this.endLoginFailProcess();
-          
           if (this.isRememberUsername) {
             this.setCookie('plantCode', this.plantCode);
             this.setCookie('username', this.username);
@@ -130,12 +130,12 @@ export default {
         .catch((error) => {
           const message = error?.response?.data?.message;
           if (message) {
-            this.startLoginFtailPerocess();
+            this.startLoginFailPerocess();
             this.$error(message).finally(() => this.endLoginFailProcess());
           }
         });
     },
-    startLoginFtailPerocess() {
+    startLoginFailPerocess() {
       this.$store.commit(mutationType.START_LOGIN_FAIL_PROCESS);
     },
     endLoginFailProcess() {

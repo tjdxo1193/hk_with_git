@@ -61,7 +61,7 @@ public class NonconformityReportApprServiceImpl implements NonconformityReportAp
                 .ansNo(param.getAnsNo())
                 .lotNo(param.getLotNo())
                 .nonCfmReason(param.getNonCfmRea())
-                .emId(jwtResolver.getUserId(jwt))
+                .emId(jwtResolver.getEmId(jwt))
                 .phsOrderNo(param.getPhsOrderNo())
                 .pdtOrderNo(param.getPdtOrderNo())
                 .orderItm(param.getPhsOrderItm())

@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 import spring.audit.type.CommandType;
 
+import java.util.List;
+
 @Getter
 @Setter
 public class AuditTrailSearchVO {
@@ -22,6 +24,9 @@ public class AuditTrailSearchVO {
     private String chgBef;
     private String chgAft;
     private String eleSgntYn;
+
+    private String ip;
+    private List<String> searchRange;
 
     private String selectClauseWithMasters;
 

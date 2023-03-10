@@ -81,7 +81,9 @@
             B.STD_RMTR_MAK_NO,
             B.STD_RMTR_ANS_NO,
             C.APR_YN,
-            A.FILE_IDX
+            A.FILE_IDX,
+            A.ETR_QTY_UNIT_CD,
+            (SELECT DTL_NM FROM SY_CD_DTL WHERE PLNT_CD = B.PLNT_CD AND DTL_CD = A.ETR_QTY_UNIT_CD) AS ETR_QTY_UNIT_NM
         FROM RT_RITM_ETR A
         JOIN RT_RITM_ETR_INFO_STD B ON A.RITM_ETR_IDX = B.RITM_ETR_IDX
         JOIN SY_CD_TREE E ON A.RITM_ROOT_CD = E.TREE_CD AND A.PLNT_CD = E.PLNT_CD
@@ -161,7 +163,8 @@
             CAS_NO,
             FOMU,
             SHADE_YN,
-            MTR_DEDUT_YN
+            MTR_DEDUT_YN,
+            ETR_QTY_UNIT_CD
         ) VALUES (
              #{plntCd},
              #{ritmEtrIdx},
@@ -197,7 +200,8 @@
              #{casNo},
              #{fomu},
              #{shadeYn},
-             #{mtrDedutYn}
+             #{mtrDedutYn},
+            #{etrQtyUnitCd}
          )
     </insert>
 

@@ -124,7 +124,8 @@ export default {
         '안정성검체량: ' +
         (item?.sbtSmpVol ? item.sbtSmpVol : '') +
         ' ' +
-        (item?.smpVolUnitNm ? item.smpVolUnitNm : '');
+        // (item?.smpVolUnitNm ? item.smpVolUnitNm : '');
+        (item?.inpUnit ? item.inpUnit : '');
 
       const txtinfo3 =
         '제조번호: ' +

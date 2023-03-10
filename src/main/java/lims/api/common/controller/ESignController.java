@@ -3,7 +3,6 @@ package lims.api.common.controller;
 import lims.api.auth.annotation.AuthToken;
 import lims.api.auth.domain.Token;
 import lims.api.auth.service.impl.JwtResolver;
-import lims.api.common.message.MessageUtil;
 import lims.api.common.model.CommonResponse;
 import lims.api.common.model.ESignAccountRequest;
 import lims.api.config.AuthenticationConfig;

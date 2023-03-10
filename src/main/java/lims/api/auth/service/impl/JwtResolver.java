@@ -40,6 +40,10 @@ public class JwtResolver {
         return getCustomClaim(jwt, TokenClaims.CLAIM_NAME_LOGIN_ID);
     }
 
+    public String getEmId(String jwt) {
+        return getCustomClaim(jwt, TokenClaims.CLAIM_NAME_EM_ID);
+    }
+
     public String getDptCd(String jwt) {
         return getCustomClaim(jwt, TokenClaims.CLAIM_NAME_DPT_CODE);
     }

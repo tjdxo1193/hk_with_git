@@ -72,6 +72,7 @@ const list = {
       .col('stdAsisCtetVal', '함량(As is)')
       .col('ritmUnitNm', '함량(As is) 단위')
       .col('etrQty', '용기수')
+      .col('etrQtyUnitNm', '용기수단위')
       .col('etrEachQty', '용량')
       .col('ritmUnitNm', '용량단위')
       .col('etrTotQty', '총수량')

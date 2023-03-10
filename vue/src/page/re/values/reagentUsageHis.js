@@ -128,7 +128,7 @@ const detail = {
       .Input('leftOverStok', '재고량', { readonly: true })
       .required()
       .Hidden('compareUseQty')
-      .Input('useQty', '사용량', { maxLength: 6 })
+      .InputNumber('useQty', '사용량', { maxLength: 5 })
       .validator((value) => value > 0 || value === '')
       .required()
       .Hidden('ritmUnitCd')

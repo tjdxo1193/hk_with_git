@@ -65,8 +65,8 @@ export default {
       this.close();
     },
     close() {
-      this.$store.commit(mutationType.HIDE_E_SIGN);
       this.init();
+      this.$store.commit(mutationType.HIDE_E_SIGN);
     },
     onOk() {
       if (this.isReasonStep) {

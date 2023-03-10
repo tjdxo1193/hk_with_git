@@ -185,7 +185,8 @@ const registerForm = {
           .spanCol(2)
           .build(),
       )
-      .Hidden('anlkl', '자산클래스')
+      .Hidden('sapAnlkl', '자산클래스')
+      .readonly()
       .Input('sapAstNm', 'SAP자산명', { readonly: true })
       .Input('sapCrtDt', 'SAP생성일자', { readonly: true })
       .Input('sapChgDt', 'SAP변경일자', { readonly: true })

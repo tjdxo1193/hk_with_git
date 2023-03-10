@@ -124,7 +124,7 @@ const detail = {
       .required()
       .Hidden('ritmUnitCd')
       .Hidden('compareUseQty')
-      .Input('useQty', '사용량', { maxLength: 6 })
+      .InputNumber('useQty', '사용량', { maxLength: 5 })
       .validator((value) => value > 0 || value === '')
       .required()
       .Input('ritmUnitNm', '단위', { disabled: true })

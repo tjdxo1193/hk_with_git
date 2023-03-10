@@ -123,7 +123,7 @@ const detail = {
         'safetyStock',
         '안전재고량',
         FormBuilder.builder()
-          .Input('sfyStok', { maxLength: 5 })
+          .InputNumber('sfyStok', { maxLength: 5 })
           .validator((value) => Number.isInteger(Number(value)))
           .Select('ritmUnitCd', {
             async: () => api.combo.userCommon.getUnitCombo(),
@@ -141,7 +141,7 @@ const detail = {
         'enterQuantity',
         '입고수량',
         FormBuilder.builder()
-          .Input('etrQty', { maxLength: 5 })
+          .InputNumber('etrQty', { maxLength: 5 })
           .validator((value) => Number.isInteger(Number(value)))
           .required()
           .Select('ritmUnitCd', {
@@ -166,7 +166,7 @@ const detail = {
         'enterEachQuantity',
         '개별 수량',
         FormBuilder.builder()
-          .Input('etrEachQty', { maxLength: 3 })
+          .InputNumber('etrEachQty', { maxLength: 5 })
           .validator((value) => Number.isInteger(Number(value)))
           .required()
           .Select('ritmUnitCd', {
@@ -195,7 +195,7 @@ const detail = {
         'glsVolMulti',
         '용량',
         FormBuilder.builder()
-          .Input('glsVol', { maxLength: 5 })
+          .InputNumber('glsVol', { maxLength: 5 })
           .validator((value) => value === '' || value > 0)
           .Select('glsVolUnitCd', {
             async: () => api.combo.userCommon.getUnitCombo(),

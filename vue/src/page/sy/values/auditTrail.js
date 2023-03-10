@@ -1,11 +1,17 @@
+import dayjs from 'dayjs';
+
 import api from '@/api';
 import { ColumnBuilder, FormBuilder } from '@/util';
+
+const today = dayjs();
+
+const format = (date) => date.format('YYYY-MM-DD');
 
 const audit = {
   static: {
     title: 'inquireData',
     countPerRow: 4,
-    buttons: [{ name: 'search', label: 'inquireData' }],
+    buttons: [{ name: 'search', label: '조회' }],
     $grid: null,
     props: {
       editable: false,
@@ -14,21 +20,18 @@ const audit = {
   },
   forms: () =>
     FormBuilder.builder()
-      .Select(1, 'auditDiv', {
+      .Select('menuCode', '메뉴', {
         defaultOption: {
-          label: 'select',
+          label: '전체',
         },
-        async: api.combo.getUpperMenus,
+        async: api.audit.getLeafMenusComboForAudit,
+      })
+      .Input('ip', 'ip')
+      .DatepickerTwin('searchRange', '저장일자', {
+        value: [format(today.subtract(7, 'day')), format(today)],
       })
       .required()
-      .Select(3, 'auditDetailDiv', {
-        defaultOption: {
-          label: 'select',
-        },
-      })
-      .required()
-      .Input(4, 'auditTargetIP')
-      .DatepickerTwinWithSwitch(2, 'auditTargetDate')
+      .spanCol(2)
       .build(),
   columns: () => ColumnBuilder.builder().build(),
 };

@@ -58,7 +58,7 @@ public class ReportDesignerHelper {
         String temporaryDirPath = getTemporaryDirPath();
         createDirectory(temporaryDirPath);
 
-        String targetFilePath = FileUtil.concat(temporaryDirPath, targetFileName + "-" + StringUtil.generateUUID(10));
+        String targetFilePath = FileUtil.concat(temporaryDirPath, targetFileName);
 
         ReportingServerInvoker invoker = new ReportingServerInvoker(getReportingServerUrl());
         invoker.setCharacterEncoding("utf-8");

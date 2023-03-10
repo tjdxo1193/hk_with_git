@@ -26,19 +26,23 @@
   />
   <SearchSapAssetsInfoModal
     :show="searchSapAssetsInfoModal.show"
-    @close="hideSearchSapAssetsInfoModal()"
-    @select="putAssetsInfo()"
+    @close="hideSearchSapAssetsInfoModal"
+    @select="putAssetsInfo"
   />
   <SearchSapDepreciationInfoModal
     :show="searchSapDepreciationInfoModal.show"
-    @close="hideSearchSapDepreciationInfoModal()"
-    @select="putDepreciationInfo()"
+    @close="hideSearchSapDepreciationInfoModal"
+    @select="putDepreciationInfo"
+    :anlkl="currentAnlkl"
   />
-  
 </template>
 
 <script>
-import { FileAttacherModal, SearchSapAssetsInfoModal, SearchSapDepreciationInfoModal } from '@/page/modal';
+import {
+  FileAttacherModal,
+  SearchSapAssetsInfoModal,
+  SearchSapDepreciationInfoModal,
+} from '@/page/modal';
 import { FormUtil } from '@/util';
 
 import values from './values/instManage.js';
@@ -86,7 +90,7 @@ export default {
       },
       searchSapDepreciationInfoModal: {
         show: false,
-      }
+      },
     };
   },
   methods: {
@@ -232,11 +236,11 @@ export default {
         return (this.fileAttacherModal.show = false);
       }
     },
-    
+
     showSearchSapAssetsInfoModal() {
       this.$setState('searchSapAssetsInfoModal', { show: true });
     },
-    
+
     hideSearchSapAssetsInfoModal() {
       this.$setState('searchSapAssetsInfoModal', { show: false });
     },
@@ -244,7 +248,7 @@ export default {
     showSearchSapDepreciationInfoModal() {
       this.$setState('searchSapDepreciationInfoModal', { show: true });
     },
-    
+
     hideSearchSapDepreciationInfoModal() {
       this.$setState('searchSapDepreciationInfoModal', { show: false });
     },
@@ -263,17 +267,13 @@ export default {
       if (name === 'save') {
         this.registerForm.forms
           .validate()
-          .then(() => {
-            this.createInstrument();
-          })
+          .then(() => this.createInstrument())
           .catch(() => {});
       }
       if (name === 'update') {
         this.registerForm.forms
           .validate()
-          .then(() => {
-            this.updateInstrument();
-          })
+          .then(() => this.updateInstrument())
           .catch(() => {});
       }
       if (name === 'delete') {
@@ -284,16 +284,19 @@ export default {
       }
     },
     onClickButtonsInRegisterForm({ originEvent }) {
-      if (originEvent === 'searchSapAssets'){
+      if (originEvent === 'searchSapAssets') {
         this.showSearchSapAssetsInfoModal();
       }
-      if (originEvent === 'searchSapDepreciation'){
-        const {forms} = this.registerForm;
-        if(!forms.anlkl || !forms.anln1){
-          return this.$warn(this.$message.warn.noAssetsInfo);
+      if (originEvent === 'searchSapDepreciation') {
+        if (!this.existsAssetsInfo()) {
+          this.$warn(this.$message.warn.noAssetsInfo);
+          return;
         }
         this.showSearchSapDepreciationInfoModal();
       }
+    },
+    existsAssetsInfo() {
+      return FormUtil.existsValue(this.registerForm.forms, 'sapAnlkl');
     },
     onClickAccessoryGridButtons({ name }) {
       if (name === 'addRow') {
@@ -303,33 +306,34 @@ export default {
         this.accessoryGridDeleteRow();
       }
     },
-    putAssetsInfo(item){
+    putAssetsInfo(item) {
       const mappingParam = {
-        sapAstNo : item.anln1,
-        sapAstNoDtl : item.anln2,
-        anlkl : item.anlkl,
-        sapAstNm : item.txt50,
-        sapCrtDt : item.erdat,
-        sapChgDt : item.aedat,
-        sapAcqDt : item.zugdt,
-        sapAccd : item.kumafa,
-        sapSaleDpsDt : item.deakt, // 비활성화일? SAP매각/폐기일자,
-        sapAddDesc : item.txa50,
-        sapCrgNmEmid : item.zzpic,
-        sapCosc : item.kostl,
-        sapOrco : item.kansw,
-      }
-      
-      FormUtil.setData(this.registerForm.forms, mappingParam)
+        sapAnlkl: item.anlkl,
+        sapAstNo: item.anln1,
+        sapAstNm: item.txt50,
+        sapCrtDt: item.erdat,
+        sapChgDt: item.aedat,
+        sapAcqDt: item.zugdt,
+        sapAccd: item.kumafa,
+        sapSaleDpsDt: item.deakt,
+        sapAddDesc: item.txa50,
+        sapCrgNmEmid: item.zzpic,
+        sapCosc: item.kostl,
+      };
+
+      FormUtil.setData(this.registerForm.forms, mappingParam);
     },
-    putDepreciationInfo(item){
+    putDepreciationInfo(item) {
       const mappingParam = {
-        sapAccd : item.kumafa,
-        sapOrco : item.kansw,
-        //'bukrs','회사코드'
-        //'bzdat','자산기준일'
-      }
-      FormUtil.setData(this.registerForm.forms, mappingParam)
+        sapAccd: item.kumafa,
+        sapOrco: item.kansw,
+      };
+      FormUtil.setData(this.registerForm.forms, mappingParam);
+    },
+  },
+  computed: {
+    currentAnlkl() {
+      return FormUtil.getValue(this.registerForm.forms, 'sapAnlkl');
     },
   },
 };

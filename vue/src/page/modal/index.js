@@ -31,6 +31,8 @@ import ResultHistoryModal from './ResultHistoryModal';
 import SampleItemSearchModal from './SampleItemSearchModal';
 import SampleSearchModal from './SampleSearchModal';
 import SapPrdhaSearchModal from './SapPrdhaSearchModal.vue';
+import SearchSapAssetsInfoModal from './SearchSapAssetsInfoModal';
+import SearchSapDepreciationInfoModal from './SearchSapDepreciationInfoModal';
 import SpecChangeReasonRegModal from './SpecChangeReasonRegModal';
 import SrmReportModal from './SrmReportModal';
 import StabDetailPlanRegModal from './StabDetailPlanRegModal';
@@ -44,8 +46,6 @@ import TestModal from './TestModal';
 import TestSearchModal from './TestSearchModal.vue';
 import ToDoListModal from './ToDoListModal';
 import TreeCommonCodeModal from './TreeCommonCodeModal';
-import SearchSapAssetsInfoModal from './SearchSapAssetsInfoModal';
-import SearchSapDepreciationInfoModal from './SearchSapDepreciationInfoModal';
 
 export {
   ItemModal,

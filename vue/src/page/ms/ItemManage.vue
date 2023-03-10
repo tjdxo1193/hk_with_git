@@ -49,7 +49,7 @@ import { FormUtil, TokenUtil } from '@/util';
 
 import values from './values/itemManage';
 
-const { pitemType, processCode } = values;
+const { processCode } = values;
 
 export default {
   name: 'itemManage',

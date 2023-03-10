@@ -45,7 +45,7 @@ export default {
         forms: searchGridWithForm.forms(),
         columns: searchGridWithForm.columns(),
         event: {
-          cellClick: (event) => {
+          cellDoubleClick: (event) => {
             this.clearReviewInfoForm();
             this.setDetailForm(event);
           },

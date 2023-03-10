@@ -6,6 +6,7 @@ import lims.api.auth.domain.Token;
 import lims.api.auth.service.impl.JwtResolver;
 import lims.api.sy.model.AuditTrailSearchResponse;
 import lims.api.sy.service.AuditTrailSearchService;
+import lims.api.sy.vo.AuditTrailSearchConditionVO;
 import lims.api.sy.vo.AuditTrailSearchVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,13 +22,15 @@ public class AuditTrailSearchController {
     private final AuditTrailSearchService searchService;
     private final JwtResolver jwtResolver;
 
-    // TODO 검색 조건 추가
     @Permit
     @GetMapping
-    public ResponseEntity<AuditTrailSearchResponse> auditList(@AuthToken Token token) {
-        AuditTrailSearchVO request = new AuditTrailSearchVO();
-        request.setPlntCd(jwtResolver.getPlantCode(token.getJwt()));
-        return ResponseEntity.ok(searchService.getAudits(request));
+    public ResponseEntity<AuditTrailSearchResponse> auditList(@AuthToken Token token, AuditTrailSearchConditionVO request) {
+        AuditTrailSearchVO param = new AuditTrailSearchVO();
+        param.setPlntCd(jwtResolver.getPlantCode(token.getJwt()));
+        param.setIp(request.getIp());
+        param.setMenuCd(request.getMenuCode());
+        param.setSearchRange(request.getSearchRange());
+        return ResponseEntity.ok(searchService.getAudits(param));
     }
 
 }

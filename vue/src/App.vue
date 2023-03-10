@@ -23,14 +23,21 @@ export default {
     Progress,
   },
   mounted() {
-    document.addEventListener('keydown', this.checkAuthExpire);
-    document.addEventListener('mousedown', this.checkAuthExpire);
+    this.releaseGlobalListener();
+    this.registerGlobalListener();
   },
   beforeUnmount() {
-    document.removeEventListener('keydown', this.checkAuthExpire);
-    document.removeEventListener('mousedown', this.checkAuthExpire);
+    this.releaseGlobalListener();
   },
   methods: {
+    registerGlobalListener() {
+      document.addEventListener('keydown', this.checkAuthExpire);
+      document.addEventListener('mousedown', this.checkAuthExpire);
+    },
+    releaseGlobalListener() {
+      document.removeEventListener('keydown', this.checkAuthExpire);
+      document.removeEventListener('mousedown', this.checkAuthExpire);
+    },
     checkAuthExpire() {
       if (this.isLoggedIn && TokenUtil.isExpiredAuth()) {
         this.$warn(message.warn.expireAuthentication).then(() => {
